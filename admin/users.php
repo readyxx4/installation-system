@@ -35,13 +35,6 @@ function column_exists(mysqli $conn, string $table, string $column): bool
     return $stmt->get_result()->num_rows > 0;
 }
 
-function prepare_user_fullname_column(mysqli $conn): void
-{
-    if (table_exists($conn, 'user') && !column_exists($conn, 'user', 'user_fullname')) {
-        $conn->query("ALTER TABLE `user` ADD COLUMN user_fullname VARCHAR(100) NOT NULL DEFAULT '' AFTER user_name");
-    }
-}
-
 function prepare_assignment_assign_by_column(mysqli $conn): void
 {
     if (table_exists($conn, 'assignment') && !column_exists($conn, 'assignment', 'assign_by')) {
@@ -49,7 +42,6 @@ function prepare_assignment_assign_by_column(mysqli $conn): void
     }
 }
 
-prepare_user_fullname_column($conn);
 prepare_assignment_assign_by_column($conn);
 
 function user_role_name($role): string
@@ -102,9 +94,6 @@ if ($action === 'delete') {
     }
 
     try {
-        /*
-          ตรวจสอบก่อนว่าผู้ใช้นี้มีอยู่จริงหรือไม่
-        */
         $check_user = $conn->prepare("
             SELECT user_id, user_role
             FROM `user`
@@ -121,10 +110,6 @@ if ($action === 'delete') {
 
         $delete_user = $user_result->fetch_assoc();
 
-        /*
-          กรณีเป็นหัวหน้าช่าง:
-          ถ้าเคยเป็นผู้มอบหมายงานใน assignment.assign_by จะไม่ให้ลบ
-        */
         if ((int) $delete_user['user_role'] === 1 && table_exists($conn, 'assignment') && column_exists($conn, 'assignment', 'assign_by')) {
             $check_assignment_by = $conn->prepare("
                 SELECT assign_id
@@ -140,10 +125,6 @@ if ($action === 'delete') {
             }
         }
 
-        /*
-          ตรวจสอบข้อมูลเชื่อมโยงอื่น ๆ ก่อนลบ
-          ถ้าผู้ใช้นี้ถูกอ้างอิงในงานติดตั้ง/การมอบหมาย/การจ่ายสินค้า จะไม่ให้ลบ
-        */
         if (table_exists($conn, 'setup')) {
             $check_setup = $conn->prepare("
                 SELECT setup_id
@@ -206,13 +187,12 @@ if ($search !== '') {
     $like = '%' . $search . '%';
 
     $stmt = $conn->prepare("
-        SELECT user_id, user_name, user_fullname, user_phone, user_email, user_role, user_address
+        SELECT user_id, user_name, user_phone, user_email, user_role, user_address
         FROM `user`
         WHERE user_role IN (1, 2, 3)
           AND (
               user_id LIKE ?
            OR user_name LIKE ?
-           OR user_fullname LIKE ?
            OR user_phone LIKE ?
            OR user_email LIKE ?
            OR user_address LIKE ?
@@ -220,12 +200,12 @@ if ($search !== '') {
         ORDER BY user_role ASC, user_id ASC
     ");
 
-    $stmt->bind_param('ssssss', $like, $like, $like, $like, $like, $like);
+    $stmt->bind_param('sssss', $like, $like, $like, $like, $like);
     $stmt->execute();
     $users = $stmt->get_result();
 } else {
     $users = $conn->query("
-        SELECT user_id, user_name, user_fullname, user_phone, user_email, user_role, user_address
+        SELECT user_id, user_name, user_phone, user_email, user_role, user_address
         FROM `user`
         WHERE user_role IN (1, 2, 3)
         ORDER BY user_role ASC, user_id ASC
@@ -233,7 +213,6 @@ if ($search !== '') {
 }
 
 layout_header('จัดการข้อมูลพนักงาน', 'users');
-// page_head('จัดการข้อมูลพนักงาน');
 ?>
 
 <?= flash_message() ?>
@@ -242,16 +221,30 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
     <div class="panel-title">รายการข้อมูลผู้ใช้ทั้งหมด</div>
 
     <form class="toolbar user-toolbar" method="GET" action="<?= h(app_system_url('admin/users.php')) ?>">
-        <input type="text" name="q" placeholder="ค้นหารหัส ชื่อผู้ใช้ ชื่อจริง เบอร์โทร อีเมล หรือที่อยู่" value="<?= h($search) ?>">
+        <input type="text" name="q" placeholder="ค้นหารหัส ชื่อ-นามสกุล เบอร์โทร อีเมล หรือที่อยู่" value="<?= h($search) ?>">
 
-        <button class="btn btn-search" type="submit"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><span>ค้นหา</span></button>
+        <button class="btn btn-search" type="submit">
+            <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <path d="M20 20l-3.5-3.5"></path>
+            </svg>
+            <span>ค้นหา</span>
+        </button>
 
         <a class="btn btn-reset" href="<?= h(app_system_url('admin/users.php')) ?>">
-            <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v6h6"></path></svg><span>ล้างค้นหา</span>
+            <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+                <path d="M3 4v6h6"></path>
+            </svg>
+            <span>ล้างค้นหา</span>
         </a>
 
         <a class="btn btn-add user-add-in-toolbar" href="<?= h(app_system_url('admin/user_add.php')) ?>">
-            <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg><span>เพิ่มผู้ใช้ใหม่</span>
+            <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14"></path>
+                <path d="M5 12h14"></path>
+            </svg>
+            <span>เพิ่มผู้ใช้ใหม่</span>
         </a>
     </form>
 
@@ -260,8 +253,7 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
             <thead>
                 <tr>
                     <th>รหัสผู้ใช้</th>
-                    <th>ชื่อผู้ใช้</th>
-                    <th>ชื่อ-นามสกุลจริง</th>
+                    <th>ชื่อ-นามสกุล</th>
                     <th>เบอร์โทร</th>
                     <th>อีเมล</th>
                     <th>สิทธิ์</th>
@@ -273,15 +265,14 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
             <tbody>
                 <?php if ($users->num_rows === 0): ?>
                     <tr>
-                        <td colspan="8" class="empty-state">ไม่พบข้อมูลผู้ใช้</td>
+                        <td colspan="7" class="empty-state">ไม่พบข้อมูลผู้ใช้</td>
                     </tr>
                 <?php endif; ?>
 
                 <?php while ($row = $users->fetch_assoc()): ?>
                     <tr>
                         <td><?= h($row['user_id']) ?></td>
-                        <td><?= h($row['user_name']) ?></td>
-                        <td><?= h($row['user_fullname'] ?: '-') ?></td>
+                        <td><?= h($row['user_name'] ?: '-') ?></td>
                         <td><?= h($row['user_phone']) ?></td>
                         <td><?= h($row['user_email']) ?></td>
                         <td>
@@ -302,32 +293,35 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                             ?>
 
                             <?php if ($is_long): ?>
-                                <span class="address-short">
-                                    <?= h($short_address) ?>
-                                </span>
-
-                                <span class="address-full" style="display:none;">
-                                    <?= nl2br(h($wrapped_address)) ?>
-                                </span>
-
-                                <button type="button" class="text-more-btn" onclick="toggleAddress(this)">
-                                    ดูเพิ่มเติม
-                                </button>
+                                <span class="address-short"><?= h($short_address) ?></span>
+                                <span class="address-full" style="display:none;"><?= nl2br(h($wrapped_address)) ?></span>
+                                <button type="button" class="text-more-btn" onclick="toggleAddress(this)">ดูเพิ่มเติม</button>
                             <?php else: ?>
                                 <?= h($address) ?>
                             <?php endif; ?>
                         </td>
                         <td>
                             <a class="btn btn-edit"
-                                href="<?= h(app_system_url('admin/user_edit.php?id=' . urlencode($row['user_id']))) ?>">
-                                <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg><span>แก้ไข</span>
+                               href="<?= h(app_system_url('admin/user_edit.php?id=' . urlencode($row['user_id']))) ?>">
+                                <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 20h9"></path>
+                                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                                </svg>
+                                <span>แก้ไข</span>
                             </a>
 
                             <?php if ($row['user_id'] !== ($_SESSION['user_id'] ?? '')): ?>
                                 <a class="btn btn-delete"
-                                    href="<?= h(app_system_url('admin/users.php?action=delete&id=' . urlencode($row['user_id']))) ?>"
-                                    onclick="return confirm('ยืนยันการลบข้อมูลผู้ใช้นี้หรือไม่?')">
-                                    <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg><span>ลบ</span>
+                                   href="<?= h(app_system_url('admin/users.php?action=delete&id=' . urlencode($row['user_id']))) ?>"
+                                   onclick="return confirm('ยืนยันการลบข้อมูลผู้ใช้นี้หรือไม่?')">
+                                    <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M8 6V4h8v2"></path>
+                                        <path d="M19 6l-1 14H6L5 6"></path>
+                                        <path d="M10 11v6"></path>
+                                        <path d="M14 11v6"></path>
+                                    </svg>
+                                    <span>ลบ</span>
                                 </a>
                             <?php endif; ?>
                         </td>
@@ -337,22 +331,23 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
         </table>
     </div>
 </div>
-<script>
-    function toggleAddress(button) {
-        const cell = button.closest('.address-cell');
-        const shortText = cell.querySelector('.address-short');
-        const fullText = cell.querySelector('.address-full');
 
-        if (fullText.style.display === 'none' || fullText.style.display === '') {
-            shortText.style.display = 'none';
-            fullText.style.display = 'block';
-            button.textContent = 'ย่อข้อความ';
-        } else {
-            shortText.style.display = 'inline';
-            fullText.style.display = 'none';
-            button.textContent = 'ดูเพิ่มเติม';
-        }
+<script>
+function toggleAddress(button) {
+    const cell = button.closest('.address-cell');
+    const shortText = cell.querySelector('.address-short');
+    const fullText = cell.querySelector('.address-full');
+
+    if (fullText.style.display === 'none' || fullText.style.display === '') {
+        shortText.style.display = 'none';
+        fullText.style.display = 'block';
+        button.textContent = 'ย่อข้อความ';
+    } else {
+        shortText.style.display = 'inline';
+        fullText.style.display = 'none';
+        button.textContent = 'ดูเพิ่มเติม';
     }
+}
 </script>
-<?php
-layout_footer();
+
+<?php layout_footer(); ?>

@@ -6,7 +6,13 @@ require_login('2');
 
 function table_exists(mysqli $conn, string $table): bool
 {
-    $stmt = $conn->prepare("\n        SELECT TABLE_NAME\n        FROM INFORMATION_SCHEMA.TABLES\n        WHERE TABLE_SCHEMA = DATABASE()\n          AND TABLE_NAME = ?\n        LIMIT 1\n    ");
+    $stmt = $conn->prepare("
+        SELECT TABLE_NAME
+        FROM INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = ?
+        LIMIT 1
+    ");
     $stmt->bind_param('s', $table);
     $stmt->execute();
 
@@ -15,7 +21,14 @@ function table_exists(mysqli $conn, string $table): bool
 
 function column_exists(mysqli $conn, string $table, string $column): bool
 {
-    $stmt = $conn->prepare("\n        SELECT COLUMN_NAME\n        FROM INFORMATION_SCHEMA.COLUMNS\n        WHERE TABLE_SCHEMA = DATABASE()\n          AND TABLE_NAME = ?\n          AND COLUMN_NAME = ?\n        LIMIT 1\n    ");
+    $stmt = $conn->prepare("
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = ?
+          AND COLUMN_NAME = ?
+        LIMIT 1
+    ");
     $stmt->bind_param('ss', $table, $column);
     $stmt->execute();
 
@@ -25,7 +38,16 @@ function column_exists(mysqli $conn, string $table, string $column): bool
 function prepare_setup_tables(mysqli $conn): void
 {
     if (!table_exists($conn, 'install_detail')) {
-        $conn->query("\n            CREATE TABLE install_detail (\n                detail_id INT AUTO_INCREMENT PRIMARY KEY,\n                setup_id CHAR(11) NOT NULL,\n                pro_id CHAR(10) NOT NULL,\n                install_qty INT NOT NULL DEFAULT 1,\n                install_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,\n                install_total DECIMAL(10,2) NOT NULL DEFAULT 0.00\n            )\n        ");
+        $conn->query("
+            CREATE TABLE install_detail (
+                detail_id INT AUTO_INCREMENT PRIMARY KEY,
+                setup_id CHAR(11) NOT NULL,
+                pro_id CHAR(10) NOT NULL,
+                install_qty INT NOT NULL DEFAULT 1,
+                install_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+                install_total DECIMAL(10,2) NOT NULL DEFAULT 0.00
+            )
+        ");
     }
 
     if (!column_exists($conn, 'install_detail', 'install_qty')) {
@@ -60,7 +82,6 @@ function icon_svg(string $name): string
     $icons = [
         'file' => '<svg class="cs-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg>',
         'plus' => '<svg class="cs-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>',
-        'user' => '<svg class="cs-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>',
     ];
 
     return $icons[$name] ?? '';
@@ -70,23 +91,23 @@ function setup_status_name($status): string
 {
     return match ((string) $status) {
         '0' => 'สร้างใบงานแล้ว',
-        '1' => 'มอบหมายงานแล้ว',
-        '2' => 'ช่างรับงานแล้ว',
+        '1' => 'มอบหมายแล้ว',
+        '2' => 'ช่างรับงาน',
         '3' => 'กำลังติดตั้ง',
-        '4' => 'ติดตั้งเสร็จสิ้น',
+        '4' => 'เสร็จสิ้น',
         default => 'ไม่ทราบสถานะ',
     };
 }
 
-function setup_status_badge($status): string
+function setup_status_class($status): string
 {
     return match ((string) $status) {
-        '0' => 'orange',
-        '1' => 'blue',
-        '2' => 'green',
-        '3' => 'purple',
-        '4' => 'green',
-        default => 'orange',
+        '0' => 'status-created',
+        '1' => 'status-assigned',
+        '2' => 'status-accepted',
+        '3' => 'status-installing',
+        '4' => 'status-done',
+        default => 'status-created',
     };
 }
 
@@ -99,15 +120,6 @@ function setup_status_group($status): string
         '3' => 'installing',
         '4' => 'done',
         default => 'created',
-    };
-}
-
-function technician_status_name($status): string
-{
-    return match ((string) $status) {
-        '0' => 'พร้อมรับงาน',
-        '1' => 'ไม่พร้อมรับงาน',
-        default => 'ไม่ทราบสถานะ',
     };
 }
 
@@ -124,13 +136,65 @@ $status_counts = [
 ];
 
 try {
-    $setup_result = $conn->query("\n        SELECT\n            s.setup_id,\n            s.user_id,\n            s.pro_id,\n            s.setup_status,\n            s.created_at,\n\n            u.user_name,\n            u.user_fullname,\n\n            p.pro_name,\n\n            COALESCE(detail_summary.item_count, 0) AS item_count,\n            COALESCE(detail_summary.setup_total, 0) AS setup_total,\n\n            a.assign_id,\n            a.assign_status,\n            a.tech_id,\n\n            t.tech_name,\n            t.tech_fullname,\n            t.tech_phone,\n            t.tech_email,\n            t.tech_status\n        FROM setup s\n        LEFT JOIN `user` u\n            ON s.user_id = u.user_id\n        LEFT JOIN product p\n            ON s.pro_id = p.pro_id\n        LEFT JOIN (\n            SELECT\n                setup_id,\n                COUNT(detail_id) AS item_count,\n                SUM(install_total) AS setup_total\n            FROM install_detail\n            GROUP BY setup_id\n        ) detail_summary\n            ON s.setup_id = detail_summary.setup_id\n        LEFT JOIN assignment a\n            ON a.setup_id = s.setup_id\n           AND a.assign_id = (\n                SELECT aa.assign_id\n                FROM assignment aa\n                WHERE aa.setup_id = s.setup_id\n                  AND aa.assign_status IN (1, 2, 5)\n                ORDER BY aa.assign_date DESC, aa.assign_id DESC\n                LIMIT 1\n           )\n        LEFT JOIN technicians t\n            ON TRIM(a.tech_id) = TRIM(t.tech_id)\n        ORDER BY s.created_at DESC, s.setup_id DESC\n        LIMIT 300\n    ");
+    $setup_result = $conn->query("
+        SELECT
+            s.setup_id,
+            s.user_id,
+            s.pro_id,
+            s.setup_status,
+            s.created_at,
+
+            u.user_name,
+
+            p.pro_name,
+
+            COALESCE(detail_summary.item_count, 0) AS item_count,
+            COALESCE(detail_summary.setup_total, 0) AS setup_total,
+
+            a.assign_id,
+            a.assign_status,
+            a.tech_id,
+
+            t.tech_name,
+            t.tech_phone,
+            t.tech_email,
+            t.tech_status
+        FROM setup s
+        LEFT JOIN `user` u
+            ON s.user_id = u.user_id
+        LEFT JOIN product p
+            ON s.pro_id = p.pro_id
+        LEFT JOIN (
+            SELECT
+                setup_id,
+                COUNT(detail_id) AS item_count,
+                SUM(install_total) AS setup_total
+            FROM install_detail
+            GROUP BY setup_id
+        ) detail_summary
+            ON s.setup_id = detail_summary.setup_id
+        LEFT JOIN assignment a
+            ON a.setup_id = s.setup_id
+           AND a.assign_id = (
+                SELECT aa.assign_id
+                FROM assignment aa
+                WHERE aa.setup_id = s.setup_id
+                  AND aa.assign_status IN (1, 2, 5)
+                ORDER BY aa.assign_date DESC, aa.assign_id DESC
+                LIMIT 1
+           )
+        LEFT JOIN technicians t
+            ON TRIM(a.tech_id) = TRIM(t.tech_id)
+        ORDER BY s.created_at DESC, s.setup_id DESC
+        LIMIT 300
+    ");
 
     while ($row = $setup_result->fetch_assoc()) {
         $setup_rows[] = $row;
         $status_counts['all']++;
 
         $group = setup_status_group($row['setup_status'] ?? '0');
+
         if (isset($status_counts[$group])) {
             $status_counts[$group]++;
         }
@@ -148,7 +212,6 @@ layout_header('รายการงานติดตั้ง', 'setups');
     <div class="cs-job-status-head">
         <div>
             <h2>รายการใบงานติดตั้ง</h2>
-            <!-- <p>แยกใบงานที่สร้างไว้แล้ว ใบงานที่มอบหมาย และใบงานที่ช่างรับงานแล้ว</p> -->
         </div>
 
         <a class="cs-status-link" href="<?= h(app_system_url('finance/create_setup.php')) ?>">
@@ -158,22 +221,27 @@ layout_header('รายการงานติดตั้ง', 'setups');
     </div>
 
     <div class="cs-status-tabs" aria-label="เลือกสถานะใบงาน">
-        <button type="button" class="cs-status-tab active" data-filter="all">
+        <button type="button" class="cs-status-tab active status-all" data-filter="all">
             ทั้งหมด <b><?= h((string) $status_counts['all']) ?></b>
         </button>
-        <button type="button" class="cs-status-tab" data-filter="created">
+
+        <button type="button" class="cs-status-tab status-created" data-filter="created">
             สร้างใบงานแล้ว <b><?= h((string) $status_counts['created']) ?></b>
         </button>
-        <button type="button" class="cs-status-tab" data-filter="assigned">
+
+        <button type="button" class="cs-status-tab status-assigned" data-filter="assigned">
             มอบหมายแล้ว <b><?= h((string) $status_counts['assigned']) ?></b>
         </button>
-        <button type="button" class="cs-status-tab" data-filter="accepted">
+
+        <button type="button" class="cs-status-tab status-accepted" data-filter="accepted">
             ช่างรับงาน <b><?= h((string) $status_counts['accepted']) ?></b>
         </button>
-        <button type="button" class="cs-status-tab" data-filter="installing">
+
+        <button type="button" class="cs-status-tab status-installing" data-filter="installing">
             กำลังติดตั้ง <b><?= h((string) $status_counts['installing']) ?></b>
         </button>
-        <button type="button" class="cs-status-tab" data-filter="done">
+
+        <button type="button" class="cs-status-tab status-done" data-filter="done">
             เสร็จสิ้น <b><?= h((string) $status_counts['done']) ?></b>
         </button>
     </div>
@@ -204,21 +272,15 @@ layout_header('รายการงานติดตั้ง', 'setups');
                     <?php
                         $status_value = (string) ($row['setup_status'] ?? '0');
                         $filter_group = setup_status_group($status_value);
-
-                        $customer_name = trim((string) ($row['user_fullname'] ?? ''));
-                        if ($customer_name === '') {
-                            $customer_name = trim((string) ($row['user_name'] ?? ''));
-                        }
-
-                        $tech_name = trim((string) ($row['tech_fullname'] ?? ''));
-                        if ($tech_name === '') {
-                            $tech_name = trim((string) ($row['tech_name'] ?? ''));
-                        }
+                        $customer_name = trim((string) ($row['user_name'] ?? ''));
+                        $tech_name = trim((string) ($row['tech_name'] ?? ''));
                     ?>
-                    <tr data-status-group="<?= h($filter_group) ?>" data-status-value="<?= h($status_value) ?>">
-                        <td>
-                            <strong><?= h($row['setup_id']) ?></strong>
-                        </td>
+
+                    <tr
+                        data-status-group="<?= h($filter_group) ?>"
+                        data-status-value="<?= h($status_value) ?>"
+                    >
+                        <td><strong><?= h($row['setup_id']) ?></strong></td>
 
                         <td>
                             <strong><?= h($customer_name !== '' ? $customer_name : '-') ?></strong>
@@ -226,7 +288,9 @@ layout_header('รายการงานติดตั้ง', 'setups');
 
                         <td><?= h($row['pro_name'] ?? '-') ?></td>
 
-                        <td><?= h((string) (int) ($row['item_count'] ?? 0)) ?> รายการ</td>
+                        <td>
+                            <?= h((string) (int) ($row['item_count'] ?? 0)) ?> รายการ
+                        </td>
 
                         <td>
                             <b><?= h(number_format((float) ($row['setup_total'] ?? 0), 2)) ?> บาท</b>
@@ -241,15 +305,18 @@ layout_header('รายการงานติดตั้ง', 'setups');
                         </td>
 
                         <td>
-                            <span class="badge <?= h(setup_status_badge($status_value)) ?>">
+                            <span class="setup-status-badge <?= h(setup_status_class($status_value)) ?>">
                                 <?= h(setup_status_name($status_value)) ?>
                             </span>
                         </td>
 
                         <td>
-                            <a class="cs-table-action" href="<?= h(app_system_url('finance/setup_slip.php?id=' . urlencode($row['setup_id']))) ?>">
+                            <a
+                                class="cs-table-action"
+                                href="<?= h(app_system_url('finance/setup_slip.php?id=' . urlencode($row['setup_id']))) ?>"
+                            >
                                 <?= icon_svg('file') ?>
-                                เปิดใบ
+                                ใบติดตั้ง
                             </a>
                         </td>
                     </tr>
@@ -259,6 +326,7 @@ layout_header('รายการงานติดตั้ง', 'setups');
     </div>
 </section>
 
+
 <script>
 document.querySelectorAll('.cs-status-tab').forEach(function (button) {
     button.addEventListener('click', function () {
@@ -267,6 +335,7 @@ document.querySelectorAll('.cs-status-tab').forEach(function (button) {
         document.querySelectorAll('.cs-status-tab').forEach(function (tab) {
             tab.classList.remove('active');
         });
+
         this.classList.add('active');
 
         document.querySelectorAll('#setupStatusRows tr[data-status-group]').forEach(function (row) {

@@ -90,7 +90,6 @@ if ($search !== '') {
 }
 
 layout_header('จัดการสินค้า', 'products');
-// page_head('จัดการสินค้า');
 ?>
 
 <?= flash_message() ?>
@@ -106,14 +105,28 @@ layout_header('จัดการสินค้า', 'products');
       value="<?= h($search) ?>"
     >
 
-    <button class="btn btn-search" type="submit"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><span>ค้นหา</span></button>
+    <button class="btn btn-search" type="submit">
+      <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="M20 20l-3.5-3.5"></path>
+      </svg>
+      <span>ค้นหา</span>
+    </button>
 
     <a class="btn btn-reset" href="<?= h(app_system_url('admin/products.php')) ?>">
-      ล้างค้นหา
+      <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+        <path d="M3 4v6h6"></path>
+      </svg>
+      <span>ล้างค้นหา</span>
     </a>
 
     <a class="btn btn-add product-add-in-toolbar" href="<?= h(app_system_url('admin/product_add.php')) ?>">
-      <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg><span>เพิ่มสินค้า</span>
+      <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5v14"></path>
+        <path d="M5 12h14"></path>
+      </svg>
+      <span>เพิ่มสินค้า</span>
     </a>
   </form>
 
@@ -141,30 +154,37 @@ layout_header('จัดการสินค้า', 'products');
           <tr>
             <td><?= h($row['pro_id']) ?></td>
             <td><?= h($row['pro_name']) ?></td>
-            <td>
-              <?= h($row['protype_name'] ?: '-') ?>
-              <br>
-              <span style="font-size:12px;color:#667085;">
-                <?= h($row['protype_id']) ?>
-              </span>
-            </td>
+            <td><?= h($row['protype_name'] ?: '-') ?></td>
             <td><?= h(number_format((float) $row['pro_price'], 2)) ?> บาท</td>
             <td><?= h(number_format((float) $row['pro_price_install'], 2)) ?> บาท</td>
             <td>
-              <a
-                class="btn btn-edit"
-                href="<?= h(app_system_url('admin/product_edit.php?id=' . urlencode($row['pro_id']))) ?>"
-              >
-                แก้ไข
-              </a>
+              <div class="table-action-buttons">
+                <a
+                  class="btn btn-edit"
+                  href="<?= h(app_system_url('admin/product_edit.php?id=' . urlencode($row['pro_id']))) ?>"
+                >
+                  <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                  </svg>
+                  <span>แก้ไข</span>
+                </a>
 
-              <a
-                class="btn btn-delete"
-                href="<?= h(app_system_url('admin/products.php?action=delete&id=' . urlencode($row['pro_id']))) ?>"
-                onclick="return confirm('ยืนยันการลบสินค้านี้หรือไม่?')"
-              >
-                ลบ
-              </a>
+                <a
+                  class="btn btn-delete"
+                  href="<?= h(app_system_url('admin/products.php?action=delete&id=' . urlencode($row['pro_id']))) ?>"
+                  onclick="return confirm('ยืนยันการลบสินค้านี้หรือไม่?')"
+                >
+                  <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M3 6h18"></path>
+                    <path d="M8 6V4h8v2"></path>
+                    <path d="M19 6l-1 14H6L5 6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
+                  </svg>
+                  <span>ลบ</span>
+                </a>
+              </div>
             </td>
           </tr>
         <?php endwhile; ?>
@@ -172,6 +192,26 @@ layout_header('จัดการสินค้า', 'products');
     </table>
   </div>
 </div>
+
+
+<style>
+.table-action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.action-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+</style>
 
 <?php
 layout_footer();

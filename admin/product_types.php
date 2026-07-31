@@ -62,7 +62,6 @@ if ($search !== '') {
 }
 
 layout_header('จัดการประเภทสินค้า', 'product_types');
-// page_head('จัดการประเภทสินค้า');
 ?>
 
 <?= flash_message() ?>
@@ -78,14 +77,28 @@ layout_header('จัดการประเภทสินค้า', 'product
       value="<?= h($search) ?>"
     >
 
-    <button class="btn btn-search" type="submit"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><span>ค้นหา</span></button>
+    <button class="btn btn-search" type="submit">
+      <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="M20 20l-3.5-3.5"></path>
+      </svg>
+      <span>ค้นหา</span>
+    </button>
 
     <a class="btn btn-reset" href="<?= h(app_system_url('admin/product_types.php')) ?>">
-      ล้างค้นหา
+      <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+        <path d="M3 4v6h6"></path>
+      </svg>
+      <span>ล้างค้นหา</span>
     </a>
 
     <a class="btn btn-add product-type-add-in-toolbar" href="<?= h(app_system_url('admin/product_type_add.php')) ?>">
-      <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg><span>เพิ่มประเภทสินค้า</span>
+      <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 5v14"></path>
+        <path d="M5 12h14"></path>
+      </svg>
+      <span>เพิ่มประเภทสินค้า</span>
     </a>
   </form>
 
@@ -96,7 +109,7 @@ layout_header('จัดการประเภทสินค้า', 'product
           <th>รหัสประเภทสินค้า</th>
           <th>ชื่อประเภทสินค้า</th>
           <th>รายละเอียด</th>
-          <th style="width:160px;">จัดการ</th>
+          <th style="width:190px;">จัดการ</th>
         </tr>
       </thead>
 
@@ -156,20 +169,33 @@ layout_header('จัดการประเภทสินค้า', 'product
             </td>
 
             <td>
-              <a
-                class="btn btn-edit"
-                href="<?= h(app_system_url('admin/product_type_edit.php?id=' . urlencode($row['protype_id']))) ?>"
-              >
-                แก้ไข
-              </a>
+              <div class="table-action-buttons">
+                <a
+                  class="btn btn-edit"
+                  href="<?= h(app_system_url('admin/product_type_edit.php?id=' . urlencode($row['protype_id']))) ?>"
+                >
+                  <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                  </svg>
+                  <span>แก้ไข</span>
+                </a>
 
-              <a
-                class="btn btn-delete"
-                href="<?= h(app_system_url('admin/product_types.php?action=delete&id=' . urlencode($row['protype_id']))) ?>"
-                onclick="return confirm('ยืนยันการลบประเภทสินค้านี้หรือไม่?')"
-              >
-                ลบ
-              </a>
+                <a
+                  class="btn btn-delete"
+                  href="<?= h(app_system_url('admin/product_types.php?action=delete&id=' . urlencode($row['protype_id']))) ?>"
+                  onclick="return confirm('ยืนยันการลบประเภทสินค้านี้หรือไม่?')"
+                >
+                  <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M3 6h18"></path>
+                    <path d="M8 6V4h8v2"></path>
+                    <path d="M19 6l-1 14H6L5 6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
+                  </svg>
+                  <span>ลบ</span>
+                </a>
+              </div>
             </td>
           </tr>
         <?php endwhile; ?>
@@ -177,6 +203,25 @@ layout_header('จัดการประเภทสินค้า', 'product
     </table>
   </div>
 </div>
+
+<style>
+.table-action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.action-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+</style>
 
 <script>
 function toggleAddress(button) {
