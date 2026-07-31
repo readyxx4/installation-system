@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สมัครสมาชิก</title>
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+
+<body class="register-page">
+
+  <div class="register-bg-shape shape-1"></div>
+  <div class="register-bg-shape shape-2"></div>
+
+  <main class="register-wrapper">
+
+    <section class="register-info">
+      <div class="register-badge">Installation System</div>
+
+      <h1>สมัครสมาชิกสำหรับลูกค้า</h1>
+
+      <p>
+        ลงทะเบียนเพื่อใช้งานระบบบริหารจัดการงานติดตั้งเครื่องใช้ไฟฟ้า
+        สามารถสร้างคำขอติดตั้ง ติดตามสถานะ และประเมินผลการติดตั้งได้
+      </p>
+
+      <div class="register-feature-list">
+        <div class="register-feature">
+          <span>✓</span>
+          <p>สมัครสมาชิกเพื่อขอใช้บริการติดตั้ง</p>
+        </div>
+
+        <div class="register-feature">
+          <span>✓</span>
+          <p>ติดตามสถานะงานติดตั้งได้ผ่านระบบ</p>
+        </div>
+
+        <div class="register-feature">
+          <span>✓</span>
+          <p>ข้อมูลลูกค้าจะถูกบันทึกในระบบอย่างเป็นระเบียบ</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="register-card">
+      <div class="register-card-header">
+        <div class="register-icon">👤</div>
+
+        <div>
+          <h2>สมัครสมาชิก</h2>
+          <p>กรอกข้อมูลลูกค้าให้ครบถ้วน</p>
+        </div>
+      </div>
+
+      <form class="register-form" method="POST" action="register.php">
+        <div class="form-row">
+
+          <div class="form-group full">
+            <label for="user_name">ชื่อลูกค้า</label>
+            <input
+              type="text"
+              id="user_name"
+              name="user_name"
+              placeholder="กรอกชื่อลูกค้า"
+              maxlength="50"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="user_phone">เบอร์โทรศัพท์</label>
+            <input
+              type="text"
+              id="user_phone"
+              name="user_phone"
+              placeholder="เช่น 0812345678"
+              maxlength="10"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="user_email">อีเมล</label>
+            <input
+              type="email"
+              id="user_email"
+              name="user_email"
+              placeholder="example@gmail.com"
+              maxlength="50"
+              required
+            >
+          </div>
+
+          <div class="form-group full">
+            <label for="user_address">ที่อยู่สำหรับติดตั้ง</label>
+            <textarea
+              id="user_address"
+              name="user_address"
+              placeholder="กรอกที่อยู่สำหรับติดตั้ง"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="user_password">รหัสผ่าน</label>
+            <input
+              type="password"
+              id="user_password"
+              name="user_password"
+              placeholder="กรอกรหัสผ่าน"
+              maxlength="50"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="confirm_password">ยืนยันรหัสผ่าน</label>
+            <input
+              type="password"
+              id="confirm_password"
+              name="confirm_password"
+              placeholder="กรอกรหัสผ่านอีกครั้ง"
+              maxlength="50"
+              required
+            >
+          </div>
+
+        </div>
+
+        <button type="submit" class="register-btn">
+          สมัครสมาชิก
+        </button>
+
+        <div class="register-login-link">
+          มีบัญชีอยู่แล้ว?
+          <a href="login.html">เข้าสู่ระบบ</a>
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+
+    const messages = {
+      empty: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+      phone: 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง 10 หลัก',
+      email: 'กรุณากรอกอีเมลให้ถูกต้อง และต้องเป็น Gmail เท่านั้น',
+      password: 'รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน',
+      duplicate_name: 'ชื่อลูกค้านี้มีอยู่ในระบบแล้ว',
+      duplicate_phone: 'เบอร์โทรศัพท์นี้มีอยู่ในระบบแล้ว',
+      duplicate_email: 'อีเมลนี้มีอยู่ในระบบแล้ว',
+      duplicate: 'ข้อมูลนี้มีอยู่ในระบบแล้ว',
+      server: 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง'
+    };
+
+    if (error && messages[error]) {
+      alert(messages[error]);
+    }
+  </script>
+
+</body>
+</html>
