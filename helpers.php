@@ -316,8 +316,8 @@ function layout_header(string $title, string $active = 'dashboard'): void
           <div class="nav-section-title">เมนูพนักงานขาย</div>
           <?php nav_item('รายการงานติดตั้ง', '📄', app_system_url('finance/setups.php'), 'setups', $active); ?>
           <?php nav_item('สร้างงานติดตั้ง', '➕', app_system_url('finance/create_setup.php'), 'setup', $active); ?>
-          <?php nav_item('บันทึกการจ่ายสินค้า', '📦', app_system_url('finance/payment.php'), 'payment', $active); ?>
-          <?php nav_item('รายงาน', '📊', app_system_url('finance/report.php'), 'report', $active); ?>
+          <!-- <?php nav_item('บันทึกการจ่ายสินค้า', '📦', app_system_url('finance/payment.php'), 'payment', $active); ?>
+          <?php nav_item('รายงาน', '📊', app_system_url('finance/report.php'), 'report', $active); ?> -->
 
         <?php elseif ($roleKey === '3'): ?>
           <div class="nav-section-title">เมนู</div>
