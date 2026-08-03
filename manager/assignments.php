@@ -332,7 +332,6 @@ $setup_stmt = $conn->prepare("
         s.created_at,
         u.user_id,
         u.user_name,
-        u.user_fullname,
         u.user_phone,
         u.user_email,
         COALESCE(
@@ -358,7 +357,6 @@ $setup_stmt = $conn->prepare("
         s.created_at,
         u.user_id,
         u.user_name,
-        u.user_fullname,
         u.user_phone,
         u.user_email,
         p.pro_name
@@ -434,7 +432,6 @@ $tech_schedules_result = $conn->query("
         TIME_FORMAT(a.assign_install_end_time, '%H:%i') AS assign_install_end_time,
         a.assign_status,
         u.user_name,
-        u.user_fullname,
         u.user_phone,
         COALESCE(p.pro_name, '-') AS pro_name,
         s.setup_address,
@@ -451,7 +448,7 @@ while ($row = $tech_schedules_result->fetch_assoc()) {
     $tech_schedules_data[] = $row;
 }
 
-$selected_setup['customer_display'] = $selected_setup['user_fullname'] ?: ($selected_setup['user_name'] ?: '-');
+$selected_setup['customer_display'] = $selected_setup['user_name'] ?: '-';
 $selected_setup['setup_address_display'] = $selected_setup['setup_address'] ?: ($selected_setup['setup_location'] ?: '-');
 $selected_setup['setup_date_display'] = manager_thai_date($selected_setup['setup_date'] ?? null);
 $selected_setup['created_at_display'] = manager_thai_date($selected_setup['created_at'] ?? null);
@@ -775,7 +772,7 @@ function techDisplayName(tech) {
 }
 
 function customerDisplayName(row) {
-  return row.user_fullname || row.user_name || '-';
+  return row.user_name || '-';
 }
 
 function getTechSlots(techId) {

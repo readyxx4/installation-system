@@ -71,7 +71,6 @@ $stmt = $conn->prepare("
 
         u.user_id,
         u.user_name,
-        u.user_fullname,
         u.user_phone,
         u.user_email,
         u.user_address,
@@ -261,14 +260,10 @@ layout_header('ใบติดตั้ง', 'setups');
             </h2>
 
             <div class="install-slip-info-grid">
-                <div>
-                    <span>ชื่อลูกค้า</span>
-                    <strong><?= h($setup['user_name'] ?? '-') ?></strong>
-                </div>
 
                 <div>
-                    <span>ชื่อ-นามสกุล</span>
-                    <strong><?= h($setup['user_fullname'] ?: '-') ?></strong>
+                    <span>ชื่อผู้ใช้</span>
+                    <strong><?= h($setup['user_name'] ?? '-') ?></strong>
                 </div>
 
                 <div>
