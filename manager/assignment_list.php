@@ -4,10 +4,12 @@ require_once __DIR__ . '/../db.php';
 
 require_login('1');
 
+date_default_timezone_set('Asia/Bangkok');
+
 $keyword = trim($_GET['q'] ?? '');
 $search = $keyword;
 $status_filter = trim($_GET['status'] ?? 'all');
-$allowed_status_filters = ['all', 'unassigned', 'canceled', 'review', 'assigned', 'accepted', 'working', 'done'];
+$allowed_status_filters = ['all', 'unassigned', 'canceled', 'overdue', 'assigned', 'accepted', 'working', 'done'];
 if (!in_array($status_filter, $allowed_status_filters, true)) {
     $status_filter = 'all';
 }
@@ -90,8 +92,10 @@ if ($action === 'cancel') {
 
 $has_install_date = table_exists($conn, 'assignment') && column_exists($conn, 'assignment', 'assign_install_date');
 $has_install_time = table_exists($conn, 'assignment') && column_exists($conn, 'assignment', 'assign_install_time');
+$has_install_end_time = table_exists($conn, 'assignment') && column_exists($conn, 'assignment', 'assign_install_end_time');
 $assign_install_date_select = $has_install_date ? 'a.assign_install_date' : 'NULL AS assign_install_date';
 $assign_install_time_select = $has_install_time ? 'a.assign_install_time' : 'NULL AS assign_install_time';
+$assign_install_end_time_select = $has_install_end_time ? 'a.assign_install_end_time' : 'NULL AS assign_install_end_time';
 
 function manager_icon_svg(string $name): string
 {
@@ -137,18 +141,59 @@ function setup_status_badge($status): string
 }
 
 
-function needs_technician_review(array $row): bool
+function assignment_is_overdue(array $row): bool
 {
-    return !empty($row['assign_id'])
-        && in_array((string) ($row['assign_status'] ?? ''), ['1', '2', '3'], true)
-        && !empty($row['tech_id'])
-        && (string) ($row['tech_status'] ?? '') === '1';
+    if (empty($row['assign_id'])) {
+        return false;
+    }
+
+    $assign_status = (int) ($row['assign_status'] ?? 0);
+    if (!in_array($assign_status, [1, 2], true)) {
+        return false;
+    }
+
+    $install_date = trim((string) ($row['assign_install_date'] ?? ''));
+    $install_start = trim((string) ($row['assign_install_time'] ?? ''));
+    $install_end = trim((string) ($row['assign_install_end_time'] ?? ''));
+
+    if ($install_date === '') {
+        return false;
+    }
+
+    if ($install_end === '' && $install_start !== '') {
+        $start_timestamp = strtotime($install_date . ' ' . $install_start);
+        if ($start_timestamp !== false) {
+            $install_end = date('H:i:s', $start_timestamp + 7200);
+        }
+    }
+
+    if ($install_end === '') {
+        return false;
+    }
+
+    $timezone = new DateTimeZone('Asia/Bangkok');
+    $deadline = DateTimeImmutable::createFromFormat(
+        'Y-m-d H:i:s',
+        $install_date . ' ' . $install_end,
+        $timezone
+    );
+
+    if (!$deadline) {
+        $deadline = DateTimeImmutable::createFromFormat(
+            'Y-m-d H:i',
+            $install_date . ' ' . substr($install_end, 0, 5),
+            $timezone
+        );
+    }
+
+    return $deadline instanceof DateTimeImmutable
+        && $deadline < new DateTimeImmutable('now', $timezone);
 }
 
 function display_assignment_status(array $row): string
 {
-    if (needs_technician_review($row)) {
-        return 'ช่างไม่ว่าง / ต้องตรวจสอบ';
+    if (assignment_is_overdue($row)) {
+        return 'เกินกำหนด';
     }
 
     if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
@@ -160,8 +205,8 @@ function display_assignment_status(array $row): string
 
 function display_assignment_badge(array $row): string
 {
-    if (needs_technician_review($row)) {
-        return 'orange';
+    if (assignment_is_overdue($row)) {
+        return 'red';
     }
 
     if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
@@ -225,8 +270,9 @@ $base_sql = "\n    SELECT\n        s.setup_id,\n        s.user_id,\n        s.pr
 
 $install_date_group_sql = $has_install_date ? "        a.assign_install_date,\n" : "";
 $install_time_group_sql = $has_install_time ? "        a.assign_install_time,\n" : "";
+$install_end_time_group_sql = $has_install_end_time ? "        a.assign_install_end_time,\n" : "";
 
-$group_sql = "\n    GROUP BY\n        s.setup_id,\n        s.user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n        u.user_name,\n        u.user_phone,\n        u.user_email,\n        u.user_address,\n        p.pro_name,\n        p.pro_price_install,\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n{$install_date_group_sql}{$install_time_group_sql}        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n        m.user_name\n";
+$group_sql = "\n    GROUP BY\n        s.setup_id,\n        s.user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n        u.user_name,\n        u.user_phone,\n        u.user_email,\n        u.user_address,\n        p.pro_name,\n        p.pro_price_install,\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n{$install_date_group_sql}{$install_time_group_sql}{$install_end_time_group_sql}        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n        m.user_name\n";
 
 if ($search !== '') {
     $like = '%' . $search . '%';
@@ -279,6 +325,7 @@ while ($row = $result->fetch_assoc()) {
     $row['install_time_display'] = thai_time($row['assign_install_time'] ?? null);
     $row['item_count_display'] = (int) ($row['item_count'] ?? 0);
     $row['install_total_display'] = money_text($row['install_total'] ?? 0);
+    $row['is_overdue'] = assignment_is_overdue($row);
     $row['status_name'] = display_assignment_status($row);
     $row['status_badge'] = display_assignment_badge($row);
     $row['assign_status_name'] = !empty($row['assign_id']) ? assign_status_name($row['assign_status']) : 'ยังไม่มอบหมาย';
@@ -291,7 +338,7 @@ $status_tabs = [
     'all' => ['label' => 'ทั้งหมด', 'status' => null],
     'unassigned' => ['label' => 'ยังไม่ได้มอบหมาย', 'status' => '0'],
     'canceled' => ['label' => 'ยกเลิกแล้ว', 'status' => 'canceled'],
-    'review' => ['label' => 'ต้องตรวจสอบ', 'status' => 'review'],
+    'overdue' => ['label' => 'เกินกำหนด', 'status' => 'overdue'],
     'assigned' => ['label' => 'มอบหมายแล้ว', 'status' => '1'],
     'accepted' => ['label' => 'ช่างรับงานแล้ว', 'status' => '2'],
     'working' => ['label' => 'กำลังติดตั้ง', 'status' => '3'],
@@ -310,8 +357,8 @@ foreach ($status_tabs as $key => $tab) {
             return !empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4';
         }
 
-        if ($key === 'review') {
-            return needs_technician_review($row);
+        if ($key === 'overdue') {
+            return !empty($row['is_overdue']);
         }
 
         if ($key === 'unassigned') {
@@ -332,8 +379,8 @@ $visible_setups = array_values(array_filter($setups, function ($row) use ($statu
         return !empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4';
     }
 
-    if ($status_filter === 'review') {
-        return needs_technician_review($row);
+    if ($status_filter === 'overdue') {
+        return !empty($row['is_overdue']);
     }
 
     if ($status_filter === 'unassigned') {
@@ -450,7 +497,7 @@ layout_header('รายการมอบหมายงาน', 'assignment_li
                             <td>
                                 <?php if (!empty($row['tech_id'])): ?>
                                     <strong><?= h($row['tech_display']) ?></strong>
-                                    <?php if (needs_technician_review($row)): ?>
+                                    <?php if (!empty($row['assign_id']) && (string) ($row['tech_status'] ?? '') === '1'): ?>
                                         <small class="assignment-tech-warning">ช่างถูกตั้งค่าไม่ว่าง</small>
                                     <?php endif; ?>
                                 <?php else: ?>
@@ -469,7 +516,7 @@ layout_header('รายการมอบหมายงาน', 'assignment_li
                             <td class="assignment-row-actions assignment-icon-actions">
                                 <a
                                     class="assignment-icon-btn view-slip manager-eye-green"
-                                    href="<?= h(app_system_url('finance/setup_slip.php?id=' . urlencode($row['setup_id']) . '&from=manager')) ?>"
+                                    href="<?= h(app_system_url('manager/assignments.php?setup_id=' . urlencode($row['setup_id']))) ?>"
                                     title="ดูใบติดตั้ง"
                                     aria-label="ดูใบติดตั้ง"
                                 >

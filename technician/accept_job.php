@@ -87,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'accept') {
             $assign_status = 2;
             $setup_status = 2;
-            $tech_status = 1;
 
             $update_assign = $conn->prepare("
                 UPDATE assignment
@@ -118,20 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             $update_setup->execute();
-
-            $update_tech = $conn->prepare("
-                UPDATE technicians
-                SET tech_status = ?
-                WHERE tech_id = ?
-            ");
-
-            $update_tech->bind_param(
-                'is',
-                $tech_status,
-                $tech_id
-            );
-
-            $update_tech->execute();
 
             $conn->commit();
 
@@ -141,7 +126,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'reject') {
             $assign_status = 3;
             $setup_status = 0;
-            $tech_status = 0;
 
             $update_assign = $conn->prepare("
                 UPDATE assignment
@@ -172,20 +156,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             $update_setup->execute();
-
-            $update_tech = $conn->prepare("
-                UPDATE technicians
-                SET tech_status = ?
-                WHERE tech_id = ?
-            ");
-
-            $update_tech->bind_param(
-                'is',
-                $tech_status,
-                $tech_id
-            );
-
-            $update_tech->execute();
 
             $conn->commit();
 

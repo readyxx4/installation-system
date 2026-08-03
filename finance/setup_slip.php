@@ -182,6 +182,8 @@ $slip_back_url = $from_manager
 
 $assign_url = app_system_url('manager/assignments.php?setup_id=' . urlencode($setup['setup_id']));
 $cancel_assign_url = app_system_url('manager/assignment_list.php?action=cancel&id=' . urlencode($setup['setup_id']));
+$manager_can_edit_assignment = (string) ($setup['setup_status'] ?? '') !== '4';
+$manager_can_cancel_assignment = (string) ($setup['assign_status'] ?? '') === '1';
 
 layout_header('ใบติดตั้ง', 'setups');
 ?>
@@ -200,11 +202,11 @@ layout_header('ใบติดตั้ง', 'setups');
                 <a class="install-slip-manager-cancel" href="<?= h($slip_back_url) ?>">
                     ยกเลิก
                 </a>
-            <?php else: ?>
+            <?php elseif ($manager_can_edit_assignment): ?>
                 <a class="install-slip-manager-edit" href="<?= h($assign_url) ?>">
                     แก้ไขการมอบหมาย
                 </a>
-                <?php if ((string) ($setup['setup_status'] ?? '') !== '4'): ?>
+                <?php if ($manager_can_cancel_assignment): ?>
                     <a
                         class="install-slip-manager-cancel"
                         href="<?= h($cancel_assign_url) ?>"

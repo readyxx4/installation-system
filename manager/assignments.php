@@ -4,6 +4,8 @@ require_once __DIR__ . '/../db.php';
 
 require_login('1');
 
+date_default_timezone_set('Asia/Bangkok');
+
 function table_exists(mysqli $conn, string $table): bool
 {
     $stmt = $conn->prepare("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? LIMIT 1");
@@ -162,6 +164,15 @@ function time_label(?string $start, ?string $end): string
     return $end !== '' ? $start . ' - ' . $end . ' น.' : $start . ' น.';
 }
 
+function assignment_time_slots(): array
+{
+    return [
+        'morning' => ['start' => '09:00', 'end' => '12:00'],
+        'afternoon' => ['start' => '13:00', 'end' => '15:00'],
+        'evening' => ['start' => '16:00', 'end' => '18:00'],
+    ];
+}
+
 prepare_assignment_table($conn);
 
 $setup_id = trim($_GET['setup_id'] ?? $_POST['setup_id'] ?? '');
@@ -173,12 +184,15 @@ if ($setup_id === '') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tech_id = trim($_POST['tech_id'] ?? '');
     $install_date = trim($_POST['assign_install_date'] ?? '');
-    $install_time = normalize_time_input($_POST['assign_install_time'] ?? '');
-    $install_end_time = normalize_time_input($_POST['assign_install_end_time'] ?? '');
+    $time_slot = trim($_POST['assign_time_slot'] ?? '');
+    $setup_note = trim($_POST['setup_note'] ?? '');
+    $confirm_tech_change = ($_POST['confirm_tech_change'] ?? '') === '1';
     $assign_date = date('Y-m-d H:i:s');
     $assign_status = 1;
 
-    if ($setup_id === '' || $tech_id === '' || $install_date === '' || $install_time === '' || $install_end_time === '') {
+    $time_slots = assignment_time_slots();
+
+    if ($setup_id === '' || $tech_id === '' || $install_date === '' || !isset($time_slots[$time_slot])) {
         redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=error'));
     }
 
@@ -186,16 +200,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=error'));
     }
 
-    if (!preg_match('/^\d{2}:\d{2}$/', $install_time) || !preg_match('/^\d{2}:\d{2}$/', $install_end_time)) {
-        redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=error'));
+    $today_bangkok = (new DateTimeImmutable('today', new DateTimeZone('Asia/Bangkok')))->format('Y-m-d');
+    if ($install_date < $today_bangkok) {
+        redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=past_date'));
     }
 
-    if (time_to_minutes($install_time) < 0 || time_to_minutes($install_end_time) <= time_to_minutes($install_time)) {
-        redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=error'));
-    }
-
+    $install_time = $time_slots[$time_slot]['start'];
+    $install_end_time = $time_slots[$time_slot]['end'];
     $install_time_db = $install_time . ':00';
     $install_end_time_db = $install_end_time . ':00';
+
+    $bangkok_timezone = new DateTimeZone('Asia/Bangkok');
+    $selected_install_date = DateTimeImmutable::createFromFormat(
+        '!Y-m-d',
+        $install_date,
+        $bangkok_timezone
+    );
+
+    if (!$selected_install_date) {
+        redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=error'));
+    }
+
+    $selected_weekday = (int) $selected_install_date->format('N');
+    if ($selected_weekday >= 6) {
+        redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=holiday'));
+    }
+
+    $selected_end_datetime = DateTimeImmutable::createFromFormat(
+        'Y-m-d H:i:s',
+        $install_date . ' ' . $install_end_time_db,
+        $bangkok_timezone
+    );
+    $now_bangkok = new DateTimeImmutable('now', $bangkok_timezone);
+
+    if (!$selected_end_datetime || $selected_end_datetime <= $now_bangkok) {
+        redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=time_passed'));
+    }
 
     try {
         $stmt_setup = $conn->prepare("SELECT setup_id, user_id, setup_status FROM setup WHERE setup_id = ? LIMIT 1");
@@ -218,29 +258,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 a.assign_install_date,
                 TIME_FORMAT(a.assign_install_time, '%H:%i') AS assign_install_time,
                 TIME_FORMAT(a.assign_install_end_time, '%H:%i') AS assign_install_end_time,
+                a.assign_status,
                 COALESCE(t.tech_status, 0) AS current_tech_status
             FROM assignment a
             LEFT JOIN technicians t ON a.tech_id = t.tech_id
             WHERE a.setup_id = ?
-              AND a.assign_status IN (1, 2)
+              AND a.assign_status IN (1, 2, 5)
             ORDER BY a.assign_date DESC, a.assign_id DESC
             LIMIT 1
         ");
         $active_stmt->bind_param('s', $setup_id);
         $active_stmt->execute();
         $active_assignment = $active_stmt->get_result()->fetch_assoc();
-        $is_limited_edit = $active_assignment && (int) ($active_assignment['current_tech_status'] ?? 0) !== 0;
+        $setup_status = (int) ($setup['setup_status'] ?? 0);
+        $current_assign_status = (int) ($active_assignment['assign_status'] ?? 0);
 
-        if ($is_limited_edit) {
-            $locked_install_date = (string) ($active_assignment['assign_install_date'] ?? '');
-
-            if ($locked_install_date === '') {
-                redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=error'));
-            }
-
-            if ((string) $install_date !== $locked_install_date) {
-                redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=time_only_edit'));
-            }
+        if ($setup_status === 4 || $current_assign_status === 5) {
+            redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=readonly'));
         }
 
         $stmt_tech = $conn->prepare("SELECT tech_id, tech_status FROM technicians WHERE tech_id = ? LIMIT 1");
@@ -256,20 +290,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=tech_unavailable'));
         }
 
+        if ($active_assignment && $setup_status === 3) {
+            if (!$is_editing_current_tech || (string) $install_date !== (string) $active_assignment['assign_install_date']) {
+                redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=assignment_locked'));
+            }
+        }
+
+        if ($active_assignment && $current_assign_status === 2 && !$is_editing_current_tech && !$confirm_tech_change) {
+            redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=confirm_tech_change'));
+        }
+
         $conflict_stmt = $conn->prepare("
             SELECT assign_id
             FROM assignment
             WHERE tech_id = ?
               AND assign_install_date = ?
               AND assign_status IN (1, 2)
-              AND setup_id <> ?
+              AND assign_id <> ?
               AND assign_install_time IS NOT NULL
               AND COALESCE(assign_install_end_time, ADDTIME(assign_install_time, '02:00:00')) IS NOT NULL
               AND assign_install_time < ?
               AND COALESCE(assign_install_end_time, ADDTIME(assign_install_time, '02:00:00')) > ?
             LIMIT 1
         ");
-        $conflict_stmt->bind_param('sssss', $tech_id, $install_date, $setup_id, $install_end_time_db, $install_time_db);
+        $current_assign_id = (string) ($active_assignment['assign_id'] ?? '');
+        $conflict_stmt->bind_param('sssss', $tech_id, $install_date, $current_assign_id, $install_end_time_db, $install_time_db);
         $conflict_stmt->execute();
         if ($conflict_stmt->get_result()->num_rows > 0) {
             redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=time_conflict'));
@@ -278,6 +323,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->begin_transaction();
 
         if ($active_assignment) {
+            $next_assign_status = (!$is_editing_current_tech && $current_assign_status === 2) ? 1 : $current_assign_status;
+            $next_setup_status = (!$is_editing_current_tech && $current_assign_status === 2) ? 1 : $setup_status;
             $update_assign = $conn->prepare("
                 UPDATE assignment
                 SET tech_id = ?,
@@ -286,11 +333,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     assign_install_date = ?,
                     assign_install_time = ?,
                     assign_install_end_time = ?,
-                    assign_status = 1
+                    assign_status = ?
                 WHERE assign_id = ?
             ");
-            $update_assign->bind_param('sssssss', $tech_id, $assign_by, $assign_date, $install_date, $install_time_db, $install_end_time_db, $active_assignment['assign_id']);
+            $update_assign->bind_param('ssssssis', $tech_id, $assign_by, $assign_date, $install_date, $install_time_db, $install_end_time_db, $next_assign_status, $active_assignment['assign_id']);
             $update_assign->execute();
+
+            $update_setup_status = $conn->prepare("UPDATE setup SET setup_status = ? WHERE setup_id = ?");
+            $update_setup_status->bind_param('is', $next_setup_status, $setup_id);
+            $update_setup_status->execute();
         } else {
             $assign_id = make_assign_id($conn);
             $user_id = $setup['user_id'];
@@ -304,9 +355,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $insert_assign->execute();
         }
 
-        $new_setup_status = 1;
-        $update_setup = $conn->prepare("UPDATE setup SET setup_status = ? WHERE setup_id = ?");
-        $update_setup->bind_param('is', $new_setup_status, $setup_id);
+        $new_setup_status = $active_assignment ? null : 1;
+        $update_setup = $conn->prepare("UPDATE setup SET setup_note = ?" . ($new_setup_status === null ? '' : ', setup_status = ?') . " WHERE setup_id = ?");
+        if ($new_setup_status === null) {
+            $update_setup->bind_param('ss', $setup_note, $setup_id);
+        } else {
+            $update_setup->bind_param('sis', $setup_note, $new_setup_status, $setup_id);
+        }
         $update_setup->execute();
 
         $conn->commit();
@@ -370,6 +425,42 @@ if (!$selected_setup) {
     redirect_to(app_system_url('manager/assignment_list.php?status=notfound'));
 }
 
+$product_items = [];
+$product_items_stmt = $conn->prepare("
+    SELECT
+        d.pro_id,
+        COALESCE(p.pro_name, d.pro_id) AS pro_name,
+        COALESCE(pt.protype_name, '-') AS protype_name,
+        COALESCE(d.install_qty, 1) AS install_qty,
+        COALESCE(d.install_price, p.pro_price_install, 0) AS install_price,
+        COALESCE(
+            d.install_total,
+            COALESCE(d.install_qty, 1) * COALESCE(d.install_price, p.pro_price_install, 0)
+        ) AS install_total
+    FROM install_detail d
+    LEFT JOIN product p ON d.pro_id = p.pro_id
+    LEFT JOIN product_type pt ON p.protype_id = pt.protype_id
+    WHERE d.setup_id = ?
+    ORDER BY d.detail_id ASC
+");
+$product_items_stmt->bind_param('s', $setup_id);
+$product_items_stmt->execute();
+$product_items_result = $product_items_stmt->get_result();
+while ($product_item = $product_items_result->fetch_assoc()) {
+    $product_items[] = $product_item;
+}
+
+if (count($product_items) === 0 && !empty($selected_setup['product_names'])) {
+    $product_items[] = [
+        'pro_id' => '-',
+        'pro_name' => $selected_setup['product_names'],
+        'protype_name' => '-',
+        'install_qty' => 1,
+        'install_price' => (float) ($selected_setup['install_total'] ?? 0),
+        'install_total' => (float) ($selected_setup['install_total'] ?? 0),
+    ];
+}
+
 $current_assignment_stmt = $conn->prepare("
     SELECT
         a.assign_id,
@@ -386,7 +477,7 @@ $current_assignment_stmt = $conn->prepare("
     FROM assignment a
     LEFT JOIN technicians t ON a.tech_id = t.tech_id
     WHERE a.setup_id = ?
-      AND a.assign_status IN (1, 2)
+      AND a.assign_status IN (1, 2, 5)
     ORDER BY a.assign_date DESC, a.assign_id DESC
     LIMIT 1
 ");
@@ -459,7 +550,34 @@ $current_tech_id = $current_assignment['tech_id'] ?? '';
 $current_install_date = $current_assignment['assign_install_date'] ?? '';
 $current_install_time = $current_assignment['assign_install_time'] ?? '';
 $current_install_end_time = $current_assignment['assign_install_end_time'] ?? '';
+$today_bangkok = (new DateTimeImmutable('today', new DateTimeZone('Asia/Bangkok')))->format('Y-m-d');
 $current_tech_unavailable = $current_assignment && (int) ($current_assignment['tech_status'] ?? 0) !== 0;
+$current_setup_status = (int) ($selected_setup['setup_status'] ?? 0);
+$current_assign_status = (int) ($current_assignment['assign_status'] ?? 0);
+
+$current_assignment_overdue = false;
+if (
+    $current_assignment
+    && in_array($current_assign_status, [1, 2], true)
+    && !empty($current_assignment['assign_install_date'])
+    && !empty($current_assignment['assign_install_end_time'])
+) {
+    $overdue_timezone = new DateTimeZone('Asia/Bangkok');
+    $deadline = DateTimeImmutable::createFromFormat(
+        'Y-m-d H:i',
+        $current_assignment['assign_install_date'] . ' ' . $current_assignment['assign_install_end_time'],
+        $overdue_timezone
+    );
+
+    if ($deadline instanceof DateTimeImmutable) {
+        $current_assignment_overdue = $deadline < new DateTimeImmutable('now', $overdue_timezone);
+    }
+}
+
+$is_read_only = $current_setup_status === 4 || $current_assign_status === 5;
+$can_change_tech = !$is_read_only && $current_setup_status !== 3;
+$can_change_date = !$is_read_only && $current_setup_status !== 3;
+$can_change_time = !$is_read_only;
 
 $selected_setup_json = json_encode($selected_setup, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 $current_assignment_json = json_encode($current_assignment ?: null, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -470,6 +588,14 @@ $current_install_date_json = json_encode($current_install_date, JSON_UNESCAPED_U
 $current_install_time_json = json_encode($current_install_time, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 $current_install_end_time_json = json_encode($current_install_end_time, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 $current_tech_unavailable_json = json_encode($current_tech_unavailable, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+$assignment_permissions_json = json_encode([
+    'readOnly' => $is_read_only,
+    'canChangeTech' => $can_change_tech,
+    'canChangeDate' => $can_change_date,
+    'canChangeTime' => $can_change_time,
+    'requiresTechChangeConfirmation' => $current_assign_status === 2,
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+$today_bangkok_json = json_encode($today_bangkok, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
 layout_header('มอบหมายงานช่าง', 'assignments');
 ?>
@@ -479,24 +605,41 @@ layout_header('มอบหมายงานช่าง', 'assignments');
         <div>
             <span class="manager-eyebrow">Process 5</span>
             <h1>มอบหมายงานช่าง</h1>
-            <p><?= $current_tech_unavailable ? 'ช่างเดิมถูกตั้งค่าไม่ว่าง จึงแก้ไขได้เฉพาะช่างและเวลาในวันเดิมเท่านั้น' : ($current_assignment ? 'งานนี้มอบหมายแล้ว สามารถแก้ไขช่าง วันที่ และเวลาได้' : 'เลือกช่างก่อน แล้วดูคิวงานของช่างคนนั้นเพื่อกำหนดวันที่ติดตั้ง') ?></p>
+            <p><?= $is_read_only ? 'งานเสร็จสิ้นแล้ว ดูรายละเอียดได้อย่างเดียว' : ($current_tech_unavailable ? 'ช่างเดิมไม่รับงานใหม่ แต่ยังทำงานนี้ได้' : ($current_assignment ? 'แก้ไขได้ตามสถานะงานปัจจุบัน' : 'เลือกช่างก่อน แล้วดูคิวงานของช่างคนนั้นเพื่อกำหนดวันที่ติดตั้ง')) ?></p>
         </div>
     </div>
 
     <?= flash_message() ?>
 
+    <?php $page_status = trim($_GET['status'] ?? ''); ?>
+    <?php if ($page_status === 'time_passed'): ?>
+        <div class="manager-page-alert danger">
+            ช่วงเวลาที่เลือกผ่านไปแล้ว กรุณาเลือกช่วงเวลาใหม่
+        </div>
+    <?php elseif ($page_status === 'holiday'): ?>
+        <div class="manager-page-alert warning">
+            วันเสาร์และวันอาทิตย์เป็นวันหยุด กรุณาเลือกวันทำงาน
+        </div>
+    <?php endif; ?>
+
+    <?php if ($current_assignment_overdue): ?>
+        <div class="manager-page-alert danger">
+            งานนี้เกินกำหนดแล้ว กรุณาเลื่อนกำหนดการ เปลี่ยนช่าง หรือยกเลิกการมอบหมายตามความเหมาะสม
+        </div>
+    <?php endif; ?>
+
     <form method="POST" action="<?= h(app_system_url('manager/assignments.php')) ?>" onsubmit="return beforeAssignSubmit()">
         <input type="hidden" id="setup_id" name="setup_id" value="<?= h($selected_setup['setup_id']) ?>" required>
         <input type="hidden" id="tech_id" name="tech_id" value="<?= h($current_tech_id) ?>" required>
         <input type="hidden" id="assign_install_date" name="assign_install_date" value="<?= h($current_install_date) ?>" required>
-        <input type="hidden" id="assign_install_time" name="assign_install_time" value="<?= h($current_install_time) ?>" required>
-        <input type="hidden" id="assign_install_end_time" name="assign_install_end_time" value="<?= h($current_install_end_time) ?>" required>
+        <input type="hidden" id="assign_time_slot" name="assign_time_slot" value="" required>
+        <input type="hidden" id="confirm_tech_change" name="confirm_tech_change" value="0">
 
         <section class="manager-assign-panel manager-selected-setup-panel always-show">
             <div class="manager-panel-head">
                 <div>
-                    <h2>ใบงานติดตั้งที่เลือก</h2>
-                    <p>ข้อมูลใบงานที่ส่งมาจากรายการใบงานติดตั้ง</p>
+                    <h2>รายละเอียดใบงานติดตั้ง</h2>
+                    <p>ตรวจสอบข้อมูลลูกค้า สินค้า และสถานที่ติดตั้งก่อนมอบหมายงาน</p>
                 </div>
                 <a class="manager-soft-link" href="<?= h(app_system_url('finance/setup_slip.php?id=' . urlencode($selected_setup['setup_id']) . '&from=manager')) ?>">
                     <?= manager_icon_svg('eye') ?> ดูใบติดตั้ง
@@ -514,17 +657,41 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                     <small><?= h($selected_setup['user_phone'] ?: '-') ?></small>
                 </div>
                 <div>
-                    <span>สินค้า</span>
-                    <strong><?= h($selected_setup['product_names'] ?: '-') ?></strong>
+                    <span>จำนวนสินค้า</span>
+                    <strong><?= h((string) count($product_items)) ?> รายการ</strong>
                 </div>
                 <div>
-                    <span>จำนวน / รวมค่าติดตั้ง</span>
-                    <strong><?= h((string) $selected_setup['item_count_display']) ?> รายการ</strong>
-                    <small><?= h($selected_setup['install_total_display']) ?></small>
+                    <span>รวมค่าติดตั้ง</span>
+                    <strong><?= h($selected_setup['install_total_display']) ?></strong>
                 </div>
                 <div class="full">
-                    <span>ที่อยู่ติดตั้ง</span>
+                    <span>สถานที่ติดตั้ง</span>
                     <strong><?= h($selected_setup['setup_address_display']) ?></strong>
+                </div>
+                <div class="full assignment-product-section">
+                    <span>รายการสินค้า</span>
+                    <div class="assignment-product-list">
+                        <?php foreach ($product_items as $index => $product_item): ?>
+                            <article class="assignment-product-row">
+                                <div class="assignment-product-number"><?= h((string) ($index + 1)) ?></div>
+                                <div class="assignment-product-info">
+                                    <strong><?= h($product_item['pro_name'] ?? '-') ?></strong>
+                                    <small>
+                                        รหัส <?= h($product_item['pro_id'] ?? '-') ?>
+                                        · ประเภท <?= h($product_item['protype_name'] ?? '-') ?>
+                                    </small>
+                                </div>
+                                <div class="assignment-product-qty">
+                                    <span>จำนวน</span>
+                                    <strong><?= h((string) ($product_item['install_qty'] ?? 1)) ?></strong>
+                                </div>
+                                <div class="assignment-product-price">
+                                    <span>ค่าติดตั้งรวม</span>
+                                    <strong><?= h(manager_money($product_item['install_total'] ?? 0)) ?></strong>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
                 <?php if (!empty($current_assignment)): ?>
                     <div class="full current-assign-alert">
@@ -534,6 +701,9 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                             วันที่ <?= h(manager_thai_date($current_assignment['assign_install_date'] ?? null)) ?>
                             เวลา <?= h(time_label($current_assignment['assign_install_time'] ?? '', $current_assignment['assign_install_end_time'] ?? '')) ?>
                             — <?= h(assign_status_name($current_assignment['assign_status'] ?? '')) ?>
+                            <?php if ($current_assignment_overdue): ?>
+                                <span class="manager-overdue-badge">เกินกำหนด</span>
+                            <?php endif; ?>
                         </strong>
                     </div>
                 <?php endif; ?>
@@ -544,7 +714,7 @@ layout_header('มอบหมายงานช่าง', 'assignments');
             <div class="manager-panel-head">
                 <div>
                     <h2>1. เลือกช่างติดตั้ง</h2>
-                    <p><?= $current_tech_unavailable ? 'ช่างเดิมไม่ว่าง ระบบล็อกเฉพาะวันที่ไว้ แต่สามารถเปลี่ยนช่างและเวลาได้' : 'ช่างที่ตั้งค่าไม่ว่างยังแสดงชื่อ แต่ไม่สามารถเลือกมอบหมายงานใหม่ได้' ?></p>
+                    <p><?= $is_read_only ? 'งานเสร็จสิ้นแล้ว จึงไม่สามารถเปลี่ยนช่างได้' : 'ช่างที่ไม่รับงานใหม่ยังแสดงชื่อ แต่เลือกได้เฉพาะกรณีเป็นช่างเดิมของงานนี้' ?></p>
                 </div>
                 <span class="manager-soft-badge" id="availableCountText">-</span>
             </div>
@@ -562,8 +732,8 @@ layout_header('มอบหมายงานช่าง', 'assignments');
         <section class="manager-assign-panel manager-schedule-panel" id="schedulePanel">
             <div class="manager-panel-head">
                 <div>
-                    <h2>2. ตารางเวลาช่างและเลือกวันที่ติดตั้ง</h2>
-                    <p id="selectedTechScheduleText"><?= $current_tech_unavailable ? 'วันที่ได้รับมอบหมายเดิมจะแสดงเป็นสีเทา เลือกวันอื่นไม่ได้ แต่เปลี่ยนช่างและเวลาได้' : ($current_assignment ? 'สามารถเลือกช่าง วันที่ และเวลาใหม่ได้ตามต้องการ' : 'เลือกช่างก่อน ระบบจะแสดงจำนวนคิวและตารางวันว่างของช่างคนนั้น') ?></p>
+                    <h2>2. เลือกวันติดตั้ง</h2>
+                    <p id="selectedTechScheduleText"><?= $is_read_only ? 'งานเสร็จสิ้นแล้ว ดูตารางเวลาได้อย่างเดียว' : ($current_setup_status === 3 ? 'กำลังติดตั้ง: แก้ไขได้เฉพาะเวลาและหมายเหตุ' : 'เลือกช่างก่อน ระบบจะแสดงตารางงานและวันที่เลือกได้') ?></p>
                 </div>
                 <span class="manager-soft-badge" id="techQueueCountText">ยังไม่ได้เลือกช่าง</span>
             </div>
@@ -591,11 +761,9 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                 <strong id="calendarMonthText">-</strong>
                 <button type="button" onclick="changeCalendarMonth(1)">›</button>
                 <span class="calendar-legend available">ว่าง</span>
-                <span class="calendar-legend busy">มีคิว/ไม่ว่าง</span>
+                <span class="calendar-legend partial">มีคิว</span>
+                <span class="calendar-legend busy">เต็ม</span>
                 <span class="calendar-legend holiday">วันหยุด</span>
-                <?php if (!empty($current_tech_unavailable)): ?>
-                    <span class="calendar-legend locked">วันที่เดิม</span>
-                <?php endif; ?>
             </div>
 
             <div class="manager-calendar" id="installCalendar"></div>
@@ -604,31 +772,30 @@ layout_header('มอบหมายงานช่าง', 'assignments');
             <div class="manager-time-panel" id="timePanel">
                 <div class="manager-time-panel-head">
                     <div>
-                        <h3>เลือกเวลาติดตั้ง</h3>
-                        <p>เลือกช่วงเวลาที่ไม่ชนกับคิวงานเดิมของช่างในวันเดียวกัน</p>
+                        <h3>3. เลือกช่วงเวลาติดตั้ง</h3>
+                        <p>เลือกช่วงเวลาว่างได้ 1 ช่วง</p>
                     </div>
                     <span class="manager-soft-badge" id="selectedTimeText">ยังไม่ได้เลือกเวลา</span>
                 </div>
 
                 <div class="manager-time-slots" id="timeSlots"></div>
 
-                <div class="manager-custom-time-box">
-                    <div>
-                        <h4>กำหนดเวลาเอง</h4>
-                        <p>ใช้ในกรณีที่หัวหน้าช่างต้องการกำหนดช่วงเวลาเฉพาะให้ช่างคนนี้</p>
+                <div class="manager-note-card">
+                    <div class="manager-note-head">
+                        <div>
+                            <label for="setup_note">หมายเหตุเพิ่มเติม</label>
+                            <p>ระบุรายละเอียดเพิ่มเติมสำหรับการติดตั้ง (ถ้ามี)</p>
+                        </div>
+                        <span id="setupNoteCounter">0/500</span>
                     </div>
-                    <div class="manager-custom-time-grid">
-                        <label>
-                            เริ่ม
-                            <input type="time" id="customStartTime" min="08:00" max="18:00" step="900">
-                        </label>
-                        <label>
-                            สิ้นสุด
-                            <input type="time" id="customEndTime" min="08:00" max="18:00" step="900">
-                        </label>
-                        <button type="button" class="manager-custom-time-btn" onclick="selectCustomTime()">ใช้เวลานี้</button>
-                    </div>
-                    <p class="manager-custom-time-note" id="customTimeNote">กำหนดเวลาได้ แต่ต้องไม่ทับกับคิวเดิมในวันเดียวกัน</p>
+                    <textarea
+                        id="setup_note"
+                        name="setup_note"
+                        maxlength="500"
+                        rows="4"
+                        placeholder="กรอกรายละเอียดเพิ่มเติมเกี่ยวกับงานติดตั้ง..."
+                        <?= $is_read_only ? 'readonly' : '' ?>
+                    ><?= h($selected_setup['setup_note'] ?? '') ?></textarea>
                 </div>
             </div>
         </section>
@@ -638,13 +805,77 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                 <?= manager_icon_svg('back') ?>
                 กลับรายการใบงาน
             </a>
-            <button class="manager-action-btn primary" type="submit">
-                <?= manager_icon_svg('check') ?>
-                บันทึกการมอบหมาย
-            </button>
+            <?php if (!$is_read_only): ?>
+                <button class="manager-action-btn primary" id="saveAssignmentButton" type="submit" disabled>
+                    <?= manager_icon_svg('check') ?>
+                    บันทึกการมอบหมาย
+                </button>
+            <?php endif; ?>
         </div>
     </form>
 </div>
+
+
+<style>
+.assignment-product-section { align-items: stretch !important; }
+.assignment-product-list { width: 100%; display: grid; gap: 10px; margin-top: 8px; }
+.assignment-product-row {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 90px 150px;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1px solid #dbe5ef;
+    border-radius: 14px;
+    background: #fff;
+}
+.assignment-product-number {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: grid; place-items: center;
+    background: #e3f2fd; color: #0d47a1; font-weight: 900;
+}
+.assignment-product-info { min-width: 0; }
+.assignment-product-info strong,
+.assignment-product-info small { display: block; }
+.assignment-product-info small { margin-top: 4px; color: #64748b; }
+.assignment-product-qty span,
+.assignment-product-price span { display: block; font-size: 12px; color: #64748b; }
+.manager-tech-card.active {
+    border-color: #2196f3 !important;
+    box-shadow: 0 0 0 3px rgba(33,150,243,.14) !important;
+    background: #f5fbff !important;
+}
+.manager-tech-card.active .manager-tech-actions .select {
+    background: #2196f3 !important; color: #fff !important; border-color: #2196f3 !important;
+}
+.manager-time-slot.active {
+    border-color: #2196f3 !important;
+    background: #e3f2fd !important;
+    box-shadow: 0 0 0 3px rgba(33,150,243,.16) !important;
+}
+.manager-time-slot.active span { color: #0d47a1; font-weight: 900; }
+.manager-note-card {
+    margin-top: 16px; padding: 16px;
+    border: 1px solid #dbe5ef; border-radius: 16px; background: #f8fbff;
+}
+.manager-note-head { display:flex; justify-content:space-between; gap:16px; margin-bottom:10px; }
+.manager-note-head label { display:block; font-weight:900; color:#0f172a; }
+.manager-note-head p { margin:3px 0 0; color:#64748b; font-size:13px; }
+.manager-note-head span { color:#64748b; font-size:12px; }
+.manager-note-card textarea {
+    width:100%; min-height:100px; box-sizing:border-box; resize:vertical;
+    border:1px solid #cbd5e1; border-radius:12px; padding:12px 14px;
+    font:inherit; background:#fff; outline:none;
+}
+.manager-note-card textarea:focus {
+    border-color:#2196f3; box-shadow:0 0 0 3px rgba(33,150,243,.14);
+}
+.calendar-day.holiday small:empty { display:none; }
+@media (max-width: 900px) {
+    .assignment-product-row { grid-template-columns: 36px minmax(0,1fr); }
+    .assignment-product-qty, .assignment-product-price { grid-column: 2; }
+}
+</style>
 
 <script>
 const selectedSetup = <?= $selected_setup_json ?: '{}' ?>;
@@ -656,8 +887,8 @@ const initialInstallDate = <?= $current_install_date_json ?: "''" ?>;
 const initialInstallTime = <?= $current_install_time_json ?: "''" ?>;
 const initialInstallEndTime = <?= $current_install_end_time_json ?: "''" ?>;
 const isEditMode = !!(currentAssignment && currentAssignment.assign_id);
-const isLimitedEdit = <?= $current_tech_unavailable_json ?: 'false' ?>;
-const lockedInstallDate = isLimitedEdit ? (initialInstallDate || '') : '';
+const assignmentPermissions = <?= $assignment_permissions_json ?: '{}' ?>;
+const serverToday = <?= $today_bangkok_json ?: "''" ?>;
 
 let selectedTechId = initialTechId || '';
 let currentQueueTechId = initialTechId || '';
@@ -671,12 +902,13 @@ const thaiMonths = [
 ];
 const weekdayNames = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 const availableTimeSlots = [
-  { start: '09:00', end: '12:00', title: 'ช่วงเช้า', detail: '09:00 - 12:00' },
-  { start: '13:00', end: '15:00', title: 'ช่วงบ่าย', detail: '13:00 - 15:00' },
-  { start: '16:00', end: '18:00', title: 'ช่วงเย็น', detail: '16:00 - 18:00' }
+  { key: 'morning', start: '09:00', end: '12:00', title: 'ช่วงเช้า', detail: '09:00 - 12:00' },
+  { key: 'afternoon', start: '13:00', end: '15:00', title: 'ช่วงบ่าย', detail: '13:00 - 15:00' },
+  { key: 'evening', start: '16:00', end: '18:00', title: 'ช่วงเย็น', detail: '16:00 - 18:00' }
 ];
 let selectedInstallTime = initialInstallTime || '';
 let selectedInstallEndTime = initialInstallEndTime || '';
+let selectedTimeSlot = availableTimeSlots.find(slot => slot.start === selectedInstallTime && slot.end === selectedInstallEndTime)?.key || '';
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -746,10 +978,37 @@ function formatMonthLabel(dateObj) {
   return `${thaiMonths[dateObj.getMonth()]} ${dateObj.getFullYear() + 543}`;
 }
 
-function isHoliday(dateKey) {
-  const dateObj = dateFromKey(dateKey);
-  const day = dateObj.getDay();
+function isPastDate(dateKey) {
+  return dateKey < serverToday;
+}
+
+function isWeekend(dateKey) {
+  const date = dateFromKey(dateKey);
+  const day = date.getDay();
   return day === 0 || day === 6;
+}
+
+function isTimeSlotPassed(dateKey, endTime) {
+  if (!dateKey || !endTime) return true;
+  if (dateKey < serverToday) return true;
+  if (dateKey > serverToday) return false;
+
+  const normalizedEnd = normalizeTime(endTime);
+  if (!normalizedEnd) return true;
+
+  const [hour, minute] = normalizedEnd.split(':').map(Number);
+  const now = new Date();
+  const slotEnd = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    hour,
+    minute,
+    0,
+    0
+  );
+
+  return slotEnd <= now;
 }
 
 function isTechBaseAvailable(tech) {
@@ -758,9 +1017,9 @@ function isTechBaseAvailable(tech) {
 
 function isTechSelectable(tech) {
   if (!tech) return false;
-  // กรณีแก้งานเดิมที่ช่างเดิมไม่ว่าง: เลือกช่างเดิมได้เพื่อแก้เวลา และเลือกช่างใหม่ที่พร้อมรับงานได้
-  if (isLimitedEdit && String(tech.tech_id || '') === String(initialTechId || '')) return true;
-  return isTechBaseAvailable(tech);
+  const isCurrentTech = String(tech.tech_id || '') === String(initialTechId || '');
+  if (!assignmentPermissions.canChangeTech) return isCurrentTech;
+  return isCurrentTech || isTechBaseAvailable(tech);
 }
 
 function getTechById(techId) {
@@ -787,11 +1046,28 @@ function getTechSlotsOnDate(techId, dateKey) {
 
 function isTimeSlotBusy(techId, dateKey, startTime, endTime) {
   return getTechSlotsOnDate(techId, dateKey).some(slot => {
-    if (String(slot.setup_id || '') === String(selectedSetup.setup_id || '')) return false;
+    if (currentAssignment && String(slot.assign_id || '') === String(currentAssignment.assign_id || '')) return false;
     const slotStart = normalizeTime(slot.assign_install_time);
     const slotEnd = normalizeTime(slot.assign_install_end_time) || addMinutesToTime(slotStart, 120);
     return rangesOverlap(startTime, endTime, slotStart, slotEnd);
   });
+}
+
+function getDateSlotState(techId, dateKey) {
+  const busyCount = availableTimeSlots.filter(slot => isTimeSlotBusy(techId, dateKey, slot.start, slot.end)).length;
+  return {
+    busyCount,
+    isFull: busyCount === availableTimeSlots.length,
+  };
+}
+
+function updateSaveButton() {
+  const saveButton = document.getElementById('saveAssignmentButton');
+  if (!saveButton) return;
+  saveButton.disabled = assignmentPermissions.readOnly
+    || !document.getElementById('tech_id').value
+    || !document.getElementById('assign_install_date').value
+    || !document.getElementById('assign_time_slot').value;
 }
 
 function addMinutesToTime(timeValue, minutesToAdd) {
@@ -820,7 +1096,7 @@ function renderTechnicians() {
   });
 
   const selectableCount = filtered.filter(isTechSelectable).length;
-  countText.textContent = `แสดง ${filtered.length} คน | เลือกได้ ${selectableCount} คน`;
+  countText.textContent = `ช่างทั้งหมด ${filtered.length} คน · พร้อมรับงาน ${selectableCount} คน`;
 
   if (filtered.length === 0) {
     list.innerHTML = '<div class="manager-empty-state">ไม่พบข้อมูลช่าง</div>';
@@ -833,12 +1109,12 @@ function renderTechnicians() {
     const disabledClass = unavailable ? ' is-disabled' : '';
     const queueCount = Number(tech.total_queue || getTechSlots(tech.tech_id).length || 0);
     const statusText = !isTechBaseAvailable(tech)
-      ? (isLimitedEdit && String(tech.tech_id || '') === String(initialTechId || '') ? 'ไม่ว่าง / แก้ได้เฉพาะเวลาในวันเดิม' : 'ไม่ว่าง')
+      ? (String(tech.tech_id || '') === String(initialTechId || '') ? 'ไม่รับงานใหม่ แต่ยังทำงานนี้ได้' : 'ไม่รับงานใหม่')
       : 'พร้อมรับงาน';
 
     return `
       <article class="manager-tech-card${active}${disabledClass}">
-        <div class="manager-tech-card-main" onclick="${unavailable ? `viewTechnicianQueue('${escapeHtml(tech.tech_id)}')` : `selectTechnician('${escapeHtml(tech.tech_id)}')`}">
+        <div class="manager-tech-card-main" ${unavailable ? '' : `onclick="selectTechnician('${escapeHtml(tech.tech_id)}')"`}>
           <div class="tech-avatar">${escapeHtml((techDisplayName(tech) || 'ช').slice(0, 1))}</div>
           <div>
             <strong>${escapeHtml(techDisplayName(tech))}</strong>
@@ -847,39 +1123,13 @@ function renderTechnicians() {
           </div>
         </div>
         <div class="manager-tech-actions">
-          <button type="button" onclick="viewTechnicianQueue('${escapeHtml(tech.tech_id)}')">ดูคิว</button>
           <button type="button" class="select" ${unavailable ? 'disabled' : ''} onclick="selectTechnician('${escapeHtml(tech.tech_id)}')">
-            ${unavailable ? 'เลือกไม่ได้' : 'เลือกช่างนี้'}
+            ${unavailable ? 'เลือกไม่ได้' : (active ? 'เลือกแล้ว' : 'เลือกช่าง')}
           </button>
         </div>
       </article>
     `;
   }).join('');
-}
-
-function viewTechnicianQueue(techId) {
-  const tech = getTechById(techId);
-  if (!tech) return;
-
-  currentQueueTechId = techId;
-  if (!isTechSelectable(tech)) {
-    selectedTechId = '';
-    selectedInstallDate = '';
-    selectedInstallTime = '';
-    selectedInstallEndTime = '';
-    document.getElementById('tech_id').value = '';
-    document.getElementById('assign_install_date').value = '';
-    document.getElementById('assign_install_time').value = '';
-    document.getElementById('assign_install_end_time').value = '';
-    document.getElementById('selectedDateBox').textContent = 'ช่างคนนี้ถูกตั้งค่าว่าไม่ว่าง จึงเลือกมอบหมายไม่ได้';
-  }
-
-  document.getElementById('schedulePanel').classList.add('show');
-  renderTechnicians();
-  renderSelectedTechSchedule();
-  renderCalendar();
-
-  setTimeout(() => document.getElementById('schedulePanel').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 }
 
 function selectTechnician(techId) {
@@ -890,30 +1140,23 @@ function selectTechnician(techId) {
   currentQueueTechId = techId;
   document.getElementById('tech_id').value = techId;
 
-  if (isLimitedEdit && lockedInstallDate) {
-    selectedInstallDate = lockedInstallDate;
-    document.getElementById('assign_install_date').value = lockedInstallDate;
-    document.getElementById('selectedDateBox').textContent = `วันที่ติดตั้งเดิม: ${formatDate(lockedInstallDate)} | เลือกวันอื่นไม่ได้ แต่เปลี่ยนช่างและเวลาได้`;
-  } else {
-    if (!selectedInstallDate && initialInstallDate) {
-      selectedInstallDate = initialInstallDate;
-    }
-    document.getElementById('assign_install_date').value = selectedInstallDate || '';
-    document.getElementById('selectedDateBox').textContent = selectedInstallDate
-      ? `วันที่ติดตั้งที่เลือก: ${formatDate(selectedInstallDate)} | สามารถเลือกวันใหม่ได้จากปฏิทิน`
-      : 'กรุณาเลือกวันที่ติดตั้งจากปฏิทิน';
-  }
+  if (!selectedInstallDate && initialInstallDate) selectedInstallDate = initialInstallDate;
+  document.getElementById('assign_install_date').value = selectedInstallDate || '';
+  document.getElementById('selectedDateBox').textContent = selectedInstallDate
+    ? `วันที่ติดตั้งที่เลือก: ${formatDate(selectedInstallDate)}`
+    : 'กรุณาเลือกวันที่ติดตั้งจากปฏิทิน';
 
   selectedInstallTime = '';
   selectedInstallEndTime = '';
-  document.getElementById('assign_install_time').value = '';
-  document.getElementById('assign_install_end_time').value = '';
+  selectedTimeSlot = '';
+  document.getElementById('assign_time_slot').value = '';
   document.getElementById('schedulePanel').classList.add('show');
 
   renderTechnicians();
   renderSelectedTechSchedule();
   renderCalendar();
   renderTimeSlots();
+  updateSaveButton();
 
   setTimeout(() => document.getElementById('schedulePanel').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 }
@@ -926,7 +1169,7 @@ function renderSelectedTechSchedule() {
 
   if (!tech) {
     body.innerHTML = '<tr><td colspan="6" class="manager-empty-cell">ยังไม่ได้เลือกช่าง</td></tr>';
-    title.textContent = 'เลือกช่างก่อน ระบบจะแสดงจำนวนคิวและตารางวันว่างของช่างคนนั้น';
+    title.textContent = 'เลือกช่างก่อน ระบบจะแสดงตารางงานและวันที่เลือกได้';
     count.textContent = 'ยังไม่ได้เลือกช่าง';
     return;
   }
@@ -936,8 +1179,8 @@ function renderSelectedTechSchedule() {
   const slots = getTechSlotsOnDate(tech.tech_id, displayDate)
     .sort((a, b) => String(a.assign_install_time || '00:00').localeCompare(String(b.assign_install_time || '00:00')));
 
-  const statusText = isTechBaseAvailable(tech) ? 'พร้อมรับงาน' : 'ไม่ว่าง';
-  title.textContent = `${techDisplayName(tech)} | สถานะ ${statusText} | วันที่ ${formatDate(displayDate)}`;
+  const statusText = isTechBaseAvailable(tech) ? 'พร้อมรับงาน' : 'ไม่รับงานใหม่';
+  title.textContent = `ช่างที่เลือก: ${techDisplayName(tech)} | สถานะ ${statusText} | วันที่ ${formatDate(displayDate)}`;
   count.textContent = `งานในวันนี้ ${slots.length} คิว`;
 
   if (slots.length === 0) {
@@ -973,7 +1216,7 @@ function renderCalendar() {
     return;
   }
 
-  const canSelectDate = !isLimitedEdit && selectedTechId === currentQueueTechId && isTechSelectable(tech);
+  const canSelectDate = assignmentPermissions.canChangeDate && selectedTechId === currentQueueTechId && isTechSelectable(tech);
   const year = calendarCursor.getFullYear();
   const month = calendarCursor.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
@@ -985,22 +1228,22 @@ function renderCalendar() {
   for (let day = 1; day <= daysInMonth; day++) {
     const dateObj = new Date(year, month, day);
     const dateKey = `${dateObj.getFullYear()}-${pad2(dateObj.getMonth() + 1)}-${pad2(dateObj.getDate())}`;
-    const holiday = isHoliday(dateKey);
-    const busySlots = getTechSlotsOnDate(currentQueueTechId, dateKey);
+    const pastDate = isPastDate(dateKey);
+    const weekend = isWeekend(dateKey);
+    const slotState = getDateSlotState(currentQueueTechId, dateKey);
     const unavailableByStatus = !isTechSelectable(tech);
-    const locked = isLimitedEdit && lockedInstallDate === dateKey;
-    const lockedOtherDate = isLimitedEdit && lockedInstallDate !== dateKey;
-    const selected = (selectedInstallDate === dateKey && selectedTechId === currentQueueTechId) || locked ? ' selected' : '';
-    const statusClass = locked
-      ? ' locked-date'
-      : (lockedOtherDate ? ' locked-other-date busy' : (holiday ? ' holiday' : (busySlots.length || unavailableByStatus ? ' busy' : ' available')));
-    const label = locked
-      ? 'วันที่เดิม'
-      : (lockedOtherDate ? 'แก้ไขวันไม่ได้' : (holiday ? 'วันหยุด' : (busySlots.length ? `${busySlots.length} คิว` : (unavailableByStatus ? 'ไม่ว่าง' : 'ว่าง'))));
-    const disabled = isLimitedEdit || holiday || unavailableByStatus || !canSelectDate ? 'disabled' : '';
+    const selected = selectedInstallDate === dateKey && selectedTechId === currentQueueTechId ? ' selected' : '';
+    const todayClass = dateKey === serverToday ? ' today' : '';
+    const statusClass = (pastDate || weekend)
+      ? ' holiday'
+      : (slotState.isFull ? ' busy' : (slotState.busyCount > 0 ? ' partial' : (unavailableByStatus ? ' busy' : ' available')));
+    const label = pastDate
+      ? ''
+      : (weekend ? 'วันหยุด' : (slotState.isFull ? 'เต็ม' : (slotState.busyCount > 0 ? 'มีคิว' : (unavailableByStatus ? 'ไม่รับงานใหม่' : 'ว่าง'))));
+    const disabled = !assignmentPermissions.canChangeDate || pastDate || weekend || slotState.isFull || unavailableByStatus || !canSelectDate ? 'disabled' : '';
 
     html += `
-      <button type="button" class="calendar-day${statusClass}${selected}" ${disabled} onclick="selectInstallDate('${dateKey}')">
+      <button type="button" class="calendar-day${statusClass}${todayClass}${selected}" ${disabled} onclick="selectInstallDate('${dateKey}')">
         <span>${day}</span>
         <small>${label}</small>
       </button>
@@ -1012,36 +1255,29 @@ function renderCalendar() {
 
 function selectInstallDate(dateKey) {
   const tech = getTechById(currentQueueTechId);
-  if (isLimitedEdit) return;
-  if (!tech || selectedTechId !== currentQueueTechId || isHoliday(dateKey) || !isTechSelectable(tech)) {
+  if (!assignmentPermissions.canChangeDate || !tech || selectedTechId !== currentQueueTechId || (isPastDate(dateKey) || isWeekend(dateKey)) || getDateSlotState(currentQueueTechId, dateKey).isFull || !isTechSelectable(tech)) {
     return;
   }
 
   selectedInstallDate = dateKey;
   selectedInstallTime = '';
   selectedInstallEndTime = '';
+  selectedTimeSlot = '';
   document.getElementById('assign_install_date').value = dateKey;
-  document.getElementById('assign_install_time').value = '';
-  document.getElementById('assign_install_end_time').value = '';
+  document.getElementById('assign_time_slot').value = '';
 
-  const busyCount = getTechSlotsOnDate(currentQueueTechId, dateKey).filter(slot => String(slot.setup_id || '') !== String(selectedSetup.setup_id || '')).length;
-  document.getElementById('selectedDateBox').textContent = busyCount > 0
-    ? `วันที่ติดตั้งที่เลือก: ${formatDate(dateKey)} | วันนี้มีคิวแล้ว ${busyCount} คิว กรุณาเลือกเวลาที่ไม่ชนกัน`
-    : `วันที่ติดตั้งที่เลือก: ${formatDate(dateKey)} | ช่างยังไม่มีคิววันนี้`;
+  document.getElementById('selectedDateBox').textContent = `วันที่ติดตั้งที่เลือก: ${formatDate(dateKey)}`;
 
   renderCalendar();
   renderSelectedTechSchedule();
   renderTimeSlots();
+  updateSaveButton();
 }
 
 function renderTimeSlots() {
   const box = document.getElementById('timeSlots');
   const panel = document.getElementById('timePanel');
   const text = document.getElementById('selectedTimeText');
-  const customStart = document.getElementById('customStartTime');
-  const customEnd = document.getElementById('customEndTime');
-  const customNote = document.getElementById('customTimeNote');
-
   if (!box || !panel || !text) return;
 
   const currentTech = getTechById(currentQueueTechId);
@@ -1049,9 +1285,6 @@ function renderTimeSlots() {
     panel.classList.remove('show');
     box.innerHTML = '';
     text.textContent = 'เลือกวันที่ก่อน แล้วระบบจะแสดงช่วงเวลาที่เลือกได้';
-    if (customStart) customStart.value = '';
-    if (customEnd) customEnd.value = '';
-    if (customNote) customNote.textContent = 'กำหนดเวลาได้ แต่ต้องไม่ทับกับคิวเดิมในวันเดียวกัน';
     return;
   }
 
@@ -1062,12 +1295,16 @@ function renderTimeSlots() {
 
   box.innerHTML = availableTimeSlots.map(slot => {
     const busy = isTimeSlotBusy(currentQueueTechId, selectedInstallDate, slot.start, slot.end);
-    const active = selectedInstallTime === slot.start && selectedInstallEndTime === slot.end ? ' active' : '';
-    const disabled = busy ? ' disabled' : '';
-    const label = busy ? 'ชนกับคิวเดิม' : 'เลือกได้';
+    const passed = isTimeSlotPassed(selectedInstallDate, slot.end);
+    const unavailable = busy || passed;
+    const active = selectedTimeSlot === slot.key && !unavailable ? ' active' : '';
+    const disabled = unavailable ? ' disabled' : '';
+    const label = passed
+      ? 'หมดเวลา'
+      : (busy ? 'ไม่ว่าง' : (active ? '✓ เลือกแล้ว' : 'ว่าง'));
 
     return `
-      <button type="button" class="manager-time-slot${active}${disabled}" ${busy ? 'disabled' : ''} onclick="selectInstallTime('${slot.start}', '${slot.end}')">
+      <button type="button" class="manager-time-slot${active}${disabled}" ${unavailable ? 'disabled' : ''} onclick="selectInstallTime('${slot.key}')">
         <strong>${escapeHtml(slot.title)}</strong>
         <em>${escapeHtml(slot.detail)} น.</em>
         <span>${label}</span>
@@ -1076,59 +1313,40 @@ function renderTimeSlots() {
   }).join('');
 }
 
-function selectInstallTime(startTime, endTime) {
+function selectInstallTime(slotKey) {
   if (!selectedInstallDate || !currentQueueTechId) return;
 
-  startTime = normalizeTime(startTime);
-  endTime = normalizeTime(endTime);
+  const slot = availableTimeSlots.find(item => item.key === slotKey);
+  if (!slot) return;
+
+  const startTime = normalizeTime(slot.start);
+  const endTime = normalizeTime(slot.end);
 
   if (!startTime || !endTime || timeToMinutes(endTime) <= timeToMinutes(startTime)) {
     alert('กรุณาเลือกเวลาเริ่มต้นและเวลาสิ้นสุดให้ถูกต้อง');
     return;
   }
 
+  if (isTimeSlotPassed(selectedInstallDate, endTime)) {
+    alert('ช่วงเวลานี้ผ่านไปแล้ว กรุณาเลือกช่วงเวลาใหม่');
+    return;
+  }
+
   if (isTimeSlotBusy(currentQueueTechId, selectedInstallDate, startTime, endTime)) {
-    alert('ช่วงเวลานี้ชนกับคิวงานเดิม กรุณาเลือกช่วงเวลาอื่น');
+    alert('ช่วงเวลานี้มีงานของช่างแล้ว กรุณาเลือกช่วงเวลาอื่น');
     return;
   }
 
   selectedInstallTime = startTime;
   selectedInstallEndTime = endTime;
-  document.getElementById('assign_install_time').value = startTime;
-  document.getElementById('assign_install_end_time').value = endTime;
+  selectedTimeSlot = slot.key;
+  document.getElementById('assign_time_slot').value = slot.key;
   document.getElementById('selectedTimeText').textContent = `เวลาที่เลือก: ${timeRangeLabel(startTime, endTime)}`;
   renderTimeSlots();
-}
-
-function selectCustomTime() {
-  const start = normalizeTime(document.getElementById('customStartTime')?.value || '');
-  const end = normalizeTime(document.getElementById('customEndTime')?.value || '');
-  const note = document.getElementById('customTimeNote');
-
-  if (!selectedInstallDate || !currentQueueTechId || selectedTechId !== currentQueueTechId || !isTechSelectable(getTechById(currentQueueTechId))) {
-    if (note) note.textContent = 'กรุณาเลือกช่างและวันที่ก่อน';
-    return;
-  }
-
-  if (!start || !end) {
-    if (note) note.textContent = 'กรุณากรอกเวลาเริ่มและเวลาสิ้นสุด';
-    return;
-  }
-
-  if (timeToMinutes(end) <= timeToMinutes(start)) {
-    if (note) note.textContent = 'เวลาสิ้นสุดต้องมากกว่าเวลาเริ่ม';
-    return;
-  }
-
-  if (isTimeSlotBusy(currentQueueTechId, selectedInstallDate, start, end)) {
-    if (note) note.textContent = 'ช่วงเวลานี้ชนกับคิวงานเดิม กรุณาเลือกเวลาอื่น';
-    return;
-  }
-
-  if (note) note.textContent = `ใช้เวลาที่กำหนดเอง: ${timeRangeLabel(start, end)}`;
-  selectInstallTime(start, end);
+  updateSaveButton();
 }
 function beforeAssignSubmit() {
+  if (assignmentPermissions.readOnly) return false;
   if (!document.getElementById('setup_id').value) {
     alert('ไม่พบใบงานติดตั้ง');
     return false;
@@ -1141,19 +1359,27 @@ function beforeAssignSubmit() {
     alert('กรุณาเลือกวันที่ติดตั้งจากตารางเวลาช่าง');
     return false;
   }
-  if (!document.getElementById('assign_install_time').value || !document.getElementById('assign_install_end_time').value) {
+  if (!document.getElementById('assign_time_slot').value) {
     alert('กรุณาเลือกช่วงเวลาติดตั้ง');
     return false;
   }
-  const startTime = document.getElementById('assign_install_time').value;
-  const endTime = document.getElementById('assign_install_end_time').value;
-  if (timeToMinutes(endTime) <= timeToMinutes(startTime)) {
-    alert('เวลาสิ้นสุดต้องมากกว่าเวลาเริ่ม');
+  const selectedSlot = availableTimeSlots.find(slot => slot.key === document.getElementById('assign_time_slot').value);
+  if (!selectedSlot) return false;
+  const startTime = selectedSlot.start;
+  const endTime = selectedSlot.end;
+
+  if (isTimeSlotPassed(document.getElementById('assign_install_date').value, endTime)) {
+    alert('ช่วงเวลาที่เลือกผ่านไปแล้ว กรุณาเลือกช่วงเวลาใหม่');
     return false;
   }
+
   if (isTimeSlotBusy(document.getElementById('tech_id').value, document.getElementById('assign_install_date').value, startTime, endTime)) {
-    alert('ช่วงเวลานี้ชนกับคิวงานเดิม กรุณาเลือกช่วงเวลาอื่น');
+    alert('ช่วงเวลานี้มีงานของช่างแล้ว กรุณาเลือกช่วงเวลาอื่น');
     return false;
+  }
+  if (assignmentPermissions.requiresTechChangeConfirmation && initialTechId && document.getElementById('tech_id').value !== initialTechId) {
+    if (!confirm('ช่างรับงานนี้แล้ว ยืนยันการเปลี่ยนช่างหรือไม่?')) return false;
+    document.getElementById('confirm_tech_change').value = '1';
   }
   return true;
 }
@@ -1161,10 +1387,20 @@ function beforeAssignSubmit() {
 const techSearchInput = document.getElementById('techSearch');
 if (techSearchInput) techSearchInput.addEventListener('input', renderTechnicians);
 
+const setupNoteInput = document.getElementById('setup_note');
+const setupNoteCounter = document.getElementById('setupNoteCounter');
+function updateSetupNoteCounter() {
+  if (!setupNoteInput || !setupNoteCounter) return;
+  setupNoteCounter.textContent = `${setupNoteInput.value.length}/500`;
+}
+if (setupNoteInput) setupNoteInput.addEventListener('input', updateSetupNoteCounter);
+updateSetupNoteCounter();
+
 renderTechnicians();
 renderSelectedTechSchedule();
 renderCalendar();
 renderTimeSlots();
+updateSaveButton();
 
 if (initialTechId) {
   document.getElementById('schedulePanel').classList.add('show');
@@ -1172,19 +1408,17 @@ if (initialTechId) {
   document.getElementById('assign_install_date').value = initialInstallDate || '';
   if (initialInstallDate) {
     selectedInstallDate = initialInstallDate;
-    document.getElementById('selectedDateBox').textContent = isLimitedEdit
-      ? `วันที่ติดตั้งเดิม: ${formatDate(initialInstallDate)} | เลือกวันอื่นไม่ได้ แต่เปลี่ยนช่างและเวลาได้`
-      : `วันที่ติดตั้งที่เลือก: ${formatDate(initialInstallDate)} | สามารถเลือกวันใหม่ได้จากปฏิทิน`;
+    document.getElementById('selectedDateBox').textContent = `วันที่ติดตั้งที่เลือก: ${formatDate(initialInstallDate)}`;
   }
   if (initialInstallTime) {
     selectedInstallTime = initialInstallTime;
     selectedInstallEndTime = initialInstallEndTime || '';
-    document.getElementById('assign_install_time').value = initialInstallTime;
-    document.getElementById('assign_install_end_time').value = initialInstallEndTime || '';
+    document.getElementById('assign_time_slot').value = selectedTimeSlot;
   }
   renderSelectedTechSchedule();
   renderCalendar();
   renderTimeSlots();
+  updateSaveButton();
 }
 </script>
 

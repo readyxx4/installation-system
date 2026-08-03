@@ -6,6 +6,10 @@
    ========================================================= */
 
 :root {
+  --brand-blue-50: #E3F2FD;
+  --brand-blue-200: #90CAF9;
+  --brand-blue-500: #2196F3;
+  --brand-blue-900: #0D47A1;
   --primary: #2f6fed;
   --primary-dark: #1f4fc4;
   --sky-light: #d9ecff;
@@ -23,6 +27,105 @@
   --soft-bg: #f8faff;
   --page-bg: #f3f6fb;
   --shadow-soft: 0 14px 34px -26px rgba(15, 23, 42, 0.35);
+}
+
+/* Admin brand theme: scoped to role-3 so other modules retain their current theme. */
+.role-3 {
+  --admin-bg: var(--brand-blue-50);
+  --admin-card: #ffffff;
+  --admin-ink: var(--brand-blue-900);
+  --admin-muted: #4f6f91;
+  --admin-border: var(--brand-blue-200);
+}
+
+.role-3 .main,
+.role-3 body.app-body,
+body.app-body.role-3,
+.role-3 body.app-body .content {
+  background: var(--brand-blue-50) !important;
+}
+
+.role-3 .sidebar { border-right-color: var(--brand-blue-200) !important; }
+.role-3 .sidebar .brand { border-bottom-color: rgba(144, 202, 249, 0.35) !important; }
+.role-3 .nav-link:hover { background: rgba(144, 202, 249, 0.2) !important; }
+.role-3 .nav-link.active {
+  background: var(--brand-blue-900) !important;
+  box-shadow: 0 14px 28px rgba(13, 71, 161, 0.32) !important;
+}
+.role-3 .sidebar-profile {
+  background: rgba(144, 202, 249, 0.14) !important;
+  border-color: rgba(144, 202, 249, 0.32) !important;
+}
+.role-3 .sidebar-profile-avatar { background: var(--brand-blue-500) !important; }
+.role-3 .nav-section-title,
+.role-3 .sidebar-profile-info span,
+.role-3 .brand span { color: rgba(227, 242, 253, 0.78) !important; }
+
+.role-3 .panel,
+.role-3 .admin-widget,
+.role-3 .staff-create-card { border-color: var(--brand-blue-200) !important; }
+.role-3 .toolbar,
+.role-3 .data-table th,
+.role-3 .staff-form-actions,
+.role-3 .staff-create-head {
+  border-color: var(--brand-blue-200) !important;
+  background: var(--brand-blue-50) !important;
+}
+
+.role-3 .btn-add,
+.role-3 .btn-search,
+.role-3 .staff-save-btn {
+  background: var(--brand-blue-500) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(33, 150, 243, 0.24) !important;
+}
+.role-3 .btn-add:hover,
+.role-3 .btn-search:hover,
+.role-3 .staff-save-btn:hover { background: var(--brand-blue-900) !important; }
+.role-3 .btn-edit,
+.role-3 .btn-small {
+  background: var(--brand-blue-50) !important;
+  color: var(--brand-blue-900) !important;
+  border-color: var(--brand-blue-200) !important;
+}
+
+.role-3 .toolbar input,
+.role-3 .toolbar select,
+.role-3 .staff-input-wrap input,
+.role-3 .staff-input-wrap select,
+.role-3 .staff-textarea-wrap textarea,
+.role-3 .staff-input-wrap.address-select-wrap { border-color: var(--brand-blue-200) !important; }
+.role-3 .toolbar input:focus,
+.role-3 .toolbar select:focus,
+.role-3 .staff-input-wrap input:focus,
+.role-3 .staff-input-wrap select:focus,
+.role-3 .staff-textarea-wrap textarea:focus,
+.role-3 .staff-input-wrap.address-select-wrap:has(.address-dropdown.is-open) {
+  border-color: var(--brand-blue-200) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(144, 202, 249, 0.35) !important;
+}
+
+.role-3 .admin-search-pill,
+.role-3 .admin-date-pill,
+.role-3 .admin-soft-badge,
+.role-3 .admin-widget-link,
+.role-3 .menu-v2-icon,
+.role-3 .admin-menu-v2-card {
+  border-color: var(--brand-blue-200) !important;
+  background: var(--brand-blue-50) !important;
+  color: var(--brand-blue-900) !important;
+}
+.role-3 .admin-menu-v2-card:hover {
+  border-color: var(--brand-blue-500) !important;
+  box-shadow: 0 16px 30px -24px rgba(13, 71, 161, 0.35) !important;
+}
+.role-3 .admin-summary-card.green,
+.role-3 .admin-summary-card.blue,
+.role-3 .admin-summary-card.orange,
+.role-3 .admin-summary-card.cyan,
+.role-3 .admin-summary-card.purple {
+  background: linear-gradient(135deg, var(--brand-blue-500), var(--brand-blue-900)) !important;
 }
 
 * {
@@ -4737,6 +4840,15 @@ body.app-body {
   background: #ef4444;
 }
 
+.calendar-legend.partial {
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.calendar-legend.partial::before {
+  background: #f59e0b;
+}
+
 .calendar-legend.holiday {
   background: #f1f5f9;
   color: #64748b;
@@ -4820,6 +4932,16 @@ body.app-body {
   color: #b91c1c;
 }
 
+.calendar-day.partial {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.calendar-day.partial small {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .calendar-day.holiday {
   border-color: #e2e8f0;
   background: #f8fafc;
@@ -4834,6 +4956,11 @@ body.app-body {
 .calendar-day.holiday small {
   background: #e2e8f0;
   color: #64748b;
+}
+
+.calendar-day.today {
+  outline: 2px solid #f59e0b;
+  outline-offset: -2px;
 }
 
 .calendar-day em {
