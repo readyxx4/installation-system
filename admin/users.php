@@ -295,7 +295,7 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                             <?php if ($is_long): ?>
                                 <span class="address-short"><?= h($short_address) ?></span>
                                 <span class="address-full" style="display:none;"><?= nl2br(h($wrapped_address)) ?></span>
-                                <button type="button" class="text-more-btn" onclick="toggleAddress(this)">ดูเพิ่มเติม</button>
+                                <button type="button" class="text-more-btn" data-toggle-address>ดูเพิ่มเติม</button>
                             <?php else: ?>
                                 <?= h($address) ?>
                             <?php endif; ?>
@@ -313,7 +313,7 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                             <?php if ($row['user_id'] !== ($_SESSION['user_id'] ?? '')): ?>
                                 <a class="btn btn-delete"
                                    href="<?= h(app_system_url('admin/users.php?action=delete&id=' . urlencode($row['user_id']))) ?>"
-                                   onclick="return confirm('ยืนยันการลบข้อมูลผู้ใช้นี้หรือไม่?')">
+                                   data-confirm-delete="ยืนยันการลบข้อมูลผู้ใช้นี้หรือไม่?">
                                     <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
                                         <path d="M3 6h18"></path>
                                         <path d="M8 6V4h8v2"></path>
@@ -332,22 +332,7 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
     </div>
 </div>
 
-<script>
-function toggleAddress(button) {
-    const cell = button.closest('.address-cell');
-    const shortText = cell.querySelector('.address-short');
-    const fullText = cell.querySelector('.address-full');
-
-    if (fullText.style.display === 'none' || fullText.style.display === '') {
-        shortText.style.display = 'none';
-        fullText.style.display = 'block';
-        button.textContent = 'ย่อข้อความ';
-    } else {
-        shortText.style.display = 'inline';
-        fullText.style.display = 'none';
-        button.textContent = 'ดูเพิ่มเติม';
-    }
-}
-</script>
+<script src="<?= h(app_asset_url('admin/assets/js/toggle_address.js')) ?>?v=<?= h(asset_version('admin/assets/js/toggle_address.js')) ?>"></script>
+<script src="<?= h(app_asset_url('admin/assets/js/confirm_delete.js')) ?>?v=<?= h(asset_version('admin/assets/js/confirm_delete.js')) ?>"></script>
 
 <?php layout_footer(); ?>

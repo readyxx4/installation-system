@@ -173,7 +173,7 @@ layout_header('จัดการสินค้า', 'products');
                 <a
                   class="btn btn-delete"
                   href="<?= h(app_system_url('admin/products.php?action=delete&id=' . urlencode($row['pro_id']))) ?>"
-                  onclick="return confirm('ยืนยันการลบสินค้านี้หรือไม่?')"
+                  data-confirm-delete="ยืนยันการลบสินค้านี้หรือไม่?"
                 >
                   <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M3 6h18"></path>
@@ -194,24 +194,8 @@ layout_header('จัดการสินค้า', 'products');
 </div>
 
 
-<style>
-.table-action-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.action-icon {
-  width: 17px;
-  height: 17px;
-  flex: 0 0 17px;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-</style>
+<link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/table_actions.css')) ?>?v=<?= h(asset_version('admin/assets/css/table_actions.css')) ?>">
+<script src="<?= h(app_asset_url('admin/assets/js/confirm_delete.js')) ?>?v=<?= h(asset_version('admin/assets/js/confirm_delete.js')) ?>"></script>
 
 <?php
 layout_footer();

@@ -205,36 +205,12 @@ layout_header('จัดการข้อมูลระบบ', 'system');
     <div class="staff-create-head staff-create-head-clean"><div><h2>แก้ไขข้อมูลระบบ</h2></div></div>
     <div class="staff-form-grid">
       <div class="staff-field"><label for="system_name">ชื่อระบบ *</label><div class="staff-input-wrap"><?= admin_form_icon_svg('text') ?><input type="text" id="system_name" name="system_name" maxlength="255" value="<?= h($system['system_name']) ?>" required></div></div>
-      <div class="staff-field"><label for="system_logo">รูปภาพ / โลโก้ระบบ</label><div class="staff-input-wrap file-input-wrap"><?= admin_form_icon_svg('image') ?><input type="file" id="system_logo" name="system_logo" accept="image/*" onchange="previewSystemLogo(this)"></div></div>
+      <div class="staff-field"><label for="system_logo">รูปภาพ / โลโก้ระบบ</label><div class="staff-input-wrap file-input-wrap"><?= admin_form_icon_svg('image') ?><input type="file" id="system_logo" name="system_logo" accept="image/*"></div></div>
       <div class="staff-field staff-field-full"><label for="system_desc">รายละเอียดระบบ *</label><div class="staff-textarea-wrap"><?= admin_form_icon_svg('text') ?><textarea id="system_desc" name="system_desc" maxlength="255" required><?= h($system['system_desc']) ?></textarea></div></div>
-      <div class="staff-field staff-field-full"><div class="system-logo-preview"><p id="logoPreviewTitle"><?= !empty($system['system_logo']) ? 'รูปภาพปัจจุบัน' : 'ตัวอย่างรูปภาพ' ?></p><div class="system-logo-image-box"><img id="systemLogoPreview" src="<?= !empty($system['system_logo']) ? h(system_logo_url($system['system_logo'])) : '' ?>" alt="โลโก้ระบบ" style="<?= empty($system['system_logo']) ? 'display:none;' : '' ?>"><?php if (!empty($system['system_logo'])): ?><button type="button" class="logo-remove-x" onclick="removeSystemLogo()" title="ลบรูปภาพ">×</button><?php endif; ?></div><span id="systemLogoFileName"><?= !empty($system['system_logo']) ? h($system['system_logo']) : 'ยังไม่มีรูปภาพ' ?></span><input type="hidden" id="remove_logo" name="remove_logo" value="0"></div></div>
+      <div class="staff-field staff-field-full"><div class="system-logo-preview"><p id="logoPreviewTitle"><?= !empty($system['system_logo']) ? 'รูปภาพปัจจุบัน' : 'ตัวอย่างรูปภาพ' ?></p><div class="system-logo-image-box"><img id="systemLogoPreview" src="<?= !empty($system['system_logo']) ? h(system_logo_url($system['system_logo'])) : '' ?>" alt="โลโก้ระบบ" style="<?= empty($system['system_logo']) ? 'display:none;' : '' ?>"><?php if (!empty($system['system_logo'])): ?><button type="button" class="logo-remove-x" title="ลบรูปภาพ">×</button><?php endif; ?></div><span id="systemLogoFileName"><?= !empty($system['system_logo']) ? h($system['system_logo']) : 'ยังไม่มีรูปภาพ' ?></span><input type="hidden" id="remove_logo" name="remove_logo" value="0"></div></div>
     </div>
     <div class="staff-form-actions"><a class="staff-cancel-btn" href="<?= h(app_system_url('admin/index.php')) ?>">ยกเลิก</a><button class="staff-save-btn" type="submit"><?= admin_form_icon_svg('save') ?> บันทึกข้อมูล</button></div>
   </form>
 </div>
-<script>
-function previewSystemLogo(input) {
-  const file = input.files && input.files[0];
-  const preview = document.getElementById('systemLogoPreview');
-  const fileName = document.getElementById('systemLogoFileName');
-  const title = document.getElementById('logoPreviewTitle');
-  const removeInput = document.getElementById('remove_logo');
-  if (!file) return;
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  if (!allowedTypes.includes(file.type)) { alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น'); input.value = ''; return; }
-  removeInput.value = '0';
-  const reader = new FileReader();
-  reader.onload = function (e) { preview.src = e.target.result; preview.style.display = 'block'; fileName.textContent = file.name; title.textContent = 'ตัวอย่างรูปภาพใหม่'; let imageBox = preview.closest('.system-logo-image-box'); let oldRemoveButton = imageBox.querySelector('.logo-remove-x'); if (!oldRemoveButton) { const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'logo-remove-x'; btn.title = 'ลบรูปภาพ'; btn.textContent = '×'; btn.onclick = removeSystemLogo; imageBox.appendChild(btn); } };
-  reader.readAsDataURL(file);
-}
-function removeSystemLogo() {
-  const preview = document.getElementById('systemLogoPreview');
-  const fileName = document.getElementById('systemLogoFileName');
-  const title = document.getElementById('logoPreviewTitle');
-  const removeInput = document.getElementById('remove_logo');
-  const fileInput = document.getElementById('system_logo');
-  const removeButton = document.querySelector('.logo-remove-x');
-  preview.src = ''; preview.style.display = 'none'; fileName.textContent = 'ลบรูปภาพแล้ว กรุณากดบันทึกข้อมูล'; title.textContent = 'ไม่มีรูปภาพ'; removeInput.value = '1'; fileInput.value = ''; if (removeButton) removeButton.remove();
-}
-</script>
+<script src="<?= h(app_asset_url('admin/assets/js/system_logo.js')) ?>?v=<?= h(asset_version('admin/assets/js/system_logo.js')) ?>"></script>
 <?php layout_footer(); ?>

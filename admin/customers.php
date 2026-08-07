@@ -124,7 +124,7 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
 
               <a class="btn btn-delete"
                  href="<?= h(app_system_url('admin/customers.php?action=delete&id=' . urlencode($row['user_id']))) ?>"
-                 onclick="return confirm('ยืนยันการลบข้อมูลลูกค้านี้หรือไม่?')">
+                 data-confirm-delete="ยืนยันการลบข้อมูลลูกค้านี้หรือไม่?">
                 <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M3 6h18"></path>
                   <path d="M8 6V4h8v2"></path>
@@ -141,5 +141,7 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
     </table>
   </div>
 </div>
+
+<script src="<?= h(app_asset_url('admin/assets/js/confirm_delete.js')) ?>?v=<?= h(asset_version('admin/assets/js/confirm_delete.js')) ?>"></script>
 
 <?php layout_footer(); ?>

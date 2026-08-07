@@ -137,11 +137,7 @@ layout_header('เพิ่มข้อมูลช่าง', 'technicians');
 
 <?= flash_message() ?>
 
-<style>
-.field-live-error{display:none;margin-top:7px;color:#dc2626;font-size:13px;font-weight:700}
-.field-live-error.is-visible{display:block}
-.staff-input-wrap.has-live-error{border-color:#ef4444!important;box-shadow:0 0 0 3px rgba(239,68,68,.1)}
-</style>
+<link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/staff_forms.css')) ?>?v=<?= h(asset_version('admin/assets/css/staff_forms.css')) ?>">
 
 <div class="staff-form-page">
   <div class="staff-page-back-row">
@@ -156,6 +152,7 @@ layout_header('เพิ่มข้อมูลช่าง', 'technicians');
     action="<?= h(app_system_url('admin/technician_add.php')) ?>"
     autocomplete="off"
     id="techAddForm"
+    data-duplicate-url="<?= h(app_system_url('admin/technician_add.php')) ?>"
   >
     <div class="staff-create-head staff-create-head-clean">
       <div>
@@ -265,69 +262,6 @@ layout_header('เพิ่มข้อมูลช่าง', 'technicians');
   </form>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-  const form=document.getElementById('techAddForm');
-  const nameInput=document.getElementById('tech_name');
-  const phoneInput=document.getElementById('tech_phone');
-  const emailInput=document.getElementById('tech_email');
-  const phoneError=document.getElementById('phoneDuplicateError');
-  const emailError=document.getElementById('emailDuplicateError');
-  const url='<?= h(app_system_url('admin/technician_add.php')) ?>';
-
-  function setError(input,box,msg){
-    const wrap=input.closest('.staff-input-wrap');
-    box.textContent=msg;
-    box.classList.toggle('is-visible',!!msg);
-    wrap.classList.toggle('has-live-error',!!msg);
-    input.dataset.duplicate=msg?'1':'0';
-  }
-
-  async function check(field,input,box){
-    const value=input.value.trim();
-    if(!value) return false;
-    const r=await fetch(`${url}?ajax=check_duplicate&field=${encodeURIComponent(field)}&value=${encodeURIComponent(value)}`);
-    const d=await r.json();
-    if(d.duplicate){
-      const label=field==='tech_phone'?'เบอร์โทรศัพท์':'อีเมล';
-      setError(input,box,`${label}นี้มีผู้ใช้งานแล้ว (รหัสช่าง ${d.tech_id})`);
-      return true;
-    }
-    setError(input,box,'');
-    return false;
-  }
-
-  nameInput.addEventListener('blur',function(){
-    this.value=this.value.trim().replace(/\s+/g,' ');
-    this.setCustomValidity(/^\S+(?:\s+\S+)+$/u.test(this.value)?'':'กรุณากรอกชื่อและนามสกุล โดยเว้นวรรคระหว่างชื่อกับนามสกุล');
-  });
-  nameInput.addEventListener('input',function(){this.setCustomValidity('')});
-
-  phoneInput.addEventListener('input',function(){
-    this.value=this.value.replace(/\D/g,'').slice(0,10);
-    setError(this,phoneError,'');
-    if(this.value.length===10) check('tech_phone',this,phoneError);
-  });
-  phoneInput.addEventListener('blur',()=>check('tech_phone',phoneInput,phoneError));
-
-  emailInput.addEventListener('input',function(){setError(this,emailError,'')});
-  emailInput.addEventListener('blur',()=>check('tech_email',emailInput,emailError));
-
-  form.addEventListener('submit',async function(e){
-    e.preventDefault();
-    nameInput.value=nameInput.value.trim().replace(/\s+/g,' ');
-    if(!/^\S+(?:\s+\S+)+$/u.test(nameInput.value)){
-      nameInput.setCustomValidity('กรุณากรอกชื่อและนามสกุล โดยเว้นวรรคระหว่างชื่อกับนามสกุล');
-      nameInput.reportValidity();
-      return;
-    }
-    if(!form.reportValidity()) return;
-    const p=await check('tech_phone',phoneInput,phoneError);
-    const m=await check('tech_email',emailInput,emailError);
-    if(p||m) return;
-    form.submit();
-  });
-});
-</script>
+<script src="<?= h(app_asset_url('admin/assets/js/technician_form.js')) ?>?v=<?= h(asset_version('admin/assets/js/technician_form.js')) ?>"></script>
 
 <?php layout_footer(); ?>

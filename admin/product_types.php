@@ -160,7 +160,7 @@ layout_header('จัดการประเภทสินค้า', 'product
                   <?= nl2br(h($wrapped_detail)) ?>
                 </span>
 
-                <button type="button" class="text-more-btn" onclick="toggleAddress(this)">
+                <button type="button" class="text-more-btn" data-toggle-address>
                   ดูเพิ่มเติม
                 </button>
               <?php else: ?>
@@ -184,7 +184,7 @@ layout_header('จัดการประเภทสินค้า', 'product
                 <a
                   class="btn btn-delete"
                   href="<?= h(app_system_url('admin/product_types.php?action=delete&id=' . urlencode($row['protype_id']))) ?>"
-                  onclick="return confirm('ยืนยันการลบประเภทสินค้านี้หรือไม่?')"
+                  data-confirm-delete="ยืนยันการลบประเภทสินค้านี้หรือไม่?"
                 >
                   <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M3 6h18"></path>
@@ -204,42 +204,10 @@ layout_header('จัดการประเภทสินค้า', 'product
   </div>
 </div>
 
-<style>
-.table-action-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
+<link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/table_actions.css')) ?>?v=<?= h(asset_version('admin/assets/css/table_actions.css')) ?>">
 
-.action-icon {
-  width: 17px;
-  height: 17px;
-  flex: 0 0 17px;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-</style>
-
-<script>
-function toggleAddress(button) {
-  const cell = button.closest('.address-cell');
-  const shortText = cell.querySelector('.address-short');
-  const fullText = cell.querySelector('.address-full');
-
-  if (fullText.style.display === 'none' || fullText.style.display === '') {
-    shortText.style.display = 'none';
-    fullText.style.display = 'block';
-    button.textContent = 'ย่อข้อความ';
-  } else {
-    shortText.style.display = 'inline';
-    fullText.style.display = 'none';
-    button.textContent = 'ดูเพิ่มเติม';
-  }
-}
-</script>
+<script src="<?= h(app_asset_url('admin/assets/js/toggle_address.js')) ?>?v=<?= h(asset_version('admin/assets/js/toggle_address.js')) ?>"></script>
+<script src="<?= h(app_asset_url('admin/assets/js/confirm_delete.js')) ?>?v=<?= h(asset_version('admin/assets/js/confirm_delete.js')) ?>"></script>
 
 <?php
 layout_footer();

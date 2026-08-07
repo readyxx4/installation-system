@@ -1,0 +1,76 @@
+.field-live-error {
+  display: none;
+  margin-top: 7px;
+  padding-left: 4px;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.field-live-error.is-visible {
+  display: block;
+}
+
+.staff-input-wrap.has-live-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+}
+
+.password-change-trigger {
+  border: 1px solid #f3b95f;
+  background: #fff6df;
+  color: #a85b00;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.password-change-trigger:hover {
+  background: #ffedbd;
+}
+
+.password-change-trigger.is-active {
+  border-color: #ff8a00;
+  background: #ff8a00;
+  color: #fff;
+}
+
+.password-help {
+  margin-top: 8px;
+  color: #8a6b3f;
+  font-size: 13px;
+}
+
+.password-inline-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.password-inline-row .staff-input-wrap,
+.password-input-wrap {
+  flex: 1;
+}
+
+.password-change-trigger-small {
+  flex: 0 0 auto;
+  min-width: 112px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .password-inline-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .password-change-trigger-small {
+    width: 100%;
+  }
+}
