@@ -17,10 +17,10 @@ function assign_status_name($status): string
     return match ((string) $status) {
         '0' => 'ยังไม่มอบหมาย',
         '1' => 'มอบหมายแล้ว',
-        '2' => 'ช่างรับงาน',
+        '2' => 'ช่างรับงานแล้ว',
         '3' => 'ช่างปฏิเสธงาน',
-        '4' => 'ยกเลิกการมอบหมาย',
-        '5' => 'งานเสร็จสิ้น',
+        '4' => 'ยกเลิกแล้ว',
+        '5' => 'เสร็จสิ้น',
         default => 'ไม่ทราบสถานะ',
     };
 }
@@ -45,7 +45,7 @@ function setup_status_name($status): string
         '1' => 'มอบหมายงานแล้ว',
         '2' => 'ช่างรับงานแล้ว',
         '3' => 'กำลังติดตั้ง',
-        '4' => 'ติดตั้งเสร็จสิ้น',
+        '4' => 'เสร็จสิ้น',
         default => 'ไม่ทราบสถานะ',
     };
 }
@@ -201,7 +201,7 @@ page_head('งานของฉัน', 'ช่างติดตั้ง > �
 
   <div class="stat-card purple">
     <h3><?= h((string) $total_finished) ?></h3>
-    <p>งานเสร็จสิ้น</p>
+    <p>เสร็จสิ้น</p>
   </div>
 </div>
 
@@ -219,9 +219,9 @@ page_head('งานของฉัน', 'ช่างติดตั้ง > �
     <select name="status">
       <option value="">ทุกสถานะ</option>
       <option value="1" <?= $status_filter === '1' ? 'selected' : '' ?>>มอบหมายแล้ว</option>
-      <option value="2" <?= $status_filter === '2' ? 'selected' : '' ?>>ช่างรับงาน</option>
+      <option value="2" <?= $status_filter === '2' ? 'selected' : '' ?>>ช่างรับงานแล้ว</option>
       <option value="3" <?= $status_filter === '3' ? 'selected' : '' ?>>ช่างปฏิเสธงาน</option>
-      <option value="5" <?= $status_filter === '5' ? 'selected' : '' ?>>งานเสร็จสิ้น</option>
+      <option value="5" <?= $status_filter === '5' ? 'selected' : '' ?>>เสร็จสิ้น</option>
     </select>
 
     <button class="btn" type="submit">ค้นหา</button>

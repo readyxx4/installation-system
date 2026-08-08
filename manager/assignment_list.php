@@ -498,7 +498,7 @@ layout_header('รายการมอบหมายงาน', 'assignment_li
                                 <?php if (!empty($row['tech_id'])): ?>
                                     <strong><?= h($row['tech_display']) ?></strong>
                                     <?php if (!empty($row['assign_id']) && (string) ($row['tech_status'] ?? '') === '1'): ?>
-                                        <small class="assignment-tech-warning">ช่างถูกตั้งค่าไม่ว่าง</small>
+                                        <small class="assignment-tech-warning">ไม่พร้อมรับงาน</small>
                                     <?php endif; ?>
                                 <?php else: ?>
                                     -
@@ -538,7 +538,7 @@ layout_header('รายการมอบหมายงาน', 'assignment_li
                                         href="<?= h(app_system_url('manager/assignment_list.php?action=cancel&id=' . urlencode($row['setup_id']))) ?>"
                                         title="ยกเลิกการมอบหมาย"
                                         aria-label="ยกเลิกการมอบหมาย"
-                                        onclick="return confirm('ยืนยันการยกเลิกการมอบหมายงานนี้หรือไม่?')"
+                                        data-confirm-cancel-assignment="ยืนยันการยกเลิกการมอบหมายงานนี้หรือไม่?"
                                     >
                                         <?= manager_icon_svg('cancel') ?>
                                     </a>
@@ -553,5 +553,8 @@ layout_header('รายการมอบหมายงาน', 'assignment_li
 </div>
 
 
+<link rel="stylesheet" href="<?= h(app_asset_url('manager/assets/css/manager.css')) ?>?v=<?= h(asset_version('manager/assets/css/manager.css')) ?>">
+<link rel="stylesheet" href="<?= h(app_asset_url('manager/assets/css/assignment_list.css')) ?>?v=<?= h(asset_version('manager/assets/css/assignment_list.css')) ?>">
+<script src="<?= h(app_asset_url('manager/assets/js/assignment_list.js')) ?>?v=<?= h(asset_version('manager/assets/js/assignment_list.js')) ?>"></script>
 
 <?php layout_footer(); ?>

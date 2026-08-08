@@ -180,47 +180,14 @@ $slip_back_url = $from_manager
     ? app_system_url('manager/assignment_list.php')
     : app_system_url('finance/setups.php');
 
-$assign_url = app_system_url('manager/assignments.php?setup_id=' . urlencode($setup['setup_id']));
-$cancel_assign_url = app_system_url('manager/assignment_list.php?action=cancel&id=' . urlencode($setup['setup_id']));
-$manager_can_edit_assignment = (string) ($setup['setup_status'] ?? '') !== '4';
-$manager_can_cancel_assignment = (string) ($setup['assign_status'] ?? '') === '1';
-
 layout_header('ใบติดตั้ง', 'setups');
 ?>
 
 <div class="install-slip-page">
     <div class="install-slip-toolbar no-print manager-slip-toolbar">
         <a class="install-slip-back" href="<?= h($slip_back_url) ?>">
-            <?= $from_manager ? 'กลับ' : 'กลับ' ?>
+            ย้อนกลับ
         </a>
-
-        <?php if ($from_manager): ?>
-            <?php if ((string) ($setup['setup_status'] ?? '') === '0'): ?>
-                <a class="install-slip-manager-assign" href="<?= h($assign_url) ?>">
-                    มอบหมายงานติดตั้ง
-                </a>
-                <a class="install-slip-manager-cancel" href="<?= h($slip_back_url) ?>">
-                    ยกเลิก
-                </a>
-            <?php elseif ($manager_can_edit_assignment): ?>
-                <a class="install-slip-manager-edit" href="<?= h($assign_url) ?>">
-                    แก้ไขการมอบหมาย
-                </a>
-                <?php if ($manager_can_cancel_assignment): ?>
-                    <a
-                        class="install-slip-manager-cancel"
-                        href="<?= h($cancel_assign_url) ?>"
-                        onclick="return confirm('ยืนยันการยกเลิกการมอบหมายงานนี้หรือไม่?')"
-                    >
-                        ยกเลิกงาน
-                    </a>
-                <?php endif; ?>
-            <?php endif; ?>
-        <?php endif; ?>
-
-        <!-- <button class="install-slip-print" type="button" onclick="window.print()">
-            พิมพ์ใบติดตั้ง
-        </button> -->
     </div>
 
     <section class="install-slip-paper">

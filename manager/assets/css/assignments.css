@@ -1,0 +1,58 @@
+.assignment-product-section { align-items: stretch !important; }
+.assignment-product-list { width: 100%; display: grid; gap: 10px; margin-top: 8px; }
+.assignment-product-row {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 90px 150px;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1px solid #dbe5ef;
+    border-radius: 14px;
+    background: #fff;
+}
+.assignment-product-number {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: grid; place-items: center;
+    background: #e3f2fd; color: #0d47a1; font-weight: 900;
+}
+.assignment-product-info { min-width: 0; }
+.assignment-product-info strong,
+.assignment-product-info small { display: block; }
+.assignment-product-info small { margin-top: 4px; color: #64748b; }
+.assignment-product-qty span,
+.assignment-product-price span { display: block; font-size: 12px; color: #64748b; }
+.manager-tech-card.active {
+    border-color: #2196f3 !important;
+    box-shadow: 0 0 0 3px rgba(33,150,243,.14) !important;
+    background: #f5fbff !important;
+}
+.manager-tech-card.active .manager-tech-actions .select {
+    background: #2196f3 !important; color: #fff !important; border-color: #2196f3 !important;
+}
+.manager-time-slot.active {
+    border-color: #2196f3 !important;
+    background: #e3f2fd !important;
+    box-shadow: 0 0 0 3px rgba(33,150,243,.16) !important;
+}
+.manager-time-slot.active span { color: #0d47a1; font-weight: 900; }
+.manager-note-card {
+    margin-top: 16px; padding: 16px;
+    border: 1px solid #dbe5ef; border-radius: 16px; background: #f8fbff;
+}
+.manager-note-head { display:flex; justify-content:space-between; gap:16px; margin-bottom:10px; }
+.manager-note-head label { display:block; font-weight:900; color:#0f172a; }
+.manager-note-head p { margin:3px 0 0; color:#64748b; font-size:13px; }
+.manager-note-head span { color:#64748b; font-size:12px; }
+.manager-note-card textarea {
+    width:100%; min-height:100px; box-sizing:border-box; resize:vertical;
+    border:1px solid #cbd5e1; border-radius:12px; padding:12px 14px;
+    font:inherit; background:#fff; outline:none;
+}
+.manager-note-card textarea:focus {
+    border-color:#2196f3; box-shadow:0 0 0 3px rgba(33,150,243,.14);
+}
+.calendar-day.holiday small:empty { display:none; }
+@media (max-width: 900px) {
+    .assignment-product-row { grid-template-columns: 36px minmax(0,1fr); }
+    .assignment-product-qty, .assignment-product-price { grid-column: 2; }
+}

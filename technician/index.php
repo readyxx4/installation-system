@@ -27,10 +27,10 @@ function assign_status_name($status): string
     return match ((string) $status) {
         '0' => 'ยังไม่มอบหมาย',
         '1' => 'มอบหมายแล้ว',
-        '2' => 'ช่างรับงาน',
+        '2' => 'ช่างรับงานแล้ว',
         '3' => 'ช่างปฏิเสธงาน',
-        '4' => 'ยกเลิกการมอบหมาย',
-        '5' => 'งานเสร็จสิ้น',
+        '4' => 'ยกเลิกแล้ว',
+        '5' => 'เสร็จสิ้น',
         default => 'ไม่ทราบสถานะ',
     };
 }
@@ -144,55 +144,7 @@ layout_header('หน้าหลักช่างติดตั้ง', 'dash
 
   <div class="stat-card purple">
     <h3><?= h((string) $total_finished) ?></h3>
-    <p>งานเสร็จสิ้น</p>
-  </div>
-</div>
-
-<div class="panel">
-  <div class="panel-title">เมนูการทำงานช่างติดตั้ง</div>
-
-  <div class="menu-card-grid technician-menu-grid">
-    <div class="menu-card">
-      <div class="menu-icon">✅</div>
-
-      <h3>ยืนยันการรับงาน</h3>
-
-      <p>
-        ตรวจสอบงานที่หัวหน้าช่างมอบหมาย แล้วกดยืนยันรับงานหรือปฏิเสธงาน
-      </p>
-
-      <a class="btn-small" href="<?= h(app_system_url('technician/accept_job.php')) ?>">
-        เปิดหน้า
-      </a>
-    </div>
-
-    <div class="menu-card">
-      <div class="menu-icon">📋</div>
-
-      <h3>งานของฉัน</h3>
-
-      <p>
-        ดูรายการงานติดตั้งที่ได้รับมอบหมายและงานที่รับไว้แล้ว
-      </p>
-
-      <a class="btn-small disabled-link" href="#">
-        เร็ว ๆ นี้
-      </a>
-    </div>
-
-    <div class="menu-card">
-      <div class="menu-icon">🖼️</div>
-
-      <h3>บันทึกผลการติดตั้ง</h3>
-
-      <p>
-        อัปโหลดรูปภาพและบันทึกผลการติดตั้งหลังดำเนินงานเสร็จ
-      </p>
-
-      <a class="btn-small disabled-link" href="#">
-        เร็ว ๆ นี้
-      </a>
-    </div>
+    <p>เสร็จสิ้น</p>
   </div>
 </div>
 

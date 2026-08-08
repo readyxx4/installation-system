@@ -1,0 +1,1 @@
+/* Shared JavaScript can be moved here when a pattern is reused across roles. */

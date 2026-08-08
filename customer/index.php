@@ -30,10 +30,10 @@ function setup_status_name($status): string
 {
     return match ((string) $status) {
         '0' => 'รอมอบหมายงาน',
-        '1' => 'มอบหมายงานแล้ว',
+        '1' => 'มอบหมายแล้ว',
         '2' => 'ช่างรับงานแล้ว',
         '3' => 'กำลังติดตั้ง',
-        '4' => 'ติดตั้งเสร็จสิ้น',
+        '4' => 'เสร็จสิ้น',
         default => 'ไม่ทราบสถานะ',
     };
 }
@@ -158,7 +158,7 @@ layout_header('หน้าหลักลูกค้า', 'dashboard');
 
   <div class="stat-card purple">
     <h3><?= h((string) $total_assigned) ?></h3>
-    <p>มอบหมายงานแล้ว</p>
+    <p>มอบหมายแล้ว</p>
   </div>
 
   <div class="stat-card green">
@@ -168,7 +168,7 @@ layout_header('หน้าหลักลูกค้า', 'dashboard');
 
   <div class="stat-card cyan">
     <h3><?= h((string) $total_finished) ?></h3>
-    <p>ติดตั้งเสร็จสิ้น</p>
+    <p>เสร็จสิ้น</p>
   </div>
 </div>
 

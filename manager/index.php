@@ -52,14 +52,10 @@ layout_header('หน้าหลักหัวหน้าช่าง', 'dash
   <div class="manager-home-head">
     <div>
       <h1>ภาพรวมหัวหน้าช่าง</h1>
-      <p>สรุปงานติดตั้ง การมอบหมายงาน และความพร้อมของช่างติดตั้ง</p>
+      <p>สรุปงานติดตั้ง การมอบหมายงาน และสถานะความพร้อมของช่างติดตั้ง</p>
     </div>
 
     <div class="manager-home-tools">
-      <div class="manager-search-pill">
-        <?= manager_icon_svg('search') ?>
-        <span>ค้นหาข้อมูลงานติดตั้ง...</span>
-      </div>
       <div class="manager-date-pill">
         <?= manager_icon_svg('calendar') ?>
         <strong><?= h(date('d/m/Y')) ?></strong>
@@ -115,30 +111,6 @@ layout_header('หน้าหลักหัวหน้าช่าง', 'dash
   </div>
 
   <div class="manager-home-grid">
-    <section class="manager-home-panel menu-panel">
-      <div class="manager-home-panel-head">
-        <div>
-          <h2>เมนูสำหรับหัวหน้าช่าง</h2>
-          <p>ใช้สำหรับมอบหมายงานให้ช่าง และตรวจสอบรายการมอบหมายงาน</p>
-        </div>
-        <span class="manager-soft-badge">งานรอจัดการ <?= h((string) $total_waiting_setups) ?> รายการ</span>
-      </div>
-
-      <div class="manager-home-menu-grid">
-        <a class="manager-home-menu-card" href="<?= h(app_system_url('manager/assignments.php')) ?>">
-          <div class="menu-icon-box"><?= manager_icon_svg('plus') ?></div>
-          <h3>มอบหมายงานช่าง</h3>
-          <p>เลือกงานติดตั้งที่รอมอบหมาย แล้วเลือกช่างที่พร้อมรับงาน</p>
-        </a>
-
-        <a class="manager-home-menu-card" href="<?= h(app_system_url('manager/assignment_list.php')) ?>">
-          <div class="menu-icon-box"><?= manager_icon_svg('list') ?></div>
-          <h3>รายการมอบหมายงาน</h3>
-          <p>ตรวจสอบสถานะงานที่มอบหมายแล้ว และติดตามการรับงานของช่าง</p>
-        </a>
-      </div>
-    </section>
-
     <section class="manager-home-panel status-panel">
       <div class="manager-home-panel-head">
         <div>
@@ -161,7 +133,7 @@ layout_header('หน้าหลักหัวหน้าช่าง', 'dash
             <strong>ไม่พร้อมรับงาน</strong>
             <span><?= h((string) $total_technicians_busy) ?> คน</span>
           </div>
-          <b>ไม่พร้อม</b>
+          <b>ไม่พร้อมรับงาน</b>
         </div>
 
         <div class="manager-status-row done">
@@ -170,36 +142,6 @@ layout_header('หน้าหลักหัวหน้าช่าง', 'dash
             <span><?= h((string) $total_done) ?> รายการ</span>
           </div>
           <b>สำเร็จ</b>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <div class="manager-home-grid lower manager-full-summary-row">
-    <section class="manager-home-panel manager-assignment-summary-panel">
-      <div class="manager-home-panel-head">
-        <div>
-          <h2>สรุปสถานะการมอบหมาย</h2>
-          <p>ภาพรวมจำนวนงานตามขั้นตอนของหัวหน้าช่าง</p>
-        </div>
-      </div>
-
-      <div class="manager-mini-stat-grid manager-mini-stat-grid-wide">
-        <div class="manager-mini-stat wait">
-          <span>รอมอบหมาย</span>
-          <strong><?= h((string) $total_waiting_setups) ?></strong>
-        </div>
-        <div class="manager-mini-stat assigned">
-          <span>มอบหมายแล้ว</span>
-          <strong><?= h((string) $total_assigned) ?></strong>
-        </div>
-        <div class="manager-mini-stat accepted">
-          <span>ช่างรับงาน</span>
-          <strong><?= h((string) $total_accepted) ?></strong>
-        </div>
-        <div class="manager-mini-stat rejected">
-          <span>ปฏิเสธ/ยกเลิก</span>
-          <strong><?= h((string) ($total_rejected + $total_cancelled)) ?></strong>
         </div>
       </div>
     </section>

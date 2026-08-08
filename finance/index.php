@@ -170,15 +170,10 @@ layout_header('หน้าหลักพนักงานขาย', 'dashboa
   <div class="admin-dashboard-head">
     <div>
       <h1>ภาพรวมพนักงานขาย</h1>
-      <p>สรุปข้อมูลงานติดตั้ง การจ่ายสินค้า และเมนูการทำงานหลักของพนักงานขาย</p>
+      <p>สรุปข้อมูลงานติดตั้ง การจ่ายสินค้า และรายการล่าสุดที่ต้องติดตาม</p>
     </div>
 
     <div class="admin-dashboard-tools">
-      <div class="admin-search-box">
-        <?= icon_svg('search') ?>
-        <input type="text" placeholder="ค้นหาข้อมูลงานติดตั้ง..." readonly>
-      </div>
-
       <div class="admin-date-box">
         <?= icon_svg('calendar') ?>
         <?= h(date('d/m/Y')) ?>
@@ -234,60 +229,15 @@ layout_header('หน้าหลักพนักงานขาย', 'dashboa
   </div>
 
   <div class="sales-dashboard-grid">
-    <div class="dashboard-panel sales-menu-panel">
-      <div class="dashboard-panel-head">
-        <div>
-          <h2>เมนูสำหรับพนักงานขาย</h2>
-          <p>เมนูสำหรับสร้างงานติดตั้ง บันทึกการจ่ายสินค้า และดูรายงาน</p>
-        </div>
-
-        <span class="dashboard-pill">
-          ยอดรวม <?= number_format($total_install_price, 2) ?> บาท
-        </span>
-      </div>
-
-      <div class="admin-menu-grid sales-menu-grid">
-          <a class="admin-menu-card" href="<?= h(app_system_url('finance/setups.php')) ?>">
-          <div class="menu-icon-box">
-            <?= icon_svg('list') ?>
-          </div>
-          <h3>รายการงานติดตั้ง</h3>
-          <p>ตรวจสอบรายการงานติดตั้งและสถานะงานทั้งหมด</p>
-        </a>
-
-        <a class="admin-menu-card" href="<?= h(app_system_url('finance/create_setup.php')) ?>">
-          <div class="menu-icon-box">
-            <?= icon_svg('plus') ?>
-          </div>
-          <h3>สร้างงานติดตั้ง</h3>
-          <p>สร้างใบติดตั้งใหม่ให้ลูกค้า เลือกลูกค้าและสินค้า</p>
-        </a>
-
-      
-        <a class="admin-menu-card" href="<?= h(app_system_url('finance/payment.php')) ?>">
-          <div class="menu-icon-box">
-            <?= icon_svg('box') ?>
-          </div>
-          <h3>บันทึกการจ่ายสินค้า</h3>
-          <p>บันทึกสถานะการจ่ายสินค้าให้กับงานติดตั้ง</p>
-        </a>
-
-        <a class="admin-menu-card" href="<?= h(app_system_url('finance/report.php')) ?>">
-          <div class="menu-icon-box">
-            <?= icon_svg('report') ?>
-          </div>
-          <h3>รายงาน</h3>
-          <p>ดูรายงานงานติดตั้ง การจ่ายสินค้า และยอดรวม</p>
-        </a>
-      </div>
-    </div>
-
     <div class="dashboard-panel">
       <div class="dashboard-panel-head">
         <div>
           <h2>สถานะการจ่ายสินค้า</h2>
           <p>สรุปสถานะการจ่ายสินค้าล่าสุด</p>
         </div>
+        <span class="dashboard-pill">
+          ยอดรวม <?= number_format($total_install_price, 2) ?> บาท
+        </span>
       </div>
 
       <div class="sales-payment-status">
