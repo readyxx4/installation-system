@@ -90,13 +90,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $userId === '' ||
         $setupAddress === ''
     ) {
-        redirect_to(app_system_url('finance/create_setup.php?status=error'));
+        redirect_to(app_system_url('sale/create_setup.php?status=error'));
     }
 
     $selectedItems = json_decode($itemsJson, true);
 
     if (!is_array($selectedItems) || count($selectedItems) === 0) {
-        redirect_to(app_system_url('finance/create_setup.php?status=error'));
+        redirect_to(app_system_url('sale/create_setup.php?status=error'));
     }
 
     try {
@@ -224,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         redirect_to(
             app_system_url(
-                'finance/setup_slip.php?id=' . urlencode($setupId) . '&status=created'
+                'sale/setup_slip.php?id=' . urlencode($setupId) . '&status=created'
             )
         );
     } catch (Throwable $e) {
@@ -235,7 +235,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        redirect_to(app_system_url('finance/create_setup.php?status=error'));
+        redirect_to(app_system_url('sale/create_setup.php?status=error'));
     }
 }
 
@@ -244,7 +244,7 @@ layout_header('สร้างใบงานติดตั้ง', 'setup');
 
 <link
   rel="stylesheet"
-  href="<?= h(app_asset_url('finance/style.css')) ?>?v=<?= h(asset_version('finance/create_setup_refactor.css')) ?>"
+  href="<?= h(app_asset_url('sale/assets/css/create_setup.css')) ?>?v=<?= h(asset_version('sale/assets/css/create_setup.css')) ?>"
 >
 
 <?= flash_message() ?>
@@ -254,7 +254,7 @@ layout_header('สร้างใบงานติดตั้ง', 'setup');
   <form
     id="createSetupForm"
     method="POST"
-    action="<?= h(app_system_url('finance/create_setup.php')) ?>"
+    action="<?= h(app_system_url('sale/create_setup.php')) ?>"
     autocomplete="off"
   >
     <input type="hidden" name="setup_id" value="<?= h($setupId) ?>">
@@ -439,6 +439,8 @@ window.createSetupData = {
   products: <?= json_encode($products, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
 };
 </script>
-<script src="<?= h(app_system_url('finance/scripts.js')) ?>?v=<?= time() ?>"></script>
+<script
+  src="<?= h(app_asset_url('sale/assets/js/create_setup.js')) ?>?v=<?= h(asset_version('sale/assets/js/create_setup.js')) ?>"
+></script>
 
 <?php layout_footer(); ?>

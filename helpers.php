@@ -91,7 +91,7 @@ function role_dashboard($role): string
   return match (role_key($role)) {
     '0' => app_system_url('customer/index.php'),
     '1' => app_system_url('manager/index.php'),
-    '2' => app_system_url('finance/index.php'),
+    '2' => app_system_url('sale/index.php'),
     '3' => app_system_url('admin/index.php'),
     'technician' => app_system_url('technician/index.php'),
     default => app_public_url('login.html?error=role'),
@@ -434,15 +434,15 @@ function layout_header(string $title, string $active = 'dashboard'): void
           nav_item(
             'รายการงานติดตั้ง',
             '<i class="fa-solid fa-file-lines"></i>',
-            app_system_url('finance/setups.php'),
+            app_system_url('sale/setups.php'),
             'setups',
             $active
           );
 
           nav_item(
-            'สร้างงานติดตั้ง',
+            'สร้างใบงานติดตั้ง',
             '<i class="fa-solid fa-square-plus"></i>',
-            app_system_url('finance/create_setup.php'),
+            app_system_url('sale/create_setup.php'),
             'setup',
             $active
           );
@@ -453,7 +453,7 @@ function layout_header(string $title, string $active = 'dashboard'): void
           nav_item(
             'บันทึกการจ่ายสินค้า',
             '<i class="fa-solid fa-boxes-stacked"></i>',
-            app_system_url('finance/payment.php'),
+            app_system_url('sale/payment.php'),
             'payment',
             $active
           );
@@ -461,7 +461,7 @@ function layout_header(string $title, string $active = 'dashboard'): void
           nav_item(
             'รายงาน',
             '<i class="fa-solid fa-chart-column"></i>',
-            app_system_url('finance/report.php'),
+            app_system_url('sale/report.php'),
             'report',
             $active
           );

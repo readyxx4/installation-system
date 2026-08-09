@@ -142,6 +142,11 @@ layout_header('รายงาน', 'report');
 page_head('รายงาน', 'หน้าหลัก > รายงาน');
 ?>
 
+<link
+  rel="stylesheet"
+  href="<?= h(app_asset_url('sale/assets/css/report.css')) ?>?v=<?= h(asset_version('sale/assets/css/report.css')) ?>"
+>
+
 <div class="role-hero no-print">
   <div>
     <div class="hero-tag">Sales Report</div>
@@ -312,6 +317,10 @@ page_head('รายงาน', 'หน้าหลัก > รายงาน')
     </table>
   </div>
 </div>
+
+<script
+  src="<?= h(app_asset_url('sale/assets/js/report.js')) ?>?v=<?= h(asset_version('sale/assets/js/report.js')) ?>"
+></script>
 
 <?php
 layout_footer();

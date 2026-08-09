@@ -35,7 +35,17 @@ function manager_icon_svg(string $name): string
 }
 
 $total_setups = safe_count($conn, "SELECT COUNT(*) AS total FROM setup");
-$total_waiting_setups = safe_count($conn, "SELECT COUNT(*) AS total FROM setup WHERE setup_status = 0");
+$total_waiting_setups = safe_count($conn, "
+    SELECT COUNT(*) AS total
+    FROM setup s
+    WHERE s.setup_status = 0
+      AND NOT EXISTS (
+          SELECT 1
+          FROM assignment a
+          WHERE a.setup_id = s.setup_id
+            AND a.assign_status = 4
+      )
+");
 $total_assigned = safe_count($conn, "SELECT COUNT(*) AS total FROM assignment WHERE assign_status = 1");
 $total_accepted = safe_count($conn, "SELECT COUNT(*) AS total FROM assignment WHERE assign_status = 2");
 $total_done = safe_count($conn, "SELECT COUNT(*) AS total FROM assignment WHERE assign_status = 5");
@@ -48,100 +58,110 @@ $total_cancelled = safe_count($conn, "SELECT COUNT(*) AS total FROM assignment W
 layout_header('หน้าหลักหัวหน้าช่าง', 'dashboard');
 ?>
 
-<div class="manager-home-v2">
-  <div class="manager-home-head">
+<div class="admin-dashboard-v2 manager-home-v2">
+  <div class="admin-dashboard-top">
     <div>
       <h1>ภาพรวมหัวหน้าช่าง</h1>
       <p>สรุปงานติดตั้ง การมอบหมายงาน และสถานะความพร้อมของช่างติดตั้ง</p>
     </div>
 
-    <div class="manager-home-tools">
-      <div class="manager-date-pill">
-        <?= manager_icon_svg('calendar') ?>
-        <strong><?= h(date('d/m/Y')) ?></strong>
+    <div class="admin-dashboard-actions">
+      <div class="admin-date-pill">
+        <i class="fa-regular fa-calendar"></i>
+        <?= h(date('d/m/Y')) ?>
       </div>
     </div>
   </div>
 
-  <div class="manager-home-summary-grid">
-    <div class="manager-home-summary-card green">
+  <div class="admin-summary-grid manager-home-summary-grid">
+    <div class="admin-summary-card">
       <div>
-        <p>งานติดตั้งทั้งหมด</p>
-        <h2><?= h((string) $total_setups) ?></h2>
-        <span>รายการงานในระบบ</span>
+        <span>งานติดตั้งทั้งหมด</span>
+        <strong><?= h((string) $total_setups) ?></strong>
+        <small>รายการงานในระบบ</small>
       </div>
-      <div class="summary-icon"><?= manager_icon_svg('box') ?></div>
+      <div class="summary-icon">
+        <i class="fa-solid fa-box"></i>
+      </div>
     </div>
 
-    <div class="manager-home-summary-card orange">
+    <div class="admin-summary-card">
       <div>
-        <p>รอมอบหมายงาน</p>
-        <h2><?= h((string) $total_waiting_setups) ?></h2>
-        <span>งานที่ต้องเลือกช่าง</span>
+        <span>ยังไม่ได้มอบหมาย</span>
+        <strong><?= h((string) $total_waiting_setups) ?></strong>
+        <small>งานที่ต้องเลือกช่าง</small>
       </div>
-      <div class="summary-icon"><?= manager_icon_svg('clock') ?></div>
+      <div class="summary-icon">
+        <i class="fa-regular fa-clock"></i>
+      </div>
     </div>
 
-    <div class="manager-home-summary-card blue">
+    <div class="admin-summary-card">
       <div>
-        <p>มอบหมายแล้ว</p>
-        <h2><?= h((string) $total_assigned) ?></h2>
-        <span>รอช่างยืนยันรับงาน</span>
+        <span>มอบหมายงานแล้ว</span>
+        <strong><?= h((string) $total_assigned) ?></strong>
+        <small>รอช่างยืนยันรับงาน</small>
       </div>
-      <div class="summary-icon"><?= manager_icon_svg('clipboard') ?></div>
+      <div class="summary-icon">
+        <i class="fa-solid fa-clipboard-list"></i>
+      </div>
     </div>
 
-    <div class="manager-home-summary-card cyan">
+    <div class="admin-summary-card">
       <div>
-        <p>ช่างรับงานแล้ว</p>
-        <h2><?= h((string) $total_accepted) ?></h2>
-        <span>อยู่ระหว่างดำเนินงาน</span>
+        <span>ช่างรับงานแล้ว</span>
+        <strong><?= h((string) $total_accepted) ?></strong>
+        <small>อยู่ระหว่างดำเนินงาน</small>
       </div>
-      <div class="summary-icon"><?= manager_icon_svg('check') ?></div>
+      <div class="summary-icon">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
     </div>
 
-    <div class="manager-home-summary-card purple">
+    <div class="admin-summary-card">
       <div>
-        <p>ช่างติดตั้ง</p>
-        <h2><?= h((string) $total_technicians) ?></h2>
-        <span>จำนวนช่างทั้งหมด</span>
+        <span>ช่างติดตั้ง</span>
+        <strong><?= h((string) $total_technicians) ?></strong>
+        <small>จำนวนช่างทั้งหมด</small>
       </div>
-      <div class="summary-icon"><?= manager_icon_svg('users') ?></div>
+      <div class="summary-icon">
+        <i class="fa-solid fa-users"></i>
+      </div>
     </div>
   </div>
 
-  <div class="manager-home-grid">
-    <section class="manager-home-panel status-panel">
-      <div class="manager-home-panel-head">
+  <div class="admin-dashboard-info-grid manager-home-grid">
+    <section class="admin-widget manager-home-panel status-panel">
+      <div class="admin-widget-head">
         <div>
           <h2>สถานะช่างติดตั้ง</h2>
           <p>สรุปความพร้อมของช่างก่อนมอบหมายงาน</p>
         </div>
       </div>
 
-      <div class="manager-status-list">
-        <div class="manager-status-row ready">
-          <div>
+      <div class="admin-mini-list manager-status-list">
+        <div class="admin-mini-item manager-status-row ready">
+          <div class="admin-mini-main">
             <strong>พร้อมรับงาน</strong>
             <span><?= h((string) $total_technicians_ready) ?> คน</span>
           </div>
-          <b>พร้อม</b>
+          <span class="badge green">พร้อม</span>
         </div>
 
-        <div class="manager-status-row busy">
-          <div>
+        <div class="admin-mini-item manager-status-row busy">
+          <div class="admin-mini-main">
             <strong>ไม่พร้อมรับงาน</strong>
             <span><?= h((string) $total_technicians_busy) ?> คน</span>
           </div>
-          <b>ไม่พร้อมรับงาน</b>
+          <span class="badge red">ไม่พร้อมรับงาน</span>
         </div>
 
-        <div class="manager-status-row done">
-          <div>
+        <div class="admin-mini-item manager-status-row done">
+          <div class="admin-mini-main">
             <strong>งานเสร็จสิ้น</strong>
             <span><?= h((string) $total_done) ?> รายการ</span>
           </div>
-          <b>สำเร็จ</b>
+          <span class="badge blue">สำเร็จ</span>
         </div>
       </div>
     </section>

@@ -56,3 +56,364 @@
     .assignment-product-row { grid-template-columns: 36px minmax(0,1fr); }
     .assignment-product-qty, .assignment-product-price { grid-column: 2; }
 }
+
+/* Compact styles for manager/assignments.php. */
+body.app-body.role-1 .manager-form-page {
+    font-size: 13px !important;
+}
+
+body.app-body.role-1 .assignment-product-list {
+    gap: 8px;
+    margin-top: 6px;
+}
+
+body.app-body.role-1 .assignment-product-row {
+    grid-template-columns: 36px minmax(0, 1fr) 78px 126px;
+    gap: 10px;
+    min-height: 58px;
+    padding: 9px 11px;
+    border-radius: 12px;
+}
+
+body.app-body.role-1 .assignment-product-number {
+    width: 29px;
+    height: 29px;
+    border-radius: 9px;
+    font-size: 12px;
+}
+
+body.app-body.role-1 .assignment-product-info strong,
+body.app-body.role-1 .assignment-product-price strong {
+    font-size: 12.5px;
+}
+
+body.app-body.role-1 .assignment-product-info small,
+body.app-body.role-1 .assignment-product-qty span,
+body.app-body.role-1 .assignment-product-price span {
+    font-size: 11px;
+}
+
+body.app-body.role-1 .manager-note-card {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 14px;
+}
+
+body.app-body.role-1 .manager-note-head {
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+body.app-body.role-1 .manager-note-head label {
+    font-size: 12.5px;
+}
+
+body.app-body.role-1 .manager-note-head p,
+body.app-body.role-1 .manager-note-head span {
+    font-size: 11px;
+}
+
+body.app-body.role-1 .manager-note-card textarea {
+    min-height: 74px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+body.app-body.role-1 .manager-unavailable-tech-warning {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    gap: 10px !important;
+    align-items: center !important;
+    margin: 0 0 12px !important;
+    padding: 7px 12px !important;
+    border: 1px solid #fde68a !important;
+    border-radius: 10px !important;
+    background: #fef9c3 !important;
+    color: #422006 !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-1 .manager-unavailable-warning-icon {
+    width: 22px !important;
+    height: 22px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    border-radius: 999px !important;
+    background: #fde68a !important;
+    color: #92400e !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+body.app-body.role-1 .manager-unavailable-warning-copy {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+}
+
+body.app-body.role-1 .manager-unavailable-warning-copy strong {
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    color: #92400e !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1 .manager-unavailable-warning-copy span {
+    min-width: 0 !important;
+    margin: 0 !important;
+    color: #422006 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+}
+
+body.app-body.role-1 .manager-unavailable-warning-action {
+    min-height: 26px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 10px !important;
+    border: 1px solid #f59e0b !important;
+    border-radius: 8px !important;
+    background: #f59e0b !important;
+    color: #ffffff !important;
+    font-size: 11.5px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    box-shadow: 0 8px 18px rgba(245, 158, 11, .18) !important;
+}
+
+body.app-body.role-1 .manager-unavailable-warning-action:hover {
+    background: #d97706 !important;
+    border-color: #d97706 !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-select-card,
+body.app-body.role-1 .manager-setup-card,
+body.app-body.role-1 .manager-tech-card,
+body.app-body.role-1 .manager-time-slot {
+    padding: 12px !important;
+    border-radius: 14px !important;
+}
+
+body.app-body.role-1 .manager-tech-card,
+body.app-body.role-1 .manager-setup-card {
+    gap: 10px !important;
+}
+
+body.app-body.role-1 .manager-tech-card {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+}
+
+body.app-body.role-1 .manager-tech-card.active {
+    border-color: #2196f3 !important;
+    background: #eff6ff !important;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, .14) !important;
+}
+
+body.app-body.role-1 .manager-tech-card-main {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+    gap: 10px !important;
+}
+
+body.app-body.role-1 .manager-tech-card-main > div:last-child,
+body.app-body.role-1 .manager-tech-identity {
+    display: block !important;
+    min-width: 0 !important;
+}
+
+body.app-body.role-1 .tech-avatar {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+}
+
+body.app-body.role-1 .manager-tech-identity strong {
+    display: block !important;
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+}
+
+body.app-body.role-1 .manager-tech-identity p {
+    margin: 3px 0 0 !important;
+    color: #64748b !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+}
+
+body.app-body.role-1 .manager-tech-card.active .manager-tech-actions .select {
+    background: #2196f3 !important;
+    border-color: #2196f3 !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-tech-card.is-disabled .manager-tech-actions .select {
+    background: #e5e7eb !important;
+    border-color: #cbd5e1 !important;
+    color: #64748b !important;
+    cursor: not-allowed !important;
+}
+
+body.app-body.role-1 .manager-time-slot {
+    min-height: 52px !important;
+}
+
+body.app-body.role-1 .manager-tech-actions button,
+body.app-body.role-1 .manager-selected-box button {
+    min-height: 28px !important;
+    padding: 5px 9px !important;
+    border-radius: 8px !important;
+    font-size: 11.5px !important;
+}
+
+body.app-body.role-1 .manager-tech-queue-table {
+    font-size: 11.8px !important;
+}
+
+body.app-body.role-1 .manager-tech-queue-table th,
+body.app-body.role-1 .manager-tech-queue-table td {
+    padding: 6px 7px !important;
+}
+
+body.app-body.role-1 .manager-calendar-toolbar {
+    gap: 8px !important;
+    margin: 12px 0 10px !important;
+    padding: 9px 10px !important;
+    border-color: #dbeafe !important;
+    border-radius: 14px !important;
+    background: #f8fbff !important;
+    flex-wrap: wrap !important;
+}
+
+body.app-body.role-1 .manager-calendar-toolbar button {
+    width: 32px !important;
+    height: 32px !important;
+    border-color: #bfdbfe !important;
+    border-radius: 10px !important;
+    color: #1d4ed8 !important;
+    font-size: 20px !important;
+}
+
+body.app-body.role-1 .manager-calendar-toolbar button:hover {
+    background: #eff6ff !important;
+}
+
+body.app-body.role-1 .manager-calendar-toolbar strong {
+    min-width: 150px !important;
+    color: #0f172a !important;
+    font-size: 15px !important;
+}
+
+body.app-body.role-1 .calendar-legend {
+    height: 24px !important;
+    padding: 0 8px !important;
+    font-size: 10.5px !important;
+}
+
+body.app-body.role-1 .manager-calendar {
+    gap: 6px !important;
+}
+
+body.app-body.role-1 .calendar-weekday {
+    height: 28px !important;
+    border-radius: 8px !important;
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    font-size: 11px !important;
+}
+
+body.app-body.role-1 .calendar-day {
+    min-height: 64px !important;
+    padding: 7px !important;
+    border-radius: 12px !important;
+    gap: 3px !important;
+}
+
+body.app-body.role-1 .calendar-day span {
+    width: 24px !important;
+    height: 24px !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    border-radius: 999px !important;
+    font-size: 13px !important;
+}
+
+body.app-body.role-1 .calendar-day small,
+body.app-body.role-1 .calendar-day em {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+}
+
+body.app-body.role-1 .calendar-day.today {
+    outline: none !important;
+}
+
+body.app-body.role-1 .calendar-day.today span {
+    border: 2px solid #2563eb !important;
+    color: #1d4ed8 !important;
+    background: #eff6ff !important;
+}
+
+body.app-body.role-1 .calendar-day:not(.empty):not(.holiday):hover,
+body.app-body.role-1 .calendar-day.selected {
+    border-color: #2563eb !important;
+    background: #eff6ff !important;
+    box-shadow: inset 0 0 0 2px rgba(37, 99, 235, .18), 0 10px 22px rgba(37, 99, 235, .10) !important;
+}
+
+body.app-body.role-1 .calendar-day.selected span {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-1 .calendar-day.today.selected span {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .18) !important;
+}
+
+body.app-body.role-1 .manager-selected-date {
+    margin-top: 10px !important;
+    padding: 11px 13px !important;
+    border-radius: 12px !important;
+    border-color: #bfdbfe !important;
+    background: #eff6ff !important;
+    color: #1e40af !important;
+}
+
+@media (max-width: 900px) {
+    body.app-body.role-1 .manager-tech-card {
+        grid-template-columns: 1fr !important;
+        align-items: stretch !important;
+    }
+
+    body.app-body.role-1 .manager-tech-actions {
+        justify-content: flex-start !important;
+    }
+
+    body.app-body.role-1 .manager-unavailable-tech-warning {
+        grid-template-columns: auto minmax(0, 1fr) !important;
+        align-items: flex-start !important;
+    }
+
+    body.app-body.role-1 .manager-unavailable-warning-copy {
+        align-items: flex-start !important;
+        flex-direction: column !important;
+        gap: 2px !important;
+    }
+
+    body.app-body.role-1 .manager-unavailable-warning-action {
+        grid-column: 1 / -1 !important;
+        width: 100% !important;
+    }
+}

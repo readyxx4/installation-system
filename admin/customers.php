@@ -53,7 +53,7 @@ if ($search !== '') {
            OR user_email LIKE ?
            OR user_address LIKE ?
           )
-        ORDER BY user_id ASC
+        ORDER BY user_id DESC
     ");
     $stmt->bind_param('sssss', $like, $like, $like, $like, $like);
     $stmt->execute();
@@ -63,7 +63,7 @@ if ($search !== '') {
         SELECT user_id, user_name, user_phone, user_email, user_address
         FROM `user`
         WHERE user_role = 0
-        ORDER BY user_id ASC
+        ORDER BY user_id DESC
     ");
 }
 

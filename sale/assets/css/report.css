@@ -1,0 +1,37 @@
+/* Page-specific styles for sale/report.php. Existing styles are provided by root style.css. */
+
+body.app-body.role-2 .sales-report-stat-grid,
+body.app-body.role-2 .sales-report-stat-grid-small {
+  gap: 10px !important;
+  margin-bottom: 12px !important;
+}
+
+body.app-body.role-2 .sales-report-stat-grid .stat-card,
+body.app-body.role-2 .sales-report-stat-grid-small .stat-card {
+  min-height: 90px !important;
+  padding: 14px !important;
+}
+
+body.app-body.role-2 .sales-report-stat-grid .stat-card h3,
+body.app-body.role-2 .sales-report-stat-grid-small .stat-card h3 {
+  font-size: 23px !important;
+}
+
+body.app-body.role-2 .sales-report-stat-grid .stat-card p,
+body.app-body.role-2 .sales-report-stat-grid-small .stat-card p {
+  font-size: 11.5px !important;
+}
+
+body.app-body.role-2 .admin-summary-card {
+  min-height: 98px !important;
+  padding: 14px !important;
+}
+
+body.app-body.role-2 .data-table {
+  font-size: 11.8px !important;
+}
+
+body.app-body.role-2 .data-table th,
+body.app-body.role-2 .data-table td {
+  padding: 7px 8px !important;
+}

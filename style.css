@@ -129,6 +129,102 @@ body.app-body.role-3,
 .role-3 .sidebar-profile-info span,
 .role-3 .brand span { color: color-mix(in srgb, var(--role-soft) 78%, transparent) !important; }
 
+.role-2 .sidebar { border-right-color: var(--role-border) !important; }
+.role-2 .sidebar .brand { border-bottom-color: color-mix(in srgb, var(--role-border) 70%, transparent) !important; }
+.role-2 .nav-link:hover { background: color-mix(in srgb, var(--role-primary) 18%, transparent) !important; }
+.role-2 .nav-link.active {
+  background: var(--role-primary-hover) !important;
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--role-primary-hover) 32%, transparent) !important;
+}
+.role-2 .sidebar-profile {
+  background: color-mix(in srgb, var(--role-primary) 14%, transparent) !important;
+  border-color: color-mix(in srgb, var(--role-border) 70%, transparent) !important;
+}
+.role-2 .sidebar-profile-avatar { background: var(--role-primary) !important; }
+.role-2 .nav-section-title,
+.role-2 .sidebar-profile-info span,
+.role-2 .brand span { color: color-mix(in srgb, var(--role-soft) 78%, transparent) !important; }
+
+.role-1 .sidebar { border-right-color: var(--role-border) !important; }
+.role-1 .sidebar .brand { border-bottom-color: color-mix(in srgb, var(--role-border) 70%, transparent) !important; }
+.role-1 .nav-link:hover { background: color-mix(in srgb, var(--role-primary) 18%, transparent) !important; }
+.role-1 .nav-link.active {
+  background: var(--role-primary-hover) !important;
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--role-primary-hover) 32%, transparent) !important;
+}
+.role-1 .sidebar-profile {
+  background: color-mix(in srgb, var(--role-primary) 14%, transparent) !important;
+  border-color: color-mix(in srgb, var(--role-border) 70%, transparent) !important;
+}
+.role-1 .sidebar-profile-avatar { background: var(--role-primary) !important; }
+.role-1 .nav-section-title,
+.role-1 .sidebar-profile-info span,
+.role-1 .brand span { color: color-mix(in srgb, var(--role-soft) 78%, transparent) !important; }
+
+.role-1 .admin-date-pill,
+.role-1 .admin-soft-badge,
+.role-1 .admin-widget-link {
+  border-color: var(--role-border) !important;
+  background: var(--role-soft) !important;
+  color: var(--role-primary-hover) !important;
+}
+
+.role-1 .admin-widget { border-color: var(--role-border) !important; }
+
+.role-1 .admin-summary-card {
+  position: relative;
+  background: #ffffff !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 18px;
+  color: #0f172a !important;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.role-1 .admin-summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.11);
+}
+
+.role-1 .admin-summary-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--card-accent, #2196F3);
+}
+
+.role-1 .admin-summary-card::after {
+  display: none;
+}
+
+.role-1 .admin-summary-card span {
+  color: #475569 !important;
+}
+
+.role-1 .admin-summary-card strong {
+  color: var(--card-accent, #2196F3) !important;
+}
+
+.role-1 .admin-summary-card small {
+  color: #64748b !important;
+  background: #f8fafc !important;
+}
+
+.role-1 .admin-summary-card .summary-icon {
+  background: color-mix(in srgb, var(--card-accent, #2196F3) 12%, white) !important;
+  color: var(--card-accent, #2196F3) !important;
+}
+
+.role-1 .admin-summary-card:nth-child(1) { --card-accent: #2563eb; }
+.role-1 .admin-summary-card:nth-child(2) { --card-accent: #f59e0b; }
+.role-1 .admin-summary-card:nth-child(3) { --card-accent: #3b82f6; }
+.role-1 .admin-summary-card:nth-child(4) { --card-accent: #0891b2; }
+.role-1 .admin-summary-card:nth-child(5) { --card-accent: #7c3aed; }
+
 .role-3 .panel,
 .role-3 .admin-widget,
 .role-3 .staff-create-card { border-color: var(--role-border) !important; }
@@ -3094,9 +3190,21 @@ body.app-body {
   color: #16a34a !important;
 }
 
+.badge.cyan {
+  background: #ecfeff !important;
+  color: #0891b2 !important;
+  border: 1px solid #a5f3fc !important;
+}
+
 .badge.red {
   background: #fee2e2 !important;
   color: #dc2626 !important;
+}
+
+.badge.slate {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1 !important;
 }
 
 .data-table td:nth-child(7) {
@@ -4391,6 +4499,70 @@ body.app-body {
 .manager-status-row.done b {
   background: #eaf2ff;
   color: #2563eb;
+}
+
+.role-1 .manager-home-v2 {
+  --admin-bg: var(--role-soft);
+  --admin-card: #ffffff;
+  --admin-ink: var(--role-ink);
+  --admin-muted: var(--role-muted);
+  --admin-border: var(--role-border);
+}
+
+.role-1 .manager-home-summary-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.role-1 .manager-home-grid {
+  grid-template-columns: 1fr;
+  margin-top: 16px;
+}
+
+.role-1 .manager-home-panel {
+  padding: 22px;
+}
+
+.role-1 .manager-status-list {
+  gap: 0;
+}
+
+.role-1 .manager-status-row {
+  min-height: 74px;
+  padding: 16px 0;
+  border: 0;
+  border-bottom: 1px solid #eef2f7;
+  border-radius: 0;
+  background: transparent;
+}
+
+.role-1 .manager-status-row:last-child {
+  border-bottom: 0;
+}
+
+.role-1 .manager-status-row strong {
+  color: var(--admin-ink);
+}
+
+.role-1 .manager-status-row span:not(.badge) {
+  color: var(--admin-muted);
+}
+
+@media (max-width: 1280px) {
+  .role-1 .manager-home-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .role-1 .manager-home-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .role-1 .manager-home-summary-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .manager-mini-stat-grid {
@@ -5813,6 +5985,42 @@ body.modal-open {
   background: #ffffff !important;
   box-sizing: border-box !important;
   transition: border-color .18s ease, box-shadow .18s ease, background .18s ease !important;
+}
+
+.staff-input-wrap.address-select-wrap select {
+  height: 100% !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 42px 0 46px !important;
+}
+
+.staff-input-wrap.address-select-wrap select:focus {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.staff-input-wrap.address-select-wrap:focus-within {
+  border-color: #f59e0b !important;
+  background: #fffdf8 !important;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.14) !important;
+}
+
+.staff-input-wrap.address-select-wrap:not(:has(.address-dropdown))::after {
+  content: "" !important;
+  width: 9px !important;
+  height: 9px !important;
+  position: absolute !important;
+  right: 20px !important;
+  top: 50% !important;
+  transform: translateY(-58%) rotate(45deg) !important;
+  border-right: 2.2px solid #8a755d !important;
+  border-bottom: 2.2px solid #8a755d !important;
+  pointer-events: none !important;
+  z-index: 6 !important;
 }
 
 .staff-input-wrap.address-select-wrap:has(.address-dropdown.is-open) {
@@ -9027,7 +9235,7 @@ body.assignment-mode .assignment-row-assign-btn {
     white-space: nowrap;
 }
 /* =========================================================
-   ปุ่มหน้า finance/setups.php
+   ปุ่มหน้า sale/setups.php
    - สร้างใบงานติดตั้ง: ปุ่มหลัก สีน้ำเงิน
    - เปิดใบ: ปุ่มรอง พื้นหลังฟ้าอ่อนมาก
    ========================================================= */
@@ -10066,4 +10274,1816 @@ body.app-body .manager-modal-cancel-btn:hover {
   width: 100%;
   height: 100%;
   min-height: 355px;
+}
+
+/* =========================================================
+   Compact UI scale - approx. 15-20% smaller without zoom
+   ========================================================= */
+
+body.app-body {
+  font-size: 14px !important;
+}
+
+.app-shell {
+  grid-template-columns: 220px minmax(0, 1fr) !important;
+}
+
+.sidebar {
+  width: 220px !important;
+  min-width: 220px !important;
+  padding: 16px 11px !important;
+}
+
+.brand-logo,
+.brand-mark {
+  width: 42px !important;
+  height: 42px !important;
+  flex: 0 0 42px !important;
+  border-radius: 13px !important;
+}
+
+.brand strong {
+  font-size: 13px !important;
+}
+
+.brand span {
+  font-size: 11px !important;
+}
+
+.sidebar .brand {
+  gap: 10px !important;
+  padding: 4px 6px 16px !important;
+  margin-bottom: 10px !important;
+}
+
+.nav-section-title,
+.sidebar .nav-section-title {
+  margin: 8px 8px 5px !important;
+  font-size: 10.5px !important;
+}
+
+.nav-link {
+  gap: 9px !important;
+  min-height: 39px !important;
+  padding: 8px 10px !important;
+  margin-bottom: 4px !important;
+  border-radius: 13px !important;
+  font-size: 12.5px !important;
+}
+
+.nav-icon {
+  width: 26px !important;
+  min-width: 26px !important;
+  height: 26px !important;
+  flex: 0 0 26px !important;
+  border-radius: 9px !important;
+  font-size: 13px !important;
+}
+
+.nav-icon i {
+  font-size: 13px !important;
+}
+
+.sidebar-profile {
+  padding: 11px 10px !important;
+  border-radius: 14px !important;
+  gap: 9px !important;
+}
+
+.sidebar-profile-avatar {
+  width: 34px !important;
+  height: 34px !important;
+  flex: 0 0 34px !important;
+  border-radius: 11px !important;
+}
+
+.sidebar-profile-info strong {
+  font-size: 12.5px !important;
+}
+
+.sidebar-profile-info span {
+  font-size: 10.5px !important;
+}
+
+.account-menu {
+  margin-top: 10px !important;
+  padding-top: 12px !important;
+}
+
+.content {
+  padding: 22px !important;
+}
+
+.admin-dashboard-v2,
+.sales-dashboard-page,
+.manager-home-v2,
+.staff-form-page,
+.sales-setups-page,
+.assignment-list-page,
+.assignment-form-page,
+.customer-page,
+.technician-page {
+  font-size: 14px !important;
+}
+
+.admin-dashboard-top,
+.admin-dashboard-head,
+.manager-list-head,
+.staff-create-head,
+.panel-title-row {
+  gap: 14px !important;
+  margin-bottom: 16px !important;
+}
+
+.admin-dashboard-top h1,
+.admin-dashboard-head h1,
+.manager-list-head h1,
+.staff-create-head h1,
+.panel-title-row h1 {
+  font-size: 25px !important;
+  line-height: 1.22 !important;
+}
+
+.admin-dashboard-top p,
+.admin-dashboard-head p,
+.manager-list-head p,
+.staff-create-head p,
+.panel-title-row p {
+  font-size: 12.5px !important;
+}
+
+.admin-summary-grid {
+  gap: 12px !important;
+  margin-bottom: 14px !important;
+}
+
+.admin-summary-card {
+  min-height: 116px !important;
+  padding: 17px !important;
+  border-radius: 16px !important;
+}
+
+.admin-summary-card h2,
+.admin-summary-card strong {
+  font-size: 27px !important;
+}
+
+.admin-summary-card p,
+.admin-summary-card span {
+  font-size: 12px !important;
+}
+
+.admin-summary-card small {
+  font-size: 11.5px !important;
+}
+
+.admin-summary-card .summary-icon {
+  width: 46px !important;
+  height: 46px !important;
+  flex: 0 0 46px !important;
+  right: 16px !important;
+  top: 16px !important;
+  font-size: 20px !important;
+}
+
+.admin-widget,
+.dashboard-panel,
+.panel,
+.staff-create-card,
+.manager-home-panel {
+  padding: 19px !important;
+  border-radius: 18px !important;
+}
+
+.admin-dashboard-info-grid .admin-widget {
+  min-height: 284px !important;
+}
+
+.admin-widget-head {
+  gap: 12px !important;
+  margin-bottom: 13px !important;
+}
+
+.admin-widget-head h2 {
+  font-size: 17px !important;
+}
+
+.admin-widget-head p {
+  font-size: 12px !important;
+}
+
+.admin-dashboard-info-grid,
+.admin-bottom-grid,
+.manager-home-grid,
+.sales-dashboard-grid,
+.sales-bottom-grid {
+  gap: 13px !important;
+  margin-top: 13px !important;
+  margin-bottom: 13px !important;
+}
+
+.toolbar,
+.user-toolbar,
+.technician-toolbar,
+.customer-toolbar,
+.product-type-toolbar,
+.product-toolbar,
+.setup-toolbar,
+.assignment-toolbar,
+.my-jobs-toolbar {
+  gap: 10px !important;
+  padding: 14px !important;
+  border-radius: 16px !important;
+}
+
+.toolbar input,
+.toolbar select,
+.user-toolbar input,
+.customer-toolbar input,
+.technician-toolbar input,
+.product-toolbar input,
+.product-type-toolbar input,
+.setup-toolbar input,
+.assignment-toolbar input,
+.my-jobs-toolbar input,
+.admin-form input,
+.admin-form select,
+.admin-form textarea,
+.staff-input-wrap input,
+.staff-input-wrap select,
+.staff-textarea-wrap textarea {
+  min-height: 38px !important;
+  height: 38px !important;
+  border-radius: 11px !important;
+  padding: 8px 11px !important;
+  font-size: 12.5px !important;
+}
+
+.admin-form textarea,
+.staff-textarea-wrap textarea {
+  height: auto !important;
+  min-height: 82px !important;
+}
+
+.btn,
+.btn-small,
+.btn-secondary,
+.btn-danger,
+.btn-edit,
+.btn-delete,
+.btn-search,
+.btn-reset,
+.btn-add,
+.staff-save-btn,
+.staff-cancel-btn,
+.staff-back-link,
+.manager-action-btn,
+.manager-link {
+  min-height: 33px !important;
+  padding: 7px 12px !important;
+  border-radius: 10px !important;
+  gap: 6px !important;
+  font-size: 12.5px !important;
+}
+
+.data-table,
+.slip-table {
+  font-size: 12.5px !important;
+}
+
+.data-table th,
+.data-table td,
+.slip-table th,
+.slip-table td {
+  padding: 9px 10px !important;
+}
+
+.data-table td .btn,
+.data-table td .btn-edit,
+.data-table td .btn-delete,
+.data-table td .btn-small,
+.data-table td .btn-danger,
+.data-table .btn-print,
+.data-table a[href*="setup_slip"] {
+  min-height: 29px !important;
+  padding: 5px 10px !important;
+  border-radius: 8px !important;
+  font-size: 11.5px !important;
+}
+
+.action-icon,
+.btn-icon {
+  width: 15px !important;
+  height: 15px !important;
+  flex-basis: 15px !important;
+}
+
+.badge,
+.admin-user-role,
+.status-badge,
+.status-pill,
+.payment-status,
+.admin-soft-badge,
+.admin-date-pill,
+.admin-widget-link {
+  font-size: 11.5px !important;
+  padding: 5px 9px !important;
+  border-radius: 999px !important;
+}
+
+.pretty-alert-card {
+  width: min(420px, 100%) !important;
+  min-height: 216px !important;
+  padding: 46px 27px 24px !important;
+  border-radius: 22px !important;
+}
+
+@media (max-width: 980px) {
+  .app-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .content {
+    padding: 18px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .content {
+    padding: 14px !important;
+  }
+
+  .admin-summary-grid {
+    gap: 10px !important;
+  }
+
+  .admin-widget,
+  .dashboard-panel,
+  .panel,
+  .staff-create-card,
+  .manager-home-panel {
+    padding: 16px !important;
+  }
+}
+
+/* =========================================================
+   Admin-only compact pass - approx. 10% smaller
+   ========================================================= */
+
+body.app-body.role-3 {
+  font-size: 13px !important;
+}
+
+body.app-body.role-3 .app-shell {
+  grid-template-columns: 200px minmax(0, 1fr) !important;
+}
+
+body.app-body.role-3 .sidebar {
+  width: 200px !important;
+  min-width: 200px !important;
+  padding: 14px 10px !important;
+}
+
+body.app-body.role-3 .brand-logo,
+body.app-body.role-3 .brand-mark {
+  width: 38px !important;
+  height: 38px !important;
+  flex-basis: 38px !important;
+  border-radius: 12px !important;
+}
+
+body.app-body.role-3 .brand strong {
+  font-size: 12.5px !important;
+}
+
+body.app-body.role-3 .brand span {
+  font-size: 10.5px !important;
+}
+
+body.app-body.role-3 .sidebar .brand {
+  gap: 9px !important;
+  padding: 3px 5px 14px !important;
+  margin-bottom: 8px !important;
+}
+
+body.app-body.role-3 .sidebar .nav-section-title {
+  margin: 7px 7px 4px !important;
+  font-size: 10px !important;
+}
+
+body.app-body.role-3 .nav-link {
+  gap: 8px !important;
+  min-height: 35px !important;
+  padding: 7px 9px !important;
+  margin-bottom: 3px !important;
+  border-radius: 11px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .nav-icon {
+  width: 23px !important;
+  min-width: 23px !important;
+  height: 23px !important;
+  flex-basis: 23px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .nav-icon i {
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .sidebar-profile {
+  padding: 9px !important;
+  border-radius: 12px !important;
+  gap: 8px !important;
+}
+
+body.app-body.role-3 .sidebar-profile-avatar {
+  width: 31px !important;
+  height: 31px !important;
+  flex-basis: 31px !important;
+  border-radius: 10px !important;
+}
+
+body.app-body.role-3 .sidebar-profile-info strong {
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .sidebar-profile-info span {
+  font-size: 10px !important;
+}
+
+body.app-body.role-3 .content {
+  padding: 20px !important;
+}
+
+body.app-body.role-3 .admin-dashboard-v2,
+body.app-body.role-3 .staff-form-page {
+  font-size: 13px !important;
+}
+
+body.app-body.role-3 .admin-dashboard-top,
+body.app-body.role-3 .admin-dashboard-head,
+body.app-body.role-3 .staff-create-head,
+body.app-body.role-3 .panel-title-row {
+  gap: 12px !important;
+  margin-bottom: 14px !important;
+}
+
+body.app-body.role-3 .admin-dashboard-top h1,
+body.app-body.role-3 .admin-dashboard-head h1,
+body.app-body.role-3 .staff-create-head h1,
+body.app-body.role-3 .panel-title-row h1 {
+  font-size: 23px !important;
+}
+
+body.app-body.role-3 .admin-dashboard-top p,
+body.app-body.role-3 .admin-dashboard-head p,
+body.app-body.role-3 .staff-create-head p,
+body.app-body.role-3 .panel-title-row p {
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .admin-summary-grid {
+  gap: 11px !important;
+  margin-bottom: 12px !important;
+}
+
+body.app-body.role-3 .admin-summary-card {
+  min-height: 104px !important;
+  padding: 15px !important;
+  border-radius: 14px !important;
+}
+
+body.app-body.role-3 .admin-summary-card h2,
+body.app-body.role-3 .admin-summary-card strong {
+  font-size: 24px !important;
+}
+
+body.app-body.role-3 .admin-summary-card p,
+body.app-body.role-3 .admin-summary-card span {
+  font-size: 11.5px !important;
+}
+
+body.app-body.role-3 .admin-summary-card .summary-icon {
+  width: 41px !important;
+  height: 41px !important;
+  flex-basis: 41px !important;
+  right: 14px !important;
+  top: 14px !important;
+  font-size: 18px !important;
+}
+
+body.app-body.role-3 .admin-widget,
+body.app-body.role-3 .panel,
+body.app-body.role-3 .staff-create-card {
+  padding: 17px !important;
+  border-radius: 16px !important;
+}
+
+body.app-body.role-3 .admin-dashboard-info-grid .admin-widget {
+  min-height: 256px !important;
+}
+
+body.app-body.role-3 .admin-dashboard-info-grid,
+body.app-body.role-3 .admin-bottom-grid {
+  gap: 12px !important;
+  margin-top: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+body.app-body.role-3 .toolbar,
+body.app-body.role-3 .user-toolbar,
+body.app-body.role-3 .customer-toolbar,
+body.app-body.role-3 .technician-toolbar,
+body.app-body.role-3 .product-toolbar,
+body.app-body.role-3 .product-type-toolbar {
+  gap: 8px !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+}
+
+body.app-body.role-3 .toolbar input,
+body.app-body.role-3 .toolbar select,
+body.app-body.role-3 .user-toolbar input,
+body.app-body.role-3 .customer-toolbar input,
+body.app-body.role-3 .technician-toolbar input,
+body.app-body.role-3 .product-toolbar input,
+body.app-body.role-3 .product-type-toolbar input,
+body.app-body.role-3 .admin-form input,
+body.app-body.role-3 .admin-form select,
+body.app-body.role-3 .staff-input-wrap input,
+body.app-body.role-3 .staff-input-wrap select {
+  min-height: 34px !important;
+  height: 34px !important;
+  border-radius: 10px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .staff-input-wrap input,
+body.app-body.role-3 .staff-input-wrap select {
+  padding: 6px 34px 6px 38px !important;
+}
+
+body.app-body.role-3 .staff-input-wrap:not(.select-wrap) input {
+  padding-right: 10px !important;
+}
+
+body.app-body.role-3 .staff-textarea-wrap textarea {
+  min-height: 74px !important;
+  border-radius: 10px !important;
+  padding: 9px 10px 9px 38px !important;
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+}
+
+body.app-body.role-3 .form-icon {
+  width: 15px !important;
+  height: 15px !important;
+  left: 13px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+body.app-body.role-3 .staff-textarea-wrap .form-icon {
+  top: 17px !important;
+  transform: none !important;
+}
+
+body.app-body.role-3 .select-wrap::after {
+  width: 7px !important;
+  height: 7px !important;
+  right: 14px !important;
+  top: 12px !important;
+}
+
+body.app-body.role-3 .address-select-button {
+  min-height: 34px !important;
+  padding: 6px 34px 6px 38px !important;
+  border-radius: 10px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .address-select-arrow {
+  right: 13px !important;
+}
+
+body.app-body.role-3 .staff-form-grid {
+  gap: 14px !important;
+  padding: 22px !important;
+}
+
+body.app-body.role-3 .staff-field label {
+  margin-bottom: 6px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .staff-field small,
+body.app-body.role-3 .field-live-error,
+body.app-body.role-3 .password-help {
+  font-size: 11.5px !important;
+}
+
+body.app-body.role-3 .staff-create-head {
+  padding: 20px 22px !important;
+}
+
+body.app-body.role-3 .staff-create-head h2 {
+  font-size: 21px !important;
+}
+
+body.app-body.role-3 .staff-password-pill {
+  min-height: 37px !important;
+  padding: 0 13px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .staff-form-actions {
+  gap: 10px !important;
+  padding: 17px 22px 22px !important;
+}
+
+body.app-body.role-3 .btn,
+body.app-body.role-3 .btn-small,
+body.app-body.role-3 .btn-secondary,
+body.app-body.role-3 .btn-danger,
+body.app-body.role-3 .btn-edit,
+body.app-body.role-3 .btn-delete,
+body.app-body.role-3 .btn-search,
+body.app-body.role-3 .btn-reset,
+body.app-body.role-3 .btn-add,
+body.app-body.role-3 .staff-save-btn,
+body.app-body.role-3 .staff-cancel-btn,
+body.app-body.role-3 .staff-back-link,
+body.app-body.role-3 .password-change-trigger,
+body.app-body.role-3 .password-change-trigger-small {
+  min-height: 30px !important;
+  padding: 6px 10px !important;
+  border-radius: 9px !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .staff-save-btn {
+  min-width: 158px !important;
+}
+
+body.app-body.role-3 .data-table,
+body.app-body.role-3 .slip-table {
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .data-table th,
+body.app-body.role-3 .data-table td,
+body.app-body.role-3 .slip-table th,
+body.app-body.role-3 .slip-table td {
+  padding: 7px 8px !important;
+}
+
+body.app-body.role-3 .data-table td .btn,
+body.app-body.role-3 .data-table td .btn-edit,
+body.app-body.role-3 .data-table td .btn-delete,
+body.app-body.role-3 .data-table td .btn-small,
+body.app-body.role-3 .data-table td .btn-danger {
+  min-height: 26px !important;
+  padding: 4px 8px !important;
+  border-radius: 7px !important;
+  font-size: 11px !important;
+}
+
+body.app-body.role-3 .table-action-buttons {
+  gap: 7px !important;
+}
+
+body.app-body.role-3 .action-icon,
+body.app-body.role-3 .btn-icon {
+  width: 14px !important;
+  height: 14px !important;
+  flex-basis: 14px !important;
+}
+
+body.app-body.role-3 .badge,
+body.app-body.role-3 .admin-user-role,
+body.app-body.role-3 .admin-soft-badge,
+body.app-body.role-3 .admin-date-pill,
+body.app-body.role-3 .admin-widget-link {
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+}
+
+body.app-body.role-3 .data-table .address-cell,
+body.app-body.role-3 .address-cell {
+  max-width: 220px !important;
+}
+
+@media (max-width: 980px) {
+  body.app-body.role-3 .app-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-3 .sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  body.app-body.role-3 .content {
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body.app-body.role-3 .content {
+    padding: 13px !important;
+  }
+
+  body.app-body.role-3 .staff-form-grid {
+    padding: 16px !important;
+  }
+}
+
+/* =========================================================
+   Sale-only compact pass - approx. 10% smaller
+   ========================================================= */
+
+body.app-body.role-2 {
+  font-size: 13px !important;
+}
+
+body.app-body.role-2 .app-shell {
+  grid-template-columns: 200px minmax(0, 1fr) !important;
+}
+
+body.app-body.role-2 .sidebar {
+  width: 200px !important;
+  min-width: 200px !important;
+  padding: 14px 10px !important;
+}
+
+body.app-body.role-2 .brand-logo,
+body.app-body.role-2 .brand-mark {
+  width: 38px !important;
+  height: 38px !important;
+  flex-basis: 38px !important;
+  border-radius: 12px !important;
+}
+
+body.app-body.role-2 .brand strong {
+  font-size: 12.5px !important;
+}
+
+body.app-body.role-2 .brand span {
+  font-size: 10.5px !important;
+}
+
+body.app-body.role-2 .sidebar .brand {
+  gap: 9px !important;
+  padding: 3px 5px 14px !important;
+  margin-bottom: 8px !important;
+}
+
+body.app-body.role-2 .sidebar .nav-section-title {
+  margin: 7px 7px 4px !important;
+  font-size: 10px !important;
+}
+
+body.app-body.role-2 .nav-link {
+  gap: 8px !important;
+  min-height: 35px !important;
+  padding: 7px 9px !important;
+  margin-bottom: 3px !important;
+  border-radius: 11px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-2 .nav-icon {
+  width: 23px !important;
+  min-width: 23px !important;
+  height: 23px !important;
+  flex-basis: 23px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-2 .nav-icon i {
+  font-size: 12px !important;
+}
+
+body.app-body.role-2 .sidebar-profile {
+  padding: 9px !important;
+  border-radius: 12px !important;
+  gap: 8px !important;
+}
+
+body.app-body.role-2 .sidebar-profile-avatar {
+  width: 31px !important;
+  height: 31px !important;
+  flex-basis: 31px !important;
+  border-radius: 10px !important;
+}
+
+body.app-body.role-2 .sidebar-profile-info strong {
+  font-size: 12px !important;
+}
+
+body.app-body.role-2 .sidebar-profile-info span {
+  font-size: 10px !important;
+}
+
+body.app-body.role-2 .content {
+  padding: 20px !important;
+}
+
+body.app-body.role-2 .sales-dashboard-page,
+body.app-body.role-2 .sales-setups-page,
+body.app-body.role-2 .setup-page {
+  font-size: 13px !important;
+}
+
+body.app-body.role-2 .admin-dashboard-top,
+body.app-body.role-2 .admin-dashboard-head,
+body.app-body.role-2 .panel-title-row {
+  gap: 12px !important;
+  margin-bottom: 14px !important;
+}
+
+body.app-body.role-2 .admin-dashboard-top h1,
+body.app-body.role-2 .admin-dashboard-head h1,
+body.app-body.role-2 .panel-title-row h1 {
+  font-size: 23px !important;
+}
+
+body.app-body.role-2 .admin-dashboard-top p,
+body.app-body.role-2 .admin-dashboard-head p,
+body.app-body.role-2 .panel-title-row p {
+  font-size: 12px !important;
+}
+
+body.app-body.role-2 .admin-summary-grid {
+  gap: 11px !important;
+  margin-bottom: 12px !important;
+}
+
+body.app-body.role-2 .admin-summary-card {
+  min-height: 104px !important;
+  padding: 15px !important;
+  border-radius: 14px !important;
+}
+
+body.app-body.role-2 .admin-summary-card h2,
+body.app-body.role-2 .admin-summary-card strong {
+  font-size: 24px !important;
+}
+
+body.app-body.role-2 .admin-summary-card p,
+body.app-body.role-2 .admin-summary-card span {
+  font-size: 11.5px !important;
+}
+
+body.app-body.role-2 .admin-summary-card .summary-icon {
+  width: 41px !important;
+  height: 41px !important;
+  flex-basis: 41px !important;
+  right: 14px !important;
+  top: 14px !important;
+  font-size: 18px !important;
+}
+
+body.app-body.role-2 .admin-widget,
+body.app-body.role-2 .panel,
+body.app-body.role-2 .dashboard-panel {
+  padding: 17px !important;
+  border-radius: 16px !important;
+}
+
+body.app-body.role-2 .admin-dashboard-info-grid,
+body.app-body.role-2 .admin-bottom-grid,
+body.app-body.role-2 .sales-dashboard-grid,
+body.app-body.role-2 .sales-bottom-grid {
+  gap: 12px !important;
+  margin-top: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+body.app-body.role-2 .toolbar,
+body.app-body.role-2 .setup-toolbar {
+  gap: 8px !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+}
+
+body.app-body.role-2 .toolbar input,
+body.app-body.role-2 .toolbar select,
+body.app-body.role-2 .setup-toolbar input,
+body.app-body.role-2 .setup-toolbar select,
+body.app-body.role-2 .admin-form input,
+body.app-body.role-2 .admin-form select,
+body.app-body.role-2 .admin-form textarea {
+  min-height: 34px !important;
+  height: 34px !important;
+  border-radius: 10px !important;
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-2 .admin-form textarea {
+  height: auto !important;
+  min-height: 74px !important;
+  line-height: 1.55 !important;
+}
+
+body.app-body.role-2 .btn,
+body.app-body.role-2 .btn-small,
+body.app-body.role-2 .btn-secondary,
+body.app-body.role-2 .btn-danger,
+body.app-body.role-2 .btn-edit,
+body.app-body.role-2 .btn-delete,
+body.app-body.role-2 .btn-search,
+body.app-body.role-2 .btn-reset,
+body.app-body.role-2 .btn-add {
+  min-height: 30px !important;
+  padding: 6px 10px !important;
+  border-radius: 14px !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-2 .data-table,
+body.app-body.role-2 .slip-table {
+  font-size: 12px !important;
+}
+
+body.app-body.role-2 .data-table th,
+body.app-body.role-2 .data-table td,
+body.app-body.role-2 .slip-table th,
+body.app-body.role-2 .slip-table td {
+  padding: 7px 8px !important;
+}
+
+body.app-body.role-2 .data-table td .btn,
+body.app-body.role-2 .data-table td .btn-edit,
+body.app-body.role-2 .data-table td .btn-delete,
+body.app-body.role-2 .data-table td .btn-small,
+body.app-body.role-2 .data-table td .btn-danger,
+body.app-body.role-2 .data-table .btn-print,
+body.app-body.role-2 .data-table a[href*="setup_slip"] {
+  min-height: 26px !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  font-size: 11px !important;
+}
+
+body.app-body.role-2 .table-action-buttons {
+  gap: 7px !important;
+}
+
+body.app-body.role-2 .action-icon,
+body.app-body.role-2 .btn-icon {
+  width: 14px !important;
+  height: 14px !important;
+  flex-basis: 14px !important;
+}
+
+body.app-body.role-2 .badge,
+body.app-body.role-2 .admin-soft-badge,
+body.app-body.role-2 .admin-date-pill,
+body.app-body.role-2 .admin-widget-link,
+body.app-body.role-2 .status-badge,
+body.app-body.role-2 .status-pill,
+body.app-body.role-2 .payment-status {
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+}
+
+body.app-body.role-2 .data-table .address-cell,
+body.app-body.role-2 .address-cell {
+  max-width: 220px !important;
+}
+
+@media (max-width: 980px) {
+  body.app-body.role-2 .app-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-2 .sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  body.app-body.role-2 .content {
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body.app-body.role-2 .content {
+    padding: 13px !important;
+  }
+}
+
+/* =========================================================
+   Manager-only compact pass - approx. 10% smaller
+   ========================================================= */
+
+body.app-body.role-1 {
+  font-size: 13px !important;
+}
+
+body.app-body.role-1 .app-shell {
+  grid-template-columns: 200px minmax(0, 1fr) !important;
+}
+
+body.app-body.role-1 .sidebar {
+  width: 200px !important;
+  min-width: 200px !important;
+  padding: 14px 10px !important;
+}
+
+body.app-body.role-1 .brand-logo,
+body.app-body.role-1 .brand-mark {
+  width: 38px !important;
+  height: 38px !important;
+  flex-basis: 38px !important;
+  border-radius: 12px !important;
+}
+
+body.app-body.role-1 .brand strong {
+  font-size: 12.5px !important;
+}
+
+body.app-body.role-1 .brand span {
+  font-size: 10.5px !important;
+}
+
+body.app-body.role-1 .sidebar .brand {
+  gap: 9px !important;
+  padding: 3px 5px 14px !important;
+  margin-bottom: 8px !important;
+}
+
+body.app-body.role-1 .sidebar .nav-section-title {
+  margin: 7px 7px 4px !important;
+  font-size: 10px !important;
+}
+
+body.app-body.role-1 .nav-link {
+  gap: 8px !important;
+  min-height: 35px !important;
+  padding: 7px 9px !important;
+  margin-bottom: 3px !important;
+  border-radius: 11px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-1 .nav-icon {
+  width: 23px !important;
+  min-width: 23px !important;
+  height: 23px !important;
+  flex-basis: 23px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-1 .nav-icon i {
+  font-size: 12px !important;
+}
+
+body.app-body.role-1 .sidebar-profile {
+  padding: 9px !important;
+  border-radius: 12px !important;
+  gap: 8px !important;
+}
+
+body.app-body.role-1 .sidebar-profile-avatar {
+  width: 31px !important;
+  height: 31px !important;
+  flex-basis: 31px !important;
+  border-radius: 10px !important;
+}
+
+body.app-body.role-1 .sidebar-profile-info strong {
+  font-size: 12px !important;
+}
+
+body.app-body.role-1 .sidebar-profile-info span {
+  font-size: 10px !important;
+}
+
+body.app-body.role-1 .content {
+  padding: 20px !important;
+}
+
+body.app-body.role-1 .manager-dashboard-page,
+body.app-body.role-1 .manager-home-v2,
+body.app-body.role-1 .manager-form-page,
+body.app-body.role-1 .manager-list-page,
+body.app-body.role-1 .assignment-list-page,
+body.app-body.role-1 .assignment-form-page {
+  font-size: 13px !important;
+}
+
+body.app-body.role-1 .manager-dashboard-head,
+body.app-body.role-1 .manager-list-head,
+body.app-body.role-1 .panel-title-row {
+  gap: 12px !important;
+  margin-bottom: 14px !important;
+}
+
+body.app-body.role-1 .manager-dashboard-head h1,
+body.app-body.role-1 .manager-list-head h1,
+body.app-body.role-1 .panel-title-row h1 {
+  font-size: 23px !important;
+  line-height: 1.22 !important;
+}
+
+body.app-body.role-1 .manager-dashboard-head p,
+body.app-body.role-1 .manager-list-head p,
+body.app-body.role-1 .panel-title-row p {
+  font-size: 12px !important;
+}
+
+body.app-body.role-1 .manager-stat-grid,
+body.app-body.role-1 .admin-summary-grid {
+  gap: 11px !important;
+  margin-bottom: 12px !important;
+}
+
+body.app-body.role-1 .stat-card,
+body.app-body.role-1 .admin-summary-card {
+  min-height: 104px !important;
+  padding: 15px !important;
+  border-radius: 14px !important;
+}
+
+body.app-body.role-1 .stat-card h3,
+body.app-body.role-1 .admin-summary-card h2,
+body.app-body.role-1 .admin-summary-card strong {
+  font-size: 24px !important;
+}
+
+body.app-body.role-1 .stat-card p,
+body.app-body.role-1 .admin-summary-card p,
+body.app-body.role-1 .admin-summary-card span {
+  font-size: 11.5px !important;
+}
+
+body.app-body.role-1 .admin-summary-card .summary-icon {
+  width: 41px !important;
+  height: 41px !important;
+  flex-basis: 41px !important;
+  right: 14px !important;
+  top: 14px !important;
+  font-size: 18px !important;
+}
+
+body.app-body.role-1 .manager-home-panel,
+body.app-body.role-1 .admin-widget,
+body.app-body.role-1 .panel,
+body.app-body.role-1 .dashboard-panel {
+  padding: 17px !important;
+  border-radius: 16px !important;
+}
+
+body.app-body.role-1 .manager-home-grid,
+body.app-body.role-1 .admin-dashboard-info-grid,
+body.app-body.role-1 .admin-bottom-grid {
+  gap: 12px !important;
+  margin-top: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+body.app-body.role-1 .manager-toolbar,
+body.app-body.role-1 .assignment-toolbar,
+body.app-body.role-1 .toolbar {
+  gap: 8px !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+}
+
+body.app-body.role-1 .manager-toolbar input,
+body.app-body.role-1 .assignment-toolbar input,
+body.app-body.role-1 .toolbar input,
+body.app-body.role-1 .toolbar select,
+body.app-body.role-1 .admin-form input,
+body.app-body.role-1 .admin-form select,
+body.app-body.role-1 .admin-form textarea,
+body.app-body.role-1 .manager-select-card select,
+body.app-body.role-1 .manager-custom-time-grid input[type="time"] {
+  min-height: 34px !important;
+  height: 34px !important;
+  border-radius: 10px !important;
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-1 .admin-form textarea,
+body.app-body.role-1 .manager-note-card textarea {
+  height: auto !important;
+  min-height: 74px !important;
+  line-height: 1.55 !important;
+}
+
+body.app-body.role-1 .btn,
+body.app-body.role-1 .btn-small,
+body.app-body.role-1 .btn-secondary,
+body.app-body.role-1 .btn-danger,
+body.app-body.role-1 .btn-edit,
+body.app-body.role-1 .btn-delete,
+body.app-body.role-1 .btn-search,
+body.app-body.role-1 .btn-reset,
+body.app-body.role-1 .btn-add,
+body.app-body.role-1 .manager-action-btn,
+body.app-body.role-1 .manager-link,
+body.app-body.role-1 .assignment-search-btn,
+body.app-body.role-1 .assignment-reset-btn,
+body.app-body.role-1 .assignment-add-btn-inline,
+body.app-body.role-1 .manager-assign-top-btn,
+body.app-body.role-1 .assignment-top-assign-btn,
+body.app-body.role-1 .assignment-assign-now-btn,
+body.app-body.role-1 .manager-custom-time-btn {
+  min-height: 30px !important;
+  padding: 6px 10px !important;
+  border-radius: 14px !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-1 .data-table,
+body.app-body.role-1 .slip-table,
+body.app-body.role-1 .manager-tech-queue-table {
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+}
+
+body.app-body.role-1 .data-table th,
+body.app-body.role-1 .data-table td,
+body.app-body.role-1 .slip-table th,
+body.app-body.role-1 .slip-table td,
+body.app-body.role-1 .manager-tech-queue-table th,
+body.app-body.role-1 .manager-tech-queue-table td {
+  padding: 7px 8px !important;
+  line-height: 1.35 !important;
+  vertical-align: middle !important;
+}
+
+body.app-body.role-1 .data-table td .btn,
+body.app-body.role-1 .data-table td .btn-edit,
+body.app-body.role-1 .data-table td .btn-delete,
+body.app-body.role-1 .data-table td .btn-small,
+body.app-body.role-1 .data-table td .btn-danger,
+body.app-body.role-1 .data-table .btn-print,
+body.app-body.role-1 .data-table a[href*="setup_slip"],
+body.app-body.role-1 .assignment-icon-btn {
+  min-height: 26px !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  font-size: 11px !important;
+}
+
+body.app-body.role-1 .table-action-buttons,
+body.app-body.role-1 .assignment-action-group,
+body.app-body.role-1 .manager-tech-actions {
+  gap: 7px !important;
+}
+
+body.app-body.role-1 .manager-icon,
+body.app-body.role-1 .action-icon,
+body.app-body.role-1 .btn-icon {
+  width: 14px !important;
+  height: 14px !important;
+  flex-basis: 14px !important;
+}
+
+body.app-body.role-1 .badge,
+body.app-body.role-1 .status-badge,
+body.app-body.role-1 .status-pill,
+body.app-body.role-1 .assignment-status-tab,
+body.app-body.role-1 .setup-status-badge,
+body.app-body.role-1 .manager-queue-status {
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
+}
+
+body.app-body.role-1 .assignment-status-tab,
+body.app-body.role-1 .setup-status-badge,
+body.app-body.role-1 .manager-queue-status {
+  min-height: 26px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-1 .assignment-status-tab b {
+  min-width: 19px !important;
+  height: 19px !important;
+  padding: 0 6px !important;
+  font-size: 10.5px !important;
+}
+
+body.app-body.role-1 .data-table .address-cell,
+body.app-body.role-1 .address-cell {
+  max-width: 220px !important;
+}
+
+@media (max-width: 980px) {
+  body.app-body.role-1 .app-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-1 .sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  body.app-body.role-1 .content {
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body.app-body.role-1 .content {
+    padding: 13px !important;
+  }
+}
+
+/* =========================================================
+   Customer module - admin-aligned blue design system
+   ========================================================= */
+
+body.app-body.role-0 {
+  font-size: 13px !important;
+}
+
+body.app-body.role-0 .app-shell {
+  grid-template-columns: 200px minmax(0, 1fr) !important;
+}
+
+body.app-body.role-0 .sidebar {
+  width: 200px !important;
+  min-width: 200px !important;
+  padding: 14px 10px !important;
+  border-right-color: var(--role-border) !important;
+}
+
+body.app-body.role-0 .brand-logo,
+body.app-body.role-0 .brand-mark {
+  width: 38px !important;
+  height: 38px !important;
+  flex-basis: 38px !important;
+  border-radius: 12px !important;
+}
+
+body.app-body.role-0 .sidebar .brand {
+  gap: 9px !important;
+  padding: 3px 5px 14px !important;
+  margin-bottom: 8px !important;
+  border-bottom-color: color-mix(in srgb, var(--role-border) 70%, transparent) !important;
+}
+
+body.app-body.role-0 .brand strong {
+  font-size: 12.5px !important;
+}
+
+body.app-body.role-0 .brand span {
+  font-size: 10.5px !important;
+  color: color-mix(in srgb, var(--role-soft) 78%, transparent) !important;
+}
+
+body.app-body.role-0 .sidebar .nav-section-title {
+  margin: 7px 7px 4px !important;
+  font-size: 10px !important;
+  color: color-mix(in srgb, var(--role-soft) 78%, transparent) !important;
+}
+
+body.app-body.role-0 .nav-link {
+  gap: 8px !important;
+  min-height: 35px !important;
+  padding: 7px 9px !important;
+  margin-bottom: 3px !important;
+  border-radius: 11px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-0 .nav-link:hover {
+  background: color-mix(in srgb, var(--role-primary) 18%, transparent) !important;
+}
+
+body.app-body.role-0 .nav-link.active {
+  background: var(--role-primary-hover) !important;
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--role-primary-hover) 32%, transparent) !important;
+}
+
+body.app-body.role-0 .nav-icon {
+  width: 23px !important;
+  min-width: 23px !important;
+  height: 23px !important;
+  flex-basis: 23px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-0 .nav-icon i {
+  font-size: 12px !important;
+}
+
+body.app-body.role-0 .sidebar-profile {
+  padding: 9px !important;
+  border-radius: 12px !important;
+  gap: 8px !important;
+  background: color-mix(in srgb, var(--role-primary) 14%, transparent) !important;
+  border-color: color-mix(in srgb, var(--role-border) 70%, transparent) !important;
+}
+
+body.app-body.role-0 .sidebar-profile-avatar {
+  width: 31px !important;
+  height: 31px !important;
+  flex-basis: 31px !important;
+  border-radius: 10px !important;
+  background: var(--role-primary) !important;
+}
+
+body.app-body.role-0 .sidebar-profile-info strong {
+  font-size: 12px !important;
+}
+
+body.app-body.role-0 .sidebar-profile-info span {
+  font-size: 10px !important;
+  color: color-mix(in srgb, var(--role-soft) 78%, transparent) !important;
+}
+
+body.app-body.role-0 .content {
+  padding: 20px !important;
+  background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.13), transparent 34%),
+    linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%) !important;
+}
+
+body.app-body.role-0 .customer-dashboard-v2 {
+  font-size: 13px !important;
+}
+
+body.app-body.role-0 .customer-dashboard-head {
+  gap: 12px !important;
+  margin-bottom: 14px !important;
+}
+
+body.app-body.role-0 .customer-dashboard-head h1 {
+  color: var(--role-ink) !important;
+  font-size: 23px !important;
+  line-height: 1.22 !important;
+  margin: 0 0 4px !important;
+}
+
+body.app-body.role-0 .customer-dashboard-head p {
+  color: var(--role-muted) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+}
+
+body.app-body.role-0 .customer-date-pill {
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 0 12px !important;
+  border-radius: 12px !important;
+  background: var(--role-soft) !important;
+  border-color: var(--role-border) !important;
+  color: var(--role-primary-hover) !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-0 .customer-stat-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 11px !important;
+  margin-bottom: 12px !important;
+}
+
+body.app-body.role-0 .customer-summary-card {
+  min-height: 104px !important;
+  padding: 15px 58px 15px 15px !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  border: 1px solid var(--role-border) !important;
+  color: var(--role-ink) !important;
+  box-shadow: 0 16px 36px rgba(37, 99, 235, 0.09) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+body.app-body.role-0 .customer-summary-card > div:first-child {
+  min-width: 0 !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+body.app-body.role-0 .customer-summary-card::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 4px !important;
+  background: var(--card-accent, var(--role-primary)) !important;
+}
+
+body.app-body.role-0 .customer-summary-card::after {
+  display: none !important;
+}
+
+body.app-body.role-0 .customer-summary-card span {
+  color: var(--role-muted) !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  opacity: 1 !important;
+}
+
+body.app-body.role-0 .customer-summary-card strong {
+  display: block !important;
+  color: var(--card-accent, var(--role-primary)) !important;
+  font-size: 24px !important;
+  line-height: 1 !important;
+  margin: 9px 0 10px !important;
+}
+
+body.app-body.role-0 .customer-summary-card small {
+  display: inline-flex !important;
+  color: var(--role-muted) !important;
+  background: var(--role-soft) !important;
+  border: 1px solid color-mix(in srgb, var(--role-border) 70%, transparent) !important;
+  border-radius: 999px !important;
+  padding: 4px 8px !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+}
+
+body.app-body.role-0 .customer-summary-card .summary-icon {
+  width: 41px !important;
+  height: 41px !important;
+  flex-basis: 41px !important;
+  border-radius: 13px !important;
+  background: color-mix(in srgb, var(--card-accent, var(--role-primary)) 13%, #ffffff) !important;
+  color: var(--card-accent, var(--role-primary)) !important;
+  font-size: 18px !important;
+}
+
+body.app-body.role-0 .customer-summary-card:nth-child(1) { --card-accent: #2563eb; }
+body.app-body.role-0 .customer-summary-card:nth-child(2) { --card-accent: #d97706; }
+body.app-body.role-0 .customer-summary-card:nth-child(3) { --card-accent: #3b82f6; }
+body.app-body.role-0 .customer-summary-card:nth-child(4) { --card-accent: #0891b2; }
+body.app-body.role-0 .customer-summary-card:nth-child(5) { --card-accent: #16a34a; }
+
+body.app-body.role-0 .customer-work-panel {
+  padding: 17px !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--role-border) !important;
+  background: #ffffff !important;
+  box-shadow: 0 16px 36px rgba(37, 99, 235, 0.08) !important;
+}
+
+body.app-body.role-0 .customer-work-panel .admin-widget-head {
+  gap: 12px !important;
+  margin-bottom: 13px !important;
+}
+
+body.app-body.role-0 .customer-work-panel .admin-widget-head h2 {
+  color: var(--role-ink) !important;
+  font-size: 17px !important;
+}
+
+body.app-body.role-0 .customer-work-panel .admin-widget-head p {
+  color: var(--role-muted) !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-0 .customer-table-wrap {
+  overflow-x: auto !important;
+}
+
+body.app-body.role-0 .customer-data-table {
+  min-width: 1060px !important;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+}
+
+body.app-body.role-0 .customer-data-table thead th {
+  background: #f6f8fb !important;
+  color: #64748b !important;
+  padding: 8px 9px !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  border-bottom: 1px solid #e5edf7 !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-0 .customer-data-table tbody td {
+  padding: 8px 9px !important;
+  color: #18324a !important;
+  font-weight: 700 !important;
+  border-bottom: 1px solid #e8eef6 !important;
+  vertical-align: middle !important;
+}
+
+body.app-body.role-0 .customer-data-table tbody tr:hover td {
+  background: #f8fbff !important;
+}
+
+body.app-body.role-0 .customer-data-table small,
+body.app-body.role-0 .muted-text {
+  color: var(--role-muted) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-0 .badge {
+  min-height: 26px !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-0 .badge.orange {
+  background: #fff7ed !important;
+  color: #d97706 !important;
+  border: 1px solid #fed7aa !important;
+}
+
+body.app-body.role-0 .badge.blue {
+  background: #eaf2ff !important;
+  color: #2563eb !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+body.app-body.role-0 .badge.cyan {
+  background: #ecfeff !important;
+  color: #0891b2 !important;
+  border: 1px solid #a5f3fc !important;
+}
+
+body.app-body.role-0 .badge.purple {
+  background: #eef2ff !important;
+  color: #4f46e5 !important;
+  border: 1px solid #c7d2fe !important;
+}
+
+body.app-body.role-0 .badge.green {
+  background: #dcfce7 !important;
+  color: #16a34a !important;
+  border: 1px solid #bbf7d0 !important;
+}
+
+body.app-body.role-0 .badge.red {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+}
+
+body.app-body.role-0 .badge.slate {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+body.app-body.role-0 .customer-detail-collapse {
+  position: relative !important;
+}
+
+body.app-body.role-0 .customer-detail-button {
+  min-height: 26px !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  background: #eaf2ff !important;
+  color: #2563eb !important;
+  border: 1px solid #bfdbfe !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  list-style: none !important;
+}
+
+body.app-body.role-0 .customer-detail-button::-webkit-details-marker {
+  display: none !important;
+}
+
+body.app-body.role-0 .customer-detail-button:hover {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+}
+
+body.app-body.role-0 .customer-detail-box {
+  min-width: 260px !important;
+  margin-top: 8px !important;
+  border-radius: 14px !important;
+  border: 1px solid #dbeafe !important;
+  background: #f8fbff !important;
+  box-shadow: 0 16px 28px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.app-body.role-0 .customer-detail-box p {
+  color: #334155 !important;
+  font-size: 11.5px !important;
+  line-height: 1.5 !important;
+}
+
+@media (max-width: 1180px) {
+  body.app-body.role-0 .customer-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  body.app-body.role-0 .app-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-0 .sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  body.app-body.role-0 .content {
+    padding: 16px !important;
+  }
+
+  body.app-body.role-0 .customer-dashboard-head {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+}
+
+@media (max-width: 720px) {
+  body.app-body.role-0 .customer-stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body.app-body.role-0 .content {
+    padding: 13px !important;
+  }
+}
+
+/* =========================================================
+   Admin address selects - single border field
+   ========================================================= */
+
+body.app-body .staff-input-wrap.address-select-wrap select,
+body.app-body.role-3 .staff-input-wrap.address-select-wrap select {
+  height: 100% !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 42px 0 46px !important;
+}
+
+body.app-body .staff-input-wrap.address-select-wrap select:focus,
+body.app-body.role-3 .staff-input-wrap.address-select-wrap select:focus {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+body.app-body .staff-input-wrap.address-select-wrap:focus-within,
+body.app-body.role-3 .staff-input-wrap.address-select-wrap:focus-within {
+  border-color: var(--role-primary) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--role-primary) 14%, transparent) !important;
+}
+
+body.app-body.role-3 .staff-input-wrap.address-select-wrap {
+  height: 34px !important;
+  min-height: 34px !important;
+  border-radius: 10px !important;
+}
+
+body.app-body.role-3 .staff-input-wrap.address-select-wrap select {
+  padding: 6px 34px 6px 38px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-3 .staff-input-wrap.address-select-wrap:not(:has(.address-dropdown))::after {
+  width: 7px !important;
+  height: 7px !important;
+  right: 14px !important;
 }

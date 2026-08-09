@@ -90,8 +90,8 @@ function icon_svg(string $name): string
 function setup_status_name($status): string
 {
     return match ((string) $status) {
-        '0' => 'สร้างใบงานแล้ว',
-        '1' => 'มอบหมายแล้ว',
+        '0' => 'สร้างใบงานติดตั้งแล้ว',
+        '1' => 'มอบหมายงานติดตั้งแล้ว',
         '2' => 'ช่างรับงาน',
         '3' => 'กำลังติดตั้ง',
         '4' => 'เสร็จสิ้น',
@@ -206,6 +206,11 @@ try {
 layout_header('รายการงานติดตั้ง', 'setups');
 ?>
 
+<link
+  rel="stylesheet"
+  href="<?= h(app_asset_url('sale/assets/css/setups.css')) ?>?v=<?= h(asset_version('sale/assets/css/setups.css')) ?>"
+>
+
 <?= flash_message() ?>
 
 <section class="cs-job-status-panel cs-setups-page-panel">
@@ -214,7 +219,7 @@ layout_header('รายการงานติดตั้ง', 'setups');
             <h2>รายการใบงานติดตั้ง</h2>
         </div>
 
-        <a class="cs-status-link" href="<?= h(app_system_url('finance/create_setup.php')) ?>">
+        <a class="cs-status-link btn btn-add cs-setup-add-link" href="<?= h(app_system_url('sale/create_setup.php')) ?>">
             <?= icon_svg('plus') ?>
             สร้างใบงานติดตั้ง
         </a>
@@ -226,23 +231,38 @@ layout_header('รายการงานติดตั้ง', 'setups');
         </button>
 
         <button type="button" class="cs-status-tab status-created" data-filter="created">
-            สร้างใบงานแล้ว <b><?= h((string) $status_counts['created']) ?></b>
+            <span>สร้างใบงานติดตั้งแล้ว</span>
+            <?php if ((int) $status_counts['created'] > 0): ?>
+                <span class="status-count-badge"><?= h((string) $status_counts['created']) ?></span>
+            <?php endif; ?>
         </button>
 
         <button type="button" class="cs-status-tab status-assigned" data-filter="assigned">
-            มอบหมายแล้ว <b><?= h((string) $status_counts['assigned']) ?></b>
+            <span>มอบหมายงานติดตั้งแล้ว</span>
+            <?php if ((int) $status_counts['assigned'] > 0): ?>
+                <span class="status-count-badge"><?= h((string) $status_counts['assigned']) ?></span>
+            <?php endif; ?>
         </button>
 
         <button type="button" class="cs-status-tab status-accepted" data-filter="accepted">
-            ช่างรับงาน <b><?= h((string) $status_counts['accepted']) ?></b>
+            <span>ช่างรับงาน</span>
+            <?php if ((int) $status_counts['accepted'] > 0): ?>
+                <span class="status-count-badge"><?= h((string) $status_counts['accepted']) ?></span>
+            <?php endif; ?>
         </button>
 
         <button type="button" class="cs-status-tab status-installing" data-filter="installing">
-            กำลังติดตั้ง <b><?= h((string) $status_counts['installing']) ?></b>
+            <span>กำลังติดตั้ง</span>
+            <?php if ((int) $status_counts['installing'] > 0): ?>
+                <span class="status-count-badge"><?= h((string) $status_counts['installing']) ?></span>
+            <?php endif; ?>
         </button>
 
         <button type="button" class="cs-status-tab status-done" data-filter="done">
-            เสร็จสิ้น <b><?= h((string) $status_counts['done']) ?></b>
+            <span>เสร็จสิ้น</span>
+            <?php if ((int) $status_counts['done'] > 0): ?>
+                <span class="status-count-badge"><?= h((string) $status_counts['done']) ?></span>
+            <?php endif; ?>
         </button>
     </div>
 
@@ -313,7 +333,7 @@ layout_header('รายการงานติดตั้ง', 'setups');
                         <td>
                             <a
                                 class="cs-table-action"
-                                href="<?= h(app_system_url('finance/setup_slip.php?id=' . urlencode($row['setup_id']))) ?>"
+                                href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($row['setup_id']))) ?>"
                             >
                                 <?= icon_svg('file') ?>
                                 ใบติดตั้ง
@@ -327,24 +347,9 @@ layout_header('รายการงานติดตั้ง', 'setups');
 </section>
 
 
-<script>
-document.querySelectorAll('.cs-status-tab').forEach(function (button) {
-    button.addEventListener('click', function () {
-        const filter = this.dataset.filter || 'all';
-
-        document.querySelectorAll('.cs-status-tab').forEach(function (tab) {
-            tab.classList.remove('active');
-        });
-
-        this.classList.add('active');
-
-        document.querySelectorAll('#setupStatusRows tr[data-status-group]').forEach(function (row) {
-            const group = row.dataset.statusGroup || 'all';
-            row.style.display = (filter === 'all' || group === filter) ? '' : 'none';
-        });
-    });
-});
-</script>
+<script
+  src="<?= h(app_asset_url('sale/assets/js/setups.js')) ?>?v=<?= h(asset_version('sale/assets/js/setups.js')) ?>"
+></script>
 
 <?php
 layout_footer();

@@ -1,1 +1,267 @@
-/* Page-specific styles for manager/assignment_list.php can be moved here when needed. */
+/* Compact styles for manager/assignment_list.php. */
+
+body.app-body.role-1 .assignment-list-page {
+  font-size: 13px !important;
+}
+
+body.app-body.role-1 .assignment-search-form,
+body.app-body.role-1 .assignment-toolbar-card {
+  gap: 8px !important;
+  padding: 12px !important;
+  border-radius: 14px !important;
+  align-items: center !important;
+}
+
+body.app-body.role-1 .assignment-search-form input[type="search"],
+body.app-body.role-1 .assignment-search-form input[type="text"] {
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 6px 10px 6px 34px !important;
+  border-radius: 10px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-1 .assignment-search-field .manager-icon {
+  width: 14px !important;
+  height: 14px !important;
+  left: 11px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+body.app-body.role-1 .assignment-toolbar-buttons {
+  gap: 7px !important;
+  align-items: center !important;
+}
+
+body.app-body.role-1 .assignment-search-btn,
+body.app-body.role-1 .assignment-reset-btn {
+  min-height: 34px !important;
+  padding: 6px 10px !important;
+  border-radius: 14px !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+}
+
+body.app-body.role-1 .assignment-status-tabs {
+  gap: 8px !important;
+  margin: 10px 0 12px !important;
+}
+
+body.app-body.role-1 .assignment-status-tab {
+  min-height: 30px !important;
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+  font-size: 11.5px !important;
+}
+
+body.app-body.role-1 .assignment-status-tab b {
+  min-width: 20px !important;
+  height: 20px !important;
+  padding: 0 6px !important;
+  font-size: 10.5px !important;
+}
+
+body.app-body.role-1 .assignment-status-tab:not(.status-all) {
+  border-color: #bfdbfe !important;
+  background: #f8fbff !important;
+  color: #1d4ed8 !important;
+}
+
+body.app-body.role-1 .assignment-status-tab:not(.status-all):hover {
+  border-color: #93c5fd !important;
+  background: #eff6ff !important;
+  color: #1e40af !important;
+}
+
+body.app-body.role-1 .assignment-status-tab .status-count-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  padding: 0 6px !important;
+  border-radius: 999px !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+
+body.app-body.role-1 .assignment-status-tab.active {
+  color: #ffffff !important;
+}
+
+body.app-body.role-1 .assignment-status-tab:not(.status-all).active {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+
+body.app-body.role-1 .assignment-status-tab.active b {
+  background: rgba(255, 255, 255, .22) !important;
+  color: #ffffff !important;
+}
+
+body.app-body.role-1 .assignment-status-tab.active .status-count-badge {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+body.app-body.role-1 .assignment-detail-table {
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th,
+body.app-body.role-1 .assignment-detail-table td {
+  padding: 7px 8px !important;
+  line-height: 1.35 !important;
+  vertical-align: middle !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .setup-status-badge,
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn {
+  min-height: 26px !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn {
+  width: 28px !important;
+  min-width: 28px !important;
+}
+
+body.app-body.role-1 .assignment-icon-actions {
+  gap: 8px !important;
+}
+
+body.app-body.role-1 .assignment-icon-btn.cancel-assign.is-disabled,
+body.app-body.role-1 .assignment-icon-btn.cancel-assign:disabled {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
+  pointer-events: auto !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.assignment-cancel-modal[hidden] {
+  display: none !important;
+}
+
+.assignment-cancel-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.assignment-cancel-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, .38);
+}
+
+.assignment-cancel-dialog {
+  position: relative;
+  width: min(440px, 100%);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid #fecaca;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, .22);
+}
+
+.assignment-cancel-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.assignment-cancel-copy h2 {
+  margin: 0 0 6px;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.assignment-cancel-copy p {
+  margin: 0;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.assignment-cancel-copy small {
+  display: block;
+  margin-top: 6px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.assignment-cancel-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.assignment-cancel-actions button {
+  min-height: 34px;
+  padding: 0 13px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.assignment-cancel-back {
+  border: 1px solid #dbe3ef;
+  background: #f8fafc;
+  color: #475569;
+}
+
+.assignment-cancel-confirm {
+  border: 1px solid #ef4444;
+  background: #ef4444;
+  color: #ffffff;
+}
+
+body.assignment-cancel-open {
+  overflow: hidden;
+}
+
+@media (max-width: 560px) {
+  .assignment-cancel-dialog {
+    grid-template-columns: 1fr;
+  }
+
+  .assignment-cancel-actions {
+    flex-direction: column-reverse;
+  }
+
+  .assignment-cancel-actions button {
+    width: 100%;
+  }
+}

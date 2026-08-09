@@ -118,6 +118,26 @@ $recent_payments = $conn->query("
     LIMIT 5
 ");
 
+$recent_setup_rows = [];
+$setup_status_counts = [
+    '0' => 0,
+    '1' => 0,
+    '2' => 0,
+    '3' => 0,
+    '4' => 0,
+];
+
+if ($recent_setups) {
+    while ($row = $recent_setups->fetch_assoc()) {
+        $recent_setup_rows[] = $row;
+        $status_key = (string) ($row['setup_status'] ?? '');
+
+        if (array_key_exists($status_key, $setup_status_counts)) {
+            $setup_status_counts[$status_key]++;
+        }
+    }
+}
+
 function setup_status_name($status): string
 {
     return match ((string) $status) {
@@ -165,130 +185,109 @@ function payment_status_badge($status): string
 layout_header('หน้าหลักพนักงานขาย', 'dashboard');
 ?>
 
-<div class="sales-dashboard-page">
+<link
+  rel="stylesheet"
+  href="<?= h(app_asset_url('sale/assets/css/dashboard.css')) ?>?v=<?= h(asset_version('sale/assets/css/dashboard.css')) ?>"
+>
 
-  <div class="admin-dashboard-head">
+<div class="admin-dashboard-v2 sales-dashboard-page">
+
+  <div class="admin-dashboard-top">
     <div>
       <h1>ภาพรวมพนักงานขาย</h1>
       <p>สรุปข้อมูลงานติดตั้ง การจ่ายสินค้า และรายการล่าสุดที่ต้องติดตาม</p>
     </div>
 
-    <div class="admin-dashboard-tools">
-      <div class="admin-date-box">
-        <?= icon_svg('calendar') ?>
+    <div class="admin-dashboard-actions">
+      <div class="admin-date-pill">
+        <i class="fa-regular fa-calendar"></i>
         <?= h(date('d/m/Y')) ?>
       </div>
     </div>
   </div>
 
   <div class="admin-summary-grid sales-summary-grid">
-    <div class="admin-summary-card green">
+    <div class="admin-summary-card">
       <div>
-        <p>งานติดตั้งทั้งหมด</p>
-        <h2><?= h((string) $total_setups) ?></h2>
-        <span>รายการงานติดตั้งในระบบ</span>
+        <span>งานติดตั้งทั้งหมด</span>
+        <strong><?= h((string) $total_setups) ?></strong>
+        <small>รายการงานติดตั้งในระบบ</small>
       </div>
-      <div class="summary-icon"><?= icon_svg('plus') ?></div>
+      <div class="summary-icon">
+        <i class="fa-solid fa-file-circle-plus"></i>
+      </div>
     </div>
 
-    <div class="admin-summary-card blue">
+    <div class="admin-summary-card">
       <div>
-        <p>ลูกค้า</p>
-        <h2><?= h((string) $total_customers) ?></h2>
-        <span>ข้อมูลลูกค้าที่ใช้บริการ</span>
+        <span>ลูกค้า</span>
+        <strong><?= h((string) $total_customers) ?></strong>
+        <small>ข้อมูลลูกค้าที่ใช้บริการ</small>
       </div>
-      <div class="summary-icon"><?= icon_svg('users') ?></div>
+      <div class="summary-icon">
+        <i class="fa-solid fa-user-group"></i>
+      </div>
     </div>
 
-    <div class="admin-summary-card orange">
+    <div class="admin-summary-card">
       <div>
-        <p>รอจ่ายสินค้า</p>
-        <h2><?= h((string) $total_wait_payment) ?></h2>
-        <span>รายการที่ยังไม่จ่ายสินค้า</span>
+        <span>สินค้า</span>
+        <strong><?= h((string) $total_products) ?></strong>
+        <small>รายการสินค้าและค่าติดตั้ง</small>
       </div>
-      <div class="summary-icon"><?= icon_svg('box') ?></div>
-    </div>
-
-    <div class="admin-summary-card cyan">
-      <div>
-        <p>จ่ายสินค้าแล้ว</p>
-        <h2><?= h((string) $total_paid) ?></h2>
-        <span>รายการที่จ่ายสินค้าเรียบร้อย</span>
+      <div class="summary-icon">
+        <i class="fa-solid fa-box"></i>
       </div>
-      <div class="summary-icon"><?= icon_svg('check') ?></div>
-    </div>
-
-    <div class="admin-summary-card purple">
-      <div>
-        <p>สินค้า</p>
-        <h2><?= h((string) $total_products) ?></h2>
-        <span>รายการสินค้าและค่าติดตั้ง</span>
-      </div>
-      <div class="summary-icon"><?= icon_svg('box') ?></div>
     </div>
   </div>
 
-  <div class="sales-dashboard-grid">
-    <div class="dashboard-panel">
-      <div class="dashboard-panel-head">
+  <div class="admin-dashboard-info-grid sales-dashboard-info-grid">
+    <div class="admin-widget sales-install-status-widget">
+      <div class="admin-widget-head">
         <div>
-          <h2>สถานะการจ่ายสินค้า</h2>
-          <p>สรุปสถานะการจ่ายสินค้าล่าสุด</p>
+          <h2>สถานะงานติดตั้ง</h2>
+          <p>สรุปสถานะงานติดตั้งล่าสุด</p>
         </div>
-        <span class="dashboard-pill">
-          ยอดรวม <?= number_format($total_install_price, 2) ?> บาท
-        </span>
       </div>
 
-      <div class="sales-payment-status">
-        <div class="payment-status-row wait">
-          <div>
-            <strong>รอจ่ายสินค้า</strong>
-            <span><?= h((string) $total_wait_payment) ?> รายการ</span>
-          </div>
-          <b>รอ</b>
-        </div>
+      <div class="admin-mini-list sales-status-list">
+        <?php foreach ($setup_status_counts as $status_value => $status_total): ?>
+          <div class="admin-mini-item">
+            <div class="admin-mini-main">
+              <strong><?= h(setup_status_name($status_value)) ?></strong>
+              <span><?= h((string) $status_total) ?> รายการ</span>
+            </div>
 
-        <div class="payment-status-row paid">
-          <div>
-            <strong>จ่ายสินค้าแล้ว</strong>
-            <span><?= h((string) $total_paid) ?> รายการ</span>
+            <span class="badge <?= h(setup_status_badge($status_value)) ?>">
+              <?= h(setup_status_name($status_value)) ?>
+            </span>
           </div>
-          <b>สำเร็จ</b>
-        </div>
-
-        <div class="payment-status-row cancel">
-          <div>
-            <strong>ยกเลิก</strong>
-            <span><?= h((string) $total_cancel) ?> รายการ</span>
-          </div>
-          <b>ยกเลิก</b>
-        </div>
+        <?php endforeach; ?>
       </div>
     </div>
   </div>
 
-  <div class="sales-dashboard-grid lower">
-    <div class="dashboard-panel">
-      <div class="dashboard-panel-head">
+  <div class="admin-bottom-grid sales-bottom-grid">
+    <div class="admin-widget">
+      <div class="admin-widget-head">
         <div>
           <h2>งานติดตั้งล่าสุด</h2>
           <p>รายการงานติดตั้งที่สร้างล่าสุด</p>
         </div>
 
-        <a class="dashboard-link" href="<?= h(app_system_url('finance/setups.php')) ?>">
+        <a class="admin-widget-link" href="<?= h(app_system_url('sale/setups.php')) ?>">
           ดูทั้งหมด
         </a>
       </div>
 
-      <div class="simple-list">
-        <?php if ($recent_setups->num_rows === 0): ?>
-          <div class="empty-dashboard">ยังไม่มีงานติดตั้ง</div>
+      <div class="admin-mini-list sales-mini-list">
+        <?php if (count($recent_setup_rows) === 0): ?>
+          <div class="admin-empty-mini">ยังไม่มีงานติดตั้ง</div>
         <?php endif; ?>
 
-        <?php while ($row = $recent_setups->fetch_assoc()): ?>
-          <div class="simple-list-item">
-            <div>
+        <?php foreach ($recent_setup_rows as $row): ?>
+          <div class="admin-mini-item">
+            <div class="admin-mini-main">
               <strong><?= h($row['setup_id']) ?> - <?= h($row['user_name'] ?? '-') ?></strong>
               <span>
                 <?= h($row['pro_name'] ?? '-') ?>
@@ -301,43 +300,7 @@ layout_header('หน้าหลักพนักงานขาย', 'dashboa
               <?= h(setup_status_name($row['setup_status'])) ?>
             </span>
           </div>
-        <?php endwhile; ?>
-      </div>
-    </div>
-
-    <div class="dashboard-panel">
-      <div class="dashboard-panel-head">
-        <div>
-          <h2>การจ่ายสินค้าล่าสุด</h2>
-          <p>รายการบันทึกการจ่ายสินค้าล่าสุด</p>
-        </div>
-
-        <a class="dashboard-link" href="<?= h(app_system_url('finance/payment.php')) ?>">
-          ดูทั้งหมด
-        </a>
-      </div>
-
-      <div class="simple-list">
-        <?php if ($recent_payments->num_rows === 0): ?>
-          <div class="empty-dashboard">ยังไม่มีข้อมูลการจ่ายสินค้า</div>
-        <?php endif; ?>
-
-        <?php while ($row = $recent_payments->fetch_assoc()): ?>
-          <div class="simple-list-item">
-            <div>
-              <strong><?= h($row['paymentpro_id']) ?> - <?= h($row['user_name'] ?? '-') ?></strong>
-              <span>
-                <?= h($row['setup_id'] ?? '-') ?>
-                |
-                <?= !empty($row['paymentpro_date']) ? h(date('d/m/Y H:i', strtotime($row['paymentpro_date']))) : '-' ?>
-              </span>
-            </div>
-
-            <span class="badge <?= h(payment_status_badge($row['paymentpro_status'])) ?>">
-              <?= h(payment_status_name($row['paymentpro_status'])) ?>
-            </span>
-          </div>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
       </div>
     </div>
   </div>

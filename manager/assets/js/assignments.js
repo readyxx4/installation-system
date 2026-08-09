@@ -175,9 +175,14 @@ function isTimeSlotBusy(techId, dateKey, startTime, endTime) {
 
 function getDateSlotState(techId, dateKey) {
   const busyCount = availableTimeSlots.filter(slot => isTimeSlotBusy(techId, dateKey, slot.start, slot.end)).length;
+  const unavailableCount = availableTimeSlots.filter(slot =>
+    isTimeSlotBusy(techId, dateKey, slot.start, slot.end) || isTimeSlotPassed(dateKey, slot.end)
+  ).length;
+
   return {
     busyCount,
-    isFull: busyCount === availableTimeSlots.length,
+    unavailableCount,
+    isFull: unavailableCount === availableTimeSlots.length,
   };
 }
 
@@ -199,7 +204,7 @@ function addMinutesToTime(timeValue, minutesToAdd) {
 
 function assignmentStatusText(status) {
   const value = String(status ?? '');
-  if (value === '1') return 'มอบหมายแล้ว';
+  if (value === '1') return 'มอบหมายงานแล้ว';
   if (value === '2') return 'ช่างรับงานแล้ว';
   if (value === '5') return 'เสร็จสิ้น';
   return '-';
@@ -227,24 +232,19 @@ function renderTechnicians() {
     const active = selectedTechId === tech.tech_id ? ' active' : '';
     const unavailable = !isTechSelectable(tech);
     const disabledClass = unavailable ? ' is-disabled' : '';
-    const queueCount = Number(tech.total_queue || getTechSlots(tech.tech_id).length || 0);
-    const statusText = !isTechBaseAvailable(tech)
-      ? (String(tech.tech_id || '') === String(initialTechId || '') ? 'ไม่พร้อมรับงาน แต่ยังทำงานนี้ได้' : 'ไม่พร้อมรับงาน')
-      : 'พร้อมรับงาน';
 
     return `
       <article class="manager-tech-card${active}${disabledClass}">
         <div class="manager-tech-card-main" ${unavailable ? '' : `onclick="selectTechnician('${escapeHtml(tech.tech_id)}')"`}>
           <div class="tech-avatar">${escapeHtml((techDisplayName(tech) || 'ช').slice(0, 1))}</div>
-          <div>
+          <div class="manager-tech-identity">
             <strong>${escapeHtml(techDisplayName(tech))}</strong>
-            <p>${escapeHtml(tech.tech_phone || '-')} | ${escapeHtml(tech.tech_email || '-')}</p>
-            <small>สถานะ: ${escapeHtml(statusText)} | คิวที่ถูกมอบหมาย ${queueCount} คิว</small>
+            <p>${escapeHtml(tech.tech_phone || '-')} • ${escapeHtml(tech.tech_email || '-')}</p>
           </div>
         </div>
         <div class="manager-tech-actions">
           <button type="button" class="select" ${unavailable ? 'disabled' : ''} onclick="selectTechnician('${escapeHtml(tech.tech_id)}')">
-            ${unavailable ? 'เลือกไม่ได้' : (active ? 'เลือกแล้ว' : 'เลือกช่าง')}
+            ${unavailable ? 'เลือกไม่ได้' : (active ? '✓ เลือกแล้ว' : 'เลือกช่าง')}
           </button>
         </div>
       </article>
@@ -294,17 +294,15 @@ function renderSelectedTechSchedule() {
     return;
   }
 
-  const todayKey = toDateKey(new Date());
-  const displayDate = selectedInstallDate || todayKey;
-  const slots = getTechSlotsOnDate(tech.tech_id, displayDate)
+  const todayKey = serverToday || toDateKey(new Date());
+  const slots = getTechSlotsOnDate(tech.tech_id, todayKey)
     .sort((a, b) => String(a.assign_install_time || '00:00').localeCompare(String(b.assign_install_time || '00:00')));
 
-  const statusText = isTechBaseAvailable(tech) ? 'พร้อมรับงาน' : 'ไม่พร้อมรับงาน';
-  title.textContent = `ช่างที่เลือก: ${techDisplayName(tech)} | สถานะ ${statusText} | วันที่ ${formatDate(displayDate)}`;
-  count.textContent = `งานในวันนี้ ${slots.length} คิว`;
+  title.textContent = `ช่างที่เลือก: ${techDisplayName(tech)}`;
+  count.textContent = `วันนี้ ${formatDate(todayKey)} · ${slots.length} งาน`;
 
   if (slots.length === 0) {
-    body.innerHTML = `<tr><td colspan="6" class="manager-empty-cell">ยังไม่มีงานที่ได้รับมอบหมายในวันที่ ${formatDate(displayDate)}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="6" class="manager-empty-cell">ยังไม่มีงานที่ได้รับมอบหมายในวันที่ ${formatDate(todayKey)}</td></tr>`;
     return;
   }
 
@@ -359,7 +357,7 @@ function renderCalendar() {
       : (slotState.isFull ? ' busy' : (slotState.busyCount > 0 ? ' partial' : (unavailableByStatus ? ' busy' : ' available')));
     const label = pastDate
       ? ''
-      : (weekend ? 'วันหยุด' : (slotState.isFull ? 'เต็ม' : (slotState.busyCount > 0 ? 'มีคิว' : (unavailableByStatus ? 'ไม่พร้อมรับงาน' : 'ว่าง'))));
+      : (weekend ? 'วันหยุด' : (slotState.isFull ? 'คิวเต็ม' : (slotState.busyCount > 0 ? 'มีคิว' : (unavailableByStatus ? 'ไม่พร้อมรับงาน' : 'ว่าง'))));
     const disabled = !assignmentPermissions.canChangeDate || pastDate || weekend || slotState.isFull || unavailableByStatus || !canSelectDate ? 'disabled' : '';
 
     html += `

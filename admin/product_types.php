@@ -47,7 +47,7 @@ if ($search !== '') {
         WHERE protype_id LIKE ?
            OR protype_name LIKE ?
            OR protype_detail LIKE ?
-        ORDER BY protype_id ASC
+        ORDER BY protype_id DESC
     ");
 
     $stmt->bind_param('sss', $like, $like, $like);
@@ -57,7 +57,7 @@ if ($search !== '') {
     $product_types = $conn->query("
         SELECT protype_id, protype_name, protype_detail
         FROM product_type
-        ORDER BY protype_id ASC
+        ORDER BY protype_id DESC
     ");
 }
 

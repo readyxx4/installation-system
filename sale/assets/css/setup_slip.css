@@ -1,0 +1,410 @@
+/* ===== Installation Slip Clean A4 - Single Row Detail ===== */
+.install-slip-page {
+    width: 210mm;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding-bottom: 16px;
+}
+
+.install-slip-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.install-slip-back,
+.install-slip-print {
+    min-height: 40px;
+    padding: 0 18px;
+    border-radius: 12px;
+    border: 1px solid #d4d4d8;
+    text-decoration: none;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.install-slip-back {
+    background: #ffffff;
+    color: #27272a;
+}
+
+.install-slip-print {
+    background: #111827;
+    color: #ffffff;
+}
+
+.install-slip-paper {
+    width: 210mm;
+    min-height: 297mm;
+    max-height: 297mm;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #d4d4d8;
+    padding: 10mm 11mm;
+    box-sizing: border-box;
+    color: #111827;
+    box-shadow: 0 16px 42px rgba(15, 23, 42, 0.12);
+}
+
+.install-slip-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12mm;
+    padding-bottom: 8mm;
+    border-bottom: 2px solid #111827;
+}
+
+.install-slip-brand {
+    display: flex;
+    align-items: center;
+    gap: 8mm;
+    min-width: 0;
+}
+
+.install-slip-logo {
+    width: 26mm;
+    height: 26mm;
+    border-radius: 50%;
+    overflow: hidden;
+    flex: 0 0 26mm;
+}
+
+.install-slip-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.install-slip-brand-text h1 {
+    margin: 2mm 0 1mm;
+    font-size: 24px;
+    line-height: 1.12;
+    color: #111827;
+    font-weight: 900;
+}
+
+.install-slip-brand-text p {
+    margin: 0;
+    font-size: 12px;
+    color: #404040;
+    font-weight: 500;
+}
+
+.install-slip-title {
+    min-width: 54mm;
+    border: 1px solid #bdbdbd;
+    border-radius: 5mm;
+    padding: 4mm 6mm;
+    text-align: center;
+}
+
+.install-slip-title span {
+    display: block;
+    font-size: 11px;
+    color: #111827;
+    font-weight: 700;
+    margin-bottom: 1mm;
+}
+
+.install-slip-title strong {
+    display: block;
+    font-size: 28px;
+    line-height: 1;
+    color: #000000;
+    font-weight: 900;
+}
+
+.install-slip-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8mm;
+    margin: 7mm 0 6mm;
+}
+
+.install-slip-summary div {
+    border: 1px solid #cfcfcf;
+    border-radius: 4mm;
+    padding: 4mm 5mm;
+    min-height: 18mm;
+    box-sizing: border-box;
+}
+
+.install-slip-summary span,
+.install-slip-info-grid span {
+    display: block;
+    color: #525252;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.install-slip-summary strong {
+    color: #111827;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.install-slip-section {
+    margin-top: 6mm;
+}
+
+.install-slip-section h2,
+.install-slip-note h2 {
+    margin: 0 0 3mm;
+    padding-bottom: 2.2mm;
+    border-bottom: 2px solid #111827;
+    font-size: 17px;
+    color: #111827;
+    font-weight: 900;
+    display: block;
+}
+
+.install-slip-section-icon {
+    display: none !important;
+}
+
+.install-slip-info-grid,
+.install-slip-location-grid {
+    display: block;
+    border-top: 1px solid #d4d4d8;
+    border-bottom: 1px solid #d4d4d8;
+}
+
+.install-slip-info-grid div,
+.install-slip-location-grid div,
+.install-slip-info-grid .full {
+    display: flex;
+    align-items: flex-start;
+    gap: 7mm;
+    min-height: auto;
+    padding: 2.7mm 3mm;
+    border: 0 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    box-sizing: border-box;
+}
+
+.install-slip-info-grid div:last-child,
+.install-slip-location-grid div:last-child {
+    border-bottom: 0 !important;
+}
+
+.install-slip-info-grid span,
+.install-slip-location-grid span {
+    width: 38mm;
+    flex: 0 0 38mm;
+    margin: 0;
+    color: #525252;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.install-slip-info-grid strong,
+.install-slip-location-grid strong {
+    flex: 1;
+    min-width: 0;
+    color: #111827;
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.install-slip-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+}
+
+.install-slip-table th,
+.install-slip-table td {
+    border: 1px solid #bdbdbd;
+    padding: 2mm 1.8mm;
+    vertical-align: top;
+    color: #111827;
+}
+
+.install-slip-table th {
+    background: #f5f5f5;
+    font-size: 9.5px;
+    font-weight: 900;
+    text-align: center;
+}
+
+.install-slip-table tfoot td {
+    font-weight: 900;
+    background: #fafafa;
+}
+
+.install-slip-table .center {
+    text-align: center;
+}
+
+.install-slip-table .right {
+    text-align: right;
+}
+
+.install-slip-table .total {
+    font-size: 11px;
+}
+
+.install-slip-note {
+    margin-top: 5mm;
+    border: 1px solid #d4d4d8;
+    border-radius: 3mm;
+    padding: 3mm 4mm;
+}
+
+.install-slip-note h2 {
+    border-bottom: 0;
+    padding-bottom: 0;
+    margin-bottom: 2mm;
+    font-size: 14px;
+}
+
+.install-slip-note-lines div {
+    height: 7mm;
+    border-bottom: 1px dashed #888;
+}
+
+.install-slip-signatures {
+    margin-top: 5mm;
+    border: 1px solid #d4d4d8;
+    border-radius: 3mm;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+}
+
+.install-slip-signatures div {
+    min-height: 31mm;
+    padding: 4mm;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.install-slip-signatures div + div {
+    border-left: 1px solid #d4d4d8;
+}
+
+.install-slip-signatures strong {
+    display: block;
+    font-size: 11.5px;
+    color: #111827;
+    margin-bottom: 6mm;
+}
+
+.install-slip-signatures p {
+    width: 72%;
+    height: 8mm;
+    margin: 0 auto 2mm;
+    border-bottom: 1.5px solid #111827;
+}
+
+.install-slip-signatures span,
+.install-slip-signatures small {
+    display: block;
+    font-size: 10.5px;
+    color: #111827;
+    line-height: 1.6;
+}
+
+.install-slip-footer {
+    margin-top: 4mm;
+    padding-top: 2mm;
+    border-top: 1px solid #d4d4d8;
+    display: flex;
+    justify-content: center;
+    gap: 7mm;
+    color: #525252;
+    font-size: 9.5px;
+}
+
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    html,
+    body {
+        width: 210mm !important;
+        height: 297mm !important;
+        background: #ffffff !important;
+    }
+
+    body.app-body {
+        overflow: visible !important;
+        background: #ffffff !important;
+    }
+
+    .sidebar,
+    .topbar,
+    .install-slip-toolbar,
+    .no-print {
+        display: none !important;
+    }
+
+    .app-shell,
+    .main,
+    .content {
+        display: block !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #ffffff !important;
+    }
+
+    .install-slip-page {
+        width: 210mm !important;
+        max-width: 210mm !important;
+        height: 297mm !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .install-slip-paper {
+        width: 210mm !important;
+        height: 297mm !important;
+        min-height: 297mm !important;
+        max-height: 297mm !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        padding: 9mm 10mm !important;
+        page-break-inside: avoid !important;
+    }
+
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+}
+
+/* Sale slip screen compact pass. Print sizing above remains unchanged. */
+body.app-body.role-2 .install-slip-page {
+    padding-bottom: 12px;
+}
+
+body.app-body.role-2 .install-slip-toolbar {
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+body.app-body.role-2 .install-slip-back,
+body.app-body.role-2 .install-slip-print {
+    min-height: 34px;
+    padding: 0 14px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+body.app-body.role-2 .install-slip-paper {
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+}
+

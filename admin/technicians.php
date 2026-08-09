@@ -66,7 +66,7 @@ if ($search !== '') {
            OR tech_name LIKE ?
            OR tech_phone LIKE ?
            OR tech_email LIKE ?
-        ORDER BY tech_id ASC
+        ORDER BY tech_id DESC
     ");
     $stmt->bind_param('ssss', $like, $like, $like, $like);
     $stmt->execute();
@@ -75,7 +75,7 @@ if ($search !== '') {
     $technicians = $conn->query("
         SELECT tech_id, tech_name, tech_phone, tech_email, tech_status
         FROM technicians
-        ORDER BY tech_id ASC
+        ORDER BY tech_id DESC
     ");
 }
 

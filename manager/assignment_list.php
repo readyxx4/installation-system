@@ -35,12 +35,60 @@ function column_exists(mysqli $conn, string $table, string $column): bool
 
 function prepare_assignment_assign_by(mysqli $conn): void
 {
-    if (table_exists($conn, 'assignment') && !column_exists($conn, 'assignment', 'assign_by')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN assign_by CHAR(13) NULL AFTER user_id");
+    if (!table_exists($conn, 'assignment') || !column_exists($conn, 'assignment', 'assign_by')) {
+        redirect_to(app_system_url('manager/index.php?status=schema_missing'));
     }
 }
 
 prepare_assignment_assign_by($conn);
+
+function make_cancel_assign_id(mysqli $conn): string
+{
+    $prefix = 'ASG-';
+    for ($i = 1; $i <= 9999999; $i++) {
+        $assign_id = $prefix . str_pad((string) $i, 7, '0', STR_PAD_LEFT);
+        $stmt = $conn->prepare("SELECT assign_id FROM assignment WHERE assign_id = ? LIMIT 1");
+        $stmt->bind_param('s', $assign_id);
+        $stmt->execute();
+
+        if ($stmt->get_result()->num_rows === 0) {
+            return $assign_id;
+        }
+    }
+
+    throw new Exception('ไม่สามารถสร้างรหัสการยกเลิกใบงานได้');
+}
+
+function assignment_cancel_allowed(array $row): bool
+{
+    if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
+        return false;
+    }
+
+    if (in_array((string) ($row['assign_status'] ?? ''), ['2', '5'], true)) {
+        return false;
+    }
+
+    return in_array((string) ($row['setup_status'] ?? ''), ['0', '1'], true);
+}
+
+function assignment_cancel_disabled_title(array $row): string
+{
+    if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
+        return 'งานนี้ถูกยกเลิกแล้ว';
+    }
+
+    if ((string) ($row['setup_status'] ?? '') === '4' || (string) ($row['assign_status'] ?? '') === '5') {
+        return 'งานนี้เสร็จสิ้นแล้ว ไม่สามารถยกเลิกได้';
+    }
+
+    if (in_array((string) ($row['setup_status'] ?? ''), ['2', '3'], true)
+        || (string) ($row['assign_status'] ?? '') === '2') {
+        return 'ไม่สามารถยกเลิกงานที่เริ่มดำเนินการแล้ว';
+    }
+
+    return 'ไม่สามารถยกเลิกงานนี้ได้';
+}
 
 
 $action = $_GET['action'] ?? '';
@@ -53,32 +101,67 @@ if ($action === 'cancel') {
     }
 
     try {
-        $assign_stmt = $conn->prepare("\n            SELECT assign_id, tech_id\n            FROM assignment\n            WHERE setup_id = ?\n            ORDER BY assign_date DESC, assign_id DESC\n            LIMIT 1\n        ");
+        $setup_cancel_stmt = $conn->prepare("
+            SELECT setup_id, user_id, setup_status
+            FROM setup
+            WHERE setup_id = ?
+            LIMIT 1
+        ");
+        $setup_cancel_stmt->bind_param('s', $setup_id_cancel);
+        $setup_cancel_stmt->execute();
+        $setup_cancel = $setup_cancel_stmt->get_result()->fetch_assoc();
+
+        if (!$setup_cancel) {
+            redirect_to(app_system_url('manager/assignment_list.php?status=all&cancel=notfound'));
+        }
+
+        $assign_stmt = $conn->prepare("\n            SELECT assign_id, tech_id, assign_status\n            FROM assignment\n            WHERE setup_id = ?\n            ORDER BY assign_date DESC, assign_id DESC\n            LIMIT 1\n        ");
         $assign_stmt->bind_param('s', $setup_id_cancel);
         $assign_stmt->execute();
         $assignment = $assign_stmt->get_result()->fetch_assoc();
 
-        if ($assignment) {
-            $conn->begin_transaction();
+        $cancel_check = [
+            'setup_status' => $setup_cancel['setup_status'] ?? null,
+            'assign_id' => $assignment['assign_id'] ?? null,
+            'assign_status' => $assignment['assign_status'] ?? null,
+        ];
 
+        if (!assignment_cancel_allowed($cancel_check)) {
+            redirect_to(app_system_url('manager/assignment_list.php?status=all&cancel=not_allowed'));
+        }
+
+        $conn->begin_transaction();
+
+        if ($assignment) {
             $cancel_stmt = $conn->prepare("\n                UPDATE assignment\n                SET assign_status = 4\n                WHERE assign_id = ?\n            ");
             $cancel_stmt->bind_param('s', $assignment['assign_id']);
             $cancel_stmt->execute();
+        } else {
+            $cancel_assign_id = make_cancel_assign_id($conn);
+            $assign_by = $_SESSION['user_id'] ?? null;
+            $assign_date = date('Y-m-d H:i:s');
+            $cancel_status = 4;
 
-            $setup_stmt = $conn->prepare("\n                UPDATE setup\n                SET setup_status = 0\n                WHERE setup_id = ?\n            ");
-            $setup_stmt->bind_param('s', $setup_id_cancel);
-            $setup_stmt->execute();
-
-            if (!empty($assignment['tech_id'])) {
-                $tech_stmt = $conn->prepare("\n                    UPDATE technicians\n                    SET tech_status = 0\n                    WHERE tech_id = ?\n                ");
-                $tech_stmt->bind_param('s', $assignment['tech_id']);
-                $tech_stmt->execute();
-            }
-
-            $conn->commit();
+            $cancel_insert_stmt = $conn->prepare("
+                INSERT INTO assignment
+                    (assign_id, setup_id, tech_id, user_id, assign_by, assign_date, assign_status)
+                VALUES (?, ?, NULL, ?, ?, ?, ?)
+            ");
+            $cancel_insert_stmt->bind_param(
+                'sssssi',
+                $cancel_assign_id,
+                $setup_id_cancel,
+                $setup_cancel['user_id'],
+                $assign_by,
+                $assign_date,
+                $cancel_status
+            );
+            $cancel_insert_stmt->execute();
         }
 
-        redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id_cancel) . '&status=canceled'));
+        $conn->commit();
+
+        redirect_to(app_system_url('manager/assignment_list.php?status=canceled'));
     } catch (Throwable $e) {
         try {
             $conn->rollback();
@@ -86,7 +169,7 @@ if ($action === 'cancel') {
             // skip rollback error
         }
 
-        redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id_cancel) . '&status=error'));
+        redirect_to(app_system_url('manager/assignment_list.php?status=all&cancel=error'));
     }
 }
 
@@ -133,8 +216,8 @@ function setup_status_badge($status): string
     return match ((string) $status) {
         '0' => 'orange',
         '1' => 'blue',
-        '2' => 'green',
-        '3' => 'orange',
+        '2' => 'cyan',
+        '3' => 'purple',
         '4' => 'green',
         default => 'red',
     };
@@ -197,10 +280,32 @@ function display_assignment_status(array $row): string
     }
 
     if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
-        return 'ยกเลิกแล้ว / รอมอบหมายใหม่';
+        return 'ยกเลิกแล้ว';
     }
 
-    return setup_status_name($row['setup_status']);
+    $status_name = setup_status_name($row['setup_status']);
+    if ((string) ($row['setup_status'] ?? '') === '1' && assignment_has_unavailable_active_tech($row)) {
+        return $status_name . '*';
+    }
+
+    return $status_name;
+}
+
+function assignment_has_unavailable_active_tech(array $row): bool
+{
+    if (empty($row['assign_id']) || empty($row['tech_id'])) {
+        return false;
+    }
+
+    if ((string) ($row['tech_status'] ?? '0') === '0') {
+        return false;
+    }
+
+    if ((string) ($row['setup_status'] ?? '') === '4') {
+        return false;
+    }
+
+    return !in_array((string) ($row['assign_status'] ?? ''), ['4', '5'], true);
 }
 
 function display_assignment_badge(array $row): string
@@ -210,7 +315,7 @@ function display_assignment_badge(array $row): string
     }
 
     if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
-        return 'red';
+        return 'slate';
     }
 
     return setup_status_badge($row['setup_status']);
@@ -220,7 +325,7 @@ function assign_status_name($status): string
 {
     return match ((string) $status) {
         '0' => 'ยังไม่มอบหมาย',
-        '1' => 'มอบหมายแล้ว',
+        '1' => 'มอบหมายงานแล้ว',
         '2' => 'ช่างรับงาน',
         '3' => 'ช่างปฏิเสธงาน',
         '4' => 'ยกเลิกการมอบหมาย',
@@ -333,16 +438,50 @@ while ($row = $result->fetch_assoc()) {
     $setups[] = $row;
 }
 
+function assignment_display_priority(array $row): int
+{
+    if ((string) ($row['setup_status'] ?? '') === '0'
+        && (empty($row['assign_id']) || (string) ($row['assign_status'] ?? '') !== '4')) {
+        return 0;
+    }
+
+    if (!empty($row['is_overdue'])) {
+        return 1;
+    }
+
+    if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
+        return 3;
+    }
+
+    return 2;
+}
+
+usort($setups, function (array $left, array $right): int {
+    $priority = assignment_display_priority($left) <=> assignment_display_priority($right);
+    if ($priority !== 0) {
+        return $priority;
+    }
+
+    $left_time = strtotime((string) ($left['created_at'] ?? '')) ?: 0;
+    $right_time = strtotime((string) ($right['created_at'] ?? '')) ?: 0;
+
+    if ($left_time !== $right_time) {
+        return $right_time <=> $left_time;
+    }
+
+    return strcmp((string) ($right['setup_id'] ?? ''), (string) ($left['setup_id'] ?? ''));
+});
+
 
 $status_tabs = [
     'all' => ['label' => 'ทั้งหมด', 'status' => null],
     'unassigned' => ['label' => 'ยังไม่ได้มอบหมาย', 'status' => '0'],
-    'canceled' => ['label' => 'ยกเลิกแล้ว', 'status' => 'canceled'],
-    'overdue' => ['label' => 'เกินกำหนด', 'status' => 'overdue'],
-    'assigned' => ['label' => 'มอบหมายแล้ว', 'status' => '1'],
+    'assigned' => ['label' => 'มอบหมายงานแล้ว', 'status' => '1'],
     'accepted' => ['label' => 'ช่างรับงานแล้ว', 'status' => '2'],
     'working' => ['label' => 'กำลังติดตั้ง', 'status' => '3'],
     'done' => ['label' => 'เสร็จสิ้น', 'status' => '4'],
+    'overdue' => ['label' => 'เกินกำหนด', 'status' => 'overdue'],
+    'canceled' => ['label' => 'ยกเลิกแล้ว', 'status' => 'canceled'],
 ];
 
 $status_counts = [];
@@ -450,11 +589,16 @@ layout_header('รายการมอบหมายงาน', 'assignment_li
         <div class="assignment-status-tabs">
             <?php foreach ($status_tabs as $key => $tab): ?>
                 <a
-                    class="assignment-status-tab <?= $status_filter === $key ? 'active' : '' ?>"
+                    class="assignment-status-tab status-<?= h($key) ?> <?= $status_filter === $key ? 'active' : '' ?>"
                     href="<?= h(assignment_status_url($key, $keyword)) ?>"
                 >
                     <span><?= h($tab['label']) ?></span>
-                    <b><?= h((string) ($status_counts[$key] ?? 0)) ?></b>
+                    <?php $tab_count = (int) ($status_counts[$key] ?? 0); ?>
+                    <?php if ($key === 'all'): ?>
+                        <b><?= h((string) $tab_count) ?></b>
+                    <?php elseif ($tab_count > 0): ?>
+                        <span class="status-count-badge"><?= h((string) $tab_count) ?></span>
+                    <?php endif; ?>
                 </a>
             <?php endforeach; ?>
         </div>
@@ -483,6 +627,12 @@ layout_header('รายการมอบหมายงาน', 'assignment_li
                     <?php endif; ?>
 
                     <?php foreach ($visible_setups as $row): ?>
+                        <?php
+                            $can_cancel_row = assignment_cancel_allowed($row);
+                            $cancel_title = $can_cancel_row
+                                ? 'ยกเลิกงาน'
+                                : assignment_cancel_disabled_title($row);
+                        ?>
                         <tr>
                             <td><strong><?= h($row['setup_id']) ?></strong></td>
 
@@ -497,9 +647,6 @@ layout_header('รายการมอบหมายงาน', 'assignment_li
                             <td>
                                 <?php if (!empty($row['tech_id'])): ?>
                                     <strong><?= h($row['tech_display']) ?></strong>
-                                    <?php if (!empty($row['assign_id']) && (string) ($row['tech_status'] ?? '') === '1'): ?>
-                                        <small class="assignment-tech-warning">ไม่พร้อมรับงาน</small>
-                                    <?php endif; ?>
                                 <?php else: ?>
                                     -
                                 <?php endif; ?>
@@ -515,33 +662,35 @@ layout_header('รายการมอบหมายงาน', 'assignment_li
 
                             <td class="assignment-row-actions assignment-icon-actions">
                                 <a
-                                    class="assignment-icon-btn view-slip manager-eye-green"
+                                    class="assignment-icon-btn view-slip"
                                     href="<?= h(app_system_url('manager/assignments.php?setup_id=' . urlencode($row['setup_id']))) ?>"
-                                    title="ดูใบติดตั้ง"
-                                    aria-label="ดูใบติดตั้ง"
+                                    title="ดู/จัดการใบงาน"
+                                    aria-label="ดู/จัดการใบงาน"
                                 >
                                     <?= manager_icon_svg('eye') ?>
                                 </a>
 
-                                <?php if ((string) $row['setup_status'] !== '0'): ?>
+                                <?php if ($can_cancel_row): ?>
                                     <a
-                                        class="assignment-icon-btn edit-assign"
-                                        href="<?= h(app_system_url('manager/assignments.php?setup_id=' . urlencode($row['setup_id']))) ?>"
-                                        title="แก้ไขการมอบหมาย"
-                                        aria-label="แก้ไขการมอบหมาย"
-                                    >
-                                        <?= manager_icon_svg('edit') ?>
-                                    </a>
-
-                                    <a
-                                        class="assignment-icon-btn cancel-assign"
+                                        class="assignment-icon-btn cancel-assign is-enabled"
                                         href="<?= h(app_system_url('manager/assignment_list.php?action=cancel&id=' . urlencode($row['setup_id']))) ?>"
-                                        title="ยกเลิกการมอบหมาย"
-                                        aria-label="ยกเลิกการมอบหมาย"
-                                        data-confirm-cancel-assignment="ยืนยันการยกเลิกการมอบหมายงานนี้หรือไม่?"
+                                        title="<?= h($cancel_title) ?>"
+                                        aria-label="<?= h($cancel_title) ?>"
+                                        data-confirm-cancel-assignment
+                                        data-cancel-setup-id="<?= h($row['setup_id']) ?>"
                                     >
                                         <?= manager_icon_svg('cancel') ?>
                                     </a>
+                                <?php else: ?>
+                                    <button
+                                        type="button"
+                                        class="assignment-icon-btn cancel-assign is-disabled"
+                                        title="<?= h($cancel_title) ?>"
+                                        aria-label="<?= h($cancel_title) ?>"
+                                        disabled
+                                    >
+                                        <?= manager_icon_svg('cancel') ?>
+                                    </button>
                                 <?php endif; ?>
                             </td>
                         </tr>

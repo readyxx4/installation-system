@@ -151,11 +151,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $paymentpro_status = trim($_POST['paymentpro_status'] ?? '');
 
     if ($setup_id === '' || $paymentpro_date === '' || $paymentpro_status === '') {
-        redirect_to(app_system_url('finance/payment.php?status=error'));
+        redirect_to(app_system_url('sale/payment.php?status=error'));
     }
 
     if (!in_array($paymentpro_status, ['0', '1', '2'], true)) {
-        redirect_to(app_system_url('finance/payment.php?status=error'));
+        redirect_to(app_system_url('sale/payment.php?status=error'));
     }
 
     $payment_date_sql = str_replace('T', ' ', $paymentpro_date);
@@ -183,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $setup_result = $stmt_setup->get_result();
 
         if ($setup_result->num_rows !== 1) {
-            redirect_to(app_system_url('finance/payment.php?status=error'));
+            redirect_to(app_system_url('sale/payment.php?status=error'));
         }
 
         $setup = $setup_result->fetch_assoc();
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stmt->execute();
 
-            redirect_to(app_system_url('finance/payment.php?status=updated'));
+            redirect_to(app_system_url('sale/payment.php?status=updated'));
         } else {
             $paymentpro_id = make_payment_id($conn);
             $status_int = (int) $paymentpro_status;
@@ -256,10 +256,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stmt->execute();
 
-            redirect_to(app_system_url('finance/payment.php?status=created'));
+            redirect_to(app_system_url('sale/payment.php?status=created'));
         }
     } catch (Throwable $e) {
-        redirect_to(app_system_url('finance/payment.php?status=error'));
+        redirect_to(app_system_url('sale/payment.php?status=error'));
     }
 }
 
@@ -310,6 +310,11 @@ layout_header('บันทึกการจ่ายสินค้า', 'paym
 page_head('บันทึกการจ่ายสินค้า', 'Process : บันทึกการจ่ายสินค้า');
 ?>
 
+<link
+  rel="stylesheet"
+  href="<?= h(app_asset_url('sale/assets/css/payment.css')) ?>?v=<?= h(asset_version('sale/assets/css/payment.css')) ?>"
+>
+
 <?= flash_message() ?>
 
 <div class="role-hero">
@@ -332,7 +337,7 @@ page_head('บันทึกการจ่ายสินค้า', 'Process 
 <div class="panel user-add-panel">
   <div class="panel-title user-add-title">ฟอร์มบันทึกการจ่ายสินค้า</div>
 
-  <form class="admin-form user-add-form" method="POST" action="<?= h(app_system_url('finance/payment.php')) ?>">
+  <form class="admin-form user-add-form" method="POST" action="<?= h(app_system_url('sale/payment.php')) ?>">
     <div class="full">
       <label for="setup_id">เลือกงานติดตั้ง</label>
       <select id="setup_id" name="setup_id" required onchange="showSetupInfo()">
@@ -394,7 +399,7 @@ page_head('บันทึกการจ่ายสินค้า', 'Process 
     </div>
 
     <div class="form-actions">
-      <a class="btn-secondary" href="<?= h(app_system_url('finance/index.php')) ?>">
+      <a class="btn-secondary" href="<?= h(app_system_url('sale/index.php')) ?>">
         กลับหน้าหลัก
       </a>
 
@@ -457,26 +462,9 @@ page_head('บันทึกการจ่ายสินค้า', 'Process 
   </div>
 </div>
 
-<script>
-function showSetupInfo() {
-  const setupSelect = document.getElementById('setup_id');
-  const selected = setupSelect.options[setupSelect.selectedIndex];
-
-  if (!selected) {
-    return;
-  }
-
-  document.getElementById('customer_show').value = selected.dataset.customer || '-';
-  document.getElementById('phone_show').value = selected.dataset.phone || '-';
-  document.getElementById('product_show').value = selected.dataset.product || '-';
-
-  const oldStatus = selected.dataset.paymentStatus;
-
-  if (oldStatus !== '') {
-    document.getElementById('paymentpro_status').value = oldStatus;
-  }
-}
-</script>
+<script
+  src="<?= h(app_asset_url('sale/assets/js/payment.js')) ?>?v=<?= h(asset_version('sale/assets/js/payment.js')) ?>"
+></script>
 
 <?php
 layout_footer();

@@ -25,52 +25,27 @@ function column_exists(mysqli $conn, string $table, string $column): bool
 function prepare_assignment_table(mysqli $conn): void
 {
     if (!table_exists($conn, 'assignment')) {
-        $conn->query("
-            CREATE TABLE assignment (
-                assign_id CHAR(11) PRIMARY KEY,
-                setup_id CHAR(11) NOT NULL,
-                tech_id CHAR(13) NOT NULL,
-                user_id CHAR(13) NOT NULL,
-                assign_by CHAR(13) NULL,
-                assign_date DATETIME NOT NULL,
-                assign_install_date DATE NULL,
-                assign_install_time TIME NULL,
-                assign_install_end_time TIME NULL,
-                assign_status INT(1) NOT NULL DEFAULT 1
-            )
-        ");
+        redirect_to(app_system_url('manager/assignment_list.php?status=schema_missing'));
         return;
     }
 
-    if (!column_exists($conn, 'assignment', 'assign_id')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN assign_id CHAR(11) NOT NULL");
-    }
-    if (!column_exists($conn, 'assignment', 'setup_id')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN setup_id CHAR(11) NULL");
-    }
-    if (!column_exists($conn, 'assignment', 'tech_id')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN tech_id CHAR(13) NULL");
-    }
-    if (!column_exists($conn, 'assignment', 'user_id')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN user_id CHAR(13) NULL");
-    }
-    if (!column_exists($conn, 'assignment', 'assign_by')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN assign_by CHAR(13) NULL AFTER user_id");
-    }
-    if (!column_exists($conn, 'assignment', 'assign_date')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN assign_date DATETIME NULL");
-    }
-    if (!column_exists($conn, 'assignment', 'assign_install_date')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN assign_install_date DATE NULL AFTER assign_date");
-    }
-    if (!column_exists($conn, 'assignment', 'assign_install_time')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN assign_install_time TIME NULL AFTER assign_install_date");
-    }
-    if (!column_exists($conn, 'assignment', 'assign_install_end_time')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN assign_install_end_time TIME NULL AFTER assign_install_time");
-    }
-    if (!column_exists($conn, 'assignment', 'assign_status')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN assign_status INT(1) NOT NULL DEFAULT 1");
+    $required_columns = [
+        'assign_id',
+        'setup_id',
+        'tech_id',
+        'user_id',
+        'assign_by',
+        'assign_date',
+        'assign_install_date',
+        'assign_install_time',
+        'assign_install_end_time',
+        'assign_status',
+    ];
+
+    foreach ($required_columns as $column) {
+        if (!column_exists($conn, 'assignment', $column)) {
+            redirect_to(app_system_url('manager/assignment_list.php?status=schema_missing'));
+        }
     }
 }
 
@@ -123,10 +98,10 @@ function manager_money($value): string
 function assign_status_name($status): string
 {
     return match ((string) $status) {
-        '1' => 'มอบหมายแล้ว',
+        '1' => 'มอบหมายงานแล้ว',
         '2' => 'ช่างรับงานแล้ว',
         '3' => 'ช่างปฏิเสธงาน',
-        '4' => 'ยกเลิกการมอบหมาย',
+        '4' => 'ยกเลิกแล้ว',
         '5' => 'งานเสร็จสิ้น',
         default => 'ยังไม่มอบหมาย',
     };
@@ -263,7 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             FROM assignment a
             LEFT JOIN technicians t ON a.tech_id = t.tech_id
             WHERE a.setup_id = ?
-              AND a.assign_status IN (1, 2, 5)
+              AND a.assign_status IN (1, 2, 4, 5)
             ORDER BY a.assign_date DESC, a.assign_id DESC
             LIMIT 1
         ");
@@ -272,6 +247,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $active_assignment = $active_stmt->get_result()->fetch_assoc();
         $setup_status = (int) ($setup['setup_status'] ?? 0);
         $current_assign_status = (int) ($active_assignment['assign_status'] ?? 0);
+
+        if ($current_assign_status === 4) {
+            redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=canceled_readonly'));
+        }
 
         if ($setup_status === 4 || $current_assign_status === 5) {
             redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=readonly'));
@@ -473,11 +452,13 @@ $current_assignment_stmt = $conn->prepare("
         t.tech_name,
         t.tech_fullname,
         t.tech_phone,
-        t.tech_status
+        t.tech_status,
+        m.user_name AS manager_name
     FROM assignment a
     LEFT JOIN technicians t ON a.tech_id = t.tech_id
+    LEFT JOIN `user` m ON a.assign_by = m.user_id
     WHERE a.setup_id = ?
-      AND a.assign_status IN (1, 2, 5)
+      AND a.assign_status IN (1, 2, 4, 5)
     ORDER BY a.assign_date DESC, a.assign_id DESC
     LIMIT 1
 ");
@@ -554,6 +535,7 @@ $today_bangkok = (new DateTimeImmutable('today', new DateTimeZone('Asia/Bangkok'
 $current_tech_unavailable = $current_assignment && (int) ($current_assignment['tech_status'] ?? 0) !== 0;
 $current_setup_status = (int) ($selected_setup['setup_status'] ?? 0);
 $current_assign_status = (int) ($current_assignment['assign_status'] ?? 0);
+$is_canceled_assignment = $current_assign_status === 4;
 
 $current_assignment_overdue = false;
 if (
@@ -574,10 +556,15 @@ if (
     }
 }
 
-$is_read_only = $current_setup_status === 4 || $current_assign_status === 5;
+$is_read_only = $is_canceled_assignment || $current_setup_status === 4 || $current_assign_status === 5;
 $can_change_tech = !$is_read_only && $current_setup_status !== 3;
 $can_change_date = !$is_read_only && $current_setup_status !== 3;
 $can_change_time = !$is_read_only;
+$show_unavailable_tech_warning = $current_assignment && $current_tech_unavailable && !$is_read_only;
+$unavailable_tech_name = $show_unavailable_tech_warning
+    ? (($current_assignment['tech_fullname'] ?: $current_assignment['tech_name']) ?: '-')
+    : '';
+$unavailable_tech_reason = 'ถูกตั้งสถานะเป็นไม่พร้อมรับงาน';
 
 $selected_setup_json = json_encode($selected_setup, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 $current_assignment_json = json_encode($current_assignment ?: null, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -601,11 +588,27 @@ layout_header('มอบหมายงานช่าง', 'assignments');
 ?>
 
 <div class="manager-assign-v2 manager-assign-er-page">
+    <?php if ($show_unavailable_tech_warning): ?>
+        <section class="manager-unavailable-tech-warning" aria-label="คำเตือนช่างไม่พร้อมรับงาน">
+            <div class="manager-unavailable-warning-icon" aria-hidden="true">*</div>
+            <div class="manager-unavailable-warning-copy">
+                <strong>คำเตือน *</strong>
+                <span>
+                    ช่างคนนี้: <?= h($unavailable_tech_name) ?>
+                    ไม่สามารถรับงานใหม่ได้ เนื่องจาก <?= h($unavailable_tech_reason) ?>
+                    หากต้องการเปลี่ยนช่างคนใหม่ กรุณากดปุ่ม "เปลี่ยนช่าง"
+                </span>
+            </div>
+            <a class="manager-unavailable-warning-action" href="#techPanel">
+                เปลี่ยนช่าง
+            </a>
+        </section>
+    <?php endif; ?>
+
     <div class="manager-dashboard-head compact">
         <div>
-            <span class="manager-eyebrow">Process 5</span>
             <h1>มอบหมายงานช่าง</h1>
-            <p><?= $is_read_only ? 'งานเสร็จสิ้นแล้ว ดูรายละเอียดได้อย่างเดียว' : ($current_tech_unavailable ? 'ช่างเดิมไม่พร้อมรับงาน แต่ยังทำงานนี้ได้' : ($current_assignment ? 'แก้ไขได้ตามสถานะงานปัจจุบัน' : 'เลือกช่างก่อน แล้วดูคิวงานของช่างคนนั้นเพื่อกำหนดวันที่ติดตั้ง')) ?></p>
+            <p><?= $is_canceled_assignment ? 'งานนี้ถูกยกเลิกแล้ว ดูประวัติได้อย่างเดียว' : ($is_read_only ? 'งานเสร็จสิ้นแล้ว ดูรายละเอียดได้อย่างเดียว' : ($current_assignment ? 'แก้ไขได้ตามสถานะงานปัจจุบัน' : 'เลือกช่างก่อน แล้วดูคิวงานของช่างคนนั้นเพื่อกำหนดวันที่ติดตั้ง')) ?></p>
         </div>
     </div>
 
@@ -620,11 +623,16 @@ layout_header('มอบหมายงานช่าง', 'assignments');
         <div class="manager-page-alert warning">
             วันเสาร์และวันอาทิตย์เป็นวันหยุด กรุณาเลือกวันทำงาน
         </div>
+    <?php elseif ($page_status === 'canceled_readonly'): ?>
+        <div class="manager-page-alert warning">
+            งานนี้ถูกยกเลิกแล้ว จึงไม่สามารถแก้ไขการมอบหมายได้
+        </div>
     <?php endif; ?>
 
     <?php if ($current_assignment_overdue): ?>
-        <div class="manager-page-alert danger">
-            งานนี้เกินกำหนดแล้ว กรุณาเลื่อนกำหนดการ เปลี่ยนช่าง หรือยกเลิกการมอบหมายตามความเหมาะสม
+        <div class="manager-page-alert warning">
+            <strong>งานเกินกำหนด</strong>
+            งานติดตั้งนี้เลยวันที่กำหนดแล้ว กรุณาตรวจสอบและดำเนินการต่อ
         </div>
     <?php endif; ?>
 
@@ -641,7 +649,7 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                     <h2>รายละเอียดใบงานติดตั้ง</h2>
                     <p>ตรวจสอบข้อมูลลูกค้า สินค้า และสถานที่ติดตั้งก่อนมอบหมายงาน</p>
                 </div>
-                <a class="manager-soft-link" href="<?= h(app_system_url('finance/setup_slip.php?id=' . urlencode($selected_setup['setup_id']) . '&from=manager')) ?>">
+                <a class="manager-soft-link" href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($selected_setup['setup_id']) . '&from=manager')) ?>">
                     <?= manager_icon_svg('eye') ?> ดูใบติดตั้ง
                 </a>
             </div>
@@ -701,6 +709,7 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                             วันที่ <?= h(manager_thai_date($current_assignment['assign_install_date'] ?? null)) ?>
                             เวลา <?= h(time_label($current_assignment['assign_install_time'] ?? '', $current_assignment['assign_install_end_time'] ?? '')) ?>
                             — <?= h(assign_status_name($current_assignment['assign_status'] ?? '')) ?>
+                            ผู้มอบหมาย <?= h($current_assignment['manager_name'] ?: '-') ?>
                             <?php if ($current_assignment_overdue): ?>
                                 <span class="manager-overdue-badge">เกินกำหนด</span>
                             <?php endif; ?>
@@ -710,6 +719,7 @@ layout_header('มอบหมายงานช่าง', 'assignments');
             </div>
         </section>
 
+        <?php if (!$is_canceled_assignment): ?>
         <section class="manager-assign-panel manager-tech-panel show" id="techPanel">
             <div class="manager-panel-head">
                 <div>
@@ -762,7 +772,7 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                 <button type="button" data-calendar-month="1">›</button>
                 <span class="calendar-legend available">ว่าง</span>
                 <span class="calendar-legend partial">มีคิว</span>
-                <span class="calendar-legend busy">เต็ม</span>
+                <span class="calendar-legend busy">คิวเต็ม</span>
                 <span class="calendar-legend holiday">วันหยุด</span>
             </div>
 
@@ -799,6 +809,7 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                 </div>
             </div>
         </section>
+        <?php endif; ?>
 
         <div class="manager-form-actions sticky-actions">
             <a class="manager-action-btn" href="<?= h(app_system_url('manager/assignment_list.php')) ?>">
@@ -819,6 +830,7 @@ layout_header('มอบหมายงานช่าง', 'assignments');
 <link rel="stylesheet" href="<?= h(app_asset_url('manager/assets/css/manager.css')) ?>?v=<?= h(asset_version('manager/assets/css/manager.css')) ?>">
 <link rel="stylesheet" href="<?= h(app_asset_url('manager/assets/css/assignments.css')) ?>?v=<?= h(asset_version('manager/assets/css/assignments.css')) ?>">
 
+<?php if (!$is_canceled_assignment): ?>
 <script>
 window.assignmentPageData = {
   selectedSetup: <?= $selected_setup_json ?: '{}' ?>,
@@ -834,5 +846,6 @@ window.assignmentPageData = {
 };
 </script>
 <script src="<?= h(app_asset_url('manager/assets/js/assignments.js')) ?>?v=<?= h(asset_version('manager/assets/js/assignments.js')) ?>"></script>
+<?php endif; ?>
 
 <?php layout_footer(); ?>

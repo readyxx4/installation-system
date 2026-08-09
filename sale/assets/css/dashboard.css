@@ -1,0 +1,261 @@
+/* Sale dashboard follows the admin dashboard component language. */
+
+body.app-body.role-2 {
+  --admin-bg: #f6f1e8;
+  --admin-card: #ffffff;
+  --admin-ink: #2c2417;
+  --admin-muted: #8a7b64;
+  --admin-border: #eadfcd;
+}
+
+.role-2 .main,
+body.app-body.role-2,
+.role-2 .content {
+  background: radial-gradient(circle at top right, rgba(238, 184, 73, 0.12), transparent 26%),
+    linear-gradient(135deg, #f8f3eb 0%, #f5efe5 55%, #f7f4ee 100%) !important;
+}
+
+.sales-dashboard-page {
+  --admin-bg: #f6f1e8;
+  --admin-card: #ffffff;
+  --admin-ink: #2c2417;
+  --admin-muted: #8a7b64;
+  --admin-border: #eadfcd;
+  padding-bottom: 22px;
+}
+
+.role-2 .admin-date-pill,
+.role-2 .admin-soft-badge,
+.role-2 .admin-widget-link {
+  border-color: var(--role-border) !important;
+  background: var(--role-soft) !important;
+  color: var(--role-primary-hover) !important;
+}
+
+.role-2 .admin-summary-card {
+  position: relative;
+  min-height: 116px;
+  padding: 17px;
+  border: 1px solid #eadfcd !important;
+  border-radius: 16px;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+}
+
+.role-2 .admin-summary-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--card-accent, #2196F3);
+}
+
+.role-2 .admin-summary-card::after {
+  display: none;
+}
+
+.role-2 .admin-summary-card span {
+  color: #475569 !important;
+  font-weight: 900;
+}
+
+.role-2 .admin-summary-card strong {
+  color: var(--card-accent, #2196F3) !important;
+}
+
+.role-2 .admin-summary-card small {
+  color: #64748b !important;
+  background: #f8fafc !important;
+}
+
+.role-2 .admin-summary-card .summary-icon {
+  background: color-mix(in srgb, var(--card-accent, #2196F3) 12%, white) !important;
+  color: var(--card-accent, #2196F3) !important;
+}
+
+.role-2 .admin-summary-card:nth-child(1) {
+  --card-accent: #2563eb;
+}
+
+.role-2 .admin-summary-card:nth-child(2) {
+  --card-accent: #0891b2;
+}
+
+.role-2 .admin-summary-card:nth-child(3) {
+  --card-accent: #7c3aed;
+}
+
+.role-2 .admin-widget {
+  border-color: #eadfcd !important;
+}
+
+.role-2 .admin-mini-item {
+  border-bottom-color: #f0e5d4 !important;
+}
+
+.role-2 .admin-empty-mini {
+  border-color: #dfc390 !important;
+  background: #fffaf3 !important;
+}
+
+.sales-summary-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sales-dashboard-info-grid {
+  grid-template-columns: 1fr;
+  margin-top: 13px;
+}
+
+.sales-install-status-widget {
+  min-height: 0 !important;
+}
+
+.sales-status-list {
+  display: grid;
+  gap: 0;
+}
+
+.sales-status-list .admin-mini-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 13px;
+  min-height: 59px;
+  padding: 13px 0;
+  border: 0;
+  border-bottom: 1px solid #eef2f7;
+  border-radius: 0;
+  background: transparent;
+}
+
+.sales-status-list .admin-mini-item:last-child {
+  border-bottom: 0;
+}
+
+.sales-status-list .admin-mini-main strong {
+  display: block;
+  color: var(--admin-ink);
+  font-weight: 900;
+}
+
+.sales-status-list .admin-mini-main span {
+  display: block;
+  margin-top: 3px;
+  color: var(--admin-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sales-bottom-grid {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  margin-top: 13px;
+}
+
+.sales-bottom-grid > .admin-widget {
+  height: 100%;
+}
+
+.sales-mini-list .admin-mini-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sales-mini-list .admin-mini-main strong {
+  font-weight: 800;
+}
+
+.sales-mini-list .admin-mini-main span {
+  font-size: 12px;
+  opacity: .72;
+}
+
+.sales-mini-list .admin-mini-item {
+  min-height: 51px;
+}
+
+.sales-mini-list .badge {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1100px) {
+  .sales-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sales-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .sales-dashboard-page .admin-dashboard-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sales-dashboard-page .admin-dashboard-actions,
+  .sales-dashboard-page .admin-date-pill {
+    width: 100%;
+  }
+
+  .sales-dashboard-page .admin-date-pill {
+    justify-content: flex-start;
+  }
+
+  .sales-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sales-status-list .admin-mini-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sales-mini-list .admin-mini-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* Sale dashboard compact pass. */
+body.app-body.role-2 .sales-dashboard-page {
+  padding-bottom: 18px;
+}
+
+body.app-body.role-2 .sales-dashboard-page .admin-dashboard-top {
+  margin-bottom: 12px !important;
+}
+
+body.app-body.role-2 .admin-summary-card {
+  min-height: 102px !important;
+  padding: 14px !important;
+}
+
+body.app-body.role-2 .sales-dashboard-info-grid,
+body.app-body.role-2 .sales-bottom-grid {
+  margin-top: 10px !important;
+  gap: 10px !important;
+}
+
+body.app-body.role-2 .sales-status-list .admin-mini-item {
+  min-height: 52px;
+  padding: 10px 0;
+  gap: 10px;
+}
+
+body.app-body.role-2 .sales-mini-list .admin-mini-item {
+  min-height: 46px;
+}
+
+body.app-body.role-2 .sales-status-list .admin-mini-main span,
+body.app-body.role-2 .sales-mini-list .admin-mini-main span {
+  font-size: 11px;
+}

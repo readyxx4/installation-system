@@ -68,7 +68,7 @@ if ($search !== '') {
            OR p.pro_name LIKE ?
            OR p.protype_id LIKE ?
            OR pt.protype_name LIKE ?
-        ORDER BY p.pro_id ASC
+        ORDER BY p.pro_id DESC
     ");
 
     $stmt->bind_param('ssss', $like, $like, $like, $like);
@@ -85,7 +85,7 @@ if ($search !== '') {
             pt.protype_name
         FROM product p
         LEFT JOIN product_type pt ON p.protype_id = pt.protype_id
-        ORDER BY p.pro_id ASC
+        ORDER BY p.pro_id DESC
     ");
 }
 

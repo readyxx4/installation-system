@@ -102,7 +102,7 @@ try {
     }
 
     if ((int) $user['user_role'] === 2) {
-        redirect_to(app_system_url('finance/index.php'));
+        redirect_to(app_system_url('sale/index.php'));
     }
 
     if ((int) $user['user_role'] === 3) {
