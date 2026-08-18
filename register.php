@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/customer_profiles.php';
+
+ensure_customer_profiles_schema($conn);
 
 function make_customer_id(mysqli $conn): string
 {
@@ -159,6 +162,8 @@ if ($user_password !== $confirm_password) {
 }
 
 try {
+    $transaction_started = false;
+
     $addr_stmt = $conn->prepare("
         SELECT
             p.name_th AS province_name,
@@ -233,9 +238,27 @@ try {
         $user_role
     );
 
+    $conn->begin_transaction();
+    $transaction_started = true;
+
     $stmt->execute();
+    upsert_customer_profile(
+        $conn,
+        $user_id,
+        $user_name,
+        $user_phone,
+        $user_email,
+        $user_address,
+        1
+    );
+
+    $conn->commit();
 
     redirect_to(app_public_url('login.html?success=register'));
 } catch (Throwable $e) {
+    if (($transaction_started ?? false) === true) {
+        $conn->rollback();
+    }
+
     register_redirect('server');
 }

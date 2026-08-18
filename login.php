@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/customer_profiles.php';
+
+ensure_customer_profiles_schema($conn);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirect_to(app_public_url('login.html'));
@@ -67,11 +70,17 @@ try {
     $user_role = (int) $login_type;
 
     $stmt = $conn->prepare("
-        SELECT user_id, user_name, user_email, user_role
-        FROM `user`
-        WHERE user_email = ?
-          AND user_password = ?
-          AND user_role = ?
+        SELECT
+          u.user_id,
+          u.user_name,
+          u.user_email,
+          u.user_role,
+          COALESCE(c.customer_status, 1) AS customer_status
+        FROM `user` u
+        LEFT JOIN customers c ON c.user_id = u.user_id
+        WHERE u.user_email = ?
+          AND u.user_password = ?
+          AND u.user_role = ?
         LIMIT 1
     ");
 
@@ -85,6 +94,10 @@ try {
     }
 
     $user = $result->fetch_assoc();
+
+    if ((int) $user['user_role'] === 0 && (int) ($user['customer_status'] ?? 1) === 0) {
+        redirect_to(app_public_url('login.html?error=suspended'));
+    }
 
     $_SESSION['logged_in'] = true;
     $_SESSION['login_type'] = 'user';

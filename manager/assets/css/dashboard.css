@@ -1,0 +1,1436 @@
+/* =========================================================
+   Manager Dashboard
+   แยกจาก PHP — ออกแบบตาม mockup ล่าสุด
+   เป้าหมาย: พอดี 1 หน้าจอที่ Browser Zoom 100%
+   ========================================================= */
+
+:root {
+    --mgr-bg: #F3EFE7;
+    --mgr-card: #FFFFFF;
+    --mgr-ink: #1E2430;
+    --mgr-soft: #6B7280;
+    --mgr-line: #E7E5DF;
+
+    --mgr-blue-deep: #123E73;
+    --mgr-blue: #1D63A8;
+    --mgr-blue-light: #EAF2FA;
+
+    --mgr-orange-bg: #FDEBDA;
+    --mgr-orange-text: #C4711A;
+
+    --mgr-green: #22A559;
+    --mgr-red: #E14B4B;
+}
+
+body.app-body.role-1 .app-main {
+    background: var(--mgr-bg);
+}
+
+.manager-home,
+.manager-home * {
+    box-sizing: border-box;
+}
+
+.manager-home {
+    width: 100%;
+    height: calc(100vh - 34px);
+    max-height: calc(100vh - 34px);
+    display: grid;
+    grid-template-rows: 72px minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    overflow: hidden;
+    color: var(--mgr-ink);
+}
+
+/* ================= Header ================= */
+
+.manager-home-header {
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    min-width: 0;
+    padding: 10px 18px;
+
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at 90% 18%, rgba(125, 211, 252, .28), transparent 28%),
+        linear-gradient(120deg, var(--mgr-blue-deep), #1461A7 62%, #258ED7);
+    color: #FFFFFF;
+    box-shadow: 0 10px 26px rgba(18, 62, 115, .12);
+}
+
+.manager-home-header::after {
+    content: "";
+    position: absolute;
+    right: -34px;
+    bottom: -78px;
+    width: 155px;
+    height: 155px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 50%;
+}
+
+.manager-home-heading,
+.manager-home-header-actions {
+    position: relative;
+    z-index: 1;
+}
+
+.manager-home-heading {
+    min-width: 0;
+}
+
+.manager-home-heading h1 {
+    margin: 0;
+    color: #FFFFFF;
+    font-size: 19px;
+    line-height: 1.15;
+    font-weight: 900;
+}
+
+.manager-home-heading p {
+    margin: 4px 0 0;
+    color: rgba(255,255,255,.82);
+    font-size: 10px;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+.manager-home-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.manager-home-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    padding: 4px 9px;
+    border: 1px solid rgba(255,255,255,.24);
+    border-radius: 10px;
+    background: rgba(255,255,255,.12);
+    color: #FFFFFF;
+    font-size: 9.5px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* ================= Rows / cards ================= */
+
+.manager-home-row {
+    display: grid;
+    gap: 10px;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.manager-home-row-top {
+    grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr);
+}
+
+.manager-home-row-bottom {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.manager-home-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+
+    padding: 12px 14px;
+    border: 1px solid var(--mgr-line);
+    border-radius: 14px;
+    background: var(--mgr-card);
+    box-shadow: 0 1px 2px rgba(20, 30, 50, .03);
+}
+
+.manager-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    flex: 0 0 auto;
+    margin-bottom: 7px;
+}
+
+.manager-card-head > div {
+    min-width: 0;
+}
+
+.manager-card-head h2 {
+    margin: 0;
+    color: var(--mgr-ink);
+    font-size: 13px;
+    line-height: 1.15;
+    font-weight: 900;
+}
+
+.manager-card-head p {
+    margin: 3px 0 0;
+    color: var(--mgr-soft);
+    font-size: 8.5px;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+.manager-card-head > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+    color: var(--mgr-blue);
+    font-size: 8.5px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* ================= Shared ================= */
+
+.manager-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 18px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 7.5px;
+    line-height: 1;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.manager-badge.blue {
+    color: var(--mgr-blue);
+    background: var(--mgr-blue-light);
+}
+
+.manager-badge.orange {
+    color: var(--mgr-orange-text);
+    background: var(--mgr-orange-bg);
+}
+
+.manager-inline-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.manager-inline-head strong {
+    overflow: hidden;
+    color: var(--mgr-blue);
+    font-size: 9.5px;
+    font-weight: 900;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.manager-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-height: 27px;
+    padding: 0 10px;
+    border-radius: 8px;
+    font-size: 8px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.manager-btn.primary {
+    background: var(--mgr-blue-deep);
+    color: #FFFFFF;
+}
+
+.manager-btn.warning {
+    background: var(--mgr-orange-bg);
+    color: var(--mgr-orange-text);
+}
+
+.manager-home-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    height: 100%;
+    color: #94A3B8;
+    font-size: 9px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* ================= Schedule ================= */
+
+.manager-schedule-body {
+    display: grid;
+    grid-template-columns: minmax(0, .98fr) minmax(260px, 1.02fr);
+    gap: 14px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.manager-schedule-list,
+.manager-mini-calendar {
+    min-width: 0;
+    min-height: 0;
+}
+
+.manager-schedule-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.manager-schedule-today {
+    flex: 0 0 auto;
+    margin-bottom: 5px;
+}
+
+.manager-schedule-today strong {
+    display: block;
+    color: var(--mgr-ink);
+    font-size: 10px;
+    line-height: 1.15;
+    font-weight: 900;
+}
+
+.manager-schedule-today span {
+    display: block;
+    margin-top: 2px;
+    color: var(--mgr-soft);
+    font-size: 7.5px;
+    line-height: 1.15;
+}
+
+.manager-schedule-items {
+    display: grid;
+    gap: 5px;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.manager-schedule-item {
+    display: grid;
+    grid-template-columns: 4px minmax(0, 1fr);
+    gap: 7px;
+    align-items: stretch;
+
+    min-width: 0;
+    min-height: 0;
+    padding: 6px 8px;
+
+    border: 1px solid var(--mgr-line);
+    border-radius: 9px;
+    background: #FFFFFF;
+
+    color: inherit;
+    text-decoration: none;
+}
+
+.manager-schedule-mark {
+    display: block;
+    width: 4px;
+    border-radius: 99px;
+}
+
+.manager-schedule-mark.green { background: #3FB56E; }
+.manager-schedule-mark.red { background: #E05A6B; }
+.manager-schedule-mark.blue { background: #3B82C4; }
+
+.manager-schedule-copy {
+    display: grid;
+    gap: 1px;
+    min-width: 0;
+}
+
+.manager-schedule-copy strong,
+.manager-schedule-copy span,
+.manager-schedule-copy small,
+.manager-schedule-copy em {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.manager-schedule-copy strong {
+    color: var(--mgr-ink);
+    font-size: 8.5px;
+    line-height: 1.15;
+    font-weight: 900;
+}
+
+.manager-schedule-copy span {
+    color: var(--mgr-ink);
+    font-size: 9px;
+    line-height: 1.15;
+    font-weight: 800;
+}
+
+.manager-schedule-copy small {
+    color: var(--mgr-soft);
+    font-size: 7.5px;
+    line-height: 1.15;
+}
+
+.manager-schedule-copy em {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--mgr-soft);
+    font-size: 7px;
+    line-height: 1.15;
+    font-style: normal;
+}
+
+.technician-status-dot,
+.manager-status-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: #94A3B8;
+}
+
+.technician-status-dot.ready,
+.manager-status-dot.ready {
+    background: var(--mgr-green);
+}
+
+.technician-status-dot.unavailable,
+.manager-status-dot.unavailable {
+    background: var(--mgr-red);
+}
+
+/* ================= Mini calendar ================= */
+
+.manager-mini-calendar-title {
+    margin-bottom: 5px;
+    color: var(--mgr-ink);
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 900;
+    text-align: center;
+}
+
+.manager-mini-weekdays,
+.manager-mini-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 1px 3px;
+}
+
+.manager-mini-weekdays {
+    margin-bottom: 2px;
+}
+
+.manager-mini-weekdays span {
+    color: var(--mgr-soft);
+    font-size: 7.5px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.manager-mini-day {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 21px;
+    border-radius: 6px;
+
+    color: var(--mgr-ink);
+    font-size: 8.5px;
+    font-weight: 700;
+}
+
+.manager-mini-day.empty {
+    visibility: hidden;
+}
+
+.manager-mini-day.today {
+    background: var(--mgr-blue-deep);
+    color: #FFFFFF;
+    font-weight: 900;
+}
+
+.manager-mini-day.has-job::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 1px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #D9A441;
+    transform: translateX(-50%);
+}
+
+.manager-mini-day.today.has-job::after {
+    background: #FFFFFF;
+}
+
+/* ================= Unassigned jobs ================= */
+
+.manager-assign-list,
+.manager-task-list {
+    display: grid;
+    gap: 6px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.manager-assign-item,
+.manager-task-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    min-height: 0;
+
+    padding: 7px 9px;
+
+    border: 1px solid var(--mgr-line);
+    border-radius: 9px;
+    background: #FFFFFF;
+}
+
+.manager-assign-copy,
+.manager-task-copy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.manager-assign-copy > span,
+.manager-task-copy > span {
+    overflow: hidden;
+    color: var(--mgr-ink);
+    font-size: 9px;
+    line-height: 1.15;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.manager-assign-copy > small,
+.manager-task-copy > small {
+    overflow: hidden;
+    color: var(--mgr-soft);
+    font-size: 7.5px;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ================= Overdue tasks ================= */
+
+.manager-task-item {
+    position: relative;
+    padding-left: 12px;
+}
+
+.manager-task-item::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 0;
+    width: 3px;
+    border-radius: 99px;
+    background: #E8A23D;
+}
+
+/* ================= Technician status ================= */
+
+.manager-tech-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    flex: 0 0 auto;
+    margin-bottom: 7px;
+}
+
+.manager-status-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    min-height: 43px;
+    padding: 6px 9px;
+
+    border: 1px solid var(--mgr-line);
+    border-radius: 9px;
+    background: #FFFFFF;
+}
+
+.manager-status-box strong {
+    display: block;
+    color: var(--mgr-ink);
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 900;
+}
+
+.manager-status-box small {
+    display: block;
+    margin-top: 3px;
+    color: var(--mgr-soft);
+    font-size: 7px;
+    line-height: 1;
+}
+
+.manager-tech-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 8px;
+    align-content: start;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.manager-tech-chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    min-height: 29px;
+    padding: 4px 8px;
+
+    border: 1px solid var(--mgr-line);
+    border-radius: 8px;
+    background: #FFFFFF;
+}
+
+.manager-tech-chip strong {
+    overflow: hidden;
+    color: var(--mgr-ink);
+    font-size: 8.5px;
+    line-height: 1;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ================= Fit / Responsive ================= */
+
+@media (min-width: 1201px) {
+    .manager-home {
+        overflow: hidden;
+    }
+}
+
+@media (max-width: 1200px) {
+    .manager-home {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+        grid-template-rows: auto;
+    }
+
+    .manager-home-row,
+    .manager-home-row-top,
+    .manager-home-row-bottom {
+        grid-template-columns: 1fr;
+        overflow: visible;
+    }
+
+    .manager-home-card {
+        min-height: 240px;
+    }
+}
+
+@media (max-width: 700px) {
+    .manager-home-header {
+        align-items: flex-start;
+        flex-direction: column;
+        height: auto;
+    }
+
+    .manager-home-header-actions {
+        flex-wrap: wrap;
+    }
+
+    .manager-schedule-body {
+        grid-template-columns: 1fr;
+        overflow: visible;
+    }
+
+    .manager-tech-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =========================================================
+   Manager Dashboard v11
+   ขยายตัวอักษรโดยยังรักษา layout 1 หน้าจอ
+   ========================================================= */
+
+/* Header */
+.manager-home-heading h1 {
+    font-size: 22px !important;
+}
+
+.manager-home-heading p {
+    font-size: 12px !important;
+}
+
+.manager-home-pill {
+    font-size: 11px !important;
+}
+
+/* Card headings */
+.manager-card-head h2 {
+    font-size: 16px !important;
+}
+
+.manager-card-head p {
+    font-size: 10.5px !important;
+}
+
+.manager-card-head > a {
+    font-size: 10px !important;
+}
+
+/* Badges / buttons */
+.manager-badge {
+    min-height: 20px !important;
+    padding: 3px 7px !important;
+    font-size: 9px !important;
+}
+
+.manager-btn {
+    min-height: 29px !important;
+    padding: 0 11px !important;
+    font-size: 9.5px !important;
+}
+
+/* Schedule */
+.manager-schedule-today strong {
+    font-size: 12px !important;
+}
+
+.manager-schedule-today span {
+    font-size: 9px !important;
+}
+
+.manager-schedule-copy strong {
+    font-size: 10px !important;
+}
+
+.manager-schedule-copy span {
+    font-size: 11px !important;
+}
+
+.manager-schedule-copy small {
+    font-size: 9px !important;
+}
+
+.manager-schedule-copy em {
+    font-size: 8.5px !important;
+}
+
+/* Calendar */
+.manager-mini-calendar-title {
+    font-size: 15px !important;
+}
+
+.manager-mini-weekdays span {
+    font-size: 9px !important;
+}
+
+.manager-mini-day {
+    font-size: 10px !important;
+}
+
+/* Unassigned + overdue */
+.manager-inline-head strong {
+    font-size: 11px !important;
+}
+
+.manager-assign-copy > span,
+.manager-task-copy > span {
+    font-size: 10.5px !important;
+}
+
+.manager-assign-copy > small,
+.manager-task-copy > small {
+    font-size: 9px !important;
+}
+
+/* Technician */
+.manager-status-box strong {
+    font-size: 16px !important;
+}
+
+.manager-status-box small {
+    font-size: 9px !important;
+}
+
+.manager-tech-chip strong {
+    font-size: 10px !important;
+}
+
+/* Empty states */
+.manager-home-empty {
+    font-size: 10.5px !important;
+}
+
+
+/* =========================================================
+   Manager Dashboard v12
+   สถานะช่างติดตั้ง — ปรับตามแบบล่าสุดของผู้ใช้
+   ========================================================= */
+
+.manager-tech-card {
+    border: 1.5px solid #C9EBD9 !important;
+    border-radius: 14px !important;
+    padding: 12px 14px !important;
+    background: #FFFFFF !important;
+}
+
+/* Header */
+.manager-tech-card .manager-card-head {
+    margin-bottom: 9px !important;
+}
+
+.manager-tech-card .manager-card-head h2 {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #1E2430 !important;
+}
+
+.manager-tech-card .manager-card-head p {
+    margin-top: 3px !important;
+    font-size: 10px !important;
+    color: #6B7280 !important;
+}
+
+.manager-tech-card .manager-badge.blue {
+    min-height: 22px !important;
+    padding: 3px 9px !important;
+    border-radius: 7px !important;
+    background: #E9F1FB !important;
+    color: #2E6FC4 !important;
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+}
+
+/* Summary */
+.manager-tech-card .manager-tech-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin-bottom: 8px !important;
+}
+
+.manager-tech-card .manager-status-box {
+    min-height: 48px !important;
+    padding: 7px 10px !important;
+    gap: 8px !important;
+
+    border: 1px solid #DCEFE4 !important;
+    border-radius: 10px !important;
+    background: #FAFDFB !important;
+}
+
+.manager-tech-card .manager-status-box .manager-status-dot {
+    width: 8px !important;
+    height: 8px !important;
+    flex: 0 0 8px !important;
+}
+
+.manager-tech-card .manager-status-box strong {
+    font-size: 17px !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+    color: #1E2430 !important;
+}
+
+.manager-tech-card .manager-status-box small {
+    margin-top: 3px !important;
+    font-size: 9px !important;
+    color: #6B7280 !important;
+}
+
+/* Technician chips */
+.manager-tech-card .manager-tech-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 7px 8px !important;
+}
+
+.manager-tech-card .manager-tech-chip {
+    min-height: 35px !important;
+    padding: 6px 9px !important;
+    gap: 7px !important;
+
+    border: 1px solid #DCEFE4 !important;
+    border-radius: 9px !important;
+    background: #FFFFFF !important;
+}
+
+.manager-tech-card .manager-tech-chip .manager-status-dot {
+    width: 8px !important;
+    height: 8px !important;
+    flex: 0 0 8px !important;
+}
+
+.manager-tech-card .manager-tech-chip strong {
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+    color: #1E2430 !important;
+}
+
+/* สีสถานะ */
+.manager-tech-card .manager-status-dot.ready {
+    background: #22A559 !important;
+}
+
+.manager-tech-card .manager-status-dot.unavailable {
+    background: #E14B4B !important;
+}
+
+/* ทำให้ยังอยู่ใน 1 หน้าจอ */
+@media (min-width: 1201px) {
+    .manager-tech-card {
+        overflow: hidden !important;
+    }
+}
+
+
+/* =========================================================
+   Manager Dashboard v13
+   สถานะช่างติดตั้ง — ปรับให้เหมือนภาพตัวอย่างล่าสุด
+   ========================================================= */
+
+.manager-tech-card {
+    padding: 18px 20px !important;
+    border: 1.5px solid #C9EBD9 !important;
+    border-radius: 18px !important;
+    background: #FFFFFF !important;
+}
+
+/* Header */
+.manager-tech-card .manager-card-head {
+    align-items: flex-start !important;
+    margin-bottom: 16px !important;
+}
+
+.manager-tech-card .manager-card-head h2 {
+    font-size: 17px !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+}
+
+.manager-tech-card .manager-card-head p {
+    margin-top: 5px !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+}
+
+.manager-tech-card .manager-badge.blue {
+    min-height: 27px !important;
+    padding: 5px 11px !important;
+    border-radius: 8px !important;
+    font-size: 10px !important;
+}
+
+/* Summary row */
+.manager-tech-card .manager-tech-summary {
+    gap: 12px !important;
+    margin-bottom: 12px !important;
+}
+
+.manager-tech-card .manager-status-box {
+    min-height: 68px !important;
+    padding: 12px 16px !important;
+    gap: 12px !important;
+
+    border: 1px solid #DCEFE4 !important;
+    border-radius: 13px !important;
+    background: #FAFDFB !important;
+}
+
+.manager-tech-card .manager-status-box .manager-status-dot {
+    width: 9px !important;
+    height: 9px !important;
+    flex: 0 0 9px !important;
+}
+
+.manager-tech-card .manager-status-box strong {
+    font-size: 20px !important;
+    line-height: 1 !important;
+}
+
+.manager-tech-card .manager-status-box small {
+    margin-top: 4px !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+}
+
+/* Technician grid */
+.manager-tech-card .manager-tech-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px 12px !important;
+}
+
+.manager-tech-card .manager-tech-chip {
+    min-height: 48px !important;
+    padding: 10px 14px !important;
+    gap: 10px !important;
+
+    border: 1px solid #DCEFE4 !important;
+    border-radius: 12px !important;
+    background: #FFFFFF !important;
+}
+
+.manager-tech-card .manager-tech-chip .manager-status-dot {
+    width: 9px !important;
+    height: 9px !important;
+    flex: 0 0 9px !important;
+}
+
+.manager-tech-card .manager-tech-chip strong {
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+}
+
+/* ให้พื้นที่ภายในการ์ดสมดุล */
+.manager-tech-card .manager-tech-grid,
+.manager-tech-card .manager-tech-summary {
+    width: 100% !important;
+}
+
+/* ถ้าหน้าจอใหญ่ ให้ความสูงการ์ดไม่ยืดเกินจำเป็น */
+@media (min-width: 1201px) {
+    .manager-tech-card {
+        align-self: start !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+    }
+}
+
+
+/* =========================================================
+   Manager Dashboard v14
+   สถานะช่างติดตั้ง — บังคับ layout ให้ตรงภาพอ้างอิง
+   ========================================================= */
+
+body.app-body.role-1 .manager-tech-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    padding: 18px 20px 20px !important;
+
+    border: 1px solid #C9EBD9 !important;
+    border-radius: 18px !important;
+    background: #FFFFFF !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+
+/* ---------- ส่วนหัว ---------- */
+body.app-body.role-1 .manager-tech-card .manager-card-head {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+
+    width: 100% !important;
+    margin: 0 0 16px !important;
+    padding: 0 !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-card-head > div {
+    min-width: 0 !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-card-head h2 {
+    margin: 0 !important;
+    color: #1E2430 !important;
+
+    font-size: 17px !important;
+    line-height: 1.25 !important;
+    font-weight: 800 !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-card-head p {
+    margin: 6px 0 0 !important;
+    color: #6B7280 !important;
+
+    font-size: 10.5px !important;
+    line-height: 1.3 !important;
+    font-weight: 500 !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-badge.blue {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+
+    min-width: 48px !important;
+    min-height: 27px !important;
+    padding: 4px 10px !important;
+    margin: 0 !important;
+
+    border: 0 !important;
+    border-radius: 8px !important;
+    background: #E9F1FB !important;
+    color: #2E6FC4 !important;
+
+    font-size: 10px !important;
+    line-height: 1 !important;
+    font-weight: 800 !important;
+}
+
+/* ---------- กล่องสรุป 3 / 1 ---------- */
+body.app-body.role-1 .manager-tech-card .manager-tech-summary {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    margin: 0 0 12px !important;
+    padding: 0 !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-status-box {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 11px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 69px !important;
+    padding: 12px 16px !important;
+
+    border: 1px solid #DCEFE4 !important;
+    border-radius: 13px !important;
+    background: #FAFDFB !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-status-box .manager-status-dot {
+    display: block !important;
+    width: 9px !important;
+    height: 9px !important;
+    flex: 0 0 9px !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-status-box > div {
+    display: block !important;
+    min-width: 0 !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-status-box strong {
+    display: block !important;
+    margin: 0 !important;
+    color: #1E2430 !important;
+
+    font-size: 20px !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-status-box small {
+    display: block !important;
+    margin: 5px 0 0 !important;
+    color: #6B7280 !important;
+
+    font-size: 9.5px !important;
+    line-height: 1.2 !important;
+    font-weight: 500 !important;
+}
+
+/* ---------- รายชื่อช่าง 2 x 2 ---------- */
+body.app-body.role-1 .manager-tech-card .manager-tech-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: 48px !important;
+    gap: 10px 12px !important;
+
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    align-content: start !important;
+    overflow: visible !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-tech-chip {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    padding: 10px 14px !important;
+    margin: 0 !important;
+
+    border: 1px solid #DCEFE4 !important;
+    border-radius: 12px !important;
+    background: #FFFFFF !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-tech-chip .manager-status-dot {
+    display: block !important;
+    width: 9px !important;
+    height: 9px !important;
+    flex: 0 0 9px !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-tech-chip strong {
+    display: block !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+
+    overflow: hidden !important;
+    color: #1E2430 !important;
+
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+/* สีจุด */
+body.app-body.role-1 .manager-tech-card .manager-status-dot.ready {
+    background: #22A559 !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-status-dot.unavailable {
+    background: #E14B4B !important;
+}
+
+/* Desktop: กัน CSS เก่าบังคับกล่องสรุปไปอยู่ด้านข้างหัวข้อ */
+@media (min-width: 1201px) {
+    body.app-body.role-1 .manager-tech-card {
+        align-self: stretch !important;
+    }
+
+    body.app-body.role-1 .manager-tech-card .manager-card-head,
+    body.app-body.role-1 .manager-tech-card .manager-tech-summary,
+    body.app-body.role-1 .manager-tech-card .manager-tech-grid {
+        position: static !important;
+        float: none !important;
+        clear: both !important;
+    }
+}
+
+
+/* =========================================================
+   Tech card only — fit inside viewport
+   แก้เฉพาะการ์ดสถานะช่างติดตั้ง
+   ========================================================= */
+
+body.app-body.role-1 .manager-tech-card {
+    padding: 12px 14px !important;
+    overflow: hidden !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-card-head {
+    margin-bottom: 8px !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-tech-summary {
+    gap: 8px !important;
+    margin-bottom: 8px !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-status-box {
+    min-height: 50px !important;
+    padding: 7px 10px !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-status-box strong {
+    font-size: 16px !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-status-box small {
+    margin-top: 2px !important;
+    font-size: 8px !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-tech-grid {
+    grid-auto-rows: 36px !important;
+    gap: 6px 8px !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-tech-chip {
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 5px 10px !important;
+}
+
+body.app-body.role-1 .manager-tech-card .manager-tech-chip strong {
+    font-size: 10px !important;
+}
+
+
+/* =========================================================
+   Dashboard schedule + unassigned refinements
+   - งานรอมอบหมายใช้สีส้ม
+   - ปฏิทินเลือกวันได้
+   - ตารางซ้ายแสดงสูงสุด 2 งานของวันที่เลือก
+   - แถบหน้ารายการเป็นฟ้า/น้ำเงินทั้งหมด
+   ========================================================= */
+
+/* งานที่ยังไม่ได้มอบหมาย = ส้ม */
+.manager-badge.orange {
+    color: #C4711A !important;
+    background: #FDEBDA !important;
+}
+
+.manager-btn.assign-warning {
+    background: #F59E0B !important;
+    color: #FFFFFF !important;
+}
+
+.manager-btn.assign-warning:hover {
+    background: #D97706 !important;
+}
+
+/* ข้อความตารางติดตั้งให้ชัดขึ้นเล็กน้อย */
+.manager-schedule-today strong {
+    font-size: 11px !important;
+    font-weight: 900 !important;
+}
+
+.manager-schedule-copy strong {
+    font-size: 10px !important;
+    font-weight: 900 !important;
+}
+
+.manager-schedule-copy span {
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+}
+
+.manager-schedule-copy small {
+    font-size: 8.5px !important;
+}
+
+.manager-schedule-copy em {
+    font-size: 8px !important;
+}
+
+/* เหลือ 2 งาน จึงให้การ์ดสูงขึ้นนิดเดียว อ่านง่าย */
+.manager-schedule-items {
+    display: grid !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+}
+
+.manager-schedule-item {
+    min-height: 0 !important;
+    padding: 8px 10px !important;
+}
+
+/* แถบหน้าทุกงานเป็นสีน้ำเงิน */
+.manager-schedule-mark,
+.manager-schedule-mark.green,
+.manager-schedule-mark.red,
+.manager-schedule-mark.blue {
+    background: #2F80ED !important;
+}
+
+/* วันที่ไม่มีงาน */
+.manager-schedule-empty-day {
+    grid-row: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    border: 1px dashed #DCE6F2;
+    border-radius: 10px;
+    color: #94A3B8;
+    background: #FAFCFF;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* ปฏิทินกดเลือกวัน */
+button.manager-mini-day {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+button.manager-mini-day:hover {
+    background: #EAF2FA;
+    color: #123E73;
+}
+
+.manager-mini-day.today {
+    background: transparent !important;
+    color: #1E2430 !important;
+}
+
+.manager-mini-day.selected {
+    background: #123E73 !important;
+    color: #FFFFFF !important;
+    font-weight: 900 !important;
+}
+
+.manager-mini-day.selected.has-job::after {
+    background: #FFFFFF !important;
+}
+
+/* เลขวัน/เดือนชัดขึ้น */
+.manager-mini-calendar-title {
+    font-size: 14px !important;
+}
+
+.manager-mini-weekdays span {
+    font-size: 8.5px !important;
+}
+
+.manager-mini-day {
+    font-size: 9.5px !important;
+}

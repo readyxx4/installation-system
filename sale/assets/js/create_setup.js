@@ -95,6 +95,9 @@
   const setupAddress =
     document.getElementById('setupAddress');
 
+  const setupNote =
+    document.getElementById('setupNote');
+
   const createSetupForm =
     document.getElementById('createSetupForm');
 
@@ -1019,4 +1022,35 @@
   renderCustomerResults('');
   renderProducts('');
   renderSummary();
+
+  const initial = window.createSetupInitial || null;
+
+  if (initial) {
+    if (initial.customerId) {
+      selectCustomer(initial.customerId);
+    }
+
+    if (setupAddress && typeof initial.setupAddress === 'string') {
+      setupAddress.value = initial.setupAddress;
+      setupAddress.readOnly = false;
+    }
+
+    if (setupNote && typeof initial.setupNote === 'string') {
+      setupNote.value = initial.setupNote;
+    }
+
+    if (Array.isArray(initial.items)) {
+      initial.items.forEach((item) => {
+        const productId = String(item.pro_id || '');
+        const qty = Number.parseInt(item.qty, 10) || 0;
+
+        if (productId && qty > 0) {
+          state.items.set(productId, qty);
+        }
+      });
+
+      renderProducts(productSearch?.value || '');
+      renderSummary();
+    }
+  }
 })();

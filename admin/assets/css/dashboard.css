@@ -2,38 +2,253 @@
    Admin Dashboard
 ============================== */
 
-.admin-dashboard-info-grid {
+.admin-dashboard-v2 {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px);
+    min-height: 0;
+    overflow: hidden;
+}
+
+.admin-dashboard-v2 .admin-dashboard-top {
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+
+    min-height: 92px;
+    padding: 16px 22px;
+
+    border: 1px solid rgba(37, 99, 235, .2);
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at 86% 18%, rgba(125, 211, 252, .34), transparent 30%),
+        linear-gradient(135deg, #0F3F7A 0%, #1565C0 56%, #1E88E5 100%);
+    box-shadow: 0 18px 44px rgba(15, 63, 122, .16);
+}
+
+.admin-dashboard-v2 .admin-dashboard-top::after {
+    content: "";
+    position: absolute;
+    right: -54px;
+    bottom: -70px;
+
+    width: 170px;
+    height: 170px;
+
+    border: 1px solid rgba(255, 255, 255, .22);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .08);
+}
+
+.admin-dashboard-v2 .admin-dashboard-top > * {
+    position: relative;
+    z-index: 1;
+}
+
+.admin-dashboard-v2 .admin-dashboard-top h1 {
+    margin: 0;
+    color: #FFFFFF;
+    font-size: 23px;
+    font-weight: 900;
+}
+
+.admin-dashboard-v2 .admin-dashboard-top p {
+    margin: 4px 0 0;
+    color: rgba(255, 255, 255, .84);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.admin-dashboard-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.admin-dashboard-v2 .admin-date-pill {
+    min-height: 30px;
+    padding: 6px 10px;
+
+    border: 1px solid rgba(255, 255, 255, .25);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .13);
+    color: #FFFFFF;
+    box-shadow: none;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.admin-update-pill {
+    min-width: 142px;
+}
+
+.admin-dashboard-v2 .admin-summary-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px !important;
+}
+
+.admin-dashboard-v2 .admin-summary-card {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    min-width: 0;
+    min-height: 56px !important;
+    padding: 8px 10px !important;
+    border-radius: 10px !important;
+}
+
+.admin-dashboard-v2 .admin-summary-card div:first-child {
+    min-width: 0;
+}
+
+.admin-dashboard-v2 .admin-summary-card small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-dashboard-v2 .admin-summary-card .summary-icon {
+    position: static !important;
+    order: -1;
+    width: 30px !important;
+    height: 30px !important;
+    flex: 0 0 30px !important;
+    font-size: 13px !important;
+}
+
+body.app-body.role-3 .admin-dashboard-v2 .admin-summary-grid {
+    gap: 8px !important;
+    margin-bottom: 10px !important;
+}
+
+body.app-body.role-3 .admin-dashboard-v2 .admin-summary-card {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    height: 57px !important;
+    min-height: 57px !important;
+    max-height: 57px !important;
+    padding: 8px 11px !important;
+    border-radius: 9px !important;
+    overflow: hidden !important;
+}
+
+body.app-body.role-3 .admin-dashboard-v2 .admin-summary-card::after {
+    display: none !important;
+}
+
+body.app-body.role-3 .admin-dashboard-v2 .admin-summary-card > div:first-child {
+    display: grid !important;
+    grid-template-rows: 13px 18px 12px;
+    align-items: start !important;
+    gap: 1px !important;
+    min-width: 0 !important;
+    text-align: left !important;
+}
+
+body.app-body.role-3 .admin-dashboard-v2 .admin-summary-card .summary-icon {
+    position: static !important;
+    order: -1 !important;
+    width: 28px !important;
+    height: 28px !important;
+    flex: 0 0 28px !important;
+    border-radius: 9px !important;
+    font-size: 12px !important;
+}
+
+body.app-body.role-3 .admin-dashboard-v2 .admin-summary-card span,
+body.app-body.role-3 .admin-dashboard-v2 .admin-summary-card p {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    font-size: 9.5px !important;
+    line-height: 13px !important;
+    text-align: left !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-3 .admin-dashboard-v2 .admin-summary-card strong,
+body.app-body.role-3 .admin-dashboard-v2 .admin-summary-card h2 {
+    display: block !important;
+    margin: 0 !important;
+    font-size: 17px !important;
+    line-height: 18px !important;
+    text-align: left !important;
+}
+
+body.app-body.role-3 .admin-dashboard-v2 .admin-summary-card small {
+    display: block !important;
+    max-width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    font-size: 9px !important;
+    line-height: 12px !important;
+    text-align: left !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.admin-dashboard-main-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 13px;
-    margin-top: 13px;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1.2fr) minmax(0, .8fr);
+    grid-template-areas:
+        "status performance"
+        "users customers";
+    gap: 10px;
+    flex: 1 1 auto;
+    margin-top: 10px;
+    min-height: 0;
     align-items: stretch;
 }
 
-.admin-dashboard-info-grid > .admin-widget {
+.admin-dashboard-main-grid > .admin-widget {
     width: 100%;
-    height: 100%;
-    min-height: 284px;
+    height: 100% !important;
+    min-height: 0 !important;
     box-sizing: border-box;
+    padding: 10px 12px !important;
 }
 
-
-/* ==============================
-   Bottom Grid
-============================== */
-
-.admin-bottom-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 13px;
-    margin-top: 13px;
-    align-items: stretch;
+.admin-status-overview-widget {
+    grid-area: status;
 }
 
-.admin-bottom-grid > .admin-widget {
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
+.technician-performance-widget {
+    grid-area: performance;
+}
+
+.admin-latest-users-widget {
+    grid-area: users;
+}
+
+.admin-latest-customers-widget {
+    grid-area: customers;
+}
+
+.admin-dashboard-main-grid .admin-widget-head {
+    margin-bottom: 6px !important;
+}
+
+.admin-dashboard-v2 .admin-widget {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
 
@@ -46,8 +261,8 @@
     align-items: center;
     justify-content: center;
 
-    min-height: 23px;
-    padding: 3px 10px;
+    min-height: 22px;
+    padding: 3px 8px;
 
     border-radius: 999px;
 
@@ -65,21 +280,304 @@
    Mini List
 ============================== */
 
+.admin-dashboard-main-grid .admin-mini-list {
+    flex: 1 1 auto;
+    gap: 0;
+    min-height: 0;
+}
+
+.admin-dashboard-main-grid .admin-mini-item {
+    justify-content: flex-start;
+    gap: 8px;
+    min-height: 36px;
+    padding: 5px 0;
+}
+
+.admin-latest-users-widget .admin-mini-list,
+.admin-latest-customers-widget .admin-mini-list {
+    overflow-y: auto;
+    padding-right: 4px;
+    overscroll-behavior: contain;
+}
+
 .admin-mini-main {
     display: flex;
     flex-direction: column;
     gap: 2px;
 
+    margin-right: auto;
     min-width: 0;
 }
 
 .admin-mini-main strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.25;
     font-weight: 800;
 }
 
 .admin-mini-main span {
     font-size: 11px;
+    line-height: 1.25;
     opacity: .72;
+}
+
+.admin-mini-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+
+    border-radius: 50%;
+    background: #EAF4FF;
+    color: #1565C0;
+    font-size: 12px;
+}
+
+.admin-dashboard-main-grid .admin-mini-item .badge,
+.admin-dashboard-main-grid .admin-mini-item .admin-user-role {
+    min-height: 22px !important;
+    padding: 3px 8px !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+}
+
+
+/* ==============================
+   Technician Performance
+============================== */
+
+.technician-performance-widget {
+    min-width: 0;
+}
+
+.technician-performance-table {
+    display: grid;
+    gap: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.technician-performance-head,
+.technician-performance-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 76px 86px;
+    align-items: center;
+    gap: 10px;
+}
+
+.technician-performance-head {
+    padding: 0 0 5px;
+    color: #64748B;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.technician-performance-head span:nth-child(2),
+.technician-performance-head span:nth-child(3) {
+    text-align: right;
+}
+
+.technician-performance-row {
+    min-height: 38px;
+    padding: 5px 0;
+    border-top: 1px solid #E2E8F0;
+}
+
+.technician-profile-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.technician-rank {
+    width: 18px;
+    flex: 0 0 18px;
+    color: #64748B;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.technician-status-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 5px;
+    border-radius: 50%;
+    background: #94A3B8;
+}
+
+.technician-status-dot.ready {
+    background: #16A34A;
+}
+
+.technician-status-dot.unavailable {
+    background: #DC2626;
+}
+
+.technician-job-count,
+.technician-review-score {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    min-width: 0;
+    text-align: right;
+}
+
+.technician-job-count strong,
+.technician-review-score strong {
+    color: #0F3F7A;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.15;
+}
+
+.technician-job-count span,
+.technician-review-score span {
+    color: #64748B;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+
+/* ==============================
+   Status Overview
+============================== */
+
+.admin-status-metrics {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 0;
+    overflow: hidden;
+    min-width: 0;
+    padding: 7px;
+
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    background: #F8FAFC;
+}
+
+.admin-status-metric {
+    min-width: 0;
+    padding: 2px 7px;
+    border-right: 1px solid #E2E8F0;
+}
+
+.admin-status-metric:last-child {
+    border-right: 0;
+}
+
+.admin-status-metric span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    overflow: hidden;
+    color: #64748B;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-status-metric strong {
+    display: block;
+    margin-top: 5px;
+    color: #0F3F7A;
+    font-size: 15px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.admin-status-dot {
+    width: 8px;
+    height: 8px;
+    flex: 0 0 8px;
+    border-radius: 999px;
+    background: #94A3B8;
+}
+
+.admin-status-dot.orange { background: #F59E0B; }
+.admin-status-dot.blue { background: #2563EB; }
+.admin-status-dot.cyan { background: #0891B2; }
+.admin-status-dot.purple { background: #7C3AED; }
+.admin-status-dot.green { background: #16A34A; }
+.admin-status-dot.red { background: #DC2626; }
+.admin-status-dot.slate { background: #64748B; }
+
+.admin-status-chart {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: 8px;
+    padding: 8px 10px 7px;
+
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    background:
+        repeating-linear-gradient(
+            to top,
+            rgba(148, 163, 184, .16) 0,
+            rgba(148, 163, 184, .16) 1px,
+            transparent 1px,
+            transparent 28px
+        ),
+        #FFFFFF;
+}
+
+.admin-status-bar-item {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: 7px;
+    min-width: 0;
+}
+
+.admin-status-bar-track {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 58px;
+}
+
+.admin-status-bar {
+    display: block;
+    width: 13px;
+    min-height: 8px;
+    border-radius: 999px 999px 3px 3px;
+    background: #94A3B8;
+}
+
+.admin-status-bar.orange { background: #F59E0B; }
+.admin-status-bar.blue { background: #2563EB; }
+.admin-status-bar.cyan { background: #0891B2; }
+.admin-status-bar.purple { background: #7C3AED; }
+.admin-status-bar.green { background: #16A34A; }
+.admin-status-bar.red { background: #DC2626; }
+.admin-status-bar.slate { background: #64748B; }
+
+.admin-status-bar-label {
+    overflow: hidden;
+    color: #64748B;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 
@@ -114,8 +612,55 @@
 ============================== */
 
 @media (max-width: 1100px) {
-    .admin-dashboard-info-grid,
-    .admin-bottom-grid {
+    .admin-summary-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .admin-status-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-status-metric {
+        border-right: 0;
+    }
+
+    .admin-dashboard-main-grid {
         grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-template-areas:
+            "status"
+            "performance"
+            "users"
+            "customers";
+    }
+}
+
+@media (max-width: 760px) {
+    .admin-dashboard-v2 .admin-dashboard-top {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 18px;
+    }
+
+    .admin-dashboard-v2 .admin-dashboard-top h1 {
+        font-size: 21px;
+    }
+
+    .admin-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-dashboard-actions {
+        justify-content: flex-start;
+    }
+
+    .admin-status-chart {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .technician-performance-head,
+    .technician-performance-row {
+        grid-template-columns: minmax(0, 1fr) 58px 76px;
+        gap: 8px;
     }
 }

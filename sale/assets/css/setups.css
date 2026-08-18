@@ -120,6 +120,14 @@ body.app-body.role-2 .cs-setups-page-panel .cs-job-status-head h2 {
   margin: 0 !important;
 }
 
+body.app-body.role-2 .cs-page-subtitle {
+  margin: 4px 0 0 !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.45 !important;
+}
+
 body.app-body.role-2 .cs-setups-page-panel .cs-setup-add-link {
   min-height: 40px !important;
   padding: 9px 16px !important;
@@ -221,4 +229,168 @@ body.app-body.role-2 .cs-data-table.cs-setups-table-clean .setup-status-badge {
 
 body.app-body.role-2 .cs-data-table.cs-setups-table-clean a[href*="setup_slip"] {
   min-width: 86px !important;
+}
+/* Clean sale toolbar matching the admin list toolbar. */
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto auto !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 0 16px !important;
+  padding: 12px !important;
+  border: 1px solid #93c5fd !important;
+  border-radius: 14px !important;
+  background: #eaf6ff !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar input[type="search"] {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 6px 10px !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .btn,
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .btn-search,
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .btn-reset,
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .btn-add,
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .cs-section-count,
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .cs-setup-add-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 6px 10px !important;
+  border-radius: 9px !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+}
+
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .btn-search,
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .btn-add,
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .cs-setup-add-link {
+  background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+  color: #ffffff !important;
+  border: 1px solid transparent !important;
+}
+
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .btn-reset {
+  background: #eef2f7 !important;
+  color: #475569 !important;
+  border: 1px solid #dbe3ef !important;
+}
+
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .cs-section-count {
+  min-width: 86px !important;
+  background: #ffffff !important;
+  color: #0f4fb8 !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .cs-icon {
+  width: 14px !important;
+  height: 14px !important;
+  flex: 0 0 14px !important;
+  stroke-width: 2.2px !important;
+}
+
+body.app-body.role-2 .cs-history-toolbar {
+  margin: 0 0 12px !important;
+}
+
+@media (max-width: 980px) {
+  body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .btn,
+  body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .btn-add,
+  body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar .cs-section-count {
+    width: 100% !important;
+  }
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+  flex-wrap: nowrap !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-inline-action-form {
+  display: inline-flex !important;
+  margin: 0 !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions .btn,
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions .btn-small,
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions .btn-edit,
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions .btn-delete,
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions a[href*="setup_slip"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 72px !important;
+  min-height: 26px !important;
+  height: 26px !important;
+  padding: 4px 8px !important;
+  border-radius: 7px !important;
+  gap: 5px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions .btn-delete {
+  color: #dc2626 !important;
+  background: #fff1f2 !important;
+  border-color: #fecaca !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions .cs-icon {
+  width: 13px !important;
+  height: 13px !important;
+  flex: 0 0 13px !important;
+}
+/* Installation slip action color. */
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions a[href*="setup_slip"],
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean a[href*="setup_slip"] {
+  color: #047857 !important;
+  background: #ecfdf5 !important;
+  border: 1px solid #86efac !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions a[href*="setup_slip"]:hover,
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean a[href*="setup_slip"]:hover {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #059669, #0f766e) !important;
+  border-color: #059669 !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions a[href*="setup_slip"] .cs-icon,
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean a[href*="setup_slip"] .cs-icon {
+  color: currentColor !important;
+  stroke: currentColor !important;
 }

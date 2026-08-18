@@ -66,6 +66,51 @@ function user_role_badge($role): string
     };
 }
 
+function user_created_column(mysqli $conn): ?string
+{
+    foreach (['created_at', 'created_date', 'registered_at'] as $column) {
+        if (column_exists($conn, 'user', $column)) {
+            return $column;
+        }
+    }
+
+    return null;
+}
+
+function format_user_created_date($value): string
+{
+    if (empty($value)) {
+        return '-';
+    }
+
+    $timestamp = strtotime((string) $value);
+
+    if ($timestamp === false) {
+        return '-';
+    }
+
+    $months = [
+        1 => 'ม.ค.',
+        2 => 'ก.พ.',
+        3 => 'มี.ค.',
+        4 => 'เม.ย.',
+        5 => 'พ.ค.',
+        6 => 'มิ.ย.',
+        7 => 'ก.ค.',
+        8 => 'ส.ค.',
+        9 => 'ก.ย.',
+        10 => 'ต.ค.',
+        11 => 'พ.ย.',
+        12 => 'ธ.ค.',
+    ];
+
+    $day = (int) date('j', $timestamp);
+    $month = $months[(int) date('n', $timestamp)] ?? date('m', $timestamp);
+    $year = (int) date('Y', $timestamp) + 543;
+
+    return "{$day} {$month} {$year}";
+}
+
 function wrap_text_every_chars(string $text, int $limit = 15): string
 {
     $text = trim($text);
@@ -183,11 +228,14 @@ if ($action === 'delete') {
     }
 }
 
+$created_column = user_created_column($conn);
+$created_select = $created_column !== null ? ", `{$created_column}` AS user_created_at" : ", NULL AS user_created_at";
+
 if ($search !== '') {
     $like = '%' . $search . '%';
 
     $stmt = $conn->prepare("
-        SELECT user_id, user_name, user_phone, user_email, user_role, user_address
+        SELECT user_id, user_name, user_phone, user_email, user_role, user_address{$created_select}
         FROM `user`
         WHERE user_role IN (1, 2, 3)
           AND (
@@ -205,7 +253,7 @@ if ($search !== '') {
     $users = $stmt->get_result();
 } else {
     $users = $conn->query("
-        SELECT user_id, user_name, user_phone, user_email, user_role, user_address
+        SELECT user_id, user_name, user_phone, user_email, user_role, user_address{$created_select}
         FROM `user`
         WHERE user_role IN (1, 2, 3)
         ORDER BY user_id DESC
@@ -217,8 +265,9 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
 
 <?= flash_message() ?>
 
-<div class="panel">
-    <div class="panel-title">รายการข้อมูลผู้ใช้ทั้งหมด</div>
+<div class="admin-user-split-layout">
+        <div class="panel admin-user-list-pane">
+    <div class="panel-title">รายการข้อมูลพนักงานทั้งหมด</div>
 
     <form class="toolbar user-toolbar" method="GET" action="<?= h(app_system_url('admin/users.php')) ?>">
         <input type="text" name="q" placeholder="ค้นหารหัส ชื่อ-นามสกุล เบอร์โทร อีเมล หรือที่อยู่" value="<?= h($search) ?>">
@@ -244,7 +293,7 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                 <path d="M12 5v14"></path>
                 <path d="M5 12h14"></path>
             </svg>
-            <span>เพิ่มผู้ใช้ใหม่</span>
+            <span>เพิ่มพนักงานใหม่</span>
         </a>
     </form>
 
@@ -252,7 +301,7 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>รหัสผู้ใช้</th>
+                    <th>รหัสพนักงาน</th>
                     <th>ชื่อ-นามสกุล</th>
                     <th>เบอร์โทร</th>
                     <th>อีเมล</th>
@@ -265,24 +314,44 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
             <tbody>
                 <?php if ($users->num_rows === 0): ?>
                     <tr>
-                        <td colspan="7" class="empty-state">ไม่พบข้อมูลผู้ใช้</td>
+                        <td colspan="7" class="empty-state">ไม่พบข้อมูลพนักงาน</td>
                     </tr>
                 <?php endif; ?>
 
                 <?php while ($row = $users->fetch_assoc()): ?>
-                    <tr>
+                    <?php
+                    $edit_url = app_system_url('admin/user_edit.php?id=' . urlencode($row['user_id']));
+                    $address = (string) $row['user_address'];
+                    $role_name = user_role_name($row['user_role']);
+                    $role_badge = user_role_badge($row['user_role']);
+                    $created_display = format_user_created_date($row['user_created_at'] ?? null);
+                    ?>
+                    <tr class="user-detail-row"
+                        tabindex="0"
+                        data-user-id="<?= h($row['user_id']) ?>"
+                        data-user-name="<?= h($row['user_name'] ?: '-') ?>"
+                        data-user-phone="<?= h($row['user_phone'] ?: '-') ?>"
+                        data-user-email="<?= h($row['user_email'] ?: '-') ?>"
+                        data-user-role="<?= h($role_name) ?>"
+                        data-user-role-badge="<?= h($role_badge) ?>"
+                        data-user-address="<?= h($address !== '' ? $address : '-') ?>"
+                        data-user-created="<?= h($created_display) ?>"
+                        data-user-edit-url="<?= h($edit_url) ?>">
                         <td><?= h($row['user_id']) ?></td>
-                        <td><?= h($row['user_name'] ?: '-') ?></td>
+                        <td>
+                            <button type="button" class="user-row-name-trigger">
+                                <?= h($row['user_name'] ?: '-') ?>
+                            </button>
+                        </td>
                         <td><?= h($row['user_phone']) ?></td>
                         <td><?= h($row['user_email']) ?></td>
                         <td>
-                            <span class="badge <?= h(user_role_badge($row['user_role'])) ?>">
-                                <?= h(user_role_name($row['user_role'])) ?>
+                            <span class="badge <?= h($role_badge) ?>">
+                                <?= h($role_name) ?>
                             </span>
                         </td>
                         <td class="address-cell">
                             <?php
-                            $address = (string) $row['user_address'];
                             $is_long = mb_strlen($address, 'UTF-8') > 25;
 
                             $short_address = mb_strlen($address, 'UTF-8') > 25
@@ -302,7 +371,7 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                         </td>
                         <td>
                             <a class="btn btn-edit"
-                               href="<?= h(app_system_url('admin/user_edit.php?id=' . urlencode($row['user_id']))) ?>">
+                               href="<?= h($edit_url) ?>">
                                 <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M12 20h9"></path>
                                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
@@ -313,7 +382,7 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                             <?php if ($row['user_id'] !== ($_SESSION['user_id'] ?? '')): ?>
                                 <a class="btn btn-delete"
                                    href="<?= h(app_system_url('admin/users.php?action=delete&id=' . urlencode($row['user_id']))) ?>"
-                                   data-confirm-delete="ยืนยันการลบข้อมูลผู้ใช้นี้หรือไม่?">
+                                   data-confirm-delete="ยืนยันการลบข้อมูลพนักงานนี้หรือไม่?">
                                     <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
                                         <path d="M3 6h18"></path>
                                         <path d="M8 6V4h8v2"></path>
@@ -330,9 +399,69 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
             </tbody>
         </table>
     </div>
-</div>
+        </div>
+
+        <aside class="admin-user-detail-panel" aria-live="polite" hidden>
+            <button type="button" class="admin-user-detail-close" data-detail-close aria-label="ปิดข้อมูลพนักงาน">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+
+            <div class="admin-user-detail-content" data-user-detail-content>
+                <h2 class="admin-user-detail-title">ข้อมูลพนักงาน</h2>
+                <div class="admin-user-detail-head">
+                    <div class="admin-user-detail-avatar">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div>
+                        <span data-detail-id>-</span>
+                        <h2 data-detail-name>-</h2>
+                        <p data-detail-role>-</p>
+                    </div>
+                </div>
+
+                <div class="admin-user-detail-list">
+                    <div class="admin-user-detail-item">
+                        <span class="admin-user-detail-icon"><i class="fa-solid fa-id-card" aria-hidden="true"></i></span>
+                        <span>รหัสพนักงาน</span>
+                        <strong data-detail-code>-</strong>
+                    </div>
+                    <div class="admin-user-detail-item">
+                        <span class="admin-user-detail-icon"><i class="fa-solid fa-phone" aria-hidden="true"></i></span>
+                        <span>เบอร์โทรศัพท์</span>
+                        <strong data-detail-phone>-</strong>
+                    </div>
+                    <div class="admin-user-detail-item">
+                        <span class="admin-user-detail-icon"><i class="fa-solid fa-envelope" aria-hidden="true"></i></span>
+                        <span>อีเมล</span>
+                        <strong data-detail-email>-</strong>
+                    </div>
+                    <div class="admin-user-detail-item">
+                        <span class="admin-user-detail-icon"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span>
+                        <span>สร้างบัญชีเมื่อ</span>
+                        <strong data-detail-created>-</strong>
+                    </div>
+                    <div class="admin-user-detail-item admin-user-detail-address">
+                        <span class="admin-user-detail-icon"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></span>
+                        <span>ที่อยู่</span>
+                        <strong data-detail-address>-</strong>
+                    </div>
+                </div>
+
+                <div class="admin-user-detail-actions">
+                    <a class="btn btn-edit" href="#" data-detail-edit>
+                        <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                        </svg>
+                        <span>แก้ไขข้อมูล</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+    </div>
 
 <script src="<?= h(app_asset_url('admin/assets/js/toggle_address.js')) ?>?v=<?= h(asset_version('admin/assets/js/toggle_address.js')) ?>"></script>
 <script src="<?= h(app_asset_url('admin/assets/js/confirm_delete.js')) ?>?v=<?= h(asset_version('admin/assets/js/confirm_delete.js')) ?>"></script>
+<script src="<?= h(app_asset_url('admin/assets/js/user_detail_panel.js')) ?>?v=<?= h(asset_version('admin/assets/js/user_detail_panel.js')) ?>"></script>
 
 <?php layout_footer(); ?>

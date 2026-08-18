@@ -1,16 +1,27 @@
 <?php
 require_once __DIR__ . '/../check_login.php';
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../customer_profiles.php';
 
 require_login('3');
+ensure_customer_profiles_schema($conn);
 
 function get_user_by_id(mysqli $conn, string $user_id): ?array
 {
   $stmt = $conn->prepare("
-    SELECT user_id, user_name, user_password, user_phone, user_email, user_address, user_role
-    FROM `user`
-    WHERE user_id = ?
-      AND user_role = 0
+    SELECT
+      u.user_id,
+      COALESCE(c.customer_name, u.user_name) AS user_name,
+      u.user_password,
+      COALESCE(c.customer_phone, u.user_phone) AS user_phone,
+      COALESCE(c.customer_email, u.user_email) AS user_email,
+      COALESCE(c.customer_address, u.user_address) AS user_address,
+      u.user_role,
+      COALESCE(c.customer_status, 1) AS customer_status
+    FROM `user` u
+    LEFT JOIN customers c ON c.user_id = u.user_id
+    WHERE u.user_id = ?
+      AND u.user_role = 0
     LIMIT 1
   ");
   $stmt->bind_param('s', $user_id);
@@ -135,6 +146,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $role_int = 0;
 
   try {
+    $transaction_started = false;
+
     // ชื่อ-นามสกุลสามารถซ้ำได้
     // ตรวจเฉพาะเบอร์โทรศัพท์และอีเมล โดยแยกทีละช่องเพื่อแจ้งเตือนให้ตรงสาเหตุ
 
@@ -222,9 +235,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       );
     }
 
+    $conn->begin_transaction();
+    $transaction_started = true;
+
     $stmt->execute();
+    upsert_customer_profile(
+      $conn,
+      $user_id,
+      $user_name,
+      $user_phone,
+      $user_email,
+      $user_address,
+      (int) ($user['customer_status'] ?? 1)
+    );
+
+    $conn->commit();
     redirect_to(app_system_url('admin/customers.php?status=updated'));
   } catch (Throwable $e) {
+    if (($transaction_started ?? false) === true) {
+      $conn->rollback();
+    }
+
     redirect_to(app_system_url('admin/customer_edit.php?id=' . urlencode($user_id) . '&status=error'));
   }
 }

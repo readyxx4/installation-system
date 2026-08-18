@@ -41,7 +41,7 @@ function make_user_id(mysqli $conn): string
     }
   }
 
-  throw new Exception('ไม่สามารถสร้างรหัสผู้ใช้ใหม่ได้');
+  throw new Exception('ไม่สามารถสร้างรหัสพนักงานใหม่ได้');
 }
 
 function normalize_full_name(string $name): string
@@ -332,7 +332,7 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users')
 
     <div class="staff-form-grid">
       <div class="staff-field readonly-field">
-        <label for="user_id">รหัสผู้ใช้ *</label>
+        <label for="user_id">รหัสพนักงาน *</label>
         <div class="staff-input-wrap">
           <?= icon_svg('id') ?>
           <input

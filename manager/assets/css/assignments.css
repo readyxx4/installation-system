@@ -417,3 +417,1084 @@ body.app-body.role-1 .manager-selected-date {
         width: 100% !important;
     }
 }
+
+/* ===== Manager assignment page refresh: aligned with Admin/Sale ===== */
+body.app-body.role-1 .manager-assign-er-page {
+    color: #0f172a !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-dashboard-head.compact {
+    margin: 0 0 14px !important;
+    padding: 0 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-dashboard-head.compact h1 {
+    margin: 0 !important;
+    color: #111827 !important;
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+    font-weight: 900 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-dashboard-head.compact p {
+    margin: 6px 0 0 !important;
+    color: #64748b !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-assign-panel {
+    margin: 0 0 14px !important;
+    padding: 16px !important;
+    border: 1px solid #dbeafe !important;
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, .04) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-panel-head {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin: 0 0 12px !important;
+    padding: 0 0 11px !important;
+    border-bottom: 1px solid #e5edf6 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-panel-head h2 {
+    margin: 0 !important;
+    color: #0f172a !important;
+    font-size: 17px !important;
+    line-height: 1.25 !important;
+    font-weight: 900 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-panel-head p {
+    margin: 4px 0 0 !important;
+    color: #64748b !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-soft-link {
+    min-height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 0 11px !important;
+    border: 1px solid #93c5fd !important;
+    border-radius: 9px !important;
+    background: #eaf4ff !important;
+    color: #0f4fb8 !important;
+    font-size: 11.5px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-soft-link:hover {
+    border-color: transparent !important;
+    background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-soft-link .manager-icon {
+    width: 15px !important;
+    height: 15px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid > div {
+    min-width: 0 !important;
+    padding: 11px 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    background: #f8fbff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid > div.full {
+    grid-column: 1 / -1 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid > div > span {
+    display: block !important;
+    margin: 0 0 4px !important;
+    color: #64748b !important;
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid > div > strong {
+    display: block !important;
+    color: #0f172a !important;
+    font-size: 13.5px !important;
+    font-weight: 900 !important;
+    line-height: 1.35 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid > div > small {
+    display: block !important;
+    margin-top: 3px !important;
+    color: #64748b !important;
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assignment-product-section {
+    padding: 11px 12px 12px !important;
+    background: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assignment-product-list {
+    gap: 7px !important;
+    margin-top: 7px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assignment-product-row {
+    grid-template-columns: 32px minmax(0, 1fr) 72px 118px !important;
+    gap: 9px !important;
+    min-height: 52px !important;
+    padding: 8px 10px !important;
+    border-color: #e2e8f0 !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assignment-product-number {
+    width: 27px !important;
+    height: 27px !important;
+    border-radius: 8px !important;
+    background: #eaf4ff !important;
+    color: #0f4fb8 !important;
+    font-size: 11px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .current-assign-alert {
+    border-color: #bfdbfe !important;
+    background: #eff6ff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .current-assign-alert > span {
+    color: #1d4ed8 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-checker {
+    margin-bottom: 10px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-queue-table-wrap {
+    margin-top: 10px !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    overflow: auto !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-queue-table thead th {
+    background: #f3f7fb !important;
+    color: #475569 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-time-panel {
+    margin-top: 12px !important;
+    padding-top: 12px !important;
+    border-top: 1px solid #e5edf6 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-form-actions.sticky-actions {
+    position: sticky !important;
+    bottom: 10px !important;
+    z-index: 30 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    margin: 14px 0 0 !important;
+    padding: 9px 10px !important;
+    border: 1px solid #dbeafe !important;
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, .96) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, .10) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-action-btn {
+    min-height: 34px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 0 12px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 9px !important;
+    background: #ffffff !important;
+    color: #475569 !important;
+    font-size: 11.5px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-action-btn.primary {
+    border-color: transparent !important;
+    background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-action-btn.primary:disabled {
+    border-color: #cbd5e1 !important;
+    background: #e2e8f0 !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed !important;
+}
+
+@media (max-width: 1050px) {
+    body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 700px) {
+    body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid > div.full {
+        grid-column: auto !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .manager-panel-head {
+        flex-direction: column !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .manager-form-actions.sticky-actions {
+        position: static !important;
+        flex-direction: column-reverse !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .manager-action-btn,
+    body.app-body.role-1 .manager-assign-er-page .manager-soft-link {
+        width: 100% !important;
+    }
+}
+
+
+/* ===== v2: compact top area so technician selection is reached sooner ===== */
+@media (min-width: 1051px) {
+    body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid {
+        grid-template-columns: .95fr 1.1fr .7fr .95fr 1.7fr !important;
+        gap: 8px !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid > div.full {
+        grid-column: auto !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .assign-setup-summary-grid > div {
+        min-height: 58px !important;
+        padding: 9px 10px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .assignment-product-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 7px 8px !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .assignment-product-row {
+        grid-template-columns: 28px minmax(0, 1fr) 56px 92px !important;
+        min-height: 48px !important;
+        padding: 7px 9px !important;
+        gap: 7px !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .assignment-product-info strong,
+    body.app-body.role-1 .manager-assign-er-page .assignment-product-price strong {
+        font-size: 11.8px !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .assignment-product-info small,
+    body.app-body.role-1 .manager-assign-er-page .assignment-product-qty span,
+    body.app-body.role-1 .manager-assign-er-page .assignment-product-price span {
+        font-size: 9.8px !important;
+    }
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel {
+    padding: 13px 14px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .manager-panel-head {
+    margin-bottom: 9px !important;
+    padding-bottom: 8px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assignment-product-section {
+    margin-top: 8px !important;
+    padding: 9px 10px 10px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .assignment-product-section > span {
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+    color: #64748b !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-panel,
+body.app-body.role-1 .manager-assign-er-page .manager-schedule-panel {
+    scroll-margin-top: 12px !important;
+}
+
+
+/* ===== v3: assignment wizard layout ===== */
+body.app-body.role-1 .manager-assign-er-page .manager-assignment-step-one {
+    display: grid !important;
+    grid-template-columns: minmax(340px, .9fr) minmax(0, 1.35fr) !important;
+    gap: 14px !important;
+    align-items: start !important;
+    margin-bottom: 14px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-assignment-step-one > .manager-assign-panel {
+    margin-bottom: 0 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel {
+    position: sticky !important;
+    top: 12px !important;
+    padding: 14px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .assign-setup-summary-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .assign-setup-summary-grid > div {
+    min-height: 0 !important;
+    padding: 9px 10px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .assign-setup-summary-grid > div:nth-child(2),
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .assign-setup-summary-grid > div:nth-child(5),
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .assignment-product-section,
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .current-assign-alert {
+    grid-column: 1 / -1 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .assignment-product-section {
+    margin-top: 0 !important;
+    max-height: 245px !important;
+    overflow: auto !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .assignment-product-list {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .assignment-product-row {
+    display: grid !important;
+    grid-template-columns: 28px minmax(0, 1fr) 52px 88px !important;
+    gap: 7px !important;
+    min-height: 46px !important;
+    padding: 7px 8px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .assignment-product-info strong {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .assignment-product-info small {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-panel {
+    min-height: 500px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-step-kicker {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 22px !important;
+    margin-bottom: 5px !important;
+    padding: 3px 8px !important;
+    border-radius: 999px !important;
+    background: #eaf4ff !important;
+    color: #0f4fb8 !important;
+    font-size: 10.5px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-list {
+    max-height: 430px !important;
+    overflow-y: auto !important;
+    padding-right: 3px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-step-panel {
+    display: none !important;
+    opacity: 0 !important;
+    transform: translateY(8px) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-step-panel.is-step-visible {
+    display: block !important;
+    opacity: 1 !important;
+    transform: none !important;
+    animation: managerStepIn .22s ease-out !important;
+}
+
+@keyframes managerStepIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-schedule-panel {
+    scroll-margin-top: 14px !important;
+}
+
+@media (max-width: 1080px) {
+    body.app-body.role-1 .manager-assign-er-page .manager-assignment-step-one {
+        grid-template-columns: 1fr !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel {
+        position: static !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .manager-tech-panel {
+        min-height: 0 !important;
+    }
+}
+
+
+/* ===== v4: compact installation summary card ===== */
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel {
+    padding: 13px 14px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel .manager-panel-head {
+    margin-bottom: 10px !important;
+    padding-bottom: 8px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-compact {
+    border: 1px solid #bfdbfe !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .04) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-heading {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-height: 42px !important;
+    padding: 8px 11px !important;
+    background: linear-gradient(90deg, #dff1ff 0%, #eef8ff 100%) !important;
+    border-bottom: 1px solid #dbeafe !important;
+    color: #0f3f7a !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-heading > strong {
+    font-size: 13px !important;
+    font-weight: 900 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-icon {
+    width: 27px !important;
+    height: 27px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 27px !important;
+    border-radius: 999px !important;
+    background: #2196f3 !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-icon .manager-icon {
+    width: 14px !important;
+    height: 14px !important;
+    stroke-width: 2 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-lines {
+    display: grid !important;
+    gap: 6px !important;
+    padding: 11px 12px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-lines p,
+body.app-body.role-1 .manager-assign-er-page .install-summary-products {
+    margin: 0 !important;
+    color: #334155 !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    line-height: 1.45 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-lines p {
+    display: flex !important;
+    align-items: baseline !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-lines strong {
+    color: #0f172a !important;
+    font-weight: 900 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-separator {
+    margin: 0 2px !important;
+    color: #94a3b8 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-products {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    gap: 5px 7px !important;
+    align-items: start !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-product-list {
+    display: grid !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-product-list span {
+    display: block !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    color: #334155 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-current {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 5px !important;
+    margin: 0 11px 11px !important;
+    padding: 8px 9px !important;
+    border: 1px solid #bfdbfe !important;
+    border-radius: 10px !important;
+    background: #eff6ff !important;
+    color: #1e3a8a !important;
+    font-size: 10.8px !important;
+    line-height: 1.4 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-current > strong {
+    font-weight: 900 !important;
+}
+
+@media (min-width: 1081px) {
+    body.app-body.role-1 .manager-assign-er-page .manager-assignment-step-one {
+        grid-template-columns: minmax(300px, .72fr) minmax(0, 1.48fr) !important;
+        gap: 12px !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .manager-tech-panel {
+        min-height: 470px !important;
+    }
+}
+
+
+/* ===== v6: remove obstructive sticky footer action card ===== */
+body.app-body.role-1 .manager-assign-er-page .manager-form-actions.sticky-actions {
+    position: static !important;
+    bottom: auto !important;
+    z-index: auto !important;
+
+    width: auto !important;
+    margin: 14px 0 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 7px !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-form-actions.sticky-actions .manager-action-btn {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 0 10px !important;
+    border-radius: 999px !important;
+    gap: 5px !important;
+    font-size: 10.8px !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-form-actions.sticky-actions .manager-action-btn .manager-icon {
+    width: 13px !important;
+    height: 13px !important;
+    flex: 0 0 13px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-form-actions.sticky-actions .manager-action-btn.primary {
+    min-width: 128px !important;
+}
+
+@media (max-width: 700px) {
+    body.app-body.role-1 .manager-assign-er-page .manager-form-actions.sticky-actions {
+        align-items: stretch !important;
+        flex-direction: column-reverse !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .manager-form-actions.sticky-actions .manager-action-btn {
+        width: 100% !important;
+    }
+}
+
+
+/* ===== v7: clearer overdue action alert ===== */
+body.app-body.role-1 .manager-assign-er-page .manager-overdue-action-alert {
+    display: grid !important;
+    grid-template-columns: 34px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 10px !important;
+
+    margin: 8px 0 12px !important;
+    padding: 10px 12px !important;
+
+    border: 1px solid #f59e0b !important;
+    border-left: 4px solid #f59e0b !important;
+    border-radius: 12px !important;
+
+    background: #fff7ed !important;
+    color: #7c2d12 !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-overdue-alert-icon {
+    width: 30px !important;
+    height: 30px !important;
+
+    display: inline-grid !important;
+    place-items: center !important;
+
+    border-radius: 999px !important;
+    background: #f59e0b !important;
+    color: #ffffff !important;
+
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-overdue-alert-copy {
+    display: grid !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-overdue-alert-copy strong {
+    display: block !important;
+    margin: 0 !important;
+
+    color: #9a3412 !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    line-height: 1.25 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-overdue-alert-copy span {
+    display: block !important;
+    margin: 0 !important;
+
+    color: #7c2d12 !important;
+    font-size: 11.5px !important;
+    font-weight: 750 !important;
+    line-height: 1.4 !important;
+}
+
+/* Pull the warning visually closer to the page heading. */
+body.app-body.role-1 .manager-assign-er-page .manager-dashboard-head.compact {
+    margin-bottom: 6px !important;
+}
+
+@media (max-width: 700px) {
+    body.app-body.role-1 .manager-assign-er-page .manager-overdue-action-alert {
+        grid-template-columns: 28px minmax(0, 1fr) !important;
+        padding: 9px 10px !important;
+    }
+
+    body.app-body.role-1 .manager-assign-er-page .manager-overdue-alert-icon {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 14px !important;
+    }
+}
+
+
+/* ===== v8: technician availability legend + status dots ===== */
+body.app-body.role-1 .manager-assign-er-page .manager-tech-count-source {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-status-legend {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    flex-wrap: wrap !important;
+    gap: 8px 12px !important;
+    margin-left: auto !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-legend-item {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    color: #475569 !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-status-dot {
+    width: 8px !important;
+    height: 8px !important;
+    flex: 0 0 8px !important;
+    display: inline-block !important;
+    border-radius: 999px !important;
+    background: #94a3b8 !important;
+    box-shadow: 0 0 0 2px rgba(148, 163, 184, .12) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-legend-item.is-ready .manager-tech-status-dot {
+    background: #16a34a !important;
+    box-shadow: 0 0 0 2px rgba(22, 163, 74, .12) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-legend-item.is-unavailable .manager-tech-status-dot {
+    background: #dc2626 !important;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, .12) !important;
+}
+
+/* Status dot in every technician row */
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card .manager-tech-identity strong {
+    display: flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card .manager-tech-identity strong::before {
+    content: "" !important;
+    width: 8px !important;
+    height: 8px !important;
+    flex: 0 0 8px !important;
+    border-radius: 999px !important;
+    background: #16a34a !important;
+    box-shadow: 0 0 0 2px rgba(22, 163, 74, .12) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card.is-disabled .manager-tech-identity strong::before {
+    background: #dc2626 !important;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, .12) !important;
+}
+
+@media (max-width: 700px) {
+    body.app-body.role-1 .manager-assign-er-page .manager-tech-status-legend {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        margin-top: 4px !important;
+    }
+}
+
+
+/* =========================================================
+   v9 — Match Manager assignment page to Admin color system
+   Source palette: admin/style.css + admin/dashboard.css
+   No text / flow / status logic changes.
+   ========================================================= */
+
+body.app-body.role-1 .manager-assign-er-page {
+    --manager-admin-primary: #2196F3;
+    --manager-admin-primary-dark: #0D47A1;
+    --manager-admin-soft: #E3F2FD;
+    --manager-admin-border: #90CAF9;
+    --manager-admin-ink: #1d2939;
+    --manager-admin-muted: #667085;
+    --manager-admin-panel: #ffffff;
+    --manager-admin-soft-bg: #f8faff;
+    --manager-admin-page-bg: #f3f6fb;
+}
+
+/* Main panels */
+body.app-body.role-1 .manager-assign-er-page .manager-assign-panel {
+    background: var(--manager-admin-panel) !important;
+    border-color: #dbeafe !important;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, .06) !important;
+}
+
+/* Panel headings */
+body.app-body.role-1 .manager-assign-er-page .manager-panel-head h2,
+body.app-body.role-1 .manager-assign-er-page .manager-time-panel-head h3 {
+    color: var(--manager-admin-ink) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-panel-head p,
+body.app-body.role-1 .manager-assign-er-page .manager-time-panel-head p {
+    color: var(--manager-admin-muted) !important;
+}
+
+/* Step badge: same soft-blue language as Admin pills */
+body.app-body.role-1 .manager-assign-er-page .manager-step-kicker {
+    background: var(--manager-admin-soft) !important;
+    color: var(--manager-admin-primary-dark) !important;
+    border: 1px solid var(--manager-admin-border) !important;
+}
+
+/* Installation information card */
+body.app-body.role-1 .manager-assign-er-page .install-summary-compact {
+    background: #ffffff !important;
+    border-color: var(--manager-admin-border) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-heading {
+    background: var(--manager-admin-soft) !important;
+    border-bottom-color: var(--manager-admin-border) !important;
+    color: var(--manager-admin-primary-dark) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-icon {
+    background: var(--manager-admin-primary) !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-lines p,
+body.app-body.role-1 .manager-assign-er-page .install-summary-products,
+body.app-body.role-1 .manager-assign-er-page .install-summary-product-list span {
+    color: #475569 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .install-summary-lines strong {
+    color: #0f172a !important;
+}
+
+/* Search field */
+body.app-body.role-1 .manager-assign-er-page .manager-assign-search {
+    background: #ffffff !important;
+    border: 1px solid #dbeafe !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-assign-search:focus-within {
+    border-color: var(--manager-admin-primary) !important;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, .12) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-assign-search input {
+    color: var(--manager-admin-ink) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-assign-search input::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Technician cards: remove orange/beige Manager palette */
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card {
+    background: #ffffff !important;
+    border-color: #dbeafe !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card:hover:not(.is-disabled) {
+    background: #f8fbff !important;
+    border-color: var(--manager-admin-border) !important;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, .05) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card.active {
+    background: var(--manager-admin-soft) !important;
+    border-color: var(--manager-admin-primary) !important;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, .12) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card.is-disabled {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    opacity: .78 !important;
+}
+
+/* Technician avatar: Admin-style soft blue instead of orange */
+body.app-body.role-1 .manager-assign-er-page .tech-avatar {
+    background: var(--manager-admin-soft) !important;
+    color: var(--manager-admin-primary-dark) !important;
+    border: 1px solid #bfdbfe !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card.is-disabled .tech-avatar {
+    background: #f1f5f9 !important;
+    color: #64748b !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* Technician identity */
+body.app-body.role-1 .manager-assign-er-page .manager-tech-identity strong {
+    color: #0f172a !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-identity p {
+    color: #64748b !important;
+}
+
+/* Select technician button */
+body.app-body.role-1 .manager-assign-er-page .manager-tech-actions .select {
+    min-height: 30px !important;
+    padding: 0 10px !important;
+    border-radius: 9px !important;
+    background: var(--manager-admin-soft) !important;
+    border: 1px solid var(--manager-admin-border) !important;
+    color: var(--manager-admin-primary-dark) !important;
+    font-weight: 800 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-actions .select:hover:not(:disabled) {
+    background: var(--manager-admin-primary) !important;
+    border-color: var(--manager-admin-primary) !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card.active .manager-tech-actions .select {
+    background: var(--manager-admin-primary) !important;
+    border-color: var(--manager-admin-primary) !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card.is-disabled .manager-tech-actions .select {
+    background: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+    color: #94a3b8 !important;
+}
+
+/* Status legend uses the exact Admin dashboard status colors */
+body.app-body.role-1 .manager-assign-er-page .manager-tech-legend-item.is-ready .manager-tech-status-dot,
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card:not(.is-disabled) .manager-tech-identity strong::before {
+    background: #16A34A !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-tech-legend-item.is-unavailable .manager-tech-status-dot,
+body.app-body.role-1 .manager-assign-er-page .manager-tech-card.is-disabled .manager-tech-identity strong::before {
+    background: #DC2626 !important;
+}
+
+/* Calendar / schedule */
+body.app-body.role-1 .manager-assign-er-page .manager-calendar-toolbar {
+    background: var(--manager-admin-soft-bg) !important;
+    border-color: #dbeafe !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .calendar-weekday {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .calendar-day:not(.empty):not(.holiday):hover,
+body.app-body.role-1 .manager-assign-er-page .calendar-day.selected {
+    background: var(--manager-admin-soft) !important;
+    border-color: var(--manager-admin-primary) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .calendar-day.selected span {
+    background: var(--manager-admin-primary) !important;
+    border-color: var(--manager-admin-primary) !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-selected-date {
+    background: var(--manager-admin-soft) !important;
+    border-color: var(--manager-admin-border) !important;
+    color: var(--manager-admin-primary-dark) !important;
+}
+
+/* Time slots */
+body.app-body.role-1 .manager-assign-er-page .manager-time-slot {
+    background: #ffffff !important;
+    border-color: #dbeafe !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-time-slot:hover:not(.is-disabled),
+body.app-body.role-1 .manager-assign-er-page .manager-time-slot.active {
+    background: var(--manager-admin-soft) !important;
+    border-color: var(--manager-admin-primary) !important;
+}
+
+/* Secondary link/buttons */
+body.app-body.role-1 .manager-assign-er-page .manager-soft-link,
+body.app-body.role-1 .manager-assign-er-page .manager-action-btn {
+    background: var(--manager-admin-soft) !important;
+    border-color: var(--manager-admin-border) !important;
+    color: var(--manager-admin-primary-dark) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-soft-link:hover,
+body.app-body.role-1 .manager-assign-er-page .manager-action-btn:hover {
+    background: #dbeafe !important;
+    color: var(--manager-admin-primary-dark) !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-action-btn.primary {
+    background: var(--manager-admin-primary) !important;
+    border-color: var(--manager-admin-primary) !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-1 .manager-assign-er-page .manager-action-btn.primary:hover:not(:disabled) {
+    background: var(--manager-admin-primary-dark) !important;
+    border-color: var(--manager-admin-primary-dark) !important;
+}
+
+/* Keep overdue warning orange; this is semantic warning color, not role color */
+body.app-body.role-1 .manager-assign-er-page .manager-overdue-action-alert {
+    background: #fff7ed !important;
+    border-color: #f59e0b !important;
+    border-left-color: #f59e0b !important;
+}

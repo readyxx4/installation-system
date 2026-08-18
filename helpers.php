@@ -115,7 +115,7 @@ function flash_message(): string
     'error' => ['error', 'เกิดข้อผิดพลาด', 'กรุณาตรวจสอบข้อมูลอีกครั้ง แล้วลองใหม่'],
     'duplicate' => ['warning', 'ข้อมูลซ้ำในระบบ', 'ข้อมูลนี้มีอยู่ในระบบแล้ว กรุณาตรวจสอบอีกครั้ง'],
     'duplicate_id' => ['warning', 'รหัสซ้ำในระบบ', 'รหัสนี้มีอยู่ในระบบแล้ว'],
-    'duplicate_name' => ['warning', 'ชื่อผู้ใช้ซ้ำ', 'ชื่อผู้ใช้นี้ถูกใช้แล้ว กรุณาเปลี่ยนชื่อใหม่'],
+    'duplicate_name' => ['warning', 'ชื่อพนักงานซ้ำ', 'ชื่อพนักงานนี้ถูกใช้แล้ว กรุณาเปลี่ยนชื่อใหม่'],
     'duplicate_phone' => ['warning', 'เบอร์โทรศัพท์ซ้ำ', 'เบอร์โทรศัพท์นี้มีอยู่ในระบบแล้ว'],
     'duplicate_email' => ['warning', 'อีเมลซ้ำ', 'อีเมลนี้มีอยู่ในระบบแล้ว'],
 
@@ -123,11 +123,14 @@ function flash_message(): string
     'email' => ['warning', 'อีเมลไม่ถูกต้อง', 'กรุณากรอกอีเมลให้ถูกต้อง'],
     'role' => ['warning', 'สิทธิ์ไม่ถูกต้อง', 'กรุณาเลือกสิทธิ์การใช้งานให้ถูกต้อง'],
 
-    'manager_assigned' => ['error', 'ไม่สามารถลบผู้ใช้ได้', 'เนื่องจากหัวหน้าช่างคนนี้ได้ทำการมอบหมายงานไปแล้ว'],
+    'manager_assigned' => ['error', 'ไม่สามารถลบพนักงานได้', 'เนื่องจากหัวหน้าช่างคนนี้ได้ทำการมอบหมายงานไปแล้ว'],
     'tech_assigned' => ['error', 'ไม่สามารถลบข้อมูลช่างได้', 'เนื่องจากช่างคนนี้ถูกมอบหมายงานแล้ว'],
 
     'customer_linked' => ['error', 'ไม่สามารถลบข้อมูลลูกค้าได้', 'เนื่องจากลูกค้าคนนี้มีงานติดตั้งหรือข้อมูลที่เกี่ยวข้องอยู่'],
-    'user_linked' => ['error', 'ไม่สามารถลบผู้ใช้ได้', 'เนื่องจากผู้ใช้นี้มีข้อมูลที่เชื่อมต่อกับรายการอื่นอยู่'],
+    'customer_delete_disabled' => ['warning', 'ไม่เปิดใช้งานการลบลูกค้า', 'ให้ใช้การระงับบัญชีแทน เพื่อเก็บข้อมูลลูกค้าและประวัติทั้งหมดไว้ครบถ้วน'],
+    'customer_suspended' => ['success', 'ระงับบัญชีลูกค้าแล้ว', 'ลูกค้าคนนี้จะไม่สามารถเข้าสู่ระบบได้จนกว่าจะกู้คืนบัญชี'],
+    'customer_restored' => ['success', 'กู้คืนบัญชีลูกค้าแล้ว', 'ลูกค้าคนนี้สามารถเข้าสู่ระบบได้ตามปกติ'],
+    'user_linked' => ['error', 'ไม่สามารถลบพนักงานได้', 'เนื่องจากพนักงานนี้มีข้อมูลที่เชื่อมต่อกับรายการอื่นอยู่'],
 
     'product_linked' => ['error', 'ไม่สามารถลบสินค้าได้', 'เนื่องจากสินค้านี้ถูกใช้ในงานติดตั้งแล้ว'],
     'product_type_linked' => ['error', 'ไม่สามารถลบประเภทสินค้าได้', 'เนื่องจากมีสินค้าอยู่ในประเภทนี้'],
@@ -417,6 +420,14 @@ function layout_header(string $title, string $active = 'dashboard'): void
             'assignment_list',
             $active
           );
+
+          nav_item(
+            'ประวัติการมอบหมายงาน',
+            '<i class="fa-solid fa-clock-rotate-left"></i>',
+            app_system_url('manager/assignment_history.php'),
+            'assignment_history',
+            $active
+          );
           ?>
 
 
@@ -444,6 +455,14 @@ function layout_header(string $title, string $active = 'dashboard'): void
             '<i class="fa-solid fa-square-plus"></i>',
             app_system_url('sale/create_setup.php'),
             'setup',
+            $active
+          );
+
+          nav_item(
+            'ประวัติใบงาน',
+            '<i class="fa-solid fa-clock-rotate-left"></i>',
+            app_system_url('sale/setup_history.php'),
+            'setup_history',
             $active
           );
           ?>
@@ -481,7 +500,7 @@ function layout_header(string $title, string $active = 'dashboard'): void
 
           <?php
           nav_item(
-            'จัดการผู้ใช้',
+            'จัดการพนักงาน',
             '<i class="fa-solid fa-users"></i>',
             app_system_url('admin/users.php'),
             'users',
@@ -593,7 +612,7 @@ function layout_header(string $title, string $active = 'dashboard'): void
         <div class="account-menu">
 
           <div class="nav-section-title">
-            บัญชีผู้ใช้
+            <?= $roleKey === '3' ? 'บัญชีพนักงาน' : 'บัญชีผู้ใช้' ?>
           </div>
 
           <a

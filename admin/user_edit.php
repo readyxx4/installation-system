@@ -320,7 +320,7 @@ layout_header('แก้ไขข้อมูลพนักงาน', 'users')
 
     <div class="staff-form-grid">
       <div class="staff-field readonly-field">
-        <label for="user_id_show">รหัสผู้ใช้ *</label>
+        <label for="user_id_show">รหัสพนักงาน *</label>
         <div class="staff-input-wrap">
           <?= admin_form_icon_svg('id') ?>
           <input type="text" id="user_id_show" value="<?= h($user['user_id']) ?>" readonly>

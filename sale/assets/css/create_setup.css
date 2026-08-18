@@ -1350,3 +1350,265 @@ body.app-body.role-2 .setup-submit-btn {
     grid-template-columns: 40px minmax(0, 1fr) auto;
   }
 }
+/* Shared viewport layout for setup create/edit pages. */
+body.app-body.role-2 .content:has(.setup-work-page) {
+  height: 100vh !important;
+  min-height: 0 !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+  padding: 16px 20px !important;
+}
+
+body.app-body.role-2 .setup-work-page {
+  height: calc(100vh - 32px) !important;
+  max-height: calc(100vh - 32px) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding-bottom: 0 !important;
+}
+
+body.app-body.role-2 .setup-work-page form {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+body.app-body.role-2 .setup-work-page .setup-split-layout {
+  height: 100% !important;
+  min-height: 0 !important;
+  grid-template-columns: minmax(0, 1fr) 32.5% !important;
+  gap: 18px !important;
+  align-items: stretch !important;
+}
+
+body.app-body.role-2 .setup-work-page .setup-main-panel,
+body.app-body.role-2 .setup-work-page .setup-summary-sidebar,
+body.app-body.role-2 .setup-work-page .summary-card {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+body.app-body.role-2 .setup-edit-page .setup-edit-main-panel {
+  position: relative !important;
+}
+
+body.app-body.role-2 .setup-edit-page .setup-frame-back {
+  position: absolute !important;
+  top: 9px !important;
+  left: 12px !important;
+  z-index: 4 !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #475569 !important;
+  text-decoration: none !important;
+}
+
+body.app-body.role-2 .setup-edit-page .setup-frame-back:hover {
+  color: var(--setup-primary-dark) !important;
+  border-color: var(--setup-primary) !important;
+  background: var(--setup-soft) !important;
+}
+
+body.app-body.role-2 .setup-edit-page .setup-frame-back svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+body.app-body.role-2 .setup-work-page .setup-tab {
+  min-height: 48px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-2 .setup-edit-page .setup-tab:first-child {
+  padding-left: 36px !important;
+}
+
+body.app-body.role-2 .setup-work-page .setup-tab span {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+body.app-body.role-2 .setup-work-page .setup-tab-panel {
+  height: calc(100% - 51px) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding: 14px 18px 12px !important;
+}
+
+body.app-body.role-2 .setup-work-page .setup-section-heading {
+  margin-bottom: 9px !important;
+}
+
+body.app-body.role-2 .setup-work-page .setup-section-heading h2 {
+  font-size: 16px !important;
+}
+
+body.app-body.role-2 .setup-work-page .setup-section-heading p {
+  margin-top: 2px !important;
+  font-size: 11px !important;
+}
+
+body.app-body.role-2 .setup-work-page .setup-search-wrap input {
+  min-height: 38px !important;
+  height: 38px !important;
+  border-radius: 11px !important;
+}
+
+body.app-body.role-2 .setup-work-page .customer-search-results {
+  max-height: calc(100% - 166px) !important;
+  overflow: auto !important;
+  gap: 8px !important;
+  margin-top: 10px !important;
+  padding-right: 4px !important;
+}
+
+body.app-body.role-2 .setup-work-page .customer-result-item {
+  grid-template-columns: 38px 1fr auto !important;
+  gap: 10px !important;
+  padding: 9px 10px !important;
+  border-radius: 13px !important;
+}
+
+body.app-body.role-2 .setup-work-page .customer-result-avatar {
+  width: 38px !important;
+  height: 38px !important;
+}
+
+body.app-body.role-2 .setup-work-page .customer-selected-card {
+  grid-template-columns: 46px 1fr auto !important;
+  gap: 10px !important;
+  margin-top: 10px !important;
+  padding: 10px 12px !important;
+  border-radius: 14px !important;
+}
+
+body.app-body.role-2 .setup-work-page .customer-avatar {
+  width: 46px !important;
+  height: 46px !important;
+}
+
+body.app-body.role-2 .setup-work-page .customer-selected-info h3 {
+  margin: 1px 0 3px !important;
+  font-size: 14px !important;
+}
+
+body.app-body.role-2 .setup-work-page .customer-selected-info p {
+  margin-top: 3px !important;
+  line-height: 1.25 !important;
+}
+
+body.app-body.role-2 .setup-work-page .change-customer-btn {
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  border-radius: 10px !important;
+}
+
+body.app-body.role-2 .setup-work-page .product-heading-row {
+  align-items: center !important;
+}
+
+body.app-body.role-2 .setup-work-page .product-grid {
+  max-height: calc(100% - 58px) !important;
+  overflow: auto !important;
+  padding-right: 4px !important;
+}
+
+body.app-body.role-2 .setup-work-page .sticky-summary {
+  position: static !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+
+body.app-body.role-2 .setup-work-page .summary-title-row h2 {
+  font-size: 17px !important;
+}
+
+body.app-body.role-2 .setup-work-page .summary-title-row p {
+  margin-top: 4px !important;
+  color: #42658f !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-2 .setup-work-page .summary-customer-mini {
+  margin: 10px 0 !important;
+  padding: 9px 10px !important;
+  border-radius: 12px !important;
+}
+
+body.app-body.role-2 .setup-work-page .summary-items {
+  flex: 0 1 132px !important;
+  max-height: 132px !important;
+  min-height: 86px !important;
+  overflow: auto !important;
+  gap: 7px !important;
+}
+
+body.app-body.role-2 .setup-work-page .summary-item {
+  padding: 8px 9px !important;
+  border-radius: 11px !important;
+}
+
+body.app-body.role-2 .setup-work-page .summary-total-row {
+  margin: 9px 0 !important;
+  padding: 9px 0 !important;
+}
+
+body.app-body.role-2 .setup-work-page .summary-total-row strong {
+  font-size: 18px !important;
+}
+
+body.app-body.role-2 .setup-work-page .summary-form-section {
+  flex: 0 0 auto !important;
+  gap: 5px !important;
+}
+
+body.app-body.role-2 .setup-work-page .same-address-check {
+  margin-bottom: 1px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-2 .setup-work-page .summary-form-section > label:not(.same-address-check) {
+  margin-top: 2px !important;
+  font-size: 12px !important;
+}
+
+body.app-body.role-2 .setup-work-page #setupAddress {
+  min-height: 64px !important;
+  height: 64px !important;
+  padding: 8px 10px !important;
+  line-height: 1.3 !important;
+  resize: none !important;
+}
+
+body.app-body.role-2 .setup-work-page #setupNote {
+  min-height: 42px !important;
+  height: 42px !important;
+  padding: 8px 10px !important;
+  line-height: 1.3 !important;
+  resize: none !important;
+}
+
+body.app-body.role-2 .setup-work-page .setup-submit-btn {
+  min-height: 38px !important;
+  height: 38px !important;
+  margin-top: 7px !important;
+  border-radius: 12px !important;
+  font-size: 13px !important;
+}
+
+body.app-body.role-2 .setup-work-page .summary-submit-note {
+  margin-top: 4px !important;
+  font-size: 10px !important;
+}

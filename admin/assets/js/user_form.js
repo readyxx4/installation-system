@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       if (result.duplicate) {
         const label = field === 'user_phone' ? 'เบอร์โทรศัพท์' : 'อีเมล';
-        setDuplicateMessage(input, messageBox, `${label}นี้มีผู้ใช้งานแล้ว (รหัสผู้ใช้ ${result.user_id})`);
+        setDuplicateMessage(input, messageBox, `${label}นี้มีพนักงานใช้งานแล้ว (รหัสพนักงาน ${result.user_id})`);
         return true;
       }
 

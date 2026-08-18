@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/../check_login.php';
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../customer_profiles.php';
 
 require_login('3');
+ensure_customer_profiles_schema($conn);
 
 function table_exists(mysqli $conn, string $table): bool
 {
@@ -165,6 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $user_role = 0;
 
   try {
+    $transaction_started = false;
+
     $addr_stmt = $conn->prepare("
       SELECT
         p.name_th AS province_name,
@@ -274,10 +278,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $user_role
     );
 
+    $conn->begin_transaction();
+    $transaction_started = true;
+
     $stmt->execute();
+    upsert_customer_profile(
+      $conn,
+      $user_id,
+      $user_name,
+      $user_phone,
+      $user_email,
+      $user_address,
+      1
+    );
+
+    $conn->commit();
 
     redirect_to(app_system_url('admin/customers.php?status=created'));
   } catch (Throwable $e) {
+    if (($transaction_started ?? false) === true) {
+      $conn->rollback();
+    }
+
     redirect_to(app_system_url('admin/customer_add.php?status=error'));
   }
 }

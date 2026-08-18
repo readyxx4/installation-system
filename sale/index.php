@@ -206,43 +206,8 @@ layout_header('หน้าหลักพนักงานขาย', 'dashboa
     </div>
   </div>
 
-  <div class="admin-summary-grid sales-summary-grid">
-    <div class="admin-summary-card">
-      <div>
-        <span>งานติดตั้งทั้งหมด</span>
-        <strong><?= h((string) $total_setups) ?></strong>
-        <small>รายการงานติดตั้งในระบบ</small>
-      </div>
-      <div class="summary-icon">
-        <i class="fa-solid fa-file-circle-plus"></i>
-      </div>
-    </div>
-
-    <div class="admin-summary-card">
-      <div>
-        <span>ลูกค้า</span>
-        <strong><?= h((string) $total_customers) ?></strong>
-        <small>ข้อมูลลูกค้าที่ใช้บริการ</small>
-      </div>
-      <div class="summary-icon">
-        <i class="fa-solid fa-user-group"></i>
-      </div>
-    </div>
-
-    <div class="admin-summary-card">
-      <div>
-        <span>สินค้า</span>
-        <strong><?= h((string) $total_products) ?></strong>
-        <small>รายการสินค้าและค่าติดตั้ง</small>
-      </div>
-      <div class="summary-icon">
-        <i class="fa-solid fa-box"></i>
-      </div>
-    </div>
-  </div>
-
-  <div class="admin-dashboard-info-grid sales-dashboard-info-grid">
-    <div class="admin-widget sales-install-status-widget">
+  <div class="sales-dashboard-work-grid">
+    <section class="admin-widget sales-install-status-widget">
       <div class="admin-widget-head">
         <div>
           <h2>สถานะงานติดตั้ง</h2>
@@ -264,11 +229,9 @@ layout_header('หน้าหลักพนักงานขาย', 'dashboa
           </div>
         <?php endforeach; ?>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <div class="admin-bottom-grid sales-bottom-grid">
-    <div class="admin-widget">
+    <section class="admin-widget sales-latest-widget">
       <div class="admin-widget-head">
         <div>
           <h2>งานติดตั้งล่าสุด</h2>
@@ -276,6 +239,7 @@ layout_header('หน้าหลักพนักงานขาย', 'dashboa
         </div>
 
         <a class="admin-widget-link" href="<?= h(app_system_url('sale/setups.php')) ?>">
+          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
           ดูทั้งหมด
         </a>
       </div>
@@ -283,26 +247,37 @@ layout_header('หน้าหลักพนักงานขาย', 'dashboa
       <div class="admin-mini-list sales-mini-list">
         <?php if (count($recent_setup_rows) === 0): ?>
           <div class="admin-empty-mini">ยังไม่มีงานติดตั้ง</div>
-        <?php endif; ?>
+        <?php else: ?>
+          <div class="sales-latest-head" aria-hidden="true">
+            <span>รหัสใบงาน</span>
+            <span>ลูกค้า / สินค้า</span>
+            <span>วันที่</span>
+            <span>สถานะ</span>
+          </div>
 
-        <?php foreach ($recent_setup_rows as $row): ?>
-          <div class="admin-mini-item">
-            <div class="admin-mini-main">
-              <strong><?= h($row['setup_id']) ?> - <?= h($row['user_name'] ?? '-') ?></strong>
-              <span>
-                <?= h($row['pro_name'] ?? '-') ?>
-                |
+          <?php foreach ($recent_setup_rows as $row): ?>
+            <div class="admin-mini-item sales-latest-item">
+              <div class="sales-work-cell">
+                <strong><?= h($row['setup_id']) ?></strong>
+              </div>
+
+              <div class="sales-main-cell">
+                <strong><?= h($row['user_name'] ?? '-') ?></strong>
+                <span><?= h($row['pro_name'] ?? '-') ?></span>
+              </div>
+
+              <div class="sales-date-cell">
                 <?= !empty($row['setup_date']) ? h(date('d/m/Y', strtotime($row['setup_date']))) : '-' ?>
+              </div>
+
+              <span class="badge <?= h(setup_status_badge($row['setup_status'])) ?>">
+                <?= h(setup_status_name($row['setup_status'])) ?>
               </span>
             </div>
-
-            <span class="badge <?= h(setup_status_badge($row['setup_status'])) ?>">
-              <?= h(setup_status_name($row['setup_status'])) ?>
-            </span>
-          </div>
-        <?php endforeach; ?>
+          <?php endforeach; ?>
+        <?php endif; ?>
       </div>
-    </div>
+    </section>
   </div>
 
 </div>

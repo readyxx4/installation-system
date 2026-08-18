@@ -607,8 +607,8 @@ layout_header('มอบหมายงานช่าง', 'assignments');
 
     <div class="manager-dashboard-head compact">
         <div>
-            <h1>มอบหมายงานช่าง</h1>
-            <p><?= $is_canceled_assignment ? 'งานนี้ถูกยกเลิกแล้ว ดูประวัติได้อย่างเดียว' : ($is_read_only ? 'งานเสร็จสิ้นแล้ว ดูรายละเอียดได้อย่างเดียว' : ($current_assignment ? 'แก้ไขได้ตามสถานะงานปัจจุบัน' : 'เลือกช่างก่อน แล้วดูคิวงานของช่างคนนั้นเพื่อกำหนดวันที่ติดตั้ง')) ?></p>
+            <h1><?= $current_assignment ? 'แก้ไขการมอบหมายงาน' : 'มอบหมายงานช่าง' ?></h1>
+            <p><?= $is_canceled_assignment ? 'งานนี้ถูกยกเลิกแล้ว ดูประวัติได้อย่างเดียว' : ($is_read_only ? 'งานเสร็จสิ้นแล้ว ดูรายละเอียดได้อย่างเดียว' : ($current_assignment ? 'ตรวจสอบและปรับข้อมูลการมอบหมายงาน' : 'ตรวจสอบข้อมูลใบงาน แล้วเลือกช่าง วัน และเวลาติดตั้ง')) ?></p>
         </div>
     </div>
 
@@ -630,9 +630,12 @@ layout_header('มอบหมายงานช่าง', 'assignments');
     <?php endif; ?>
 
     <?php if ($current_assignment_overdue): ?>
-        <div class="manager-page-alert warning">
-            <strong>งานเกินกำหนด</strong>
-            งานติดตั้งนี้เลยวันที่กำหนดแล้ว กรุณาตรวจสอบและดำเนินการต่อ
+        <div class="manager-page-alert warning manager-overdue-action-alert">
+            <div class="manager-overdue-alert-icon">!</div>
+            <div class="manager-overdue-alert-copy">
+                <strong>งานนี้เกินกำหนดแล้ว</strong>
+                <span>กรุณาตรวจสอบการมอบหมาย และเลือกช่าง วัน หรือเวลาใหม่ก่อนบันทึกการแก้ไข</span>
+            </div>
         </div>
     <?php endif; ?>
 
@@ -643,77 +646,70 @@ layout_header('มอบหมายงานช่าง', 'assignments');
         <input type="hidden" id="assign_time_slot" name="assign_time_slot" value="" required>
         <input type="hidden" id="confirm_tech_change" name="confirm_tech_change" value="0">
 
+        <div class="manager-assignment-step-one">
         <section class="manager-assign-panel manager-selected-setup-panel always-show">
             <div class="manager-panel-head">
                 <div>
-                    <h2>รายละเอียดใบงานติดตั้ง</h2>
-                    <p>ตรวจสอบข้อมูลลูกค้า สินค้า และสถานที่ติดตั้งก่อนมอบหมายงาน</p>
+                    <h2>รายการติดตั้ง</h2>
+                    <p><?= $current_assignment ? 'ข้อมูลใบงานที่กำลังแก้ไข' : 'ข้อมูลใบงานที่กำลังมอบหมาย' ?></p>
                 </div>
                 <a class="manager-soft-link" href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($selected_setup['setup_id']) . '&from=manager')) ?>">
                     <?= manager_icon_svg('eye') ?> ดูใบติดตั้ง
                 </a>
             </div>
 
-            <div class="assign-setup-summary-grid">
-                <div>
-                    <span>รหัสใบงาน</span>
-                    <strong><?= h($selected_setup['setup_id']) ?></strong>
+            <div class="install-summary-compact">
+                <div class="install-summary-heading">
+                    <span class="install-summary-icon"><?= manager_icon_svg('box') ?></span>
+                    <strong>ข้อมูลการติดตั้ง</strong>
                 </div>
-                <div>
-                    <span>ลูกค้า</span>
-                    <strong><?= h($selected_setup['customer_display']) ?></strong>
-                    <small><?= h($selected_setup['user_phone'] ?: '-') ?></small>
-                </div>
-                <div>
-                    <span>จำนวนสินค้า</span>
-                    <strong><?= h((string) count($product_items)) ?> รายการ</strong>
-                </div>
-                <div>
-                    <span>รวมค่าติดตั้ง</span>
-                    <strong><?= h($selected_setup['install_total_display']) ?></strong>
-                </div>
-                <div class="full">
-                    <span>สถานที่ติดตั้ง</span>
-                    <strong><?= h($selected_setup['setup_address_display']) ?></strong>
-                </div>
-                <div class="full assignment-product-section">
-                    <span>รายการสินค้า</span>
-                    <div class="assignment-product-list">
-                        <?php foreach ($product_items as $index => $product_item): ?>
-                            <article class="assignment-product-row">
-                                <div class="assignment-product-number"><?= h((string) ($index + 1)) ?></div>
-                                <div class="assignment-product-info">
-                                    <strong><?= h($product_item['pro_name'] ?? '-') ?></strong>
-                                    <small>
-                                        รหัส <?= h($product_item['pro_id'] ?? '-') ?>
-                                        · ประเภท <?= h($product_item['protype_name'] ?? '-') ?>
-                                    </small>
-                                </div>
-                                <div class="assignment-product-qty">
-                                    <span>จำนวน</span>
-                                    <strong><?= h((string) ($product_item['install_qty'] ?? 1)) ?></strong>
-                                </div>
-                                <div class="assignment-product-price">
-                                    <span>ค่าติดตั้งรวม</span>
-                                    <strong><?= h(manager_money($product_item['install_total'] ?? 0)) ?></strong>
-                                </div>
-                            </article>
-                        <?php endforeach; ?>
+
+                <div class="install-summary-lines">
+                    <p>
+                        <strong>รหัสใบงาน:</strong>
+                        <span><?= h($selected_setup['setup_id']) ?></span>
+                    </p>
+                    <p>
+                        <strong>ลูกค้า:</strong>
+                        <span><?= h($selected_setup['customer_display']) ?></span>
+                        <span class="install-summary-separator">|</span>
+                        <strong>โทร:</strong>
+                        <span><?= h($selected_setup['user_phone'] ?: '-') ?></span>
+                    </p>
+                    <div class="install-summary-products">
+                        <strong>สินค้า:</strong>
+                        <div class="install-summary-product-list">
+                            <?php foreach ($product_items as $index => $product_item): ?>
+                                <span>
+                                    <?= h((string) ($index + 1)) ?>.
+                                    <?= h($product_item['pro_name'] ?? '-') ?>
+                                    × <?= h((string) ($product_item['install_qty'] ?? 1)) ?>
+                                </span>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
+                    <p>
+                        <strong>รวมค่าติดตั้ง:</strong>
+                        <span><?= h($selected_setup['install_total_display']) ?></span>
+                    </p>
+                    <p>
+                        <strong>สถานที่:</strong>
+                        <span><?= h($selected_setup['setup_address_display']) ?></span>
+                    </p>
                 </div>
+
                 <?php if (!empty($current_assignment)): ?>
-                    <div class="full current-assign-alert">
-                        <span>การมอบหมายปัจจุบัน</span>
-                        <strong>
+                    <div class="install-summary-current">
+                        <strong>การมอบหมายปัจจุบัน:</strong>
+                        <span>
                             <?= h(($current_assignment['tech_fullname'] ?: $current_assignment['tech_name']) ?: '-') ?>
-                            วันที่ <?= h(manager_thai_date($current_assignment['assign_install_date'] ?? null)) ?>
-                            เวลา <?= h(time_label($current_assignment['assign_install_time'] ?? '', $current_assignment['assign_install_end_time'] ?? '')) ?>
-                            — <?= h(assign_status_name($current_assignment['assign_status'] ?? '')) ?>
-                            ผู้มอบหมาย <?= h($current_assignment['manager_name'] ?: '-') ?>
-                            <?php if ($current_assignment_overdue): ?>
-                                <span class="manager-overdue-badge">เกินกำหนด</span>
-                            <?php endif; ?>
-                        </strong>
+                            · <?= h(manager_thai_date($current_assignment['assign_install_date'] ?? null)) ?>
+                            · <?= h(time_label($current_assignment['assign_install_time'] ?? '', $current_assignment['assign_install_end_time'] ?? '')) ?>
+                            · <?= h(assign_status_name($current_assignment['assign_status'] ?? '')) ?>
+                        </span>
+                        <?php if ($current_assignment_overdue): ?>
+                            <span class="manager-overdue-badge">เกินกำหนด</span>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
             </div>
@@ -723,10 +719,21 @@ layout_header('มอบหมายงานช่าง', 'assignments');
         <section class="manager-assign-panel manager-tech-panel show" id="techPanel">
             <div class="manager-panel-head">
                 <div>
-                    <h2>1. เลือกช่างติดตั้ง</h2>
-                    <p><?= $is_read_only ? 'งานเสร็จสิ้นแล้ว จึงไม่สามารถเปลี่ยนช่างได้' : 'ช่างที่ไม่พร้อมรับงานยังแสดงชื่อ แต่เลือกได้เฉพาะกรณีเป็นช่างเดิมของงานนี้' ?></p>
+                    <span class="manager-step-kicker">ขั้นตอนที่ 1</span>
+                    <h2>เลือกช่างติดตั้ง</h2>
+                    <p><?= $is_read_only ? 'งานเสร็จสิ้นแล้ว จึงไม่สามารถเปลี่ยนช่างได้' : 'กรุณาเลือกช่างสำหรับงานติดตั้งนี้' ?></p>
                 </div>
-                <span class="manager-soft-badge" id="availableCountText">-</span>
+                <div class="manager-tech-status-legend" aria-label="สถานะช่าง">
+                    <span class="manager-tech-legend-item is-ready">
+                        <i class="manager-tech-status-dot" aria-hidden="true"></i>
+                        พร้อมรับงาน
+                    </span>
+                    <span class="manager-tech-legend-item is-unavailable">
+                        <i class="manager-tech-status-dot" aria-hidden="true"></i>
+                        ไม่พร้อมรับงาน
+                    </span>
+                </div>
+                <span class="manager-soft-badge manager-tech-count-source" id="availableCountText" aria-hidden="true">-</span>
             </div>
 
             <div class="manager-tech-checker">
@@ -738,11 +745,13 @@ layout_header('มอบหมายงานช่าง', 'assignments');
 
             <div class="manager-tech-list" id="techList"></div>
         </section>
+        </div>
 
-        <section class="manager-assign-panel manager-schedule-panel" id="schedulePanel">
+        <section class="manager-assign-panel manager-schedule-panel manager-step-panel" id="schedulePanel">
             <div class="manager-panel-head">
                 <div>
-                    <h2>2. เลือกวันติดตั้ง</h2>
+                    <span class="manager-step-kicker">ขั้นตอนที่ 2</span>
+                    <h2>เลือกวันติดตั้ง</h2>
                     <p id="selectedTechScheduleText"><?= $is_read_only ? 'งานเสร็จสิ้นแล้ว ดูตารางเวลาได้อย่างเดียว' : ($current_setup_status === 3 ? 'กำลังติดตั้ง: แก้ไขได้เฉพาะเวลาและหมายเหตุ' : 'เลือกช่างก่อน ระบบจะแสดงตารางงานและวันที่เลือกได้') ?></p>
                 </div>
                 <span class="manager-soft-badge" id="techQueueCountText">ยังไม่ได้เลือกช่าง</span>
@@ -782,8 +791,9 @@ layout_header('มอบหมายงานช่าง', 'assignments');
             <div class="manager-time-panel" id="timePanel">
                 <div class="manager-time-panel-head">
                     <div>
-                        <h3>3. เลือกช่วงเวลาติดตั้ง</h3>
-                        <p>เลือกช่วงเวลาว่างได้ 1 ช่วง</p>
+                        <span class="manager-step-kicker">ขั้นตอนที่ 3</span>
+                        <h3>เลือกช่วงเวลาติดตั้ง</h3>
+                        <!-- <p>เลือกช่วงเวลาว่างได้ 1 ช่วง</p> -->
                     </div>
                     <span class="manager-soft-badge" id="selectedTimeText">ยังไม่ได้เลือกเวลา</span>
                 </div>
@@ -819,7 +829,7 @@ layout_header('มอบหมายงานช่าง', 'assignments');
             <?php if (!$is_read_only): ?>
                 <button class="manager-action-btn primary" id="saveAssignmentButton" type="submit" disabled>
                     <?= manager_icon_svg('check') ?>
-                    บันทึกการมอบหมาย
+                    <?= $current_assignment ? 'บันทึกการแก้ไข' : 'บันทึกการมอบหมาย' ?>
                 </button>
             <?php endif; ?>
         </div>
@@ -846,6 +856,61 @@ window.assignmentPageData = {
 };
 </script>
 <script src="<?= h(app_asset_url('manager/assets/js/assignments.js')) ?>?v=<?= h(asset_version('manager/assets/js/assignments.js')) ?>"></script>
+<script>
+(function () {
+    const techInput = document.getElementById('tech_id');
+    const techList = document.getElementById('techList');
+    const schedulePanel = document.getElementById('schedulePanel');
+
+    if (!techInput || !schedulePanel) return;
+
+    let lastTechId = String(techInput.value || '');
+
+    function syncAssignmentStep(shouldScroll) {
+        const currentTechId = String(techInput.value || '').trim();
+        const hasTech = currentTechId !== '';
+
+        schedulePanel.classList.toggle('is-step-visible', hasTech);
+        schedulePanel.setAttribute('aria-hidden', hasTech ? 'false' : 'true');
+
+        if (hasTech && shouldScroll) {
+            window.setTimeout(function () {
+                schedulePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 180);
+        }
+
+        lastTechId = currentTechId;
+    }
+
+    // Existing assignment: show date/time immediately. New assignment: keep step 2 hidden.
+    syncAssignmentStep(false);
+
+    if (techList) {
+        techList.addEventListener('click', function (event) {
+            const selectButton = event.target.closest('button, a');
+            if (!selectButton) return;
+
+            window.setTimeout(function () {
+                const newTechId = String(techInput.value || '').trim();
+                syncAssignmentStep(newTechId !== '' && newTechId !== lastTechId);
+            }, 80);
+        });
+    }
+
+    techInput.addEventListener('change', function () {
+        syncAssignmentStep(true);
+    });
+
+    // assignments.js changes the hidden input value as a property, which does not always fire "change".
+    // A lightweight watcher keeps the step UI in sync without altering the original assignment logic.
+    window.setInterval(function () {
+        const currentTechId = String(techInput.value || '').trim();
+        if (currentTechId !== lastTechId) {
+            syncAssignmentStep(currentTechId !== '');
+        }
+    }, 250);
+})();
+</script>
 <?php endif; ?>
 
 <?php layout_footer(); ?>

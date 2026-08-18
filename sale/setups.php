@@ -82,6 +82,10 @@ function icon_svg(string $name): string
     $icons = [
         'file' => '<svg class="cs-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg>',
         'plus' => '<svg class="cs-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>',
+        'search' => '<svg class="cs-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>',
+        'reset' => '<svg class="cs-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v6h6"></path></svg>',
+        'edit' => '<svg class="cs-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg>',
+        'trash' => '<svg class="cs-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>',
     ];
 
     return $icons[$name] ?? '';
@@ -90,11 +94,12 @@ function icon_svg(string $name): string
 function setup_status_name($status): string
 {
     return match ((string) $status) {
-        '0' => 'สร้างใบงานติดตั้งแล้ว',
-        '1' => 'มอบหมายงานติดตั้งแล้ว',
-        '2' => 'ช่างรับงาน',
+        '0' => 'สร้างใบงานแล้ว',
+        '1' => 'มอบหมายงานแล้ว',
+        '2' => 'รับงาน',
         '3' => 'กำลังติดตั้ง',
         '4' => 'เสร็จสิ้น',
+        '5' => 'ยกเลิกแล้ว',
         default => 'ไม่ทราบสถานะ',
     };
 }
@@ -107,6 +112,7 @@ function setup_status_class($status): string
         '2' => 'status-accepted',
         '3' => 'status-installing',
         '4' => 'status-done',
+        '5' => 'status-canceled',
         default => 'status-created',
     };
 }
@@ -119,21 +125,72 @@ function setup_status_group($status): string
         '2' => 'accepted',
         '3' => 'installing',
         '4' => 'done',
+        '5' => 'canceled',
         default => 'created',
     };
 }
 
 prepare_setup_tables($conn);
 
-$setup_rows = [];
-$status_counts = [
-    'all' => 0,
-    'created' => 0,
-    'assigned' => 0,
-    'accepted' => 0,
-    'installing' => 0,
-    'done' => 0,
-];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'cancel_setup') {
+    $cancelSetupId = trim($_POST['setup_id'] ?? '');
+
+    if ($cancelSetupId === '') {
+        redirect_to(app_system_url('sale/setups.php?status=error'));
+    }
+
+    try {
+        $conn->begin_transaction();
+
+        $lockStmt = $conn->prepare("
+            SELECT
+                s.setup_id,
+                s.setup_status,
+                a.assign_id
+            FROM setup s
+            LEFT JOIN assignment a
+              ON a.setup_id = s.setup_id
+             AND a.assign_id = (
+                SELECT a2.assign_id
+                FROM assignment a2
+                WHERE a2.setup_id = s.setup_id
+                ORDER BY a2.assign_date DESC, a2.assign_id DESC
+                LIMIT 1
+             )
+            WHERE s.setup_id = ?
+            LIMIT 1
+            FOR UPDATE
+        ");
+        $lockStmt->bind_param('s', $cancelSetupId);
+        $lockStmt->execute();
+        $cancelSetup = $lockStmt->get_result()->fetch_assoc();
+
+        if (!$cancelSetup || (string) ($cancelSetup['setup_status'] ?? '') !== '0' || !empty($cancelSetup['assign_id'])) {
+            $conn->rollback();
+            redirect_to(app_system_url('sale/setups.php?status=assignment_locked'));
+        }
+
+        $cancelStmt = $conn->prepare("
+            UPDATE setup
+            SET setup_status = 5
+            WHERE setup_id = ?
+              AND setup_status = 0
+        ");
+        $cancelStmt->bind_param('s', $cancelSetupId);
+        $cancelStmt->execute();
+
+        $conn->commit();
+        redirect_to(app_system_url('sale/setup_history.php?status=cancelled'));
+    } catch (Throwable $e) {
+        try {
+            $conn->rollback();
+        } catch (Throwable $rollbackError) {
+        }
+
+        redirect_to(app_system_url('sale/setups.php?status=error'));
+    }
+}
+$pending_setup_rows = [];
 
 try {
     $setup_result = $conn->query("
@@ -179,7 +236,6 @@ try {
                 SELECT aa.assign_id
                 FROM assignment aa
                 WHERE aa.setup_id = s.setup_id
-                  AND aa.assign_status IN (1, 2, 5)
                 ORDER BY aa.assign_date DESC, aa.assign_id DESC
                 LIMIT 1
            )
@@ -190,17 +246,96 @@ try {
     ");
 
     while ($row = $setup_result->fetch_assoc()) {
-        $setup_rows[] = $row;
-        $status_counts['all']++;
+        $is_pending_sale_work = (string) ($row['setup_status'] ?? '0') === '0'
+            && empty($row['assign_id']);
 
-        $group = setup_status_group($row['setup_status'] ?? '0');
-
-        if (isset($status_counts[$group])) {
-            $status_counts[$group]++;
+        if ($is_pending_sale_work) {
+            $pending_setup_rows[] = $row;
         }
     }
 } catch (Throwable $e) {
-    $setup_rows = [];
+    $pending_setup_rows = [];
+}
+
+function render_sale_setup_rows(array $rows, string $empty_message): void
+{
+    if (count($rows) === 0): ?>
+        <tr>
+            <td colspan="9" class="cs-empty-cell"><?= h($empty_message) ?></td>
+        </tr>
+        <?php return;
+    endif;
+
+    foreach ($rows as $row):
+        $status_value = (string) ($row['setup_status'] ?? '0');
+        $filter_group = setup_status_group($status_value);
+        $customer_name = trim((string) ($row['user_name'] ?? ''));
+        $tech_name = trim((string) ($row['tech_name'] ?? ''));
+        ?>
+
+        <tr
+            data-status-group="<?= h($filter_group) ?>"
+            data-status-value="<?= h($status_value) ?>"
+            data-setup-search-text="<?= h(strtolower($row['setup_id'] . ' ' . $customer_name . ' ' . ($row['pro_name'] ?? '') . ' ' . $tech_name)) ?>"
+        >
+            <td><strong><?= h($row['setup_id']) ?></strong></td>
+
+            <td>
+                <strong><?= h($customer_name !== '' ? $customer_name : '-') ?></strong>
+            </td>
+
+            <td><?= h($row['pro_name'] ?? '-') ?></td>
+
+            <td>
+                <?= h((string) (int) ($row['item_count'] ?? 0)) ?> รายการ
+            </td>
+
+            <td>
+                <b><?= h(number_format((float) ($row['setup_total'] ?? 0), 2)) ?> บาท</b>
+            </td>
+
+            <td>
+                <?php if (!empty($row['tech_id']) && $tech_name !== ''): ?>
+                    <strong class="cs-tech-name-text"><?= h($tech_name) ?></strong>
+                <?php else: ?>
+                    <span class="cs-muted-text">-</span>
+                <?php endif; ?>
+            </td>
+
+            <td>
+                <span class="setup-status-badge <?= h(setup_status_class($status_value)) ?>">
+                    <?= h(setup_status_name($status_value)) ?>
+                </span>
+            </td>
+
+            <td>
+                <div class="cs-row-actions">
+                    <a
+                        class="btn btn-small cs-table-action"
+                        href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($row['setup_id']))) ?>"
+                    >
+                        <?= icon_svg('file') ?>
+                        ใบติดตั้ง
+                    </a>
+                    <a
+                        class="btn btn-edit"
+                        href="<?= h(app_system_url('sale/edit_setup.php?id=' . urlencode($row['setup_id']))) ?>"
+                    >
+                        <?= icon_svg('edit') ?>
+                        แก้ไข
+                    </a>
+                    <form method="POST" class="cs-inline-action-form" data-confirm-cancel-setup>
+                        <input type="hidden" name="action" value="cancel_setup">
+                        <input type="hidden" name="setup_id" value="<?= h($row['setup_id']) ?>">
+                        <button class="btn btn-delete" type="submit">
+                            <?= icon_svg('trash') ?>
+                            ยกเลิก
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    <?php endforeach;
 }
 
 layout_header('รายการงานติดตั้ง', 'setups');
@@ -217,56 +352,35 @@ layout_header('รายการงานติดตั้ง', 'setups');
     <div class="cs-job-status-head">
         <div>
             <h2>รายการใบงานติดตั้ง</h2>
+            <p class="cs-page-subtitle">ใบงานที่รอดำเนินการ</p>
         </div>
+    </div>
 
-        <a class="cs-status-link btn btn-add cs-setup-add-link" href="<?= h(app_system_url('sale/create_setup.php')) ?>">
+    <form class="toolbar setup-toolbar cs-list-toolbar cs-sale-admin-toolbar" action="javascript:void(0)">
+        <input
+            id="setupSearchInput"
+            type="search"
+            data-setup-search
+            placeholder="ค้นหารหัสใบงาน ลูกค้า สินค้า หรือช่าง"
+            autocomplete="off"
+        >
+
+        <button class="btn btn-search" type="submit" data-setup-search-submit>
+            <?= icon_svg('search') ?>
+            <span>ค้นหา</span>
+        </button>
+
+        <button class="btn btn-reset" type="button" data-setup-search-reset>
+            <?= icon_svg('reset') ?>
+            <span>ล้างค้นหา</span>
+        </button>
+
+        <a class="btn btn-add cs-setup-add-link" href="<?= h(app_system_url('sale/create_setup.php')) ?>">
             <?= icon_svg('plus') ?>
-            สร้างใบงานติดตั้ง
+            <span>สร้างใบงานติดตั้ง</span>
         </a>
-    </div>
-
-    <div class="cs-status-tabs" aria-label="เลือกสถานะใบงาน">
-        <button type="button" class="cs-status-tab active status-all" data-filter="all">
-            ทั้งหมด <b><?= h((string) $status_counts['all']) ?></b>
-        </button>
-
-        <button type="button" class="cs-status-tab status-created" data-filter="created">
-            <span>สร้างใบงานติดตั้งแล้ว</span>
-            <?php if ((int) $status_counts['created'] > 0): ?>
-                <span class="status-count-badge"><?= h((string) $status_counts['created']) ?></span>
-            <?php endif; ?>
-        </button>
-
-        <button type="button" class="cs-status-tab status-assigned" data-filter="assigned">
-            <span>มอบหมายงานติดตั้งแล้ว</span>
-            <?php if ((int) $status_counts['assigned'] > 0): ?>
-                <span class="status-count-badge"><?= h((string) $status_counts['assigned']) ?></span>
-            <?php endif; ?>
-        </button>
-
-        <button type="button" class="cs-status-tab status-accepted" data-filter="accepted">
-            <span>ช่างรับงาน</span>
-            <?php if ((int) $status_counts['accepted'] > 0): ?>
-                <span class="status-count-badge"><?= h((string) $status_counts['accepted']) ?></span>
-            <?php endif; ?>
-        </button>
-
-        <button type="button" class="cs-status-tab status-installing" data-filter="installing">
-            <span>กำลังติดตั้ง</span>
-            <?php if ((int) $status_counts['installing'] > 0): ?>
-                <span class="status-count-badge"><?= h((string) $status_counts['installing']) ?></span>
-            <?php endif; ?>
-        </button>
-
-        <button type="button" class="cs-status-tab status-done" data-filter="done">
-            <span>เสร็จสิ้น</span>
-            <?php if ((int) $status_counts['done'] > 0): ?>
-                <span class="status-count-badge"><?= h((string) $status_counts['done']) ?></span>
-            <?php endif; ?>
-        </button>
-    </div>
-
-    <div class="cs-table-wrap cs-job-status-table-wrap cs-setups-table-wrap">
+    </form>
+    <div class="cs-table-wrap cs-job-status-table-wrap cs-setups-table-wrap cs-pending-table-wrap">
         <table class="cs-data-table cs-job-status-table cs-setups-table-clean">
             <thead>
                 <tr>
@@ -277,73 +391,21 @@ layout_header('รายการงานติดตั้ง', 'setups');
                     <th>รวมค่าติดตั้ง</th>
                     <th>ช่าง</th>
                     <th>สถานะ</th>
-                    <th>ใบติดตั้ง</th>
+                    <th style="width:240px;">จัดการ</th>
                 </tr>
             </thead>
 
             <tbody id="setupStatusRows">
-                <?php if (count($setup_rows) === 0): ?>
-                    <tr>
-                        <td colspan="8" class="cs-empty-cell">ยังไม่มีใบงานติดตั้ง</td>
+                <?php render_sale_setup_rows($pending_setup_rows, 'ยังไม่มีใบงานที่รอดำเนินการ'); ?>
+                <?php if (count($pending_setup_rows) > 0): ?>
+                    <tr data-setup-search-empty style="display: none;">
+                        <td colspan="9" class="cs-empty-cell">ไม่พบใบงานที่ตรงกับคำค้นหา</td>
                     </tr>
                 <?php endif; ?>
-
-                <?php foreach ($setup_rows as $row): ?>
-                    <?php
-                        $status_value = (string) ($row['setup_status'] ?? '0');
-                        $filter_group = setup_status_group($status_value);
-                        $customer_name = trim((string) ($row['user_name'] ?? ''));
-                        $tech_name = trim((string) ($row['tech_name'] ?? ''));
-                    ?>
-
-                    <tr
-                        data-status-group="<?= h($filter_group) ?>"
-                        data-status-value="<?= h($status_value) ?>"
-                    >
-                        <td><strong><?= h($row['setup_id']) ?></strong></td>
-
-                        <td>
-                            <strong><?= h($customer_name !== '' ? $customer_name : '-') ?></strong>
-                        </td>
-
-                        <td><?= h($row['pro_name'] ?? '-') ?></td>
-
-                        <td>
-                            <?= h((string) (int) ($row['item_count'] ?? 0)) ?> รายการ
-                        </td>
-
-                        <td>
-                            <b><?= h(number_format((float) ($row['setup_total'] ?? 0), 2)) ?> บาท</b>
-                        </td>
-
-                        <td>
-                            <?php if (!empty($row['tech_id']) && $tech_name !== ''): ?>
-                                <strong class="cs-tech-name-text"><?= h($tech_name) ?></strong>
-                            <?php else: ?>
-                                <span class="cs-muted-text">-</span>
-                            <?php endif; ?>
-                        </td>
-
-                        <td>
-                            <span class="setup-status-badge <?= h(setup_status_class($status_value)) ?>">
-                                <?= h(setup_status_name($status_value)) ?>
-                            </span>
-                        </td>
-
-                        <td>
-                            <a
-                                class="cs-table-action"
-                                href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($row['setup_id']))) ?>"
-                            >
-                                <?= icon_svg('file') ?>
-                                ใบติดตั้ง
-                            </a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
+
 </section>
 
 

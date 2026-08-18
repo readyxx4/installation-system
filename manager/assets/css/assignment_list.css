@@ -265,3 +265,591 @@ body.assignment-cancel-open {
     width: 100%;
   }
 }
+/* Manager assignment list aligned with sale/admin lists. */
+body.app-body.role-1 .assignment-list-no-tophead {
+  font-size: 13px !important;
+}
+
+body.app-body.role-1 .assignment-from-setup-card {
+  border: 1px solid #bfdbfe !important;
+  border-radius: 18px !important;
+  background: #ffffff !important;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, .04) !important;
+}
+
+body.app-body.role-1 .assignment-list-head-action {
+  margin-bottom: 12px !important;
+}
+
+body.app-body.role-1 .assignment-list-head-action h2 {
+  margin: 0 !important;
+  color: #111827 !important;
+  font-size: 24px !important;
+  line-height: 1.2 !important;
+  font-weight: 900 !important;
+}
+
+body.app-body.role-1 .assignment-list-head-action p {
+  margin-top: 6px !important;
+  color: #64748b !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-1 .assignment-toolbar-card {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 0 0 14px !important;
+  padding: 12px !important;
+  border: 1px solid #93c5fd !important;
+  border-radius: 14px !important;
+  background: #eaf6ff !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .assignment-search-field {
+  position: relative !important;
+  min-width: 0 !important;
+}
+
+body.app-body.role-1 .assignment-search-field input[type="text"] {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 6px 10px 6px 34px !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .assignment-search-field .manager-icon {
+  position: absolute !important;
+  left: 12px !important;
+  top: 50% !important;
+  width: 14px !important;
+  height: 14px !important;
+  transform: translateY(-50%) !important;
+  color: #64748b !important;
+  stroke-width: 2.2px !important;
+}
+
+body.app-body.role-1 .assignment-toolbar-buttons {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+}
+
+body.app-body.role-1 .assignment-toolbar-card .btn-search,
+body.app-body.role-1 .assignment-toolbar-card .btn-reset {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 6px 10px !important;
+  border-radius: 9px !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+}
+
+body.app-body.role-1 .assignment-toolbar-card .btn-search {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+  border: 1px solid transparent !important;
+}
+
+body.app-body.role-1 .assignment-toolbar-card .btn-reset {
+  color: #475569 !important;
+  background: #eef2f7 !important;
+  border: 1px solid #dbe3ef !important;
+}
+
+body.app-body.role-1 .assignment-toolbar-card .manager-icon {
+  width: 14px !important;
+  height: 14px !important;
+  flex: 0 0 14px !important;
+}
+
+body.app-body.role-1 .assignment-status-tabs {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin: 0 0 14px !important;
+}
+
+body.app-body.role-1 .assignment-status-tab {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 32px !important;
+  padding: 5px 10px !important;
+  border: 1px solid #bfdbfe !important;
+  border-radius: 999px !important;
+  background: #f8fbff !important;
+  color: #1d4ed8 !important;
+  gap: 7px !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+}
+
+body.app-body.role-1 .assignment-status-tab.active {
+  color: #ffffff !important;
+  border-color: var(--role-primary) !important;
+  background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+}
+
+body.app-body.role-1 .assignment-status-tab b,
+body.app-body.role-1 .assignment-status-tab .status-count-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 19px !important;
+  height: 19px !important;
+  padding: 0 6px !important;
+  border-radius: 999px !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+body.app-body.role-1 .assignment-status-tab b {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, .22) !important;
+}
+
+body.app-body.role-1 .assignment-status-tab .status-count-badge {
+  color: #ffffff !important;
+  background: #ef4444 !important;
+}
+
+body.app-body.role-1 .assignment-table-wrap {
+  padding: 12px !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  overflow: auto !important;
+}
+
+body.app-body.role-1 .assignment-detail-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+}
+
+body.app-body.role-1 .assignment-detail-table thead th {
+  padding: 8px 9px !important;
+  border-bottom: 1px solid #dbeafe !important;
+  background: #f3f7fb !important;
+  color: #475569 !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-1 .assignment-detail-table tbody td {
+  padding: 8px 9px !important;
+  border-bottom: 1px solid #e5edf6 !important;
+  color: #001b3d !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  vertical-align: middle !important;
+}
+
+body.app-body.role-1 .assignment-detail-table tbody tr:hover td {
+  background: #f8fbff !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .badge,
+body.app-body.role-1 .assignment-detail-table .setup-status-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 96px !important;
+  min-height: 26px !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-1 .assignment-row-actions,
+body.app-body.role-1 .assignment-icon-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  flex-wrap: nowrap !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn .manager-icon {
+  width: 14px !important;
+  height: 14px !important;
+  flex: 0 0 14px !important;
+  stroke-width: 2.2px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.view-slip {
+  color: #0f4fb8 !important;
+  background: #eaf4ff !important;
+  border: 1px solid #93c5fd !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.view-slip:hover {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+  border-color: transparent !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.cancel-assign.is-enabled {
+  color: #dc2626 !important;
+  background: #fff1f2 !important;
+  border: 1px solid #fecaca !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.cancel-assign.is-enabled:hover {
+  color: #ffffff !important;
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+}
+
+body.app-body.role-1 .assignment-icon-btn.cancel-assign.is-disabled,
+body.app-body.role-1 .assignment-icon-btn.cancel-assign:disabled {
+  color: #94a3b8 !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+@media (max-width: 980px) {
+  body.app-body.role-1 .assignment-toolbar-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-1 .assignment-toolbar-buttons,
+  body.app-body.role-1 .assignment-toolbar-card .btn-search,
+  body.app-body.role-1 .assignment-toolbar-card .btn-reset {
+    width: 100% !important;
+  }
+}
+/* Remove nested manager search box. */
+body.app-body.role-1 .assignment-toolbar-card .assignment-search-field {
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: block !important;
+}
+
+body.app-body.role-1 .assignment-toolbar-card .assignment-search-field input,
+body.app-body.role-1 .assignment-toolbar-card .assignment-search-field input[type="text"] {
+  height: 34px !important;
+  min-height: 34px !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  padding: 6px 10px 6px 34px !important;
+}
+
+/* ===== Manager list: icon + text actions, aligned with Admin/Sale ===== */
+body.app-body.role-1 .assignment-detail-table .assignment-row-actions {
+    min-width: 190px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn {
+    width: auto !important;
+    min-width: 0 !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 11px !important;
+    border-radius: 9px !important;
+    gap: 6px !important;
+    font-size: 11.5px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn span {
+    display: inline-block !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn .manager-icon {
+    width: 15px !important;
+    height: 15px !important;
+    flex: 0 0 15px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.view-slip {
+    color: #0f4fb8 !important;
+    background: #eaf4ff !important;
+    border: 1px solid #93c5fd !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.view-slip:hover {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+    border-color: transparent !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.cancel-assign.is-enabled {
+    color: #dc2626 !important;
+    background: #fff1f2 !important;
+    border: 1px solid #fecaca !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.cancel-assign.is-enabled:hover {
+    color: #ffffff !important;
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+}
+
+body.app-body.role-1 .assignment-icon-btn.cancel-assign.is-disabled,
+body.app-body.role-1 .assignment-icon-btn.cancel-assign:disabled {
+    color: #94a3b8 !important;
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+@media (max-width: 1180px) {
+    body.app-body.role-1 .assignment-detail-table .assignment-icon-btn {
+        width: 32px !important;
+        min-width: 32px !important;
+        padding: 0 !important;
+    }
+
+    body.app-body.role-1 .assignment-detail-table .assignment-icon-btn span {
+        display: none !important;
+    }
+
+    body.app-body.role-1 .assignment-detail-table .assignment-row-actions {
+        min-width: 78px !important;
+    }
+}
+
+
+/* ===== v2: semantic Manager actions ===== */
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.assign-work {
+    color: #0f4fb8 !important;
+    background: #eaf4ff !important;
+    border-color: #93c5fd !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.assign-work:hover {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+    border-color: transparent !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.edit-assignment {
+    color: #1d4ed8 !important;
+    background: #eff6ff !important;
+    border-color: #bfdbfe !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.edit-assignment:hover {
+    color: #ffffff !important;
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+}
+
+
+/* ===== v3: fix action button width / icon alignment ===== */
+body.app-body.role-1 .assignment-detail-table {
+    min-width: 1120px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th:last-child,
+body.app-body.role-1 .assignment-detail-table td:last-child {
+    width: 238px !important;
+    min-width: 238px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-row-actions {
+    min-width: 238px !important;
+    gap: 8px !important;
+    justify-content: center !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn {
+    box-sizing: border-box !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 10px !important;
+    gap: 6px !important;
+    overflow: hidden !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.assign-work,
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.edit-assignment {
+    min-width: 126px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.cancel-assign {
+    min-width: 94px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn .manager-icon {
+    width: 14px !important;
+    height: 14px !important;
+    flex: 0 0 14px !important;
+    stroke-width: 1.9 !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn span {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+@media (max-width: 1180px) {
+    body.app-body.role-1 .assignment-detail-table th:last-child,
+    body.app-body.role-1 .assignment-detail-table td:last-child {
+        width: 82px !important;
+        min-width: 82px !important;
+    }
+
+    body.app-body.role-1 .assignment-detail-table .assignment-row-actions {
+        min-width: 82px !important;
+    }
+
+    body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.assign-work,
+    body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.edit-assignment,
+    body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.cancel-assign {
+        width: 32px !important;
+        min-width: 32px !important;
+        padding: 0 !important;
+    }
+}
+
+
+/* ===== v4: compact rounded action buttons ===== */
+body.app-body.role-1 .assignment-detail-table th:last-child,
+body.app-body.role-1 .assignment-detail-table td:last-child {
+    width: 210px !important;
+    min-width: 210px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-row-actions {
+    min-width: 210px !important;
+    gap: 6px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 9px !important;
+    border-radius: 999px !important;
+    gap: 5px !important;
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+    overflow: visible !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.assign-work,
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.edit-assignment {
+    min-width: 112px !important;
+    max-width: 118px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.cancel-assign {
+    min-width: 84px !important;
+    max-width: 88px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn .manager-icon {
+    width: 13px !important;
+    height: 13px !important;
+    flex: 0 0 13px !important;
+    stroke-width: 1.9 !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .assignment-icon-btn span {
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+}
+
+@media (max-width: 1180px) {
+    body.app-body.role-1 .assignment-detail-table th:last-child,
+    body.app-body.role-1 .assignment-detail-table td:last-child {
+        width: 76px !important;
+        min-width: 76px !important;
+    }
+
+    body.app-body.role-1 .assignment-detail-table .assignment-row-actions {
+        min-width: 76px !important;
+        gap: 5px !important;
+    }
+
+    body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.assign-work,
+    body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.edit-assignment,
+    body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.cancel-assign {
+        width: 30px !important;
+        min-width: 30px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+        padding: 0 !important;
+    }
+}
+
+
+/* ===== v5: keep "ทั้งหมด" count visible when inactive ===== */
+body.app-body.role-1 .assignment-status-tab.status-all b {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-width: 20px !important;
+    height: 20px !important;
+    padding: 0 6px !important;
+
+    border-radius: 999px !important;
+    background: #dbeafe !important;
+    color: #1d4ed8 !important;
+
+    font-size: 10.5px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+body.app-body.role-1 .assignment-status-tab.status-all.active b {
+    background: rgba(255, 255, 255, .22) !important;
+    color: #ffffff !important;
+}
