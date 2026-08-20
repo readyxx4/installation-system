@@ -90,7 +90,7 @@ function role_dashboard($role): string
 {
   return match (role_key($role)) {
     '0' => app_system_url('customer/index.php'),
-    '1' => app_system_url('manager/index.php'),
+    '1' => app_system_url('manager/assignment_list.php'),
     '2' => app_system_url('sale/index.php'),
     '3' => app_system_url('admin/index.php'),
     'technician' => app_system_url('technician/index.php'),
@@ -341,16 +341,18 @@ function layout_header(string $title, string $active = 'dashboard'): void
 
         </div>
 
-        <!-- หน้าหลัก -->
-        <?php
-        nav_item(
-          'หน้าหลัก',
-          '<i class="fa-solid fa-house"></i>',
-          role_dashboard($role),
-          'dashboard',
-          $active
-        );
-        ?>
+        <!-- หน้าหลัก: แสดงกับ Role อื่น ยกเว้นพนักงานขาย -->
+        <?php if ($roleKey !== '1' && $roleKey !== '2'): ?>
+          <?php
+          nav_item(
+            'หน้าหลัก',
+            '<i class="fa-solid fa-house"></i>',
+            role_dashboard($role),
+            'dashboard',
+            $active
+          );
+          ?>
+        <?php endif; ?>
 
 
         <!-- ====================================== -->
@@ -414,7 +416,7 @@ function layout_header(string $title, string $active = 'dashboard'): void
 
           <?php
           nav_item(
-            'รายการมอบหมายงาน',
+            'มอบหมายงาน',
             '<i class="fa-solid fa-clipboard-list"></i>',
             app_system_url('manager/assignment_list.php'),
             'assignment_list',
@@ -422,7 +424,7 @@ function layout_header(string $title, string $active = 'dashboard'): void
           );
 
           nav_item(
-            'ประวัติการมอบหมายงาน',
+            'รายการมอบหมายงาน',
             '<i class="fa-solid fa-clock-rotate-left"></i>',
             app_system_url('manager/assignment_history.php'),
             'assignment_history',
@@ -443,18 +445,18 @@ function layout_header(string $title, string $active = 'dashboard'): void
 
           <?php
           nav_item(
-            'รายการงานติดตั้ง',
-            '<i class="fa-solid fa-file-lines"></i>',
-            app_system_url('sale/setups.php'),
-            'setups',
+            'สร้างใบงานติดตั้ง',
+            '<i class="fa-solid fa-file-circle-plus"></i>',
+            app_system_url('sale/index.php'),
+            'create_setup',
             $active
           );
 
           nav_item(
-            'สร้างใบงานติดตั้ง',
-            '<i class="fa-solid fa-square-plus"></i>',
-            app_system_url('sale/create_setup.php'),
-            'setup',
+            'รายการงานติดตั้ง',
+            '<i class="fa-solid fa-file-lines"></i>',
+            app_system_url('sale/setups.php'),
+            'setups',
             $active
           );
 

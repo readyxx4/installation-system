@@ -4,6 +4,12 @@ require_once __DIR__ . '/../db.php';
 
 require_login('2');
 
+$currentSaleId = trim((string) ($_SESSION['user_id'] ?? ''));
+
+if ($currentSaleId === '') {
+    redirect_to(app_system_url('login.php'));
+}
+
 function table_exists(mysqli $conn, string $table): bool
 {
     $stmt = $conn->prepare("
@@ -158,10 +164,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'cance
                 LIMIT 1
              )
             WHERE s.setup_id = ?
+              AND s.sale_id = ?
             LIMIT 1
             FOR UPDATE
         ");
-        $lockStmt->bind_param('s', $cancelSetupId);
+        $lockStmt->bind_param('ss', $cancelSetupId, $currentSaleId);
         $lockStmt->execute();
         $cancelSetup = $lockStmt->get_result()->fetch_assoc();
 
@@ -174,9 +181,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'cance
             UPDATE setup
             SET setup_status = 5
             WHERE setup_id = ?
+              AND sale_id = ?
               AND setup_status = 0
         ");
-        $cancelStmt->bind_param('s', $cancelSetupId);
+        $cancelStmt->bind_param('ss', $cancelSetupId, $currentSaleId);
         $cancelStmt->execute();
 
         $conn->commit();
@@ -193,7 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'cance
 $pending_setup_rows = [];
 
 try {
-    $setup_result = $conn->query("
+    $setup_stmt = $conn->prepare("
         SELECT
             s.setup_id,
             s.user_id,
@@ -241,9 +249,14 @@ try {
            )
         LEFT JOIN technicians t
             ON TRIM(a.tech_id) = TRIM(t.tech_id)
+        WHERE s.sale_id = ?
         ORDER BY s.created_at DESC, s.setup_id DESC
         LIMIT 300
     ");
+
+    $setup_stmt->bind_param('s', $currentSaleId);
+    $setup_stmt->execute();
+    $setup_result = $setup_stmt->get_result();
 
     while ($row = $setup_result->fetch_assoc()) {
         $is_pending_sale_work = (string) ($row['setup_status'] ?? '0') === '0'
@@ -273,65 +286,91 @@ function render_sale_setup_rows(array $rows, string $empty_message): void
         $tech_name = trim((string) ($row['tech_name'] ?? ''));
         ?>
 
-        <tr
-            data-status-group="<?= h($filter_group) ?>"
-            data-status-value="<?= h($status_value) ?>"
-            data-setup-search-text="<?= h(strtolower($row['setup_id'] . ' ' . $customer_name . ' ' . ($row['pro_name'] ?? '') . ' ' . $tech_name)) ?>"
-        >
-            <td><strong><?= h($row['setup_id']) ?></strong></td>
-
-            <td>
-                <strong><?= h($customer_name !== '' ? $customer_name : '-') ?></strong>
+        <tr data-status-group="<?= h($filter_group) ?>" data-status-value="<?= h($status_value) ?>" data-setup-search-text="<?= h(strtolower(
+                $row['setup_id'] . ' ' .
+                $customer_name
+            )) ?>">
+            <!-- รหัสใบงาน -->
+            <td class="setup-col-id">
+                <strong><?= h($row['setup_id']) ?></strong>
             </td>
 
-            <td><?= h($row['pro_name'] ?? '-') ?></td>
+            <!-- เวลาที่สร้างใบติดตั้ง -->
+            <td class="setup-col-created">
+                <?php
+                $createdAt = trim((string) ($row['created_at'] ?? ''));
 
-            <td>
-                <?= h((string) (int) ($row['item_count'] ?? 0)) ?> รายการ
+                if ($createdAt !== '') {
+                    $createdTimestamp = strtotime($createdAt);
+
+                    echo h(
+                        $createdTimestamp
+                        ? date('d/m/Y H:i', $createdTimestamp)
+                        : $createdAt
+                    );
+                } else {
+                    echo '-';
+                }
+                ?>
             </td>
 
-            <td>
-                <b><?= h(number_format((float) ($row['setup_total'] ?? 0), 2)) ?> บาท</b>
+            <!-- ลูกค้า -->
+            <td class="setup-col-customer">
+                <strong>
+                    <?= h($customer_name !== '' ? $customer_name : '-') ?>
+                </strong>
             </td>
 
-            <td>
-                <?php if (!empty($row['tech_id']) && $tech_name !== ''): ?>
-                    <strong class="cs-tech-name-text"><?= h($tech_name) ?></strong>
-                <?php else: ?>
-                    <span class="cs-muted-text">-</span>
-                <?php endif; ?>
-            </td>
-
-            <td>
-                <span class="setup-status-badge <?= h(setup_status_class($status_value)) ?>">
-                    <?= h(setup_status_name($status_value)) ?>
+            <!-- จำนวนสินค้า -->
+            <td class="setup-col-items">
+                <span class="setup-item-count">
+                    <?= h((string) (int) ($row['item_count'] ?? 0)) ?>
+                    รายการ
                 </span>
             </td>
 
-            <td>
+            <!-- รวมค่าติดตั้ง -->
+            <td class="setup-col-total">
+                <strong>
+                    <?= h(number_format((float) ($row['setup_total'] ?? 0), 2)) ?>
+                    บาท
+                </strong>
+            </td>
+
+            <!-- จัดการ -->
+            <td class="setup-col-actions">
                 <div class="cs-row-actions">
-                    <a
-                        class="btn btn-small cs-table-action"
-                        href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($row['setup_id']))) ?>"
-                    >
+
+                    <a href="<?= h(
+                        app_system_url(
+                            'sale/setup_slip.php?id=' .
+                            urlencode((string) $row['setup_id'])
+                        )
+                    ) ?>" class="btn btn-small">
                         <?= icon_svg('file') ?>
-                        ใบติดตั้ง
+                        ดู
                     </a>
-                    <a
-                        class="btn btn-edit"
-                        href="<?= h(app_system_url('sale/edit_setup.php?id=' . urlencode($row['setup_id']))) ?>"
-                    >
+
+                    <a href="<?= h(
+                        app_system_url(
+                            'sale/edit_setup.php?id=' .
+                            urlencode((string) $row['setup_id'])
+                        )
+                    ) ?>" class="btn btn-small btn-edit">
                         <?= icon_svg('edit') ?>
                         แก้ไข
                     </a>
-                    <form method="POST" class="cs-inline-action-form" data-confirm-cancel-setup>
-                        <input type="hidden" name="action" value="cancel_setup">
-                        <input type="hidden" name="setup_id" value="<?= h($row['setup_id']) ?>">
-                        <button class="btn btn-delete" type="submit">
-                            <?= icon_svg('trash') ?>
-                            ยกเลิก
-                        </button>
-                    </form>
+
+                    <button
+                        type="button"
+                        class="btn btn-small btn-delete"
+                        data-open-cancel-modal
+                        data-setup-id="<?= h($row['setup_id']) ?>"
+                    >
+                        <?= icon_svg('trash') ?>
+                        ยกเลิก
+                    </button>
+
                 </div>
             </td>
         </tr>
@@ -341,10 +380,8 @@ function render_sale_setup_rows(array $rows, string $empty_message): void
 layout_header('รายการงานติดตั้ง', 'setups');
 ?>
 
-<link
-  rel="stylesheet"
-  href="<?= h(app_asset_url('sale/assets/css/setups.css')) ?>?v=<?= h(asset_version('sale/assets/css/setups.css')) ?>"
->
+<link rel="stylesheet"
+    href="<?= h(app_asset_url('sale/assets/css/setups.css')) ?>?v=<?= h(asset_version('sale/assets/css/setups.css')) ?>">
 
 <?= flash_message() ?>
 
@@ -357,13 +394,8 @@ layout_header('รายการงานติดตั้ง', 'setups');
     </div>
 
     <form class="toolbar setup-toolbar cs-list-toolbar cs-sale-admin-toolbar" action="javascript:void(0)">
-        <input
-            id="setupSearchInput"
-            type="search"
-            data-setup-search
-            placeholder="ค้นหารหัสใบงาน ลูกค้า สินค้า หรือช่าง"
-            autocomplete="off"
-        >
+        <input id="setupSearchInput" type="search" data-setup-search placeholder="ค้นหารหัสใบงาน ลูกค้า สินค้า หรือช่าง"
+            autocomplete="off">
 
         <button class="btn btn-search" type="submit" data-setup-search-submit>
             <?= icon_svg('search') ?>
@@ -385,13 +417,11 @@ layout_header('รายการงานติดตั้ง', 'setups');
             <thead>
                 <tr>
                     <th>รหัสใบงาน</th>
+                    <th>วันที่-เวลา</th>
                     <th>ลูกค้า</th>
-                    <th>สินค้าแรก</th>
-                    <th>จำนวนรายการ</th>
-                    <th>รวมค่าติดตั้ง</th>
-                    <th>ช่าง</th>
-                    <th>สถานะ</th>
-                    <th style="width:240px;">จัดการ</th>
+                    <th>จำนวนสินค้า</th>
+                    <th>ค่าติดตั้ง</th>
+                    <th>จัดการ</th>
                 </tr>
             </thead>
 
@@ -399,7 +429,7 @@ layout_header('รายการงานติดตั้ง', 'setups');
                 <?php render_sale_setup_rows($pending_setup_rows, 'ยังไม่มีใบงานที่รอดำเนินการ'); ?>
                 <?php if (count($pending_setup_rows) > 0): ?>
                     <tr data-setup-search-empty style="display: none;">
-                        <td colspan="9" class="cs-empty-cell">ไม่พบใบงานที่ตรงกับคำค้นหา</td>
+                        <td colspan="6" class="cs-empty-cell">ไม่พบใบงานที่ตรงกับคำค้นหา</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
@@ -409,9 +439,94 @@ layout_header('รายการงานติดตั้ง', 'setups');
 </section>
 
 
+<div class="cs-cancel-modal" id="cancelSetupModal" hidden>
+    <div class="cs-cancel-modal-backdrop" data-close-cancel-modal></div>
+
+    <div
+        class="cs-cancel-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cancelSetupModalTitle"
+    >
+        <div class="cs-cancel-modal-icon" aria-hidden="true">
+            <?= icon_svg('trash') ?>
+        </div>
+
+        <div class="cs-cancel-modal-content">
+            <h3 id="cancelSetupModalTitle">ยืนยันการยกเลิกใบงาน</h3>
+
+            <p>
+                คุณต้องการยกเลิกใบงาน
+                <strong id="cancelSetupCode">-</strong>
+                ใช่หรือไม่?
+            </p>
+
+            <div class="cs-cancel-modal-note">
+                ใบงานที่ยกเลิกจะถูกเก็บไว้ในประวัติ และไม่สามารถดำเนินการต่อจากหน้ารายการได้
+            </div>
+        </div>
+
+        <form method="POST" class="cs-cancel-modal-actions" id="cancelSetupForm">
+            <input type="hidden" name="action" value="cancel_setup">
+            <input type="hidden" name="setup_id" id="cancelSetupId" value="">
+
+            <button type="button" class="btn cs-cancel-modal-close" data-close-cancel-modal>
+                ปิด
+            </button>
+
+            <button type="submit" class="btn cs-cancel-modal-confirm">
+                <?= icon_svg('trash') ?>
+                ยืนยันยกเลิก
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+(() => {
+    'use strict';
+
+    const modal = document.getElementById('cancelSetupModal');
+    const setupIdInput = document.getElementById('cancelSetupId');
+    const setupCode = document.getElementById('cancelSetupCode');
+
+    if (!modal || !setupIdInput || !setupCode) return;
+
+    const openModal = (setupId) => {
+        setupIdInput.value = setupId;
+        setupCode.textContent = setupId || '-';
+        modal.hidden = false;
+        document.body.classList.add('cs-modal-open');
+    };
+
+    const closeModal = () => {
+        modal.hidden = true;
+        setupIdInput.value = '';
+        setupCode.textContent = '-';
+        document.body.classList.remove('cs-modal-open');
+    };
+
+    document.querySelectorAll('[data-open-cancel-modal]').forEach((button) => {
+        button.addEventListener('click', () => {
+            openModal(button.dataset.setupId || '');
+        });
+    });
+
+    modal.querySelectorAll('[data-close-cancel-modal]').forEach((element) => {
+        element.addEventListener('click', closeModal);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.hidden) {
+            closeModal();
+        }
+    });
+})();
+</script>
+
+
 <script
-  src="<?= h(app_asset_url('sale/assets/js/setups.js')) ?>?v=<?= h(asset_version('sale/assets/js/setups.js')) ?>"
-></script>
+    src="<?= h(app_asset_url('sale/assets/js/setups.js')) ?>?v=<?= h(asset_version('sale/assets/js/setups.js')) ?>"></script>
 
 <?php
 layout_footer();

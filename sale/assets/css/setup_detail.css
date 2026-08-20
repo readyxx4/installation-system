@@ -1,0 +1,683 @@
+/* Sale setup detail - summary card + separate process card */
+
+.sale-detail-page {
+    width: 64%;
+    max-width: 980px;
+    min-width: 760px;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+
+    margin: 0 auto;
+}
+
+/* =========================
+   SUMMARY CARD
+   ========================= */
+
+.sale-detail-summary-card,
+.sale-detail-process-card {
+    border: 1px solid #dbe8f7;
+    border-radius: 18px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.sale-detail-summary-card {
+    padding: 18px 20px 20px;
+}
+
+.sale-detail-summary-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 14px;
+}
+
+.sale-detail-back {
+    display: inline-flex;
+    margin-bottom: 8px;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.sale-detail-summary-title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 52px;
+}
+
+.sale-detail-summary-title-row h1 {
+    margin: 0;
+    color: #172033;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.sale-detail-summary-subtitle {
+    margin: 2px 0 0;
+
+    color: #7b8ba1;
+
+    font-size: 10.5px;
+}
+
+.sale-detail-setup-code {
+    margin: 5px 0 1px;
+
+    color: #52667f;
+
+    font-size: 15px;
+    font-weight: 800;
+
+    line-height: 1.25;
+}
+
+.sale-detail-setup-code strong {
+    margin-left: 5px;
+
+    color: #172033;
+
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.sale-detail-status-area {
+    display: flex;
+    align-items: center;
+
+    margin-top: 5px;
+    margin-left: 18px;
+
+    white-space: nowrap;
+}
+
+.sale-detail-status strong {
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.sale-detail-slip-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 8px 14px;
+    border: 1px solid #1565c0;
+    border-radius: 10px;
+    background: #1565c0;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.sale-detail-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    min-height: 30px;
+    padding: 6px 13px;
+
+    border: 1px solid transparent;
+    border-radius: 999px;
+
+    font-size: 10.5px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.sale-detail-status.waiting {
+    color: #1d4ed8;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.sale-detail-status.progress {
+    color: #0e7490;
+    background: #ecfeff;
+    border-color: #a5f3fc;
+}
+
+.sale-detail-status.done {
+    color: #15803d;
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.sale-detail-status.cancelled {
+    color: #b91c1c;
+    background: #fff1f2;
+    border-color: #fecdd3;
+}
+
+/* ลูกค้า */
+.sale-detail-customer-box {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+
+    padding: 13px 14px;
+
+    border: 1px solid #d8e6f6;
+    border-radius: 14px;
+
+    background: #f8fbff;
+}
+
+.sale-detail-customer-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+}
+
+.sale-detail-customer-icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 11px;
+
+    background: #eaf4ff;
+    color: #1685ed;
+}
+
+.sale-detail-customer-icon svg {
+    width: 20px;
+    height: 20px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+}
+
+.sale-detail-customer-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.sale-detail-customer-name small,
+.sale-detail-customer-name strong {
+    display: block;
+}
+
+.sale-detail-customer-name small {
+    margin-bottom: 2px;
+
+    color: #7b8ba1;
+
+    font-size: 9px;
+}
+
+.sale-detail-customer-name strong {
+    color: #172033;
+
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.sale-detail-customer-contact {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+
+    margin-top: 8px;
+}
+
+.sale-detail-customer-contact > div {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.sale-detail-customer-contact span {
+    width: 58px;
+    flex: 0 0 58px;
+
+    color: #7b8ba1;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.sale-detail-customer-contact strong {
+    min-width: 0;
+
+    color: #172033;
+
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.4;
+
+    word-break: break-word;
+}
+
+.sale-detail-customer-id span {
+    color: #7b8ba1;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.sale-detail-customer-id strong {
+    color: #172033;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.sale-detail-customer-id {
+    flex: 0 0 auto;
+
+    text-align: right;
+
+    padding-top: 2px;
+}
+
+.sale-detail-customer-id span,
+.sale-detail-customer-id strong {
+    display: block;
+}
+
+.sale-detail-customer-id strong {
+    margin-top: 3px;
+}
+
+/* รายละเอียดงานติดตั้ง + รายการสินค้า */
+.sale-detail-work-box {
+    margin-top: 12px;
+    overflow: hidden;
+
+    border: 1px solid #e3ebf5;
+    border-radius: 14px;
+
+    background: #ffffff;
+}
+
+.sale-detail-work-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    background: #f8fbff;
+    border-bottom: 1px solid #e7eef7;
+}
+
+.sale-detail-work-meta > div {
+    min-width: 0;
+    padding: 10px 13px;
+}
+
+.sale-detail-work-meta > div:nth-child(2) {
+    border-left: 1px solid #e7eef7;
+}
+
+.sale-detail-work-meta .wide {
+    grid-column: 1 / -1;
+    border-top: 1px solid #e7eef7;
+}
+
+.sale-detail-work-meta span,
+.sale-detail-work-meta strong {
+    display: block;
+}
+
+.sale-detail-work-meta span {
+    margin-bottom: 3px;
+
+    color: #7b8ba1;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.sale-detail-work-meta strong {
+    color: #172033;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+/* ตารางสินค้าแบบกระชับ */
+.sale-detail-product-table {
+    width: 100%;
+}
+
+.sale-detail-product-head,
+.sale-detail-product-row {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        80px
+        135px
+        125px;
+
+    align-items: center;
+}
+
+.sale-detail-product-head {
+    min-height: 34px;
+
+    padding: 0 13px;
+
+    border-bottom: 1px solid #e7eef7;
+
+    background: #fbfdff;
+
+    color: #65758b;
+
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.sale-detail-product-head span:nth-child(2) {
+    text-align: center;
+}
+
+.sale-detail-product-head span:nth-child(3),
+.sale-detail-product-head span:nth-child(4) {
+    text-align: right;
+}
+
+.sale-detail-product-row {
+    min-height: 42px;
+
+    padding: 6px 13px;
+
+    border-bottom: 1px solid #eef2f7;
+}
+
+.sale-detail-product-row:last-child {
+    border-bottom: 0;
+}
+
+.sale-detail-product-main {
+    min-width: 0;
+}
+
+.sale-detail-product-main strong {
+    color: #172033;
+
+    font-size: 11px;
+    font-weight: 900;
+
+    line-height: 1.35;
+}
+
+.sale-detail-product-row > span {
+    color: #52667f;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.sale-detail-product-row > span:nth-child(2) {
+    text-align: center;
+}
+
+.sale-detail-product-row > span:nth-child(3) {
+    text-align: right;
+}
+
+.sale-detail-product-total {
+    text-align: right;
+
+    color: #172033;
+
+    font-size: 11px;
+    font-weight: 900;
+
+    white-space: nowrap;
+}
+
+.sale-detail-empty {
+    padding: 22px;
+
+    text-align: center;
+
+    color: #94a3b8;
+
+    font-size: 10.5px;
+}
+
+/* หมายเหตุ + ยอดรวม อยู่ในกล่องเดียวกัน */
+.sale-detail-work-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+
+    border-top: 1px solid #e7eef7;
+
+    background: #ffffff;
+}
+
+.sale-detail-note {
+    min-width: 0;
+
+    padding: 10px 13px;
+}
+
+.sale-detail-note span,
+.sale-detail-note strong {
+    display: block;
+}
+
+.sale-detail-note span {
+    margin-bottom: 3px;
+
+    color: #7b8ba1;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.sale-detail-note strong {
+    color: #172033;
+
+    font-size: 10.5px;
+    font-weight: 800;
+
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.sale-detail-total-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 10px 13px;
+
+    border-left: 1px solid #e7eef7;
+
+    text-align: right;
+}
+
+.sale-detail-total-row span {
+    color: #65758b;
+
+    font-size: 9.5px;
+    font-weight: 800;
+}
+
+.sale-detail-total-row strong {
+    margin-top: 2px;
+
+    color: #0f4fb8;
+
+    font-size: 17px;
+    font-weight: 900;
+
+    white-space: nowrap;
+}
+
+/* =========================
+   PROCESS CARD
+   ========================= */
+
+.sale-detail-process-card {
+    padding: 16px 18px 18px;
+}
+
+.sale-detail-process-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.sale-detail-process-number {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 9px;
+
+    background: #eef6ff;
+    color: #1565c0;
+
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.sale-detail-process-head h2 {
+    margin: 0;
+    color: #172033;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.sale-detail-process-head p {
+    margin: 2px 0 0;
+    color: #7b8ba1;
+    font-size: 9.5px;
+}
+
+.sale-detail-process-row {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    overflow: hidden;
+    border: 1px solid #edf2f7;
+    border-radius: 12px;
+}
+
+.sale-detail-process-row > div {
+    min-width: 0;
+    padding: 12px 13px;
+}
+
+.sale-detail-process-row > div + div {
+    border-left: 1px solid #edf2f7;
+}
+
+.sale-detail-process-row span,
+.sale-detail-process-row strong {
+    display: block;
+}
+
+.sale-detail-process-row span {
+    margin-bottom: 4px;
+    color: #7b8ba1;
+    font-size: 9.5px;
+    font-weight: 700;
+}
+
+.sale-detail-process-row strong {
+    color: #172033;
+    font-size: 11.5px;
+    font-weight: 800;
+}
+
+@media (max-width: 900px) {
+    .sale-detail-page {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        margin: 0;
+    }
+
+    .sale-detail-summary-head {
+        flex-direction: column;
+    }
+
+    .sale-detail-slip-btn {
+        width: 100%;
+    }
+
+    .sale-detail-process-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .sale-detail-product-head {
+        display: none;
+    }
+
+    .sale-detail-product-row {
+        grid-template-columns: 1fr auto;
+        gap: 5px 12px;
+    }
+
+    .sale-detail-product-row > span:nth-child(2),
+    .sale-detail-product-row > span:nth-child(3) {
+        text-align: left;
+    }
+
+    .sale-detail-work-bottom {
+        grid-template-columns: 1fr;
+    }
+
+    .sale-detail-total-row {
+        border-left: 0;
+        border-top: 1px solid #e7eef7;
+    }
+
+
+    .sale-detail-summary-title-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .sale-detail-install-grid,
+    .sale-detail-process-row {
+        grid-template-columns: 1fr;
+    }
+
+    .sale-detail-install-grid > div:nth-child(2),
+    .sale-detail-process-row > div + div {
+        border-left: 0;
+        border-top: 1px solid #e5edf6;
+    }
+
+    .sale-detail-install-grid .wide {
+        grid-column: auto;
+    }
+
+    .sale-detail-customer-box {
+        flex-direction: column;
+    }
+
+    .sale-detail-customer-id {
+        width: 100%;
+        text-align: left;
+        padding-top: 8px;
+        border-top: 1px solid #e5edf6;
+    }
+}

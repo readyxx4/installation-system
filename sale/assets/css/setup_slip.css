@@ -1,77 +1,85 @@
-/* ===== Installation Slip Clean A4 - Single Row Detail ===== */
+/* =========================================================
+   ใบติดตั้ง - บริษัท ห้างโอวเปงฮง (2009) จำกัด
+   ขนาดครึ่ง A4 / A5 แนวนอน
+   ========================================================= */
+
 .install-slip-page {
     width: 210mm;
     max-width: 210mm;
     margin: 0 auto;
-    padding-bottom: 16px;
+    padding-bottom: 12px;
 }
 
 .install-slip-toolbar {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
 .install-slip-back,
 .install-slip-print {
-    min-height: 40px;
-    padding: 0 18px;
-    border-radius: 12px;
+    min-height: 34px;
+    padding: 0 14px;
     border: 1px solid #d4d4d8;
-    text-decoration: none;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #27272a;
+    font-size: 12px;
     font-weight: 800;
+    text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
 }
 
-.install-slip-back {
-    background: #ffffff;
-    color: #27272a;
-}
-
 .install-slip-print {
     background: #111827;
+    border-color: #111827;
     color: #ffffff;
 }
 
 .install-slip-paper {
     width: 210mm;
-    min-height: 297mm;
-    max-height: 297mm;
-    overflow: hidden;
-    background: #ffffff;
-    border: 1px solid #d4d4d8;
-    padding: 10mm 11mm;
+    height: 148mm;
+    min-height: 148mm;
+    max-height: 148mm;
     box-sizing: border-box;
-    color: #111827;
-    box-shadow: 0 16px 42px rgba(15, 23, 42, 0.12);
+    overflow: hidden;
+
+    padding: 6mm 7mm 5mm;
+
+    border: 1px solid #c4c4c4;
+    background: #ffffff;
+    color: #161616;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, .10);
+
+    font-family: Tahoma, Arial, sans-serif;
+    font-size: 11px;
 }
+
+/* ========================= HEADER ========================= */
 
 .install-slip-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12mm;
-    padding-bottom: 8mm;
-    border-bottom: 2px solid #111827;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 32mm;
+    gap: 5mm;
+    align-items: start;
 }
 
-.install-slip-brand {
+.install-slip-company {
     display: flex;
-    align-items: center;
-    gap: 8mm;
+    gap: 4mm;
+    align-items: flex-start;
     min-width: 0;
 }
 
 .install-slip-logo {
-    width: 26mm;
-    height: 26mm;
-    border-radius: 50%;
+    width: 24mm;
+    height: 17mm;
+    flex: 0 0 24mm;
     overflow: hidden;
-    flex: 0 0 26mm;
 }
 
 .install-slip-logo img {
@@ -80,163 +88,184 @@
     object-fit: contain;
 }
 
-.install-slip-brand-text h1 {
-    margin: 2mm 0 1mm;
-    font-size: 24px;
-    line-height: 1.12;
-    color: #111827;
+.install-slip-company-text {
+    min-width: 0;
+    padding-top: .3mm;
+}
+
+.install-slip-company-title {
+    display: flex;
+    align-items: baseline;
+    gap: 2mm;
+    margin-bottom: 1mm;
+    white-space: nowrap;
+}
+
+.install-slip-company-title strong {
+    font-size: 17px;
     font-weight: 900;
 }
 
-.install-slip-brand-text p {
-    margin: 0;
-    font-size: 12px;
-    color: #404040;
-    font-weight: 500;
+.install-slip-company-title span {
+    font-size: 9px;
+    font-weight: 700;
 }
 
-.install-slip-title {
-    min-width: 54mm;
-    border: 1px solid #bdbdbd;
-    border-radius: 5mm;
-    padding: 4mm 6mm;
+.install-slip-company-text p {
+    margin: .7mm 0 0;
+    font-size: 9px;
+    line-height: 1.4;
+    color: #333;
+}
+
+.install-slip-doc-title {
+    padding-top: 3mm;
     text-align: center;
 }
 
-.install-slip-title span {
+.install-slip-doc-title strong {
     display: block;
-    font-size: 11px;
-    color: #111827;
-    font-weight: 700;
-    margin-bottom: 1mm;
-}
-
-.install-slip-title strong {
-    display: block;
-    font-size: 28px;
+    font-size: 21px;
     line-height: 1;
-    color: #000000;
     font-weight: 900;
 }
 
-.install-slip-summary {
+/* ========================= CUSTOMER ========================= */
+
+.install-slip-customer-block {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8mm;
-    margin: 7mm 0 6mm;
+    grid-template-columns: minmax(0, 1fr) 49mm;
+    gap: 5mm;
+    align-items: stretch;
+    margin-top: 4mm;
 }
 
-.install-slip-summary div {
-    border: 1px solid #cfcfcf;
-    border-radius: 4mm;
-    padding: 4mm 5mm;
-    min-height: 18mm;
-    box-sizing: border-box;
-}
-
-.install-slip-summary span,
-.install-slip-info-grid span {
-    display: block;
-    color: #525252;
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.install-slip-summary strong {
-    color: #111827;
-    font-size: 15px;
-    font-weight: 900;
-}
-
-.install-slip-section {
-    margin-top: 6mm;
-}
-
-.install-slip-section h2,
-.install-slip-note h2 {
-    margin: 0 0 3mm;
-    padding-bottom: 2.2mm;
-    border-bottom: 2px solid #111827;
-    font-size: 17px;
-    color: #111827;
-    font-weight: 900;
-    display: block;
-}
-
-.install-slip-section-icon {
-    display: none !important;
-}
-
-.install-slip-info-grid,
-.install-slip-location-grid {
-    display: block;
-    border-top: 1px solid #d4d4d8;
-    border-bottom: 1px solid #d4d4d8;
-}
-
-.install-slip-info-grid div,
-.install-slip-location-grid div,
-.install-slip-info-grid .full {
-    display: flex;
-    align-items: flex-start;
-    gap: 7mm;
-    min-height: auto;
-    padding: 2.7mm 3mm;
-    border: 0 !important;
-    border-bottom: 1px solid #e5e7eb !important;
-    box-sizing: border-box;
-}
-
-.install-slip-info-grid div:last-child,
-.install-slip-location-grid div:last-child {
-    border-bottom: 0 !important;
-}
-
-.install-slip-info-grid span,
-.install-slip-location-grid span {
-    width: 38mm;
-    flex: 0 0 38mm;
-    margin: 0;
-    color: #525252;
-    font-size: 10px;
-    font-weight: 800;
-}
-
-.install-slip-info-grid strong,
-.install-slip-location-grid strong {
-    flex: 1;
+.install-slip-customer-box {
+    display: grid;
+    grid-template-columns: 1fr;
     min-width: 0;
-    color: #111827;
-    font-size: 12.5px;
+}
+
+.install-slip-customer-box > div {
+    display: grid;
+    grid-template-columns: 24mm minmax(0, 1fr);
+    align-items: baseline;
+    min-height: 6mm;
+    padding: 0.8mm 0;
+}
+.install-slip-customer-box span {
+    color: #222;
+    font-size: 10px;
     font-weight: 700;
-    line-height: 1.45;
+    white-space: nowrap;
+}
+
+.install-slip-customer-box strong {
+    min-width: 0;
+    color: #111;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.3;
     word-break: break-word;
+}
+
+.install-slip-doc-meta {
+    align-self: center;
+}
+
+.install-slip-doc-meta > div {
+    display: grid;
+    grid-template-columns: 21mm minmax(0, 1fr);
+    min-height: 6.5mm;
+    align-items: center;
+}
+
+.install-slip-doc-meta span {
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.install-slip-doc-meta strong {
+    text-align: right;
+    font-size: 10px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+/* ========================= TABLE ========================= */
+
+.install-slip-products {
+    margin-top: 3mm;
 }
 
 .install-slip-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
+
+    border-top: 1.5px solid #444;
+    border-bottom: 1.5px solid #444;
+
     font-size: 10px;
 }
 
-.install-slip-table th,
-.install-slip-table td {
-    border: 1px solid #bdbdbd;
-    padding: 2mm 1.8mm;
-    vertical-align: top;
-    color: #111827;
-}
-
 .install-slip-table th {
-    background: #f5f5f5;
-    font-size: 9.5px;
-    font-weight: 900;
+    height: 8mm;
+    padding: 1.5mm 1.5mm;
+
+    border: 0;
+    border-bottom: 1.5px solid #444;
+    border-right: 1px solid #b8b8b8;
+
+    color: #111;
+    background: #ffffff;
+
     text-align: center;
+    vertical-align: middle;
+
+    font-size: 10px;
+    font-weight: 900;
 }
 
-.install-slip-table tfoot td {
-    font-weight: 900;
-    background: #fafafa;
+.install-slip-table td {
+    height: 8mm;
+    padding: 2mm 1.7mm;
+
+    border: 0;
+    border-right: 1px solid #d0d0d0;
+
+    color: #111;
+    vertical-align: top;
+}
+
+.install-slip-table th:first-child,
+.install-slip-table td:first-child {
+    border-left: 1px solid #b8b8b8;
+}
+
+.install-slip-table th:last-child,
+.install-slip-table td:last-child {
+    border-right: 1px solid #b8b8b8;
+}
+
+.install-slip-table .col-no {
+    width: 12mm;
+}
+
+.install-slip-table .col-item {
+    width: auto;
+}
+
+.install-slip-table .col-qty {
+    width: 16mm;
+}
+
+.install-slip-table .col-unit {
+    width: 29mm;
+}
+
+.install-slip-table .col-net {
+    width: 29mm;
 }
 
 .install-slip-table .center {
@@ -247,81 +276,137 @@
     text-align: right;
 }
 
-.install-slip-table .total {
-    font-size: 11px;
+.install-slip-table .item-detail strong {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+
+/* ========================= SUMMARY ========================= */
+
+.install-slip-summary-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 58mm;
+
+    margin-top: 3mm;
+
+    border-top: 1.5px solid #444;
+    border-bottom: 0;
 }
 
 .install-slip-note {
-    margin-top: 5mm;
-    border: 1px solid #d4d4d8;
-    border-radius: 3mm;
-    padding: 3mm 4mm;
+    padding: 3mm;
+    border-right: 1px solid #aaa;
 }
 
-.install-slip-note h2 {
-    border-bottom: 0;
-    padding-bottom: 0;
-    margin-bottom: 2mm;
-    font-size: 14px;
+.install-slip-note-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
 }
 
-.install-slip-note-lines div {
-    height: 7mm;
-    border-bottom: 1px dashed #888;
+.install-slip-note-row span,
+.install-slip-amount-text span {
+    color: #333;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
-.install-slip-signatures {
-    margin-top: 5mm;
-    border: 1px solid #d4d4d8;
-    border-radius: 3mm;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    overflow: hidden;
-}
-
-.install-slip-signatures div {
-    min-height: 31mm;
-    padding: 4mm;
-    text-align: center;
-    box-sizing: border-box;
-}
-
-.install-slip-signatures div + div {
-    border-left: 1px solid #d4d4d8;
-}
-
-.install-slip-signatures strong {
-    display: block;
-    font-size: 11.5px;
-    color: #111827;
-    margin-bottom: 6mm;
-}
-
-.install-slip-signatures p {
-    width: 72%;
-    height: 8mm;
-    margin: 0 auto 2mm;
-    border-bottom: 1.5px solid #111827;
-}
-
-.install-slip-signatures span,
-.install-slip-signatures small {
-    display: block;
+.install-slip-note-row strong {
     font-size: 10.5px;
-    color: #111827;
-    line-height: 1.6;
+    font-weight: 800;
 }
+
+.install-slip-amount-text {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 3mm;
+}
+
+.install-slip-amount-text strong {
+    color: #111;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.install-slip-totals {
+    display: flex;
+    align-items: stretch;
+}
+
+.install-slip-totals .grand-total {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 3mm;
+
+    text-align: right;
+
+    border-bottom: 1.5px solid #444;
+}
+
+.install-slip-totals .grand-total span {
+    color: #333;
+    font-size: 10.5px;
+    font-weight: 800;
+}
+
+.install-slip-totals .grand-total strong {
+    margin-top: 1mm;
+    color: #111;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+/* ========================= SIGNATURE ========================= */
 
 .install-slip-footer {
-    margin-top: 4mm;
-    padding-top: 2mm;
-    border-top: 1px solid #d4d4d8;
-    display: flex;
-    justify-content: center;
-    gap: 7mm;
-    color: #525252;
-    font-size: 9.5px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12mm;
+    margin-top: 6mm;
 }
+
+.install-slip-signature {
+    text-align: center;
+}
+
+.install-slip-signature p {
+    width: 76%;
+    height: 7mm;
+    margin: 0 auto 1mm;
+    border-bottom: 1px dotted #555;
+}
+
+.install-slip-signature strong {
+    display: block;
+    color: #111;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.install-slip-signature small {
+    display: block;
+    margin-top: .5mm;
+    color: #555;
+    font-size: 8.5px;
+}
+
+.install-slip-signature span {
+    display: block;
+    margin-top: 1mm;
+    color: #555;
+    font-size: 8.5px;
+}
+
+/* ========================= PRINT ========================= */
 
 @media print {
     * {
@@ -332,7 +417,8 @@
     html,
     body {
         width: 210mm !important;
-        height: 297mm !important;
+        height: 148mm !important;
+        margin: 0 !important;
         background: #ffffff !important;
     }
 
@@ -353,58 +439,36 @@
     .content {
         display: block !important;
         width: 210mm !important;
-        height: 297mm !important;
+        height: 148mm !important;
         min-height: 0 !important;
-        overflow: hidden !important;
-        padding: 0 !important;
         margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
         background: #ffffff !important;
     }
 
     .install-slip-page {
         width: 210mm !important;
         max-width: 210mm !important;
-        height: 297mm !important;
-        padding: 0 !important;
+        height: 148mm !important;
         margin: 0 !important;
+        padding: 0 !important;
     }
 
     .install-slip-paper {
         width: 210mm !important;
-        height: 297mm !important;
-        min-height: 297mm !important;
-        max-height: 297mm !important;
-        box-shadow: none !important;
+        height: 148mm !important;
+        min-height: 148mm !important;
+        max-height: 148mm !important;
+        margin: 0 !important;
+        padding: 6mm 7mm 5mm !important;
         border: 0 !important;
-        padding: 9mm 10mm !important;
+        box-shadow: none !important;
         page-break-inside: avoid !important;
     }
 
     @page {
-        size: A4 portrait;
+        size: A5 landscape;
         margin: 0;
     }
 }
-
-/* Sale slip screen compact pass. Print sizing above remains unchanged. */
-body.app-body.role-2 .install-slip-page {
-    padding-bottom: 12px;
-}
-
-body.app-body.role-2 .install-slip-toolbar {
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-body.app-body.role-2 .install-slip-back,
-body.app-body.role-2 .install-slip-print {
-    min-height: 34px;
-    padding: 0 14px;
-    border-radius: 10px;
-    font-size: 12px;
-}
-
-body.app-body.role-2 .install-slip-paper {
-    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
-}
-

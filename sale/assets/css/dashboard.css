@@ -33,14 +33,14 @@ body.app-body.role-2,
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  min-height: 88px;
-  padding: 15px 22px;
+  min-height: 74px;
+  padding: 13px 20px;
   border: 1px solid rgba(37, 99, 235, .2);
-  border-radius: 18px;
+  border-radius: 16px;
   background:
     radial-gradient(circle at 86% 18%, rgba(125, 211, 252, .34), transparent 30%),
     linear-gradient(135deg, #0f3f7a 0%, #1565c0 56%, #1e88e5 100%);
-  box-shadow: 0 18px 44px rgba(15, 63, 122, .16);
+  box-shadow: 0 14px 34px rgba(15, 63, 122, .14);
 }
 
 .sales-dashboard-page .admin-dashboard-top::after {
@@ -63,15 +63,15 @@ body.app-body.role-2,
 .sales-dashboard-page .admin-dashboard-top h1 {
   margin: 0;
   color: #ffffff;
-  font-size: 23px;
+  font-size: 21px;
   font-weight: 900;
   line-height: 1.15;
 }
 
 .sales-dashboard-page .admin-dashboard-top p {
-  margin: 4px 0 0;
+  margin: 3px 0 0;
   color: rgba(255, 255, 255, .84);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -374,4 +374,207 @@ body.app-body.role-2,
   .sales-status-list .badge {
     justify-self: start;
   }
+}
+.sales-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(190px, 260px));
+    gap: 10px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.sales-summary-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 76px;
+    padding: 11px 14px;
+    background: #fff;
+    border: 1px solid #dbe8f7;
+    border-radius: 13px;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.sales-summary-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--card-accent);
+}
+
+.sales-summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(15, 76, 150, .10);
+}
+
+.sales-summary-icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: var(--card-soft);
+    color: var(--card-accent);
+    font-size: 16px;
+}
+
+.sales-summary-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sales-summary-info span {
+    font-size: 12px;
+    color: #65758b;
+    font-weight: 600;
+}
+
+.sales-summary-info strong {
+    margin: 1px 0;
+    color: var(--card-accent);
+    font-size: 22px;
+    line-height: 1.1;
+}
+
+.sales-summary-info small {
+    color: #8a98aa;
+    font-size: 11px;
+}
+
+.card-all {
+    --card-accent: #2563eb;
+    --card-soft: #eaf2ff;
+}
+
+
+
+.card-pending {
+    --card-accent: #f59e0b;
+    --card-soft: #fff5dd;
+}
+
+@media (max-width: 1000px) {
+    .sales-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* ==============================
+   Sale Home - Create Setup
+   ============================== */
+
+.sales-create-section {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    margin-top: 0;
+}
+
+.sales-create-head {
+    flex: 0 0 auto;
+    margin-bottom: 8px;
+}
+
+.sales-create-head h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f2f57;
+}
+
+.sales-create-head p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #6d7f96;
+}
+
+/* ลดพื้นที่ว่างของฟอร์มเมื่ออยู่หน้า Dashboard */
+.sales-dashboard-page .setup-page {
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0;
+    min-height: 0;
+}
+
+.sales-dashboard-page .setup-split-layout {
+    gap: 14px;
+}
+
+.sales-dashboard-page .setup-main-panel,
+.sales-dashboard-page .summary-card {
+    border-radius: 14px;
+}
+
+.sales-dashboard-page .setup-tabs {
+    min-height: 48px;
+}
+
+.sales-dashboard-page .setup-tab {
+    padding: 10px 14px;
+}
+
+.sales-dashboard-page .setup-tab-panel {
+    padding: 14px 18px;
+}
+
+.sales-dashboard-page .setup-section-heading {
+    margin-bottom: 10px;
+}
+
+.sales-dashboard-page .setup-section-heading h2 {
+    font-size: 18px;
+    margin-bottom: 2px;
+}
+
+.sales-dashboard-page .setup-section-heading p {
+    font-size: 12px;
+}
+
+.sales-dashboard-page .setup-search-wrap {
+    min-height: 42px;
+}
+
+.sales-dashboard-page .customer-search-results {
+    max-height: 245px;
+    overflow-y: auto;
+}
+
+.sales-dashboard-page .summary-card {
+    padding: 14px;
+}
+
+.sales-dashboard-page .summary-title-row {
+    margin-bottom: 10px;
+}
+
+.sales-dashboard-page .summary-items {
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.sales-dashboard-page textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.sales-dashboard-page #setupAddress {
+    height: 72px;
+}
+
+.sales-dashboard-page #setupNote {
+    height: 58px;
+}
+
+.sales-dashboard-page .setup-submit-btn {
+    min-height: 42px;
 }

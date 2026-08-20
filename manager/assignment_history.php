@@ -82,8 +82,10 @@ function assignment_cancel_disabled_title(array $row): string
         return 'งานนี้เสร็จสิ้นแล้ว ไม่สามารถยกเลิกได้';
     }
 
-    if (in_array((string) ($row['setup_status'] ?? ''), ['2', '3'], true)
-        || (string) ($row['assign_status'] ?? '') === '2') {
+    if (
+        in_array((string) ($row['setup_status'] ?? ''), ['2', '3'], true)
+        || (string) ($row['assign_status'] ?? '') === '2'
+    ) {
         return 'ไม่สามารถยกเลิกงานที่เริ่มดำเนินการแล้ว';
     }
 
@@ -284,7 +286,7 @@ function money_text($value): string
 
 $latest_assignment_join = "\n    LEFT JOIN assignment a\n        ON a.setup_id = s.setup_id\n       AND a.assign_id = (\n            SELECT a2.assign_id\n            FROM assignment a2\n            WHERE a2.setup_id = s.setup_id\n            ORDER BY a2.assign_date DESC, a2.assign_id DESC\n            LIMIT 1\n       )\n";
 
-$base_sql = "\n    SELECT\n        s.setup_id,\n        s.user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n\n        u.user_name,\n        u.user_phone,\n        u.user_email,\n        u.user_address,\n\n        p.pro_name,\n        p.pro_price_install,\n\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n        {$assign_install_date_select},\n        {$assign_install_time_select},\n\n        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n\n        m.user_name AS manager_name,\n\n        COUNT(idt.detail_id) AS item_count,\n        COALESCE(SUM(idt.install_total), 0) AS install_total\n\n    FROM setup s\n    LEFT JOIN `user` u ON s.user_id = u.user_id\n    LEFT JOIN product p ON s.pro_id = p.pro_id\n    {$latest_assignment_join}\n    LEFT JOIN technicians t ON a.tech_id = t.tech_id\n    LEFT JOIN `user` m ON a.assign_by = m.user_id\n    LEFT JOIN install_detail idt ON s.setup_id = idt.setup_id\n";
+$base_sql = "\n    SELECT\n        s.setup_id,\n        s.user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n\n        u.user_name,\n        u.user_phone,\n        u.user_email,\n        u.user_address,\n\n        p.pro_name,\n        p.pro_price_install,\n\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n        {$assign_install_date_select},\n        {$assign_install_time_select},\n        {$assign_install_end_time_select},\n\n        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n\n        m.user_name AS manager_name,\n\n        COUNT(idt.detail_id) AS item_count,\n        COALESCE(SUM(idt.install_total), 0) AS install_total\n\n    FROM setup s\n    LEFT JOIN `user` u ON s.user_id = u.user_id\n    LEFT JOIN product p ON s.pro_id = p.pro_id\n    {$latest_assignment_join}\n    LEFT JOIN technicians t ON a.tech_id = t.tech_id\n    LEFT JOIN `user` m ON a.assign_by = m.user_id\n    LEFT JOIN install_detail idt ON s.setup_id = idt.setup_id\n";
 
 $install_date_group_sql = $has_install_date ? "        a.assign_install_date,\n" : "";
 $install_time_group_sql = $has_install_time ? "        a.assign_install_time,\n" : "";
@@ -341,6 +343,25 @@ while ($row = $result->fetch_assoc()) {
     $row['created_at_display'] = thai_datetime($row['created_at'] ?? null);
     $row['install_date_display'] = thai_date($row['assign_install_date'] ?? null);
     $row['install_time_display'] = thai_time($row['assign_install_time'] ?? null);
+
+    $install_date_text = thai_date($row['assign_install_date'] ?? null);
+    $install_start_text = !empty($row['assign_install_time'])
+        ? date('H:i', strtotime((string) $row['assign_install_time']))
+        : '';
+    $install_end_text = !empty($row['assign_install_end_time'])
+        ? date('H:i', strtotime((string) $row['assign_install_end_time']))
+        : '';
+
+    if ($install_date_text === '-') {
+        $row['install_datetime_display'] = '-';
+    } elseif ($install_start_text === '') {
+        $row['install_datetime_display'] = $install_date_text;
+    } elseif ($install_end_text !== '') {
+        $row['install_datetime_display'] = $install_date_text . ' ' . $install_start_text . ' - ' . $install_end_text . ' น.';
+    } else {
+        $row['install_datetime_display'] = $install_date_text . ' ' . $install_start_text . ' น.';
+    }
+
     $row['item_count_display'] = (int) ($row['item_count'] ?? 0);
     $row['install_total_display'] = money_text($row['install_total'] ?? 0);
     $row['is_overdue'] = assignment_is_overdue($row);
@@ -353,8 +374,10 @@ while ($row = $result->fetch_assoc()) {
 
 function assignment_display_priority(array $row): int
 {
-    if ((string) ($row['setup_status'] ?? '') === '0'
-        && (empty($row['assign_id']) || (string) ($row['assign_status'] ?? '') !== '4')) {
+    if (
+        (string) ($row['setup_status'] ?? '') === '0'
+        && (empty($row['assign_id']) || (string) ($row['assign_status'] ?? '') !== '4')
+    ) {
         return 0;
     }
 
@@ -397,18 +420,23 @@ $status_tabs = [
 
 function assignment_history_row(array $row): bool
 {
-    $is_canceled = !empty($row['assign_id'])
-        && (string) ($row['assign_status'] ?? '') === '4';
-
-    if ($is_canceled) {
-        return true;
-    }
-
-    if (!empty($row['is_overdue'])) {
+    // ประวัติของหัวหน้าช่าง ต้องเคยมีการมอบหมายงานจริงก่อน
+    if (empty($row['assign_id'])) {
         return false;
     }
 
-    return (string) ($row['setup_status'] ?? '') !== '0';
+    // งานที่หัวหน้าช่างยกเลิกหลังจากมอบหมายแล้ว
+    if ((string) ($row['assign_status'] ?? '') === '4') {
+        return true;
+    }
+
+    // งานที่มอบหมายแล้วและเกินกำหนด
+    if (!empty($row['is_overdue'])) {
+        return true;
+    }
+
+    // งานอื่น ๆ ที่ผ่านขั้นตอนการมอบหมายแล้ว
+    return true;
 }
 
 $status_counts = [];
@@ -474,7 +502,8 @@ $setups_json = json_encode($visible_setups, JSON_UNESCAPED_UNICODE | JSON_UNESCA
 layout_header('ประวัติการมอบหมายงาน', 'assignment_history');
 ?>
 
-<div class="manager-list-page manager-list-detail-page assignment-from-setup-page assignment-list-no-tophead assignment-history-page">
+<div
+    class="manager-list-page manager-list-detail-page assignment-from-setup-page assignment-list-no-tophead assignment-history-page">
     <?= flash_message() ?>
 
     <section class="manager-panel manager-list-panel assignment-from-setup-card">
@@ -486,15 +515,12 @@ layout_header('ประวัติการมอบหมายงาน', 'a
 
         </div>
 
-        <form class="assignment-search-form assignment-toolbar-card" method="GET" action="<?= h(app_system_url('manager/assignment_history.php')) ?>">
+        <form class="assignment-search-form assignment-toolbar-card" method="GET"
+            action="<?= h(app_system_url('manager/assignment_history.php')) ?>">
             <div class="assignment-search-field">
                 <?= manager_icon_svg('search') ?>
-                <input
-                    type="text"
-                    name="q"
-                    value="<?= h($keyword) ?>"
-                    placeholder="ค้นหารหัสใบงาน ลูกค้า สินค้า ช่าง หรือผู้มอบหมาย"
-                >
+                <input type="text" name="q" value="<?= h($keyword) ?>"
+                    placeholder="ค้นหารหัสใบงาน ลูกค้า สินค้า ช่าง หรือผู้มอบหมาย">
             </div>
 
             <div class="assignment-toolbar-buttons">
@@ -503,7 +529,8 @@ layout_header('ประวัติการมอบหมายงาน', 'a
                     ค้นหา
                 </button>
 
-                <a class="btn-reset assignment-reset-btn" href="<?= h(app_system_url('manager/assignment_history.php')) ?>">
+                <a class="btn-reset assignment-reset-btn"
+                    href="<?= h(app_system_url('manager/assignment_history.php')) ?>">
                     <?= manager_icon_svg('reset') ?>
                     ล้างค้นหา
                 </a>
@@ -512,10 +539,8 @@ layout_header('ประวัติการมอบหมายงาน', 'a
 
         <div class="assignment-status-tabs">
             <?php foreach ($status_tabs as $key => $tab): ?>
-                <a
-                    class="assignment-status-tab status-<?= h($key) ?> <?= $status_filter === $key ? 'active' : '' ?>"
-                    href="<?= h(assignment_status_url($key, $keyword)) ?>"
-                >
+                <a class="assignment-status-tab status-<?= h($key) ?> <?= $status_filter === $key ? 'active' : '' ?>"
+                    href="<?= h(assignment_status_url($key, $keyword)) ?>">
                     <span><?= h($tab['label']) ?></span>
                     <?php $tab_count = (int) ($status_counts[$key] ?? 0); ?>
                     <?php if ($key === 'all'): ?>
@@ -528,74 +553,82 @@ layout_header('ประวัติการมอบหมายงาน', 'a
         </div>
 
         <div class="table-wrap manager-table-wrap assignment-table-wrap">
-            <table class="data-table manager-table assignment-detail-table setup-source-table">
+            <table
+                class="data-table manager-table assignment-detail-table setup-source-table assignment-history-compact-table">
                 <thead>
                     <tr>
-                        <th>รหัสใบงาน</th>
+                        <th>รหัสมอบหมายงาน</th>
                         <th>ลูกค้า</th>
-                        <th>สินค้า</th>
-                        <th>วันที่ติดตั้ง</th>
-                        <th>เวลา</th>
-                        <th>ช่าง</th>
-                        <th>ผู้มอบหมาย</th>
-                        <th>สถานะ</th>
-                        <th class="text-center">รายละเอียด</th>
+                        <th>ช่างติดตั้ง</th>
+                        <th>จำนวนสินค้า</th>
+                        <th>วันที่มอบหมาย</th>
+                        <th>วันที่-เวลาติดตั้ง</th>
+                        <th class="text-center">จัดการ</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     <?php if (count($visible_setups) === 0): ?>
                         <tr>
-                            <td colspan="9" class="empty-state">ยังไม่มีประวัติการมอบหมายงาน</td>
+                            <td colspan="7" class="empty-state">ยังไม่มีประวัติการมอบหมายงาน</td>
                         </tr>
                     <?php endif; ?>
 
                     <?php foreach ($visible_setups as $row): ?>
+                        <?php
+                        $can_cancel_row = assignment_cancel_allowed($row);
+                        $cancel_title = $can_cancel_row
+                            ? 'ยกเลิก'
+                            : assignment_cancel_disabled_title($row);
+                        ?>
+
                         <tr>
-                            <td><strong><?= h($row['setup_id']) ?></strong></td>
-
-                            <td><strong><?= h($row['customer_display']) ?></strong></td>
-
-                            <td><?= h($row['pro_name'] ?: '-') ?></td>
-
-                            <td><strong><?= h($row['install_date_display']) ?></strong></td>
-
-                            <td><?= h($row['install_time_display']) ?></td>
-
                             <td>
-                                <?php if (!empty($row['tech_id'])): ?>
-                                    <?php $tech_unavailable = assignment_has_unavailable_active_tech($row); ?>
-                                    <strong class="history-tech-name">
-                                        <span
-                                            class="history-tech-dot <?= $tech_unavailable ? 'is-unavailable' : 'is-ready' ?>"
-                                            title="<?= $tech_unavailable ? 'ไม่พร้อมรับงานใหม่' : 'พร้อมรับงาน' ?>"
-                                            aria-label="<?= $tech_unavailable ? 'ไม่พร้อมรับงานใหม่' : 'พร้อมรับงาน' ?>"
-                                        ></span>
-                                        <?= h($row['tech_display']) ?>
-                                    </strong>
-                                <?php else: ?>
-                                    -
-                                <?php endif; ?>
+                                <?= h($row['assign_id'] ?: '-') ?>
                             </td>
 
-                            <td><?= h($row['manager_display']) ?></td>
+                            <td>
+                                <?= h($row['customer_display']) ?>
+                            </td>
 
                             <td>
-                                <span class="badge <?= h($row['status_badge']) ?>">
-                                    <?= h($row['status_name']) ?>
-                                </span>
+                                <?= h($row['tech_display']) ?>
+                            </td>
+
+                            <td>
+                                <?= h((string) ($row['item_count_display'] ?? 0)) ?> รายการ
+                            </td>
+
+                            <td>
+                                <?= h($row['assign_date_display']) ?>
+                            </td>
+
+                            <td>
+                                <?= h($row['install_datetime_display']) ?>
                             </td>
 
                             <td class="assignment-row-actions assignment-icon-actions">
-                                <a
-                                    class="assignment-icon-btn view-slip history-detail-btn"
+                                <a class="assignment-icon-btn edit-assignment"
                                     href="<?= h(app_system_url('manager/assignments.php?setup_id=' . urlencode($row['setup_id']))) ?>"
-                                    title="ดูรายละเอียด"
-                                    aria-label="ดูรายละเอียด"
-                                >
-                                    <?= manager_icon_svg('eye') ?>
-                                    <span>ดูรายละเอียด</span>
+                                    title="แก้ไข" aria-label="แก้ไข">
+                                    <?= manager_icon_svg('edit') ?>
+                                    <span>แก้ไข</span>
                                 </a>
+
+                                <?php if ($can_cancel_row): ?>
+                                    <a class="assignment-icon-btn cancel-assign is-enabled"
+                                        href="<?= h(app_system_url('manager/assignment_list.php?action=cancel&id=' . urlencode($row['setup_id']))) ?>"
+                                        title="ยกเลิก" aria-label="ยกเลิก" data-confirm-cancel-assignment>
+                                        <?= manager_icon_svg('cancel') ?>
+                                        <span>ยกเลิก</span>
+                                    </a>
+                                <?php else: ?>
+                                    <button type="button" class="assignment-icon-btn cancel-assign is-disabled"
+                                        title="<?= h($cancel_title) ?>" aria-label="<?= h($cancel_title) ?>" disabled>
+                                        <?= manager_icon_svg('cancel') ?>
+                                        <span>ยกเลิก</span>
+                                    </button>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -606,8 +639,11 @@ layout_header('ประวัติการมอบหมายงาน', 'a
 </div>
 
 
-<link rel="stylesheet" href="<?= h(app_asset_url('manager/assets/css/manager.css')) ?>?v=<?= h(asset_version('manager/assets/css/manager.css')) ?>">
-<link rel="stylesheet" href="<?= h(app_asset_url('manager/assets/css/assignment_list.css')) ?>?v=<?= h(asset_version('manager/assets/css/assignment_list.css')) ?>">
-<link rel="stylesheet" href="<?= h(app_asset_url('manager/assets/css/assignment_history.css')) ?>?v=<?= h(asset_version('manager/assets/css/assignment_history.css')) ?>">
+<link rel="stylesheet"
+    href="<?= h(app_asset_url('manager/assets/css/manager.css')) ?>?v=<?= h(asset_version('manager/assets/css/manager.css')) ?>">
+<link rel="stylesheet"
+    href="<?= h(app_asset_url('manager/assets/css/assignment_list.css')) ?>?v=<?= h(asset_version('manager/assets/css/assignment_list.css')) ?>">
+<link rel="stylesheet"
+    href="<?= h(app_asset_url('manager/assets/css/assignment_history.css')) ?>?v=<?= h(asset_version('manager/assets/css/assignment_history.css')) ?>">
 
 <?php layout_footer(); ?>

@@ -39,9 +39,18 @@ function slip_thai_date(?string $date): string
     }
 
     $months = [
-        1 => 'มกราคม', 2 => 'กุมภาพันธ์', 3 => 'มีนาคม', 4 => 'เมษายน',
-        5 => 'พฤษภาคม', 6 => 'มิถุนายน', 7 => 'กรกฎาคม', 8 => 'สิงหาคม',
-        9 => 'กันยายน', 10 => 'ตุลาคม', 11 => 'พฤศจิกายน', 12 => 'ธันวาคม'
+        1 => 'มกราคม',
+        2 => 'กุมภาพันธ์',
+        3 => 'มีนาคม',
+        4 => 'เมษายน',
+        5 => 'พฤษภาคม',
+        6 => 'มิถุนายน',
+        7 => 'กรกฎาคม',
+        8 => 'สิงหาคม',
+        9 => 'กันยายน',
+        10 => 'ตุลาคม',
+        11 => 'พฤศจิกายน',
+        12 => 'ธันวาคม'
     ];
 
     $day = (int) date('j', $ts);
@@ -54,6 +63,97 @@ function slip_thai_date(?string $date): string
 function slip_money($value): string
 {
     return number_format((float) $value, 2) . ' บาท';
+}
+
+function thai_baht_text(float $amount): string
+{
+    $amount = round($amount, 2);
+    $formatted = number_format($amount, 2, '.', '');
+    [$integerPart, $decimalPart] = explode('.', $formatted);
+
+    $digits = [
+        0 => 'ศูนย์',
+        1 => 'หนึ่ง',
+        2 => 'สอง',
+        3 => 'สาม',
+        4 => 'สี่',
+        5 => 'ห้า',
+        6 => 'หก',
+        7 => 'เจ็ด',
+        8 => 'แปด',
+        9 => 'เก้า',
+    ];
+
+    $units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน'];
+
+    $readSixDigits = function (string $number) use ($digits, $units): string {
+        $number = str_pad($number, 6, '0', STR_PAD_LEFT);
+        $text = '';
+
+        for ($i = 0; $i < 6; $i++) {
+            $digit = (int) $number[$i];
+            $position = 5 - $i;
+
+            if ($digit === 0) {
+                continue;
+            }
+
+            if ($position === 1) {
+                if ($digit === 1) {
+                    $text .= 'สิบ';
+                } elseif ($digit === 2) {
+                    $text .= 'ยี่สิบ';
+                } else {
+                    $text .= $digits[$digit] . 'สิบ';
+                }
+                continue;
+            }
+
+            if ($position === 0) {
+                if ($digit === 1 && $text !== '') {
+                    $text .= 'เอ็ด';
+                } else {
+                    $text .= $digits[$digit];
+                }
+                continue;
+            }
+
+            $text .= $digits[$digit] . $units[$position];
+        }
+
+        return $text;
+    };
+
+    $readInteger = function (string $number) use (&$readInteger, $readSixDigits): string {
+        $number = ltrim($number, '0');
+
+        if ($number === '') {
+            return 'ศูนย์';
+        }
+
+        if (strlen($number) <= 6) {
+            return $readSixDigits($number);
+        }
+
+        $head = substr($number, 0, -6);
+        $tail = substr($number, -6);
+
+        $text = $readInteger($head) . 'ล้าน';
+
+        if ((int) $tail > 0) {
+            $text .= $readSixDigits($tail);
+        }
+
+        return $text;
+    };
+
+    $result = $readInteger($integerPart) . 'บาท';
+
+    if ((int) $decimalPart === 0) {
+        return $result . 'ถ้วน';
+    }
+
+    return $result . $readSixDigits($decimalPart) . 'สตางค์';
 }
 
 $install_date_select = slip_column_exists($conn, 'assignment', 'assign_install_date') ? 'a.assign_install_date' : 'NULL AS assign_install_date';
@@ -174,6 +274,17 @@ if (slip_table_exists($conn, 'system')) {
     }
 }
 
+
+/*
+ * ข้อมูลบริษัทสำหรับเอกสารใบติดตั้ง
+ * อ้างอิงสำนักงานใหญ่ของ บริษัท ห้างโอวเปงฮง (2009) จำกัด
+ */
+$slip_company_name = 'บริษัท ห้างโอวเปงฮง (2009) จำกัด';
+$slip_company_branch = 'สำนักงานใหญ่';
+$slip_company_address = '311-315 หมู่ที่ 2 ถนนราชนิกูล ตำบลในเมือง อำเภอบ้านไผ่ จังหวัดขอนแก่น 40110';
+$slip_company_phone = '043-272-136';
+$slip_company_tax_id = '0405551001144';
+
 $display_install_date = !empty($setup['assign_install_date']) ? $setup['assign_install_date'] : ($setup['setup_date'] ?? null);
 
 $slip_back_url = $from_manager
@@ -183,115 +294,88 @@ $slip_back_url = $from_manager
 layout_header('ใบติดตั้ง', 'setups');
 ?>
 
-<link
-  rel="stylesheet"
-  href="<?= h(app_asset_url('sale/assets/css/setup_slip.css')) ?>?v=<?= h(asset_version('sale/assets/css/setup_slip.css')) ?>"
->
+<link rel="stylesheet"
+    href="<?= h(app_asset_url('sale/assets/css/setup_slip.css')) ?>?v=<?= h(asset_version('sale/assets/css/setup_slip.css')) ?>">
 
 <div class="install-slip-page">
     <div class="install-slip-toolbar no-print manager-slip-toolbar">
-        <a class="install-slip-back" href="<?= h($slip_back_url) ?>">
+        <a class="install-slip-back" href="#" onclick="history.back(); return false;">
             ย้อนกลับ
         </a>
+
+        <button class="install-slip-print" type="button" onclick="window.print()">
+            พิมพ์ใบติดตั้ง
+        </button>
     </div>
 
     <section class="install-slip-paper">
         <header class="install-slip-header">
-            <div class="install-slip-brand">
+            <div class="install-slip-company">
                 <div class="install-slip-logo">
-                    <img src="<?= h(app_asset_url($logo_path)) ?>" alt="<?= h($company_name) ?>">
+                    <img src="<?= h(app_asset_url($logo_path)) ?>" alt="โอวเปงฮง">
                 </div>
 
-                <div class="install-slip-brand-text">
-                    <h1><?= h($company_name) ?></h1>
-                    <p>Installation System</p>
+                <div class="install-slip-company-text">
+                    <div class="install-slip-company-title">
+                        <strong><?= h($slip_company_name) ?></strong>
+                        <span>(<?= h($slip_company_branch) ?>)</span>
+                    </div>
+
+                    <p><?= h($slip_company_address) ?></p>
+
+                    <p>
+                        โทร. <?= h($slip_company_phone) ?>
+                        &nbsp;&nbsp;
+                        เลขประจำตัวผู้เสียภาษี <?= h($slip_company_tax_id) ?>
+                    </p>
                 </div>
             </div>
 
-            <div class="install-slip-title">
-                <span>เอกสารงานติดตั้ง</span>
+            <div class="install-slip-doc-title">
                 <strong>ใบติดตั้ง</strong>
             </div>
         </header>
 
-        <div class="install-slip-summary">
-            <div>
-                <span>รหัสงานติดตั้ง</span>
-                <strong><?= h($setup['setup_id']) ?></strong>
-            </div>
-
-
-            <div>
-                <span>รวมค่าติดตั้ง</span>
-                <strong><?= h(slip_money($total_amount)) ?></strong>
-            </div>
-        </div>
-
-        <section class="install-slip-section">
-            <h2>
-                <span class="install-slip-section-icon">●</span>
-                ข้อมูลลูกค้า
-            </h2>
-
-            <div class="install-slip-info-grid">
-
+        <section class="install-slip-customer-block">
+            <div class="install-slip-customer-box">
                 <div>
-                    <span>ชื่อผู้ใช้</span>
+                    <span>ชื่อลูกค้า :</span>
                     <strong><?= h($setup['user_name'] ?? '-') ?></strong>
                 </div>
 
                 <div>
-                    <span>เบอร์โทรศัพท์</span>
+                    <span>ที่อยู่ติดตั้ง :</span>
+                    <strong><?= h($setup['setup_address'] ?: ($setup['setup_location'] ?? '-')) ?></strong>
+                </div>
+
+                <div>
+                    <span>โทร :</span>
                     <strong><?= h($setup['user_phone'] ?? '-') ?></strong>
                 </div>
+            </div>
 
+            <div class="install-slip-doc-meta">
                 <div>
-                    <span>อีเมล</span>
-                    <strong><?= h($setup['user_email'] ?? '-') ?></strong>
+                    <span>เลขที่เอกสาร</span>
+                    <strong><?= h($setup['setup_id']) ?></strong>
                 </div>
 
-                <div class="full">
-                    <span>ที่อยู่ลูกค้า</span>
-                    <strong><?= nl2br(h($setup['user_address'] ?: '-')) ?></strong>
+                <div>
+                    <span>วันที่สร้าง</span>
+                    <strong><?= h(slip_thai_date($setup['created_at'] ?? null)) ?></strong>
                 </div>
             </div>
         </section>
 
-        <section class="install-slip-section">
-            <h2>
-                <span class="install-slip-section-icon">●</span>
-                สถานที่ติดตั้งและรายละเอียดหน้างาน
-            </h2>
-
-            <div class="install-slip-info-grid install-slip-location-grid">
-                <div>
-                    <span>ที่อยู่สำหรับติดตั้ง</span>
-                    <strong><?= nl2br(h($setup['setup_address'] ?: ($setup['setup_location'] ?? '-'))) ?></strong>
-                </div>
-
-                <div>
-                    <span>หมายเหตุ</span>
-                    <strong><?= nl2br(h($setup['setup_note'] ?: '-')) ?></strong>
-                </div>
-            </div>
-        </section>
-
-        <section class="install-slip-section">
-            <h2>
-                <span class="install-slip-section-icon">●</span>
-                รายการสินค้าและค่าติดตั้ง
-            </h2>
-
+        <section class="install-slip-products">
             <table class="install-slip-table">
                 <thead>
                     <tr>
-                        <th class="center">ลำดับ</th>
-                        <th>รหัสสินค้า</th>
-                        <th>รายการสินค้า</th>
-                        <th>ประเภท</th>
-                        <th class="center">จำนวน</th>
-                        <th class="right">ค่าติดตั้ง/หน่วย</th>
-                        <th class="right">รวม</th>
+                        <th class="col-no">ลำดับ</th>
+                        <th class="col-item">รายละเอียดสินค้า</th>
+                        <th class="col-qty">จำนวน</th>
+                        <th class="col-unit">ค่าติดตั้ง/หน่วย</th>
+                        <th class="col-net">จำนวนเงิน</th>
                     </tr>
                 </thead>
 
@@ -299,56 +383,71 @@ layout_header('ใบติดตั้ง', 'setups');
                     <?php foreach ($items as $index => $item): ?>
                         <tr>
                             <td class="center"><?= h((string) ($index + 1)) ?></td>
-                            <td><?= h($item['pro_id'] ?? '-') ?></td>
-                            <td><?= h($item['pro_name'] ?? '-') ?></td>
-                            <td><?= h($item['protype_name'] ?? '-') ?></td>
-                            <td class="center"><?= h((string) ($item['install_qty'] ?? 1)) ?></td>
-                            <td class="right"><?= h(number_format((float) ($item['install_price'] ?? 0), 2)) ?></td>
-                            <td class="right"><?= h(number_format((float) ($item['install_total'] ?? 0), 2)) ?></td>
+
+                            <td class="item-detail">
+                                <strong><?= h($item['pro_name'] ?? '-') ?></strong>
+                            </td>
+
+                            <td class="center">
+                                <?= h((string) ($item['install_qty'] ?? 1)) ?>
+                            </td>
+
+                            <td class="right">
+                                <?= h(number_format((float) ($item['install_price'] ?? 0), 2)) ?>
+                            </td>
+
+
+                            <td class="right">
+                                <?= h(number_format((float) ($item['install_total'] ?? 0), 2)) ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
-
-                <tfoot>
-                    <tr>
-                        <td colspan="6" class="right">รวมค่าติดตั้งทั้งสิ้น</td>
-                        <td class="right total"><?= h(number_format((float) $total_amount, 2)) ?></td>
-                    </tr>
-                </tfoot>
             </table>
         </section>
 
-        <section class="install-slip-note">
-            <h2>
-                <span class="install-slip-section-icon">●</span>
-                หมายเหตุ
-            </h2>
-            <div class="install-slip-note-lines">
-                <div></div>
-                <div></div>
-            </div>
-        </section>
+        <section class="install-slip-summary-row">
+            <div class="install-slip-note">
+                <div class="install-slip-note-row">
+                    <span>หมายเหตุ :</span>
+                    <strong><?= h($setup['setup_note'] ?: '-') ?></strong>
+                </div>
 
-        <section class="install-slip-signatures">
-            <div>
-                <strong>ลงชื่อผู้รับงาน (ลูกค้า)</strong>
-                <p></p>
-                <span>( ______________________________ )</span>
-                <small>วันที่ ______ / ______ / ______</small>
+                <div class="install-slip-amount-text">
+                    <span>จำนวนเงินเป็นตัวอักษร :</span>
+                    <strong><?= h(thai_baht_text($total_amount)) ?></strong>
+                </div>
             </div>
 
-            <div>
-                <strong>ลงชื่อผู้ติดตั้ง (เจ้าหน้าที่)</strong>
-                <p></p>
-                <span>( ______________________________ )</span>
-                <small>วันที่ ______ / ______ / ______</small>
+            <div class="install-slip-totals">
+                <div class="grand-total">
+                    <span>รวมค่าติดตั้งทั้งหมด</span>
+                    <strong><?= h(number_format($total_amount, 2)) ?> บาท</strong>
+                </div>
             </div>
         </section>
 
         <footer class="install-slip-footer">
-            <span>โทรศัพท์ 012-345-6789</span>
-            <span>opphenghong.install@gmail.com</span>
-            <span><?= h($company_address) ?></span>
+            <div class="install-slip-signature">
+                <p></p>
+                <strong>ผู้จัดทำใบงาน</strong>
+                <small>พนักงานขาย</small>
+                <span>วันที่ ____ / ____ / ______</span>
+            </div>
+
+            <div class="install-slip-signature">
+                <p></p>
+                <strong>ช่างผู้ติดตั้ง</strong>
+                <small>ผู้ดำเนินงานติดตั้ง</small>
+                <span>วันที่ ____ / ____ / ______</span>
+            </div>
+
+            <div class="install-slip-signature">
+                <p></p>
+                <strong>ลูกค้า / ผู้รับงาน</strong>
+                <small>ผู้ตรวจรับงานติดตั้ง</small>
+                <span>วันที่ ____ / ____ / ______</span>
+            </div>
         </footer>
     </section>
 </div>

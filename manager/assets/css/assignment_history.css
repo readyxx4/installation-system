@@ -4,54 +4,56 @@
    ไฟล์นี้เก็บเฉพาะส่วนที่แตกต่างของหน้า History เท่านั้น
    ========================================================= */
 
-/* ปุ่มดูรายละเอียด: ใช้โทนและขนาดเดียวกับปุ่มใน assignment_list */
-body.app-body.role-1 .assignment-history-page .history-detail-btn {
-    width: auto !important;
-    min-width: 96px !important;
-    height: 28px !important;
-    min-height: 28px !important;
-    padding: 0 9px !important;
-
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 5px !important;
-
-    border: 1px solid #93c5fd !important;
-    border-radius: 999px !important;
-    background: #eaf4ff !important;
-    color: #0f4fb8 !important;
-
-    box-shadow: none !important;
-    font-size: 10.5px !important;
-    font-weight: 800 !important;
-    line-height: 1 !important;
-    text-decoration: none !important;
+/* ปุ่มจัดการ: แก้ไข / ยกเลิก ให้เล็กและขนาดเท่ากัน */
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table
+.assignment-row-actions {
+    text-align: center !important;
     white-space: nowrap !important;
 }
 
-body.app-body.role-1 .assignment-history-page .history-detail-btn .manager-icon {
-    width: 13px !important;
-    height: 13px !important;
-    flex: 0 0 13px !important;
-    stroke-width: 2 !important;
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table
+.assignment-row-actions
+.assignment-icon-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+
+    width: 68px !important;
+    min-width: 68px !important;
+    height: 26px !important;
+    min-height: 26px !important;
+
+    padding: 0 7px !important;
+    margin: 0 2px !important;
+
+    border-radius: 10px !important;
+
+    font-size: 10.5px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
 }
 
-body.app-body.role-1 .assignment-history-page .history-detail-btn:hover {
-    color: #ffffff !important;
-    background: linear-gradient(
-        135deg,
-        var(--role-primary),
-        var(--role-primary-hover)
-    ) !important;
-    border-color: transparent !important;
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table
+.assignment-row-actions
+.assignment-icon-btn .manager-icon {
+    width: 12px !important;
+    height: 12px !important;
+    flex: 0 0 12px !important;
 }
 
-/* คอลัมน์รายละเอียด */
+/* คอลัมน์จัดการ */
 body.app-body.role-1 .assignment-history-page .assignment-detail-table th:last-child,
 body.app-body.role-1 .assignment-history-page .assignment-detail-table td:last-child {
-    width: 116px !important;
-    min-width: 116px !important;
+    width: 154px !important;
+    min-width: 154px !important;
+    text-align: center !important;
 }
 
 /* ยกเลิกแล้วเป็นสีเทาแบบสถานะสิ้นสุด */
@@ -61,22 +63,24 @@ body.app-body.role-1 .assignment-history-page .badge.slate {
     border: 1px solid #cbd5e1 !important;
 }
 
-/* มือถือ/จอแคบให้เหลือเฉพาะไอคอน */
+/* จอแคบ: คงปุ่มทั้งสองให้ขนาดเท่ากัน */
 @media (max-width: 1180px) {
-    body.app-body.role-1 .assignment-history-page .history-detail-btn {
-        width: 30px !important;
-        min-width: 30px !important;
-        padding: 0 !important;
-    }
-
-    body.app-body.role-1 .assignment-history-page .history-detail-btn span {
-        display: none !important;
+    body.app-body.role-1
+    .assignment-history-page
+    .assignment-history-compact-table
+    .assignment-row-actions
+    .assignment-icon-btn {
+        width: 64px !important;
+        min-width: 64px !important;
+        height: 26px !important;
+        min-height: 26px !important;
+        padding: 0 6px !important;
     }
 
     body.app-body.role-1 .assignment-history-page .assignment-detail-table th:last-child,
     body.app-body.role-1 .assignment-history-page .assignment-detail-table td:last-child {
-        width: 54px !important;
-        min-width: 54px !important;
+        width: 146px !important;
+        min-width: 146px !important;
     }
 }
 
@@ -167,4 +171,88 @@ body.app-body.role-1 .assignment-history-page .history-tech-dot.is-ready {
 body.app-body.role-1 .assignment-history-page .history-tech-dot.is-unavailable {
     background: #DC2626 !important;
     box-shadow: 0 0 0 2px rgba(220, 38, 38, .10) !important;
+}
+
+/* ให้ข้อความในแถว History ใช้สีเดียวกับหน้ารายการมอบหมายงาน */
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
+/* รหัสมอบหมายงาน */
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table th:nth-child(1),
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table td:nth-child(1) {
+    width: 14% !important;
+}
+
+/* ลูกค้า */
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table th:nth-child(2),
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table td:nth-child(2) {
+    width: 18% !important;
+}
+
+/* ช่างติดตั้ง */
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table th:nth-child(3),
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table td:nth-child(3) {
+    width: 16% !important;
+}
+
+/* จำนวนสินค้า */
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table th:nth-child(4),
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table td:nth-child(4) {
+    width: 10% !important;
+    text-align: center !important;
+}
+
+/* วันที่มอบหมาย */
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table th:nth-child(5),
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table td:nth-child(5) {
+    width: 14% !important;
+    text-align: center !important;
+}
+
+/* วันที่-เวลาติดตั้ง */
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table th:nth-child(6),
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table td:nth-child(6) {
+    width: 17% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+/* จัดการ */
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table th:nth-child(7),
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table td:nth-child(7) {
+    width: 18% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
 }

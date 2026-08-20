@@ -4,198 +4,97 @@ require_once __DIR__ . '/../db.php';
 
 require_login('2');
 
-function safe_count(mysqli $conn, string $sql): int
+function make_setup_id(mysqli $conn): string
 {
-    try {
-        $result = $conn->query($sql);
-        $row = $result->fetch_assoc();
+    $result = $conn->query("
+        SELECT MAX(CAST(SUBSTRING(setup_id, 5) AS UNSIGNED)) AS max_number
+        FROM setup
+        WHERE setup_id REGEXP '^SET-[0-9]{7}$'
+    ");
 
-        return (int) ($row['total'] ?? 0);
-    } catch (Throwable $e) {
-        return 0;
+    if (!$result) {
+        throw new RuntimeException('ไม่สามารถตรวจสอบรหัสใบงานล่าสุดได้');
     }
+
+    $row = $result->fetch_assoc();
+    $nextNumber = ((int) ($row['max_number'] ?? 0)) + 1;
+
+    if ($nextNumber > 9999999) {
+        throw new RuntimeException('รหัสใบงานเกินจำนวนที่ระบบรองรับ');
+    }
+
+    return 'SET-' . str_pad((string) $nextNumber, 7, '0', STR_PAD_LEFT);
 }
 
-function safe_money(mysqli $conn, string $sql): float
-{
-    try {
-        $result = $conn->query($sql);
-        $row = $result->fetch_assoc();
-
-        return (float) ($row['total'] ?? 0);
-    } catch (Throwable $e) {
-        return 0;
-    }
-}
-
-function icon_svg(string $name): string
+function create_setup_icon(string $name): string
 {
     $icons = [
-        'search' => '<svg class="dash-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20L16.65 16.65"></path></svg>',
-        'calendar' => '<svg class="dash-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path></svg>',
-        'plus' => '<svg class="dash-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>',
-        'users' => '<svg class="dash-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
-        'box' => '<svg class="dash-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path></svg>',
-        'check' => '<svg class="dash-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>',
-        'list' => '<svg class="dash-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 6h13"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M3 6h.01"></path><path d="M3 12h.01"></path><path d="M3 18h.01"></path></svg>',
-        'report' => '<svg class="dash-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V5"></path><path d="M4 19h16"></path><rect x="7" y="11" width="3" height="5" rx="1"></rect><rect x="12" y="8" width="3" height="8" rx="1"></rect><rect x="17" y="4" width="3" height="12" rx="1"></rect></svg>',
-        'card' => '<svg class="dash-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 10h18"></path><path d="M7 15h4"></path></svg>',
+        'search' => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>',
+        'user' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>',
+        'box' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path></svg>',
+        'map' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-4.4 7-11a7 7 0 1 0-14 0c0 6.6 7 11 7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>',
+        'note' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"></path><path d="M8 9h8"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg>',
+        'save' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><path d="M17 21v-8H7v8"></path><path d="M7 3v5h8"></path></svg>',
+        'plus' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>',
+        'minus' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path></svg>',
+        'eye' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
+        'trash' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>',
     ];
 
     return $icons[$name] ?? '';
 }
 
-$total_setups = safe_count($conn, "
-    SELECT COUNT(*) AS total
-    FROM setup
-");
-
-$total_wait_payment = safe_count($conn, "
-    SELECT COUNT(*) AS total
-    FROM product_payment
-    WHERE paymentpro_status = 0
-");
-
-$total_paid = safe_count($conn, "
-    SELECT COUNT(*) AS total
-    FROM product_payment
-    WHERE paymentpro_status = 1
-");
-
-$total_cancel = safe_count($conn, "
-    SELECT COUNT(*) AS total
-    FROM product_payment
-    WHERE paymentpro_status = 2
-");
-
-$total_customers = safe_count($conn, "
-    SELECT COUNT(*) AS total
+$customers = [];
+$customerResult = $conn->query("
+    SELECT user_id, user_name, user_phone, user_email, user_address
     FROM `user`
     WHERE user_role = 0
+    ORDER BY user_name ASC, user_id ASC
 ");
-
-$total_products = safe_count($conn, "
-    SELECT COUNT(*) AS total
-    FROM product
-");
-
-$total_install_price = safe_money($conn, "
-    SELECT COALESCE(SUM(install_total), 0) AS total
-    FROM install_detail
-");
-
-$recent_setups = $conn->query("
-    SELECT
-        s.setup_id,
-        s.setup_date,
-        s.setup_status,
-        u.user_name,
-        u.user_phone,
-        p.pro_name,
-        d.install_qty,
-        d.install_total
-    FROM setup s
-    LEFT JOIN `user` u ON s.user_id = u.user_id
-    LEFT JOIN product p ON s.pro_id = p.pro_id
-    LEFT JOIN install_detail d ON s.setup_id = d.setup_id
-    ORDER BY s.created_at DESC, s.setup_id DESC
-    LIMIT 5
-");
-
-$recent_payments = $conn->query("
-    SELECT
-        pp.paymentpro_id,
-        pp.paymentpro_date,
-        pp.paymentpro_status,
-        s.setup_id,
-        u.user_name,
-        p.pro_name
-    FROM product_payment pp
-    LEFT JOIN setup s ON pp.setup_id = s.setup_id
-    LEFT JOIN `user` u ON pp.user_id = u.user_id
-    LEFT JOIN product p ON s.pro_id = p.pro_id
-    ORDER BY pp.paymentpro_date DESC, pp.paymentpro_id DESC
-    LIMIT 5
-");
-
-$recent_setup_rows = [];
-$setup_status_counts = [
-    '0' => 0,
-    '1' => 0,
-    '2' => 0,
-    '3' => 0,
-    '4' => 0,
-];
-
-if ($recent_setups) {
-    while ($row = $recent_setups->fetch_assoc()) {
-        $recent_setup_rows[] = $row;
-        $status_key = (string) ($row['setup_status'] ?? '');
-
-        if (array_key_exists($status_key, $setup_status_counts)) {
-            $setup_status_counts[$status_key]++;
-        }
+if ($customerResult) {
+    while ($row = $customerResult->fetch_assoc()) {
+        $customers[] = $row;
     }
 }
 
-function setup_status_name($status): string
-{
-    return match ((string) $status) {
-        '0' => 'รอมอบหมายงาน',
-        '1' => 'มอบหมายงานแล้ว',
-        '2' => 'ช่างรับงานแล้ว',
-        '3' => 'กำลังติดตั้ง',
-        '4' => 'ติดตั้งเสร็จสิ้น',
-        default => 'ไม่ทราบสถานะ',
-    };
+$products = [];
+$productResult = $conn->query("
+    SELECT
+        p.pro_id,
+        p.pro_name,
+        p.pro_price,
+        p.pro_price_install,
+        p.protype_id,
+        pt.protype_name
+    FROM product p
+    LEFT JOIN product_type pt
+        ON p.protype_id = pt.protype_id
+    ORDER BY pt.protype_name ASC, p.pro_name ASC
+");
+if ($productResult) {
+    while ($row = $productResult->fetch_assoc()) {
+        $products[] = $row;
+    }
 }
 
-function setup_status_badge($status): string
-{
-    return match ((string) $status) {
-        '0' => 'orange',
-        '1' => 'blue',
-        '2' => 'green',
-        '3' => 'blue',
-        '4' => 'green',
-        default => 'red',
-    };
-}
+$setupId = make_setup_id($conn);
 
-function payment_status_name($status): string
-{
-    return match ((string) $status) {
-        '0' => 'รอจ่ายสินค้า',
-        '1' => 'จ่ายสินค้าแล้ว',
-        '2' => 'ยกเลิก',
-        default => 'ไม่ทราบสถานะ',
-    };
-}
-
-function payment_status_badge($status): string
-{
-    return match ((string) $status) {
-        '0' => 'orange',
-        '1' => 'green',
-        '2' => 'red',
-        default => 'blue',
-    };
-}
-
-layout_header('หน้าหลักพนักงานขาย', 'dashboard');
+layout_header('สร้างใบงานติดตั้ง', 'create_setup');
 ?>
 
-<link
-  rel="stylesheet"
-  href="<?= h(app_asset_url('sale/assets/css/dashboard.css')) ?>?v=<?= h(asset_version('sale/assets/css/dashboard.css')) ?>"
->
+<link rel="stylesheet"
+  href="<?= h(app_asset_url('sale/assets/css/dashboard.css')) ?>?v=<?= h(asset_version('sale/assets/css/dashboard.css')) ?>">
+
+<link rel="stylesheet"
+  href="<?= h(app_asset_url('sale/assets/css/create_setup.css')) ?>?v=<?= h(asset_version('sale/assets/css/create_setup.css')) ?>">
+
+<?= flash_message() ?>
 
 <div class="admin-dashboard-v2 sales-dashboard-page">
-
   <div class="admin-dashboard-top">
     <div>
-      <h1>ภาพรวมพนักงานขาย</h1>
-      <p>สรุปข้อมูลงานติดตั้ง การจ่ายสินค้า และรายการล่าสุดที่ต้องติดตาม</p>
+      <h1>สร้างใบงานติดตั้ง</h1>
+      <p>เลือกข้อมูลลูกค้า สินค้า และรายละเอียดการติดตั้งก่อนบันทึกใบงาน</p>
     </div>
 
     <div class="admin-dashboard-actions">
@@ -206,81 +105,9 @@ layout_header('หน้าหลักพนักงานขาย', 'dashboa
     </div>
   </div>
 
-  <div class="sales-dashboard-work-grid">
-    <section class="admin-widget sales-install-status-widget">
-      <div class="admin-widget-head">
-        <div>
-          <h2>สถานะงานติดตั้ง</h2>
-          <p>สรุปสถานะงานติดตั้งล่าสุด</p>
-        </div>
-      </div>
-
-      <div class="admin-mini-list sales-status-list">
-        <?php foreach ($setup_status_counts as $status_value => $status_total): ?>
-          <div class="admin-mini-item">
-            <div class="admin-mini-main">
-              <strong><?= h(setup_status_name($status_value)) ?></strong>
-              <span><?= h((string) $status_total) ?> รายการ</span>
-            </div>
-
-            <span class="badge <?= h(setup_status_badge($status_value)) ?>">
-              <?= h(setup_status_name($status_value)) ?>
-            </span>
-          </div>
-        <?php endforeach; ?>
-      </div>
-    </section>
-
-    <section class="admin-widget sales-latest-widget">
-      <div class="admin-widget-head">
-        <div>
-          <h2>งานติดตั้งล่าสุด</h2>
-          <p>รายการงานติดตั้งที่สร้างล่าสุด</p>
-        </div>
-
-        <a class="admin-widget-link" href="<?= h(app_system_url('sale/setups.php')) ?>">
-          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-          ดูทั้งหมด
-        </a>
-      </div>
-
-      <div class="admin-mini-list sales-mini-list">
-        <?php if (count($recent_setup_rows) === 0): ?>
-          <div class="admin-empty-mini">ยังไม่มีงานติดตั้ง</div>
-        <?php else: ?>
-          <div class="sales-latest-head" aria-hidden="true">
-            <span>รหัสใบงาน</span>
-            <span>ลูกค้า / สินค้า</span>
-            <span>วันที่</span>
-            <span>สถานะ</span>
-          </div>
-
-          <?php foreach ($recent_setup_rows as $row): ?>
-            <div class="admin-mini-item sales-latest-item">
-              <div class="sales-work-cell">
-                <strong><?= h($row['setup_id']) ?></strong>
-              </div>
-
-              <div class="sales-main-cell">
-                <strong><?= h($row['user_name'] ?? '-') ?></strong>
-                <span><?= h($row['pro_name'] ?? '-') ?></span>
-              </div>
-
-              <div class="sales-date-cell">
-                <?= !empty($row['setup_date']) ? h(date('d/m/Y', strtotime($row['setup_date']))) : '-' ?>
-              </div>
-
-              <span class="badge <?= h(setup_status_badge($row['setup_status'])) ?>">
-                <?= h(setup_status_name($row['setup_status'])) ?>
-              </span>
-            </div>
-          <?php endforeach; ?>
-        <?php endif; ?>
-      </div>
-    </section>
+  <div class="setup-page setup-work-page setup-create-page">
+    <?php require __DIR__ . '/partials/create_setup_form.php'; ?>
   </div>
-
 </div>
 
-<?php
-layout_footer();
+<?php layout_footer(); ?>

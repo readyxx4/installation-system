@@ -1,20 +1,63 @@
 (() => {
   'use strict';
 
-  const data = window.createSetupData || {
-    customers: [],
-    products: [],
-  };
+  const data = window.createSetupData || {};
+  const initial = window.createSetupInitial || {};
+
+  const customers = Array.isArray(data.customers) ? data.customers : [];
+  const products = Array.isArray(data.products) ? data.products : [];
 
   const state = {
-    customer: null,
-    items: new Map(),
+    selectedCustomer: null,
+    quantities: new Map(),
   };
 
-  const money = new Intl.NumberFormat('th-TH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+  const form = $('#createSetupForm');
+  if (!form) return;
+
+  const customerSearch = $('#customerSearch');
+  const customerResults = $('#customerResults');
+
+  const productSearch = $('#productSearch');
+  const productGrid = $('#productGrid');
+  const productEmptyState = $('#productEmptyState');
+
+  const selectedCustomerId = $('#selectedCustomerId');
+  const selectedItemsJson = $('#selectedItemsJson');
+
+  const summaryCustomerName = $('#summaryCustomerName');
+  const summaryCustomerDetails = $('#summaryCustomerDetails');
+  const summaryCustomerCode = $('#summaryCustomerCode');
+  const summaryCustomerPhone = $('#summaryCustomerPhone');
+  const summaryCustomerEmail = $('#summaryCustomerEmail');
+  const summaryCustomerAddress = $('#summaryCustomerAddress');
+
+  const summaryItems = $('#summaryItems');
+  const summaryItemCount = $('#summaryItemCount');
+  const summaryTotal = $('#summaryTotal');
+
+  const sameAddressCheckbox = $('#sameAddressCheckbox');
+  const setupAddress = $('#setupAddress');
+  const setupNote = $('#setupNote');
+
+  const submitSetupBtn = $('#submitSetupBtn');
+  const summarySubmitNote = $('#summarySubmitNote');
+
+  const productDetailModal = $('#productDetailModal');
+  const modalProductType = $('#modalProductType');
+  const modalProductName = $('#modalProductName');
+  const modalProductCode = $('#modalProductCode');
+  const modalProductPrice = $('#modalProductPrice');
+  const modalInstallPrice = $('#modalInstallPrice');
+
+  const money = (value) =>
+    `${Number(value || 0).toLocaleString('th-TH', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })} บาท`;
 
   const escapeHtml = (value) =>
     String(value ?? '')
@@ -24,865 +67,513 @@
       .replaceAll('"', '&quot;')
       .replaceAll("'", '&#039;');
 
-  /* =========================================================
-     DOM Elements
-     ========================================================= */
+  const userIcon = `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 21a8 8 0 0 0-16 0"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+  `;
 
-  const tabs = document.querySelectorAll('.setup-tab');
+  const boxIcon = `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M21 8l-9-5-9 5 9 5 9-5z"></path>
+      <path d="M3 8v8l9 5 9-5V8"></path>
+      <path d="M12 13v8"></path>
+    </svg>
+  `;
 
-  const panels = {
-    customer: document.getElementById('customerPanel'),
-    products: document.getElementById('productsPanel'),
-  };
+  const eyeIcon = `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+      <circle cx="12" cy="12" r="3"></circle>
+    </svg>
+  `;
 
-  const customerSearch =
-    document.getElementById('customerSearch');
+  const minusIcon = `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 12h14"></path>
+    </svg>
+  `;
 
-  const customerResults =
-    document.getElementById('customerResults');
-
-  const selectedCustomerCard =
-    document.getElementById('selectedCustomerCard');
-
-  const selectedCustomerId =
-    document.getElementById('selectedCustomerId');
-
-  const selectedCustomerName =
-    document.getElementById('selectedCustomerName');
-
-  const selectedCustomerCode =
-    document.getElementById('selectedCustomerCode');
-
-  const selectedCustomerPhone =
-    document.getElementById('selectedCustomerPhone');
-
-  const selectedCustomerEmail =
-    document.getElementById('selectedCustomerEmail');
-
-  const selectedCustomerAddress =
-    document.getElementById('selectedCustomerAddress');
-
-  const changeCustomerBtn =
-    document.getElementById('changeCustomerBtn');
-
-  const summaryCustomerName =
-    document.getElementById('summaryCustomerName');
-
-  const productSearch =
-    document.getElementById('productSearch');
-
-  const productGrid =
-    document.getElementById('productGrid');
-
-  const productEmptyState =
-    document.getElementById('productEmptyState');
-
-  const summaryItems =
-    document.getElementById('summaryItems');
-
-  const summaryItemCount =
-    document.getElementById('summaryItemCount');
-
-  const summaryTotal =
-    document.getElementById('summaryTotal');
-
-  const selectedItemsJson =
-    document.getElementById('selectedItemsJson');
-
-  const sameAddressCheckbox =
-    document.getElementById('sameAddressCheckbox');
-
-  const setupAddress =
-    document.getElementById('setupAddress');
-
-  const setupNote =
-    document.getElementById('setupNote');
-
-  const createSetupForm =
-    document.getElementById('createSetupForm');
-
-  const submitSetupBtn =
-    document.getElementById('submitSetupBtn');
-
-  const modal =
-    document.getElementById('productDetailModal');
-
-  const modalProductType =
-    document.getElementById('modalProductType');
-
-  const modalProductName =
-    document.getElementById('modalProductName');
-
-  const modalProductCode =
-    document.getElementById('modalProductCode');
-
-  const modalProductPrice =
-    document.getElementById('modalProductPrice');
-
-  const modalInstallPrice =
-    document.getElementById('modalInstallPrice');
-
-  /* =========================================================
-     Tab
-     ========================================================= */
+  const plusIcon = `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 5v14"></path>
+      <path d="M5 12h14"></path>
+    </svg>
+  `;
 
   function switchTab(tabName) {
-    tabs.forEach((tab) => {
-      tab.classList.toggle(
+    $$('.setup-tab').forEach((button) => {
+      button.classList.toggle(
         'active',
-        tab.dataset.tab === tabName
+        button.dataset.tab === tabName
       );
     });
 
-    Object.entries(panels).forEach(([name, panel]) => {
-      if (!panel) {
-        return;
-      }
-
-      panel.classList.toggle(
-        'active',
-        name === tabName
-      );
-    });
-  }
-
-  tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      switchTab(tab.dataset.tab);
-    });
-  });
-
-  /* =========================================================
-     Customer
-     ========================================================= */
-
-  function customerSearchText(customer) {
-    return [
-      customer.user_id,
-      customer.user_name,
-      customer.user_phone,
-      customer.user_email,
-      customer.user_address,
-    ]
-      .join(' ')
-      .toLowerCase();
-  }
-
-  function renderCustomerResults(query = '') {
-    if (!customerResults) {
-      return;
-    }
-
-    const normalizedQuery =
-      String(query).trim().toLowerCase();
-
-    const matches = data.customers.filter(
-      (customer) => {
-        if (!normalizedQuery) {
-          return true;
-        }
-
-        return customerSearchText(customer).includes(
-          normalizedQuery
-        );
-      }
+    $('#customerPanel')?.classList.toggle(
+      'active',
+      tabName === 'customer'
     );
 
-    if (matches.length === 0) {
+    $('#productsPanel')?.classList.toggle(
+      'active',
+      tabName === 'products'
+    );
+  }
+
+  function renderCustomers() {
+    const keyword = (customerSearch?.value || '')
+      .trim()
+      .toLowerCase();
+
+    const filtered = customers.filter((customer) => {
+      const haystack = [
+        customer.user_name,
+        customer.user_id,
+        customer.user_phone,
+        customer.user_email,
+        customer.user_address,
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      return haystack.includes(keyword);
+    });
+
+    if (!customerResults) return;
+
+    if (filtered.length === 0) {
       customerResults.innerHTML = `
         <div class="setup-empty-state">
-          ไม่พบข้อมูลลูกค้า
+          ไม่พบลูกค้าที่ค้นหา
         </div>
       `;
-
       return;
     }
 
-    customerResults.innerHTML = matches
+    customerResults.innerHTML = filtered
       .map((customer) => {
-        const isSelected =
-          state.customer &&
-          String(state.customer.user_id) ===
-            String(customer.user_id);
+        const selected =
+          String(state.selectedCustomer?.user_id || '') ===
+          String(customer.user_id || '');
 
         return `
           <button
             type="button"
-            class="customer-result-item${
-              isSelected ? ' selected' : ''
-            }"
-            data-customer-id="${escapeHtml(
-              customer.user_id
-            )}"
+            class="customer-result-item${selected ? ' selected' : ''}"
+            data-customer-id="${escapeHtml(customer.user_id)}"
+            aria-pressed="${selected ? 'true' : 'false'}"
           >
-            <div class="customer-result-avatar">
-              <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  d="M20 21a8 8 0 0 0-16 0"
-                ></path>
-                <circle
-                  cx="12"
-                  cy="7"
-                  r="4"
-                ></circle>
-              </svg>
-            </div>
+            <span class="customer-result-avatar">
+              ${userIcon}
+            </span>
 
-            <div class="customer-result-main">
-              <strong>
-                ${escapeHtml(
-                  customer.user_name || '-'
-                )}
-              </strong>
+            <span class="customer-result-main">
+              <strong>${escapeHtml(customer.user_name || '-')}</strong>
 
               <span>
-                ${escapeHtml(
-                  customer.user_phone || '-'
-                )}
+                ${escapeHtml(customer.user_phone || '-')}
                 ·
-                ${escapeHtml(
-                  customer.user_email || '-'
-                )}
+                ${escapeHtml(customer.user_email || '-')}
               </span>
-            </div>
-
-            <div class="customer-result-code">
-              ${escapeHtml(customer.user_id)}
-            </div>
+            </span>
           </button>
         `;
       })
       .join('');
   }
 
-  function selectCustomer(customerId) {
-    const customer = data.customers.find(
-      (item) =>
-        String(item.user_id) ===
-        String(customerId)
-    );
+  function updateCustomerSummary() {
+    const customer = state.selectedCustomer;
 
     if (!customer) {
+      if (selectedCustomerId) {
+        selectedCustomerId.value = '';
+      }
+
+      if (summaryCustomerName) {
+        summaryCustomerName.textContent =
+          'ยังไม่ได้เลือกลูกค้า';
+      }
+
+      if (summaryCustomerCode) {
+        summaryCustomerCode.textContent = '-';
+      }
+
+      if (summaryCustomerPhone) {
+        summaryCustomerPhone.textContent = '-';
+      }
+
+      if (summaryCustomerEmail) {
+        summaryCustomerEmail.textContent = '-';
+      }
+
+      if (summaryCustomerAddress) {
+        summaryCustomerAddress.textContent = '-';
+      }
+
+      if (summaryCustomerDetails) {
+        summaryCustomerDetails.hidden = true;
+      }
+
+      if (sameAddressCheckbox) {
+        sameAddressCheckbox.checked = false;
+        sameAddressCheckbox.disabled = true;
+      }
+
       return;
     }
-
-    state.customer = customer;
 
     if (selectedCustomerId) {
       selectedCustomerId.value =
         customer.user_id || '';
     }
 
-    if (selectedCustomerName) {
-      selectedCustomerName.textContent =
+    if (summaryCustomerName) {
+      summaryCustomerName.textContent =
         customer.user_name || '-';
     }
 
-    if (selectedCustomerCode) {
-      selectedCustomerCode.textContent =
+    if (summaryCustomerCode) {
+      summaryCustomerCode.textContent =
         customer.user_id || '-';
     }
 
-    if (selectedCustomerPhone) {
-      selectedCustomerPhone.textContent =
+    if (summaryCustomerPhone) {
+      summaryCustomerPhone.textContent =
         customer.user_phone || '-';
     }
 
-    if (selectedCustomerEmail) {
-      selectedCustomerEmail.textContent =
+    if (summaryCustomerEmail) {
+      summaryCustomerEmail.textContent =
         customer.user_email || '-';
     }
 
-    if (selectedCustomerAddress) {
-      selectedCustomerAddress.textContent =
+    if (summaryCustomerAddress) {
+      summaryCustomerAddress.textContent =
         customer.user_address || '-';
     }
 
-    if (summaryCustomerName) {
-      summaryCustomerName.textContent =
-        customer.user_name || '-';
+    if (summaryCustomerDetails) {
+      summaryCustomerDetails.hidden = false;
     }
 
-    if (selectedCustomerCard) {
-      selectedCustomerCard.hidden = false;
-    }
+    if (sameAddressCheckbox) {
+      sameAddressCheckbox.disabled = false;
 
-    renderCustomerResults(
-      customerSearch?.value || ''
-    );
-
-    if (
-      sameAddressCheckbox &&
-      sameAddressCheckbox.checked &&
-      setupAddress
-    ) {
-      setupAddress.value =
-        customer.user_address || '';
-
-      setupAddress.readOnly = true;
-    }
-
-    updateSubmitState();
-  }
-
-  function clearCustomer() {
-    state.customer = null;
-
-    if (selectedCustomerId) {
-      selectedCustomerId.value = '';
-    }
-
-    if (selectedCustomerCard) {
-      selectedCustomerCard.hidden = true;
-    }
-
-    if (summaryCustomerName) {
-      summaryCustomerName.textContent =
-        'ยังไม่ได้เลือกลูกค้า';
-    }
-
-    if (
-      sameAddressCheckbox &&
-      sameAddressCheckbox.checked &&
-      setupAddress
-    ) {
-      setupAddress.value = '';
-      setupAddress.readOnly = false;
-    }
-
-    if (customerSearch) {
-      customerSearch.value = '';
-      customerSearch.focus();
-    }
-
-    renderCustomerResults('');
-    updateSubmitState();
-  }
-
-  if (customerSearch) {
-    customerSearch.addEventListener(
-      'input',
-      () => {
-        renderCustomerResults(
-          customerSearch.value
-        );
+      if (
+        sameAddressCheckbox.checked &&
+        setupAddress
+      ) {
+        setupAddress.value =
+          customer.user_address || '';
       }
+    }
+  }
+
+  function selectCustomer(customerId) {
+    state.selectedCustomer =
+      customers.find(
+        (customer) =>
+          String(customer.user_id) ===
+          String(customerId)
+      ) || null;
+
+    updateCustomerSummary();
+    renderCustomers();
+    updateSubmitState();
+
+    if (state.selectedCustomer) {
+      switchTab('products');
+    }
+  }
+
+  function getQuantity(productId) {
+    return Number(
+      state.quantities.get(String(productId)) || 0
     );
   }
 
-  if (customerResults) {
-    customerResults.addEventListener(
-      'click',
-      (event) => {
-        const customerItem =
-          event.target.closest(
-            '[data-customer-id]'
-          );
-
-        if (!customerItem) {
-          return;
-        }
-
-        selectCustomer(
-          customerItem.dataset.customerId
-        );
-      }
-    );
-  }
-
-  if (changeCustomerBtn) {
-    changeCustomerBtn.addEventListener(
-      'click',
-      clearCustomer
-    );
-  }
-
-  /* =========================================================
-     Product
-     ========================================================= */
-
-  function getProduct(productId) {
-    return data.products.find(
-      (product) =>
-        String(product.pro_id) ===
-        String(productId)
-    );
-  }
-
-  function getQty(productId) {
-    return (
-      state.items.get(String(productId)) || 0
-    );
-  }
-
-  function setQty(productId, qty) {
-    const normalizedQty = Math.max(
+  function setQuantity(productId, quantity) {
+    const id = String(productId);
+    const next = Math.max(
       0,
-      Number.parseInt(qty, 10) || 0
+      Number(quantity) || 0
     );
 
-    if (normalizedQty === 0) {
-      state.items.delete(String(productId));
+    if (next === 0) {
+      state.quantities.delete(id);
     } else {
-      state.items.set(
-        String(productId),
-        normalizedQty
-      );
+      state.quantities.set(id, next);
     }
 
-    renderProducts(
-      productSearch?.value || ''
-    );
-
+    renderProducts();
     renderSummary();
+    updateHiddenItems();
+    updateSubmitState();
   }
 
-  function productSearchText(product) {
-    return [
-      product.pro_id,
-      product.pro_name,
-      product.protype_name,
-      product.protype_id,
-    ]
-      .join(' ')
+  function renderProducts() {
+    const keyword = (productSearch?.value || '')
+      .trim()
       .toLowerCase();
-  }
 
-  function renderProducts(query = '') {
-  if (!productGrid) {
-    return;
-  }
+    const filtered = products.filter((product) => {
+      const haystack = [
+        product.pro_name,
+        product.pro_id,
+        product.protype_name,
+      ]
+        .join(' ')
+        .toLowerCase();
 
-  const normalizedQuery =
-    String(query).trim().toLowerCase();
+      return haystack.includes(keyword);
+    });
 
-  const products = data.products.filter(
-    (product) => {
-      if (!normalizedQuery) {
-        return true;
-      }
-
-      return productSearchText(product).includes(
-        normalizedQuery
-      );
+    if (productEmptyState) {
+      productEmptyState.hidden =
+        filtered.length !== 0;
     }
-  );
 
-  if (productEmptyState) {
-    productEmptyState.hidden =
-      products.length > 0;
-  }
+    if (!productGrid) return;
 
-  if (products.length === 0) {
-    productGrid.innerHTML = '';
-    return;
-  }
+    productGrid.innerHTML = filtered
+      .map((product) => {
+        const qty = getQuantity(product.pro_id);
+        const selected = qty > 0;
 
-  productGrid.innerHTML = products
-    .map((product) => {
-      const qty = getQty(product.pro_id);
-      const installPrice = Number(
-        product.pro_price_install || 0
-      );
-
-      const isSelected = qty > 0;
-
-      return `
-        <article
-          class="product-list-item${
-            isSelected ? ' selected' : ''
-          }"
-        >
-          <div class="product-list-icon">
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path d="M21 8l-9-5-9 5 9 5 9-5z"></path>
-              <path d="M3 8v8l9 5 9-5V8"></path>
-              <path d="M12 13v8"></path>
-            </svg>
-          </div>
-
-          <div class="product-list-info">
-            <div class="product-list-type">
-              ${escapeHtml(
-                product.protype_name ||
-                  'ไม่ระบุประเภท'
-              )}
-            </div>
-
-            <strong class="product-list-name">
-              ${escapeHtml(
-                product.pro_name || '-'
-              )}
-            </strong>
-
-            <div class="product-list-code">
-              ${escapeHtml(
-                product.pro_id || '-'
-              )}
-            </div>
-          </div>
-
-          <div class="product-list-price">
-            <small>ค่าติดตั้งต่อหน่วย</small>
-
-            <strong>
-              ${money.format(installPrice)}
-              บาท
-            </strong>
-          </div>
-
-          <button
-            type="button"
-            class="product-detail-btn"
-            data-product-detail="${escapeHtml(
-              product.pro_id
-            )}"
-            aria-label="ดูรายละเอียดสินค้า"
+        return `
+          <div
+            class="product-list-item${selected ? ' selected' : ''}"
+            data-product-id="${escapeHtml(product.pro_id)}"
           >
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"
-              ></path>
-              <circle
-                cx="12"
-                cy="12"
-                r="3"
-              ></circle>
-            </svg>
-          </button>
+            <div class="product-list-icon">
+              ${boxIcon}
+            </div>
 
-          <div class="qty-control">
-            <button
-              type="button"
-              class="qty-btn"
-              data-qty-action="minus"
-              data-product-id="${escapeHtml(
-                product.pro_id
-              )}"
-              aria-label="ลดจำนวนสินค้า"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path d="M5 12h14"></path>
-              </svg>
-            </button>
+            <div class="product-list-info">
+              <div class="product-list-type">
+                ${escapeHtml(
+                  product.protype_name || 'สินค้า'
+                )}
+              </div>
 
-            <span class="qty-value">
-              ${qty}
-            </span>
+              <strong class="product-list-name">
+                ${escapeHtml(product.pro_name || '-')}
+              </strong>
+
+              <div class="product-list-code">
+                ${escapeHtml(product.pro_id || '-')}
+              </div>
+            </div>
 
             <button
               type="button"
-              class="qty-btn"
-              data-qty-action="plus"
-              data-product-id="${escapeHtml(
-                product.pro_id
-              )}"
-              aria-label="เพิ่มจำนวนสินค้า"
+              class="product-detail-btn"
+              data-action="detail"
+              data-product-id="${escapeHtml(product.pro_id)}"
+              aria-label="ดูรายละเอียดสินค้า"
             >
-              <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path d="M12 5v14"></path>
-                <path d="M5 12h14"></path>
-              </svg>
+              ${eyeIcon}
             </button>
+
+            <div class="product-list-price">
+              <small>ค่าติดตั้งต่อหน่วย</small>
+              <strong>
+                ${money(product.pro_price_install)}
+              </strong>
+            </div>
+
+            <div class="qty-control">
+              <button
+                type="button"
+                class="qty-btn"
+                data-action="minus"
+                data-product-id="${escapeHtml(product.pro_id)}"
+              >
+                ${minusIcon}
+              </button>
+
+              <span class="qty-value">
+                ${qty}
+              </span>
+
+              <button
+                type="button"
+                class="qty-btn"
+                data-action="plus"
+                data-product-id="${escapeHtml(product.pro_id)}"
+              >
+                ${plusIcon}
+              </button>
+            </div>
           </div>
-        </article>
-      `;
-    })
-    .join('');
-}
-
-  if (productSearch) {
-    productSearch.addEventListener(
-      'input',
-      () => {
-        renderProducts(productSearch.value);
-      }
-    );
+        `;
+      })
+      .join('');
   }
 
-  if (productGrid) {
-    productGrid.addEventListener(
-      'click',
-      (event) => {
-        const qtyButton =
-          event.target.closest(
-            '[data-qty-action]'
-          );
-
-        if (qtyButton) {
-          const productId =
-            qtyButton.dataset.productId;
-
-          const action =
-            qtyButton.dataset.qtyAction;
-
-          const currentQty =
-            getQty(productId);
-
-          if (action === 'plus') {
-            setQty(
-              productId,
-              currentQty + 1
-            );
-          } else {
-            setQty(
-              productId,
-              currentQty - 1
-            );
-          }
-
-          return;
-        }
-
-        const detailButton =
-          event.target.closest(
-            '[data-product-detail]'
-          );
-
-        if (detailButton) {
-          openProductModal(
-            detailButton.dataset.productDetail
-          );
-        }
-      }
-    );
+  function selectedProducts() {
+    return products
+      .map((product) => ({
+        ...product,
+        qty: getQuantity(product.pro_id),
+      }))
+      .filter(
+        (product) => product.qty > 0
+      );
   }
-
-  /* =========================================================
-     Summary
-     ========================================================= */
 
   function renderSummary() {
-    const items = Array.from(
-      state.items.entries()
-    )
-      .map(([productId, qty]) => {
-        const product =
-          getProduct(productId);
-
-        if (!product) {
-          return null;
-        }
-
-        return {
-          product,
-          qty,
-        };
-      })
-      .filter(Boolean);
-
-    const totalQty = items.reduce(
-      (sum, item) => sum + item.qty,
-      0
-    );
-
-    const totalPrice = items.reduce(
-      (sum, item) =>
-        sum +
-        Number(
-          item.product.pro_price_install || 0
-        ) *
-          item.qty,
-      0
-    );
+    const selected = selectedProducts();
 
     if (summaryItemCount) {
       summaryItemCount.textContent =
-        `${totalQty} รายการ`;
+        `${selected.length} รายการ`;
     }
 
-    if (summaryTotal) {
-      summaryTotal.textContent =
-        `${money.format(totalPrice)} บาท`;
-    }
+    if (!summaryItems) return;
 
-    if (selectedItemsJson) {
-      selectedItemsJson.value =
-        JSON.stringify(
-          items.map((item) => ({
-            pro_id: item.product.pro_id,
-            qty: item.qty,
-          }))
-        );
-    }
-
-    if (!summaryItems) {
-      updateSubmitState();
-      return;
-    }
-
-    if (items.length === 0) {
+    if (selected.length === 0) {
       summaryItems.innerHTML = `
         <div class="summary-empty">
           ยังไม่มีสินค้าที่เลือก
         </div>
       `;
-    } else {
-      summaryItems.innerHTML = items
-        .map((item) => {
-          const price = Number(
-            item.product.pro_price_install || 0
-          );
 
-          const subtotal =
-            price * item.qty;
-
-          return `
-            <div class="summary-item">
-              <div class="summary-item-main">
-                <strong>
-                  ${escapeHtml(
-                    item.product.pro_name || '-'
-                  )}
-                </strong>
-
-                <span>
-                  ${item.qty}
-                  ×
-                  ${money.format(price)}
-                  บาท
-                </span>
-              </div>
-
-              <div class="summary-item-side">
-                <strong>
-                  ${money.format(subtotal)}
-                  บาท
-                </strong>
-
-                <button
-                  type="button"
-                  class="summary-remove-btn"
-                  data-remove-product="${escapeHtml(
-                    item.product.pro_id
-                  )}"
-                  aria-label="ลบสินค้า"
-                >
-                  ลบ
-                </button>
-              </div>
-            </div>
-          `;
-        })
-        .join('');
-    }
-
-    updateSubmitState();
-  }
-
-  if (summaryItems) {
-    summaryItems.addEventListener(
-      'click',
-      (event) => {
-        const removeButton =
-          event.target.closest(
-            '[data-remove-product]'
-          );
-
-        if (!removeButton) {
-          return;
-        }
-
-        setQty(
-          removeButton.dataset.removeProduct,
-          0
-        );
+      if (summaryTotal) {
+        summaryTotal.textContent = money(0);
       }
-    );
-  }
 
-  /* =========================================================
-     Address
-     ========================================================= */
-
-  if (sameAddressCheckbox) {
-    sameAddressCheckbox.addEventListener(
-      'change',
-      () => {
-        if (!setupAddress) {
-          return;
-        }
-
-        if (sameAddressCheckbox.checked) {
-          setupAddress.value =
-            state.customer?.user_address || '';
-
-          setupAddress.readOnly =
-            Boolean(state.customer);
-        } else {
-          setupAddress.readOnly = false;
-        }
-
-        updateSubmitState();
-      }
-    );
-  }
-
-  if (setupAddress) {
-    setupAddress.addEventListener(
-      'input',
-      updateSubmitState
-    );
-  }
-
-  /* =========================================================
-     Submit validation
-     ========================================================= */
-
-  function updateSubmitState() {
-    if (!submitSetupBtn) {
       return;
     }
 
-    const hasCustomer =
-      Boolean(state.customer);
+    summaryItems.innerHTML = selected
+      .map((product) => {
+        const unitPrice = Number(
+          product.pro_price_install || 0
+        );
 
-    const hasProducts =
-      state.items.size > 0;
+        const total =
+          unitPrice * product.qty;
 
-    const hasAddress =
-      Boolean(
-        setupAddress &&
-          setupAddress.value.trim() !== ''
-      );
+        return `
+          <div class="summary-item">
+            <div class="summary-item-main">
+              <strong>
+                ${escapeHtml(product.pro_name || '-')}
+              </strong>
 
-    submitSetupBtn.disabled = !(
-      hasCustomer &&
-      hasProducts &&
-      hasAddress
+              <span>
+                จำนวน ${product.qty} ชิ้น
+                · ค่าติดตั้ง ${money(unitPrice)}/ชิ้น
+              </span>
+            </div>
+
+            <div class="summary-item-side">
+              <strong>
+                ${money(total)}
+              </strong>
+
+              <button
+                type="button"
+                class="summary-remove-btn"
+                data-remove-product="${escapeHtml(product.pro_id)}"
+              >
+                ลบ
+              </button>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+
+    const total = selected.reduce(
+      (sum, product) =>
+        sum +
+        Number(product.pro_price_install || 0) *
+          product.qty,
+      0
     );
+
+    if (summaryTotal) {
+      summaryTotal.textContent =
+        money(total);
+    }
   }
 
-  /* =========================================================
-     Product Modal
-     ========================================================= */
+  function updateHiddenItems() {
+    const payload = selectedProducts().map(
+      (product) => ({
+        pro_id: product.pro_id,
+        qty: product.qty,
+      })
+    );
+
+    if (selectedItemsJson) {
+      selectedItemsJson.value =
+        JSON.stringify(payload);
+    }
+  }
+
+  function updateSubmitState() {
+    const hasCustomer =
+      Boolean(state.selectedCustomer);
+
+    const hasItems =
+      selectedProducts().length > 0;
+
+    const hasAddress =
+      Boolean(setupAddress?.value.trim());
+
+    const ready =
+      hasCustomer &&
+      hasItems &&
+      hasAddress;
+
+    if (submitSetupBtn) {
+      submitSetupBtn.disabled = !ready;
+    }
+
+    if (summarySubmitNote) {
+      if (ready) {
+        summarySubmitNote.textContent =
+          'ข้อมูลพร้อมสำหรับบันทึกใบงาน';
+      } else {
+        const missing = [];
+
+        if (!hasCustomer) {
+          missing.push('ลูกค้า');
+        }
+
+        if (!hasItems) {
+          missing.push('สินค้า');
+        }
+
+        if (!hasAddress) {
+          missing.push('ที่อยู่ติดตั้ง');
+        }
+
+        summarySubmitNote.textContent =
+          `กรุณาเลือก/กรอก ${missing.join(', ')} ให้ครบ`;
+      }
+    }
+  }
 
   function openProductModal(productId) {
-    const product = getProduct(productId);
+    const product = products.find(
+      (item) =>
+        String(item.pro_id) ===
+        String(productId)
+    );
 
-    if (!product || !modal) {
+    if (!product || !productDetailModal) {
       return;
     }
 
     if (modalProductType) {
       modalProductType.textContent =
-        product.protype_name ||
-        'ไม่ระบุประเภท';
+        product.protype_name || 'สินค้า';
     }
 
     if (modalProductName) {
@@ -897,160 +588,268 @@
 
     if (modalProductPrice) {
       modalProductPrice.textContent =
-        `${money.format(
-          Number(product.pro_price || 0)
-        )} บาท`;
+        money(product.pro_price);
     }
 
     if (modalInstallPrice) {
       modalInstallPrice.textContent =
-        `${money.format(
-          Number(
-            product.pro_price_install || 0
-          )
-        )} บาท`;
+        money(product.pro_price_install);
     }
 
-    modal.hidden = false;
-    document.body.style.overflow = 'hidden';
+    productDetailModal.hidden = false;
   }
 
   function closeProductModal() {
-    if (!modal) {
-      return;
+    if (productDetailModal) {
+      productDetailModal.hidden = true;
     }
-
-    modal.hidden = true;
-    document.body.style.overflow = '';
   }
 
-  if (modal) {
-    modal.addEventListener(
+  $$('.setup-tab').forEach((button) => {
+    button.addEventListener(
       'click',
-      (event) => {
-        const closeElement =
-          event.target.closest(
-            '[data-close-modal]'
-          );
-
-        if (closeElement) {
-          closeProductModal();
-        }
+      () => {
+        switchTab(
+          button.dataset.tab || 'customer'
+        );
       }
     );
-  }
+  });
+
+  customerSearch?.addEventListener(
+    'input',
+    renderCustomers
+  );
+
+  productSearch?.addEventListener(
+    'input',
+    renderProducts
+  );
+
+  customerResults?.addEventListener(
+    'click',
+    (event) => {
+      const button =
+        event.target.closest(
+          '[data-customer-id]'
+        );
+
+      if (!button) return;
+
+      selectCustomer(
+        button.dataset.customerId
+      );
+    }
+  );
+
+  productGrid?.addEventListener(
+    'click',
+    (event) => {
+      const button =
+        event.target.closest(
+          '[data-action]'
+        );
+
+      if (!button) return;
+
+      const productId =
+        button.dataset.productId;
+
+      const action =
+        button.dataset.action;
+
+      if (action === 'plus') {
+        setQuantity(
+          productId,
+          getQuantity(productId) + 1
+        );
+      }
+
+      if (action === 'minus') {
+        setQuantity(
+          productId,
+          getQuantity(productId) - 1
+        );
+      }
+
+      if (action === 'detail') {
+        openProductModal(productId);
+      }
+    }
+  );
+
+  summaryItems?.addEventListener(
+    'click',
+    (event) => {
+      const button =
+        event.target.closest(
+          '[data-remove-product]'
+        );
+
+      if (!button) return;
+
+      setQuantity(
+        button.dataset.removeProduct,
+        0
+      );
+    }
+  );
+
+  sameAddressCheckbox?.addEventListener(
+    'change',
+    () => {
+      if (!setupAddress) return;
+
+      if (
+        sameAddressCheckbox.checked &&
+        state.selectedCustomer
+      ) {
+        setupAddress.value =
+          state.selectedCustomer.user_address ||
+          '';
+      } else if (
+        !sameAddressCheckbox.checked
+      ) {
+        setupAddress.value = '';
+      }
+
+      updateSubmitState();
+    }
+  );
+
+  setupAddress?.addEventListener(
+    'input',
+    updateSubmitState
+  );
+
+  $$('[data-close-modal]').forEach(
+    (element) => {
+      element.addEventListener(
+        'click',
+        closeProductModal
+      );
+    }
+  );
 
   document.addEventListener(
     'keydown',
     (event) => {
       if (
         event.key === 'Escape' &&
-        modal &&
-        !modal.hidden
+        productDetailModal &&
+        !productDetailModal.hidden
       ) {
         closeProductModal();
       }
     }
   );
 
-  /* =========================================================
-     Form submit
-     ========================================================= */
+  form.addEventListener(
+    'submit',
+    (event) => {
+      updateHiddenItems();
+      updateSubmitState();
 
-  if (createSetupForm) {
-    createSetupForm.addEventListener(
-      'submit',
-      (event) => {
-        if (!state.customer) {
-          event.preventDefault();
-
-          switchTab('customer');
-
-          if (customerSearch) {
-            customerSearch.focus();
-          }
-
-          return;
-        }
-
-        if (state.items.size === 0) {
-          event.preventDefault();
-
-          switchTab('products');
-
-          if (productSearch) {
-            productSearch.focus();
-          }
-
-          return;
-        }
-
-        if (
-          !setupAddress ||
-          setupAddress.value.trim() === ''
-        ) {
-          event.preventDefault();
-
-          if (setupAddress) {
-            setupAddress.focus();
-          }
-
-          return;
-        }
-
-        if (submitSetupBtn) {
-          submitSetupBtn.disabled = true;
-          submitSetupBtn.textContent =
-            'กำลังบันทึก...';
-        }
+      if (submitSetupBtn?.disabled) {
+        event.preventDefault();
       }
-    );
-  }
-
-  /* =========================================================
-     Initial render
-     ========================================================= */
-
-  if (selectedCustomerCard) {
-    selectedCustomerCard.hidden = true;
-  }
-
-  if (modal) {
-    modal.hidden = true;
-  }
-
-  renderCustomerResults('');
-  renderProducts('');
-  renderSummary();
-
-  const initial = window.createSetupInitial || null;
-
-  if (initial) {
-    if (initial.customerId) {
-      selectCustomer(initial.customerId);
     }
+  );
 
-    if (setupAddress && typeof initial.setupAddress === 'string') {
-      setupAddress.value = initial.setupAddress;
-      setupAddress.readOnly = false;
-    }
+  /*
+   * EDIT MODE
+   * ถ้ามี window.createSetupInitial
+   * ให้โหลดค่าของใบงานเดิมกลับมา
+   */
+  if (
+    initial &&
+    Object.keys(initial).length > 0
+  ) {
+    const initialCustomerId =
+      String(initial.customerId || '');
 
-    if (setupNote && typeof initial.setupNote === 'string') {
-      setupNote.value = initial.setupNote;
+    if (initialCustomerId !== '') {
+      state.selectedCustomer =
+        customers.find(
+          (customer) =>
+            String(customer.user_id) ===
+            initialCustomerId
+        ) || null;
     }
 
     if (Array.isArray(initial.items)) {
       initial.items.forEach((item) => {
-        const productId = String(item.pro_id || '');
-        const qty = Number.parseInt(item.qty, 10) || 0;
+        const productId =
+          String(item?.pro_id || '');
 
-        if (productId && qty > 0) {
-          state.items.set(productId, qty);
+        const qty = Math.max(
+          0,
+          Number(item?.qty) || 0
+        );
+
+        if (
+          productId !== '' &&
+          qty > 0
+        ) {
+          state.quantities.set(
+            productId,
+            qty
+          );
         }
       });
+    }
 
-      renderProducts(productSearch?.value || '');
-      renderSummary();
+    if (setupAddress) {
+      setupAddress.value =
+        typeof initial.setupAddress ===
+        'string'
+          ? initial.setupAddress
+          : '';
+    }
+
+    if (setupNote) {
+      setupNote.value =
+        typeof initial.setupNote ===
+        'string'
+          ? initial.setupNote
+          : '';
     }
   }
+
+  /*
+   * เช็กว่า address เดิมตรงกับ
+   * address ของลูกค้าหรือไม่
+   */
+  if (sameAddressCheckbox) {
+    sameAddressCheckbox.disabled =
+      !state.selectedCustomer;
+
+    if (
+      state.selectedCustomer &&
+      setupAddress
+    ) {
+      const customerAddress =
+        String(
+          state.selectedCustomer
+            .user_address || ''
+        ).trim();
+
+      const currentAddress =
+        String(
+          setupAddress.value || ''
+        ).trim();
+
+      sameAddressCheckbox.checked =
+        customerAddress !== '' &&
+        customerAddress ===
+          currentAddress;
+    }
+  }
+
+  renderCustomers();
+  renderProducts();
+  updateCustomerSummary();
+  renderSummary();
+  updateHiddenItems();
+  updateSubmitState();
 })();

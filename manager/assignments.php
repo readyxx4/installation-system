@@ -145,6 +145,7 @@ function assignment_time_slots(): array
         'morning' => ['start' => '09:00', 'end' => '12:00'],
         'afternoon' => ['start' => '13:00', 'end' => '15:00'],
         'evening' => ['start' => '16:00', 'end' => '18:00'],
+        'full_day' => ['start' => '09:00', 'end' => '18:00'],
     ];
 }
 
@@ -344,7 +345,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update_setup->execute();
 
         $conn->commit();
-        redirect_to(app_system_url('manager/assignment_list.php?status=created'));
+        redirect_to(app_system_url('manager/assignment_history.php?status=created'));
     } catch (Throwable $e) {
         try {
             $conn->rollback();
@@ -368,6 +369,7 @@ $setup_stmt = $conn->prepare("
         u.user_name,
         u.user_phone,
         u.user_email,
+        u.user_address,
         COALESCE(
             NULLIF(GROUP_CONCAT(DISTINCT p2.pro_name ORDER BY p2.pro_name SEPARATOR ', '), ''),
             p.pro_name,
@@ -393,6 +395,7 @@ $setup_stmt = $conn->prepare("
         u.user_name,
         u.user_phone,
         u.user_email,
+        u.user_address,
         p.pro_name
     LIMIT 1
 ");
@@ -480,6 +483,11 @@ $technicians_result = $conn->query("
     LEFT JOIN assignment a
         ON t.tech_id = a.tech_id
        AND a.assign_status IN (1, 2)
+       AND EXISTS (
+           SELECT 1
+           FROM setup s_active
+           WHERE s_active.setup_id = a.setup_id
+       )
     GROUP BY
         t.tech_id,
         t.tech_name,
@@ -505,11 +513,16 @@ $tech_schedules_result = $conn->query("
         a.assign_status,
         u.user_name,
         u.user_phone,
+        (
+            SELECT COUNT(*)
+            FROM install_detail idc
+            WHERE idc.setup_id = a.setup_id
+        ) AS item_count,
         COALESCE(p.pro_name, '-') AS pro_name,
         s.setup_address,
         s.setup_location
     FROM assignment a
-    LEFT JOIN setup s ON a.setup_id = s.setup_id
+    INNER JOIN setup s ON a.setup_id = s.setup_id
     LEFT JOIN `user` u ON a.user_id = u.user_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     WHERE a.assign_status IN (1, 2)
@@ -605,10 +618,19 @@ layout_header('มอบหมายงานช่าง', 'assignments');
         </section>
     <?php endif; ?>
 
-    <div class="manager-dashboard-head compact">
-        <div>
-            <h1><?= $current_assignment ? 'แก้ไขการมอบหมายงาน' : 'มอบหมายงานช่าง' ?></h1>
-            <p><?= $is_canceled_assignment ? 'งานนี้ถูกยกเลิกแล้ว ดูประวัติได้อย่างเดียว' : ($is_read_only ? 'งานเสร็จสิ้นแล้ว ดูรายละเอียดได้อย่างเดียว' : ($current_assignment ? 'ตรวจสอบและปรับข้อมูลการมอบหมายงาน' : 'ตรวจสอบข้อมูลใบงาน แล้วเลือกช่าง วัน และเวลาติดตั้ง')) ?></p>
+    <div class="assignment-sale-header manager-assignment-page-header">
+        <div class="admin-dashboard-top">
+            <div>
+                <h1><?= $current_assignment ? 'แก้ไขการมอบหมายงาน' : 'มอบหมายงานช่าง' ?></h1>
+                <p><?= $is_canceled_assignment ? 'งานนี้ถูกยกเลิกแล้ว ดูประวัติได้อย่างเดียว' : ($is_read_only ? 'งานเสร็จสิ้นแล้ว ดูรายละเอียดได้อย่างเดียว' : ($current_assignment ? 'ตรวจสอบและปรับข้อมูลการมอบหมายงาน' : 'ตรวจสอบข้อมูลใบงาน แล้วเลือกช่าง วัน และเวลาติดตั้ง')) ?></p>
+            </div>
+
+            <div class="admin-dashboard-actions">
+                <div class="admin-date-pill">
+                    <i class="fa-regular fa-calendar"></i>
+                    <?= h(date('d/m/Y')) ?>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -648,78 +670,143 @@ layout_header('มอบหมายงานช่าง', 'assignments');
 
         <div class="manager-assignment-step-one">
         <section class="manager-assign-panel manager-selected-setup-panel always-show">
-            <div class="manager-panel-head">
+            <div class="manager-work-summary-head">
                 <div>
-                    <h2>รายการติดตั้ง</h2>
-                    <p><?= $current_assignment ? 'ข้อมูลใบงานที่กำลังแก้ไข' : 'ข้อมูลใบงานที่กำลังมอบหมาย' ?></p>
+                    <h2>สรุปใบงาน</h2>
+                    <p class="manager-work-code">
+                        รหัสใบงาน
+                        <strong><?= h($selected_setup['setup_id']) ?></strong>
+                    </p>
+                    <p class="manager-work-subtitle">ตรวจสอบรายละเอียดใบงานก่อนดำเนินการมอบหมาย</p>
                 </div>
-                <a class="manager-soft-link" href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($selected_setup['setup_id']) . '&from=manager')) ?>">
-                    <?= manager_icon_svg('eye') ?> ดูใบติดตั้ง
+
+                <a
+                    class="manager-soft-link"
+                    href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($selected_setup['setup_id']) . '&from=manager')) ?>"
+                >
+                    <?= manager_icon_svg('eye') ?>
+                    ดูใบติดตั้ง
                 </a>
             </div>
 
-            <div class="install-summary-compact">
-                <div class="install-summary-heading">
-                    <span class="install-summary-icon"><?= manager_icon_svg('box') ?></span>
-                    <strong>ข้อมูลการติดตั้ง</strong>
+            <div class="manager-work-customer">
+                <div class="manager-work-customer-icon">
+                    <i class="fa-regular fa-user"></i>
                 </div>
 
-                <div class="install-summary-lines">
-                    <p>
-                        <strong>รหัสใบงาน:</strong>
-                        <span><?= h($selected_setup['setup_id']) ?></span>
-                    </p>
-                    <p>
-                        <strong>ลูกค้า:</strong>
-                        <span><?= h($selected_setup['customer_display']) ?></span>
-                        <span class="install-summary-separator">|</span>
-                        <strong>โทร:</strong>
-                        <span><?= h($selected_setup['user_phone'] ?: '-') ?></span>
-                    </p>
-                    <div class="install-summary-products">
-                        <strong>สินค้า:</strong>
-                        <div class="install-summary-product-list">
-                            <?php foreach ($product_items as $index => $product_item): ?>
-                                <span>
-                                    <?= h((string) ($index + 1)) ?>.
-                                    <?= h($product_item['pro_name'] ?? '-') ?>
-                                    × <?= h((string) ($product_item['install_qty'] ?? 1)) ?>
-                                </span>
-                            <?php endforeach; ?>
+                <div class="manager-work-customer-main">
+                    <span>ลูกค้า</span>
+                    <strong><?= h($selected_setup['customer_display']) ?></strong>
+
+                    <div class="manager-work-contact-list">
+                        <div>
+                            <span>เบอร์โทร</span>
+                            <strong><?= h($selected_setup['user_phone'] ?: '--') ?></strong>
+                        </div>
+
+                        <div>
+                            <span>อีเมล</span>
+                            <strong><?= h($selected_setup['user_email'] ?: '--') ?></strong>
+                        </div>
+
+                        <div>
+                            <span>ที่อยู่ลูกค้า</span>
+                            <strong><?= h($selected_setup['user_address'] ?: '--') ?></strong>
                         </div>
                     </div>
-                    <p>
-                        <strong>รวมค่าติดตั้ง:</strong>
-                        <span><?= h($selected_setup['install_total_display']) ?></span>
-                    </p>
-                    <p>
-                        <strong>สถานที่:</strong>
-                        <span><?= h($selected_setup['setup_address_display']) ?></span>
-                    </p>
                 </div>
 
-                <?php if (!empty($current_assignment)): ?>
-                    <div class="install-summary-current">
-                        <strong>การมอบหมายปัจจุบัน:</strong>
-                        <span>
-                            <?= h(($current_assignment['tech_fullname'] ?: $current_assignment['tech_name']) ?: '-') ?>
-                            · <?= h(manager_thai_date($current_assignment['assign_install_date'] ?? null)) ?>
-                            · <?= h(time_label($current_assignment['assign_install_time'] ?? '', $current_assignment['assign_install_end_time'] ?? '')) ?>
-                            · <?= h(assign_status_name($current_assignment['assign_status'] ?? '')) ?>
-                        </span>
-                        <?php if ($current_assignment_overdue): ?>
-                            <span class="manager-overdue-badge">เกินกำหนด</span>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
+                <div class="manager-work-customer-id">
+                    <span>รหัสลูกค้า</span>
+                    <strong><?= h($selected_setup['user_id'] ?: '--') ?></strong>
+                </div>
             </div>
+
+            <div class="manager-work-detail-box">
+                <div class="manager-work-meta">
+                    <div>
+                        <span>วันที่สร้างใบงาน</span>
+                        <strong><?= h(date('d/m/Y H:i', strtotime($selected_setup['created_at']))) ?></strong>
+                    </div>
+
+                    <div>
+                        <span>จำนวนสินค้า</span>
+                        <strong><?= h((string) ((int) ($selected_setup['item_count'] ?? 0))) ?> รายการ</strong>
+                    </div>
+
+                    <div class="wide">
+                        <span>ที่อยู่ติดตั้ง</span>
+                        <strong><?= h($selected_setup['setup_address_display']) ?></strong>
+                    </div>
+                </div>
+
+                <div class="manager-work-product-table">
+                    <div class="manager-work-product-head">
+                        <span>สินค้า</span>
+                        <span>จำนวน</span>
+                        <span>ค่าติดตั้ง/หน่วย</span>
+                        <span>รวม</span>
+                    </div>
+
+                    <?php foreach ($product_items as $product_item): ?>
+                        <div class="manager-work-product-row">
+                            <strong><?= h($product_item['pro_name'] ?? '--') ?></strong>
+
+                            <span>
+                                <?= h((string) ($product_item['install_qty'] ?? 0)) ?> ชิ้น
+                            </span>
+
+                            <span>
+                                <?= h(number_format((float) ($product_item['install_price'] ?? 0), 2)) ?> บาท
+                            </span>
+
+                            <strong>
+                                <?= h(number_format((float) ($product_item['install_total'] ?? 0), 2)) ?> บาท
+                            </strong>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class="manager-work-bottom">
+                    <div>
+                        <span>หมายเหตุ</span>
+                        <strong>
+                            <?= h(
+                                trim((string) ($selected_setup['setup_note'] ?? '')) !== ''
+                                    ? $selected_setup['setup_note']
+                                    : '--'
+                            ) ?>
+                        </strong>
+                    </div>
+
+                    <div class="manager-work-total">
+                        <span>รวมค่าติดตั้ง</span>
+                        <strong><?= h($selected_setup['install_total_display']) ?></strong>
+                    </div>
+                </div>
+            </div>
+
+            <?php if (!empty($current_assignment)): ?>
+                <div class="install-summary-current">
+                    <strong>การมอบหมายปัจจุบัน:</strong>
+                    <span>
+                        <?= h(($current_assignment['tech_fullname'] ?: $current_assignment['tech_name']) ?: '-') ?>
+                        · <?= h(manager_thai_date($current_assignment['assign_install_date'] ?? null)) ?>
+                        · <?= h(time_label($current_assignment['assign_install_time'] ?? '', $current_assignment['assign_install_end_time'] ?? '')) ?>
+                        · <?= h(assign_status_name($current_assignment['assign_status'] ?? '')) ?>
+                    </span>
+
+                    <?php if ($current_assignment_overdue): ?>
+                        <span class="manager-overdue-badge">เกินกำหนด</span>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </section>
 
         <?php if (!$is_canceled_assignment): ?>
         <section class="manager-assign-panel manager-tech-panel show" id="techPanel">
             <div class="manager-panel-head">
                 <div>
-                    <span class="manager-step-kicker">ขั้นตอนที่ 1</span>
                     <h2>เลือกช่างติดตั้ง</h2>
                     <p><?= $is_read_only ? 'งานเสร็จสิ้นแล้ว จึงไม่สามารถเปลี่ยนช่างได้' : 'กรุณาเลือกช่างสำหรับงานติดตั้งนี้' ?></p>
                 </div>
@@ -750,7 +837,6 @@ layout_header('มอบหมายงานช่าง', 'assignments');
         <section class="manager-assign-panel manager-schedule-panel manager-step-panel" id="schedulePanel">
             <div class="manager-panel-head">
                 <div>
-                    <span class="manager-step-kicker">ขั้นตอนที่ 2</span>
                     <h2>เลือกวันติดตั้ง</h2>
                     <p id="selectedTechScheduleText"><?= $is_read_only ? 'งานเสร็จสิ้นแล้ว ดูตารางเวลาได้อย่างเดียว' : ($current_setup_status === 3 ? 'กำลังติดตั้ง: แก้ไขได้เฉพาะเวลาและหมายเหตุ' : 'เลือกช่างก่อน ระบบจะแสดงตารางงานและวันที่เลือกได้') ?></p>
                 </div>
@@ -758,19 +844,17 @@ layout_header('มอบหมายงานช่าง', 'assignments');
             </div>
 
             <div class="manager-tech-queue-table-wrap" id="techQueueBox">
-                <table class="manager-tech-queue-table">
+                <table class="manager-tech-queue-table manager-tech-week-table">
                     <thead>
                         <tr>
                             <th>รหัสใบงาน</th>
                             <th>ลูกค้า</th>
-                            <th>สินค้า</th>
-                            <th>วันที่ติดตั้ง</th>
-                            <th>เวลา</th>
-                            <th>สถานะ</th>
+                            <th>จำนวนสินค้า</th>
+                            <th>วันที่-เวลาที่ติดตั้ง</th>
                         </tr>
                     </thead>
                     <tbody id="techQueueTableBody">
-                        <tr><td colspan="6" class="manager-empty-cell">ยังไม่ได้เลือกช่าง</td></tr>
+                        <tr><td colspan="4" class="manager-empty-cell">ยังไม่ได้เลือกช่าง</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -791,12 +875,19 @@ layout_header('มอบหมายงานช่าง', 'assignments');
             <div class="manager-time-panel" id="timePanel">
                 <div class="manager-time-panel-head">
                     <div>
-                        <span class="manager-step-kicker">ขั้นตอนที่ 3</span>
                         <h3>เลือกช่วงเวลาติดตั้ง</h3>
                         <!-- <p>เลือกช่วงเวลาว่างได้ 1 ช่วง</p> -->
                     </div>
                     <span class="manager-soft-badge" id="selectedTimeText">ยังไม่ได้เลือกเวลา</span>
                 </div>
+
+                <label class="manager-full-day-option" id="fullDayOption">
+                    <input type="checkbox" id="fullDayCheckbox">
+                    <span>
+                        <strong>เหมาทั้งวัน</strong>
+                        <small>เลือกทั้ง 3 ช่วงเวลา</small>
+                    </span>
+                </label>
 
                 <div class="manager-time-slots" id="timeSlots"></div>
 

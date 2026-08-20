@@ -111,9 +111,9 @@ try {
     }
 
     if ((int) $user['user_role'] === 1) {
-        redirect_to(app_system_url('manager/index.php'));
+        redirect_to(app_system_url('manager/assignment_list.php'));
     }
-
+    
     if ((int) $user['user_role'] === 2) {
         redirect_to(app_system_url('sale/index.php'));
     }

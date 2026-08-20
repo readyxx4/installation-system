@@ -692,7 +692,7 @@ body.app-body.role-1 .assignment-detail-table .assignment-icon-btn.edit-assignme
 
 /* ===== v3: fix action button width / icon alignment ===== */
 body.app-body.role-1 .assignment-detail-table {
-    min-width: 1120px !important;
+    min-width: 760px !important;
 }
 
 body.app-body.role-1 .assignment-detail-table th:last-child,
@@ -762,12 +762,12 @@ body.app-body.role-1 .assignment-detail-table .assignment-icon-btn span {
 /* ===== v4: compact rounded action buttons ===== */
 body.app-body.role-1 .assignment-detail-table th:last-child,
 body.app-body.role-1 .assignment-detail-table td:last-child {
-    width: 210px !important;
-    min-width: 210px !important;
+    width: 145px !important;
+    min-width: 145px !important;
 }
 
 body.app-body.role-1 .assignment-detail-table .assignment-row-actions {
-    min-width: 210px !important;
+    min-width: 145px !important;
     gap: 6px !important;
 }
 
@@ -830,6 +830,47 @@ body.app-body.role-1 .assignment-detail-table .assignment-icon-btn span {
 }
 
 
+
+/* ===== Manager assignment list: 5-column table ===== */
+body.app-body.role-1 .assignment-detail-table th:nth-child(1),
+body.app-body.role-1 .assignment-detail-table td:nth-child(1) {
+    width: 18% !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th:nth-child(2),
+body.app-body.role-1 .assignment-detail-table td:nth-child(2) {
+    width: 27% !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th:nth-child(3),
+body.app-body.role-1 .assignment-detail-table td:nth-child(3) {
+    width: 18% !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th:nth-child(4),
+body.app-body.role-1 .assignment-detail-table td:nth-child(4) {
+    width: 20% !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th:nth-child(5),
+body.app-body.role-1 .assignment-detail-table td:nth-child(5) {
+    width: 17% !important;
+    text-align: center !important;
+}
+
+/* ให้ช่องจัดการยังเป็น table-cell ไม่แยกออกจากตาราง */
+body.app-body.role-1 .assignment-detail-table td.assignment-row-actions {
+    display: table-cell !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+/* จัดปุ่มมอบหมายงานให้อยู่ตรงกลางหัวข้อ "จัดการ" */
+body.app-body.role-1 .assignment-detail-table td.assignment-row-actions .assignment-icon-btn {
+    display: inline-flex !important;
+    margin: 0 auto !important;
+}
+
 /* ===== v5: keep "ทั้งหมด" count visible when inactive ===== */
 body.app-body.role-1 .assignment-status-tab.status-all b {
     display: inline-flex !important;
@@ -852,4 +893,234 @@ body.app-body.role-1 .assignment-status-tab.status-all b {
 body.app-body.role-1 .assignment-status-tab.status-all.active b {
     background: rgba(255, 255, 255, .22) !important;
     color: #ffffff !important;
+}
+
+/* ===== Manager Assignment Header — copied directly from Sale dashboard header values ===== */
+body.app-body.role-1 .assignment-sale-header {
+  margin-bottom: 14px;
+}
+
+body.app-body.role-1 .assignment-sale-header .admin-dashboard-top {
+  position: relative !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  min-height: 74px !important;
+  padding: 13px 20px !important;
+  border: 1px solid rgba(37, 99, 235, .2) !important;
+  border-radius: 16px !important;
+  background:
+    radial-gradient(circle at 86% 18%, rgba(125, 211, 252, .34), transparent 30%),
+    linear-gradient(135deg, #0f3f7a 0%, #1565c0 56%, #1e88e5 100%) !important;
+  box-shadow: 0 14px 34px rgba(15, 63, 122, .14) !important;
+}
+
+body.app-body.role-1 .assignment-sale-header .admin-dashboard-top::after {
+  content: "" !important;
+  position: absolute !important;
+  right: -54px !important;
+  bottom: -70px !important;
+  width: 170px !important;
+  height: 170px !important;
+  border: 1px solid rgba(255, 255, 255, .22) !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, .08) !important;
+}
+
+body.app-body.role-1 .assignment-sale-header .admin-dashboard-top > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+body.app-body.role-1 .assignment-sale-header .admin-dashboard-top h1 {
+  margin: 0 !important;
+  color: #ffffff !important;
+  font-size: 21px !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+}
+
+body.app-body.role-1 .assignment-sale-header .admin-dashboard-top p {
+  margin: 3px 0 0 !important;
+  color: rgba(255, 255, 255, .84) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-1 .assignment-sale-header .admin-dashboard-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+body.app-body.role-1 .assignment-sale-header .admin-date-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  min-height: 30px !important;
+  padding: 6px 10px !important;
+  border: 1px solid rgba(255, 255, 255, .25) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, .13) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 760px) {
+  body.app-body.role-1 .assignment-sale-header .admin-dashboard-top {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    padding: 18px !important;
+  }
+
+  body.app-body.role-1 .assignment-sale-header .admin-dashboard-top h1 {
+    font-size: 21px !important;
+  }
+
+  body.app-body.role-1 .assignment-sale-header .admin-dashboard-actions {
+    justify-content: flex-start !important;
+  }
+}
+
+@media (max-width: 560px) {
+  body.app-body.role-1 .assignment-sale-header .admin-date-pill {
+    width: 100% !important;
+  }
+}
+
+/* ===== Manager assignment rows: match Sale setup list ===== */
+body.app-body.role-1 .assignment-detail-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th,
+body.app-body.role-1 .assignment-detail-table td {
+    padding: 8px 12px !important;
+    line-height: 1.35 !important;
+    vertical-align: middle !important;
+}
+
+body.app-body.role-1 .assignment-detail-table tbody td {
+    height: 46px !important;
+    padding: 7px 10px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .setup-col-id {
+    width: 18% !important;
+    text-align: left !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .setup-col-customer {
+    width: 27% !important;
+    text-align: left !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .setup-col-items {
+    width: 18% !important;
+    text-align: center !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .setup-col-total {
+    width: 20% !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .setup-col-actions {
+    width: 17% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .setup-col-id strong,
+body.app-body.role-1 .assignment-detail-table .setup-col-total strong {
+    color: #383f4f !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .setup-item-count {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-width: 68px !important;
+    padding: 4px 9px !important;
+
+    border: 1px solid #dbeafe !important;
+    border-radius: 999px !important;
+
+    background: #f8fbff !important;
+    color: #315b8a !important;
+
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+
+body.app-body.role-1 .assignment-detail-table td,
+body.app-body.role-1 .assignment-detail-table td a,
+body.app-body.role-1 .assignment-detail-table td span,
+body.app-body.role-1 .assignment-detail-table td strong {
+    font-size: 12px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .setup-item-count {
+    font-size: 11px !important;
+}
+
+body.app-body.role-1 .assignment-detail-table td.setup-col-actions {
+    display: table-cell !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+body.app-body.role-1 .assignment-detail-table .setup-col-actions .assignment-icon-btn {
+    display: inline-flex !important;
+    margin: 0 auto !important;
+}
+
+/* ===== Align table headers with row values ===== */
+body.app-body.role-1 .assignment-detail-table th:nth-child(1),
+body.app-body.role-1 .assignment-detail-table td:nth-child(1) {
+    text-align: left !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th:nth-child(2),
+body.app-body.role-1 .assignment-detail-table td:nth-child(2) {
+    text-align: left !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th:nth-child(3),
+body.app-body.role-1 .assignment-detail-table td:nth-child(3) {
+    text-align: center !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th:nth-child(4),
+body.app-body.role-1 .assignment-detail-table td:nth-child(4) {
+    text-align: right !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th:nth-child(5),
+body.app-body.role-1 .assignment-detail-table td:nth-child(5) {
+    text-align: center !important;
+}
+
+body.app-body.role-1 .assignment-detail-table th,
+body.app-body.role-1 .assignment-detail-table td {
+    vertical-align: middle !important;
 }
