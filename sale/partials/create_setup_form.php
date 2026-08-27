@@ -5,7 +5,7 @@
   autocomplete="off"
 >
   <input type="hidden" name="setup_id" value="<?= h($setupId) ?>">
-  <input type="hidden" name="user_id" id="selectedCustomerId">
+  <input type="hidden" name="customer_id" id="selectedCustomerId">
   <input type="hidden" name="selected_items_json" id="selectedItemsJson" value="[]">
 
   <div class="setup-split-layout">

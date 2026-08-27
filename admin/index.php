@@ -183,7 +183,7 @@ function dashboard_assignment_is_overdue(array $row): bool
 }
 
 $total_system_users = count_users_by_role($conn, [1, 2, 3]);
-$total_customers = count_users_by_role($conn, [0]);
+$total_customers = count_table($conn, 'customers');
 $total_technicians = count_table($conn, 'technicians');
 $total_product_types = count_table($conn, 'product_type');
 $total_products = count_table($conn, 'product');
@@ -352,13 +352,13 @@ $recent_users = safe_result($conn, "
 
 $recent_customers = safe_result($conn, "
     SELECT
-        user_id,
-        user_name,
-        user_phone,
-        user_email
-    FROM `user`
-    WHERE user_role = 0
-    ORDER BY user_id DESC
+        customer_id AS user_id,
+        customer_name AS user_name,
+        customer_phone AS user_phone,
+        customer_email AS user_email,
+        customer_status
+    FROM customers
+    ORDER BY customer_id DESC
     LIMIT 5
 ");
 
@@ -380,7 +380,129 @@ layout_header('หน้าหลักผู้ดูแลระบบ', 'dash
     href="<?= h(app_asset_url('admin/assets/css/dashboard.css')) ?>?v=<?= h(asset_version('admin/assets/css/dashboard.css')) ?>"
 >
 
-<div class="admin-dashboard-v2">
+<style>
+    .admin-dashboard-summary-page {
+        height: auto;
+        min-height: calc(100vh - 40px);
+        overflow: visible;
+    }
+
+    .admin-dashboard-summary-page .admin-dashboard-top {
+        min-height: auto;
+        padding: 18px 22px;
+    }
+
+    .admin-dashboard-summary-page .admin-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+    }
+
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card {
+        align-items: flex-start !important;
+        height: auto !important;
+        min-height: 84px !important;
+        max-height: none !important;
+        padding: 14px !important;
+        border-radius: 12px !important;
+    }
+
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card > div:first-child {
+        display: block !important;
+    }
+
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card span,
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card p {
+        font-size: 12px !important;
+        line-height: 1.35 !important;
+    }
+
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card strong,
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card h2 {
+        margin: 5px 0 4px !important;
+        font-size: 26px !important;
+        line-height: 1.1 !important;
+    }
+
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card small {
+        font-size: 11px !important;
+        line-height: 1.35 !important;
+    }
+
+    .admin-dashboard-brief-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-top: 14px;
+    }
+
+    .admin-dashboard-summary-page .admin-brief-card {
+        min-height: 0;
+        padding: 18px;
+    }
+
+    .admin-dashboard-summary-page .admin-status-chart {
+        display: none;
+    }
+
+    .admin-dashboard-summary-page .admin-status-metrics {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0;
+        margin-top: 12px;
+    }
+
+    .admin-dashboard-summary-page .admin-simple-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .admin-dashboard-summary-page .admin-simple-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #E2E8F0;
+    }
+
+    .admin-dashboard-summary-page .admin-simple-row:last-child {
+        border-bottom: 0;
+    }
+
+    .admin-dashboard-summary-page .admin-simple-row span {
+        color: #64748B;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .admin-dashboard-summary-page .admin-simple-row strong {
+        color: #0F3F7A;
+        font-size: 15px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 1100px) {
+        .admin-dashboard-summary-page .admin-summary-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .admin-dashboard-brief-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 760px) {
+        .admin-dashboard-summary-page .admin-summary-grid,
+        .admin-dashboard-summary-page .admin-status-metrics {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="admin-dashboard-v2 admin-dashboard-summary-page">
 
     <div class="admin-dashboard-top">
         <div>
@@ -400,85 +522,60 @@ layout_header('หน้าหลักผู้ดูแลระบบ', 'dash
         </div>
     </div>
 
-    <div class="admin-dashboard-main-grid">
-
-        <div class="admin-widget technician-performance-widget">
-            <div class="admin-widget-head">
-                <div>
-                    <h2>ประสิทธิภาพช่างติดตั้ง</h2>
-                    <p>ภาพรวมจำนวนงานและคะแนนจากลูกค้า</p>
-                </div>
-
-                <a class="admin-widget-link" href="<?= h(app_system_url('admin/technicians.php')) ?>">
-                    ดูทั้งหมด
-                </a>
+    <div class="admin-summary-grid">
+        <div class="admin-summary-card blue">
+            <div>
+                <span>พนักงาน</span>
+                <strong><?= h((string) $total_system_users) ?></strong>
+                <small>บัญชีผู้ใช้งานระบบ</small>
             </div>
-
-            <div class="technician-performance-table">
-                <div class="technician-performance-head">
-                    <span>ช่างติดตั้ง</span>
-                    <span>งานที่รับ</span>
-                    <span>คะแนนรีวิว</span>
-                </div>
-
-                <?php if (!$technician_performance || $technician_performance->num_rows === 0): ?>
-
-                    <div class="admin-empty-mini">
-                        ยังไม่มีข้อมูลช่าง
-                    </div>
-
-                <?php else: ?>
-
-                    <?php $rank = 1; ?>
-                    <?php while ($tech = $technician_performance->fetch_assoc()): ?>
-
-                        <div class="technician-performance-row">
-                            <div class="technician-profile-cell">
-                                <span class="technician-rank"><?= h((string) $rank) ?></span>
-                                <div class="admin-mini-avatar">
-                                    <i class="fa-solid fa-screwdriver-wrench"></i>
-                                </div>
-
-                                <div class="admin-mini-main">
-                                    <strong><?= h($tech['tech_name']) ?></strong>
-                                    <span>
-                                        <i class="technician-status-dot <?= (string) ($tech['tech_status'] ?? '') === '0' ? 'ready' : 'unavailable' ?>" aria-hidden="true"></i>
-                                        <?= h(tech_status_name($tech['tech_status'])) ?>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="technician-job-count">
-                                <strong><?= h((string) (int) ($tech['job_count'] ?? 0)) ?></strong>
-                                <span>งาน</span>
-                            </div>
-
-                            <div class="technician-review-score">
-                                <?php if ((int) ($tech['review_count'] ?? 0) > 0 && $tech['avg_rating'] !== null): ?>
-                                    <strong><?= h(number_format((float) $tech['avg_rating'], 1)) ?> ★</strong>
-                                    <span><?= h((string) (int) $tech['review_count']) ?> รีวิว</span>
-                                <?php else: ?>
-                                    <strong>-</strong>
-                                    <span>ยังไม่มีรีวิว</span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <?php $rank++; ?>
-                    <?php endwhile; ?>
-
-                <?php endif; ?>
-
-            </div>
+            <div class="summary-icon"><i class="fa-solid fa-user-tie"></i></div>
         </div>
 
-        <div class="admin-widget admin-status-overview-widget">
+        <div class="admin-summary-card green">
+            <div>
+                <span>ช่าง</span>
+                <strong><?= h((string) $total_technicians) ?></strong>
+                <small>พร้อมรับงาน <?= h((string) $total_technicians_ready) ?></small>
+            </div>
+            <div class="summary-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        </div>
+
+        <div class="admin-summary-card cyan">
+            <div>
+                <span>ลูกค้า</span>
+                <strong><?= h((string) $total_customers) ?></strong>
+                <small>ข้อมูลลูกค้าทั้งหมด</small>
+            </div>
+            <div class="summary-icon"><i class="fa-solid fa-users"></i></div>
+        </div>
+
+        <div class="admin-summary-card orange">
+            <div>
+                <span>สินค้า</span>
+                <strong><?= h((string) $total_products) ?></strong>
+                <small>ประเภทสินค้า <?= h((string) $total_product_types) ?></small>
+            </div>
+            <div class="summary-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+        </div>
+
+        <div class="admin-summary-card purple">
+            <div>
+                <span>งานติดตั้ง</span>
+                <strong><?= h((string) $total_setups) ?></strong>
+                <small>เสร็จสิ้น <?= h((string) $status_counts['done']) ?></small>
+            </div>
+            <div class="summary-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+        </div>
+    </div>
+
+    <div class="admin-dashboard-brief-grid">
+        <div class="admin-widget admin-brief-card">
             <div class="admin-widget-head">
                 <div>
-                    <h2>ภาพรวมงานติดตั้ง</h2>
-                    <p>สถานะงานทั้งหมดในระบบ</p>
+                    <h2>สรุปสถานะงานติดตั้ง</h2>
+                    <p>จำนวนงานตามสถานะปัจจุบัน</p>
                 </div>
-
             </div>
 
             <div class="admin-status-metrics">
@@ -491,114 +588,6 @@ layout_header('หน้าหลักผู้ดูแลระบบ', 'dash
                         <strong><?= h((string) $item['count']) ?></strong>
                     </div>
                 <?php endforeach; ?>
-            </div>
-
-            <div class="admin-status-chart" aria-label="กราฟภาพรวมสถานะงานติดตั้ง">
-                <?php foreach ($status_overview as $item): ?>
-                    <?php
-                        $count = (int) $item['count'];
-                        $height = max(8, (int) round(($count / $status_max_count) * 100));
-                    ?>
-                    <div class="admin-status-bar-item">
-                        <div class="admin-status-bar-track">
-                            <span
-                                class="admin-status-bar <?= h($item['badge']) ?>"
-                                style="height: <?= h((string) $height) ?>%;"
-                            ></span>
-                        </div>
-                        <span class="admin-status-bar-label"><?= h($item['label']) ?></span>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-
-        <div class="admin-widget admin-latest-users-widget">
-            <div class="admin-widget-head">
-                <div>
-                    <h2>พนักงานล่าสุด</h2>
-                    <p>บัญชีพนักงานที่เพิ่มล่าสุด</p>
-                </div>
-
-                <a class="admin-widget-link" href="<?= h(app_system_url('admin/users.php')) ?>">
-                    ดูทั้งหมด
-                </a>
-            </div>
-
-            <div class="admin-mini-list">
-
-                <?php if (!$recent_users || $recent_users->num_rows === 0): ?>
-
-                    <div class="admin-empty-mini">
-                        ยังไม่มีข้อมูลพนักงาน
-                    </div>
-
-                <?php else: ?>
-
-                    <?php while ($user = $recent_users->fetch_assoc()): ?>
-
-                        <div class="admin-mini-item">
-                            <div class="admin-mini-avatar">
-                                <i class="fa-solid fa-user-tie"></i>
-                            </div>
-
-                            <div class="admin-mini-main">
-                                <strong><?= h($user['user_name']) ?></strong>
-                                <span><?= h($user['user_phone'] ?: '-') ?></span>
-                            </div>
-
-                            <span class="admin-user-role">
-                                <?= h(role_name($user['user_role'])) ?>
-                            </span>
-                        </div>
-
-                    <?php endwhile; ?>
-
-                <?php endif; ?>
-
-            </div>
-        </div>
-
-        <div class="admin-widget admin-latest-customers-widget">
-            <div class="admin-widget-head">
-                <div>
-                    <h2>ลูกค้าล่าสุด</h2>
-                    <p>ข้อมูลลูกค้าที่เพิ่มล่าสุด</p>
-                </div>
-
-                <a class="admin-widget-link" href="<?= h(app_system_url('admin/customers.php')) ?>">
-                    ดูทั้งหมด
-                </a>
-            </div>
-
-            <div class="admin-mini-list">
-
-                <?php if (!$recent_customers || $recent_customers->num_rows === 0): ?>
-
-                    <div class="admin-empty-mini">
-                        ยังไม่มีลูกค้า
-                    </div>
-
-                <?php else: ?>
-
-                    <?php while ($customer = $recent_customers->fetch_assoc()): ?>
-
-                        <div class="admin-mini-item">
-                            <div class="admin-mini-avatar">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
-
-                            <div class="admin-mini-main">
-                                <strong><?= h($customer['user_name']) ?></strong>
-                                <span><?= h($customer['user_phone'] ?: ($customer['user_email'] ?: '-')) ?></span>
-                            </div>
-
-                            <small><?= h($customer['user_id']) ?></small>
-                        </div>
-
-                    <?php endwhile; ?>
-
-                <?php endif; ?>
-
             </div>
         </div>
 

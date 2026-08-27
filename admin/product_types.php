@@ -7,6 +7,20 @@ require_login('3');
 $action = $_GET['action'] ?? '';
 $search = trim($_GET['q'] ?? '');
 
+function product_type_has_product(mysqli $conn, string $protype_id): bool
+{
+    $check_product = $conn->prepare("
+        SELECT pro_id
+        FROM product
+        WHERE protype_id = ?
+        LIMIT 1
+    ");
+    $check_product->bind_param('s', $protype_id);
+    $check_product->execute();
+
+    return $check_product->get_result()->num_rows > 0;
+}
+
 if ($action === 'delete') {
     $delete_id = trim($_GET['id'] ?? '');
 
@@ -15,16 +29,7 @@ if ($action === 'delete') {
     }
 
     try {
-        $check_product = $conn->prepare("
-            SELECT pro_id
-            FROM product
-            WHERE protype_id = ?
-            LIMIT 1
-        ");
-        $check_product->bind_param('s', $delete_id);
-        $check_product->execute();
-
-        if ($check_product->get_result()->num_rows > 0) {
+        if (product_type_has_product($conn, $delete_id)) {
             redirect_to(app_system_url('admin/product_types.php?status=product_type_linked'));
         }
 
@@ -103,7 +108,7 @@ layout_header('จัดการประเภทสินค้า', 'product
   </form>
 
   <div class="table-wrap">
-    <table class="data-table">
+    <table class="data-table product-type-table">
       <thead>
         <tr>
           <th>รหัสประเภทสินค้า</th>
@@ -121,10 +126,11 @@ layout_header('จัดการประเภทสินค้า', 'product
         <?php endif; ?>
 
         <?php while ($row = $product_types->fetch_assoc()): ?>
+          <?php $has_product = product_type_has_product($conn, $row['protype_id']); ?>
           <tr>
             <td><?= h($row['protype_id']) ?></td>
             <td><?= h($row['protype_name']) ?></td>
-            <td class="address-cell">
+            <td class="address-cell product-type-detail-cell">
               <?php
                 $detail = (string) $row['protype_detail'];
                 $is_long = mb_strlen($detail, 'UTF-8') > 25;
@@ -133,22 +139,6 @@ layout_header('จัดการประเภทสินค้า', 'product
                   ? mb_substr($detail, 0, 25, 'UTF-8') . '...'
                   : $detail;
 
-                if (!function_exists('wrap_text_every_chars')) {
-                    function wrap_text_every_chars(string $text, int $limit = 15): string
-                    {
-                        $text = trim($text);
-                        $length = mb_strlen($text, 'UTF-8');
-                        $lines = [];
-
-                        for ($i = 0; $i < $length; $i += $limit) {
-                            $lines[] = mb_substr($text, $i, $limit, 'UTF-8');
-                        }
-
-                        return implode("\n", $lines);
-                    }
-                }
-
-                $wrapped_detail = wrap_text_every_chars($detail, 15);
               ?>
 
               <?php if ($is_long): ?>
@@ -156,8 +146,8 @@ layout_header('จัดการประเภทสินค้า', 'product
                   <?= h($short_detail) ?>
                 </span>
 
-                <span class="address-full" style="display:none;">
-                  <?= nl2br(h($wrapped_detail)) ?>
+                <span class="address-full product-type-detail-full" style="display:none;">
+                  <?= nl2br(h($detail)) ?>
                 </span>
 
                 <button type="button" class="text-more-btn" data-toggle-address>
@@ -181,20 +171,37 @@ layout_header('จัดการประเภทสินค้า', 'product
                   <span>แก้ไข</span>
                 </a>
 
-                <a
-                  class="btn btn-delete"
-                  href="<?= h(app_system_url('admin/product_types.php?action=delete&id=' . urlencode($row['protype_id']))) ?>"
-                  data-confirm-delete="ยืนยันการลบประเภทสินค้านี้หรือไม่?"
-                >
-                  <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M3 6h18"></path>
-                    <path d="M8 6V4h8v2"></path>
-                    <path d="M19 6l-1 14H6L5 6"></path>
-                    <path d="M10 11v6"></path>
-                    <path d="M14 11v6"></path>
-                  </svg>
-                  <span>ลบ</span>
-                </a>
+                <?php if ($has_product): ?>
+                  <span
+                    class="btn btn-delete disabled-link"
+                    aria-disabled="true"
+                    title="ไม่สามารถลบได้ เนื่องจากมีสินค้าอยู่ในประเภทนี้"
+                  >
+                    <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M3 6h18"></path>
+                      <path d="M8 6V4h8v2"></path>
+                      <path d="M19 6l-1 14H6L5 6"></path>
+                      <path d="M10 11v6"></path>
+                      <path d="M14 11v6"></path>
+                    </svg>
+                    <span>ลบ</span>
+                  </span>
+                <?php else: ?>
+                  <a
+                    class="btn btn-delete"
+                    href="<?= h(app_system_url('admin/product_types.php?action=delete&id=' . urlencode($row['protype_id']))) ?>"
+                    data-confirm-delete="ยืนยันการลบประเภทสินค้านี้หรือไม่?"
+                  >
+                    <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M3 6h18"></path>
+                      <path d="M8 6V4h8v2"></path>
+                      <path d="M19 6l-1 14H6L5 6"></path>
+                      <path d="M10 11v6"></path>
+                      <path d="M14 11v6"></path>
+                    </svg>
+                    <span>ลบ</span>
+                  </a>
+                <?php endif; ?>
               </div>
             </td>
           </tr>

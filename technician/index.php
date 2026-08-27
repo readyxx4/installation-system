@@ -87,13 +87,13 @@ $stmt_jobs = $conn->prepare("
         s.setup_address,
         s.setup_location,
 
-        u.user_name,
-        u.user_phone,
+        c.customer_name AS user_name,
+        c.customer_phone AS user_phone,
 
         p.pro_name
     FROM assignment a
     LEFT JOIN setup s ON a.setup_id = s.setup_id
-    LEFT JOIN `user` u ON a.user_id = u.user_id
+    LEFT JOIN customers c ON COALESCE(a.customer_id, s.customer_id) = c.customer_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     WHERE a.tech_id = ?
     ORDER BY a.assign_date DESC, a.assign_id DESC

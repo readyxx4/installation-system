@@ -6,25 +6,23 @@ require_once __DIR__ . '/../customer_profiles.php';
 require_login('3');
 ensure_customer_profiles_schema($conn);
 
-function get_user_by_id(mysqli $conn, string $user_id): ?array
+function get_customer_by_id(mysqli $conn, string $customer_id): ?array
 {
   $stmt = $conn->prepare("
     SELECT
-      u.user_id,
-      COALESCE(c.customer_name, u.user_name) AS user_name,
-      u.user_password,
-      COALESCE(c.customer_phone, u.user_phone) AS user_phone,
-      COALESCE(c.customer_email, u.user_email) AS user_email,
-      COALESCE(c.customer_address, u.user_address) AS user_address,
-      u.user_role,
-      COALESCE(c.customer_status, 1) AS customer_status
-    FROM `user` u
-    LEFT JOIN customers c ON c.user_id = u.user_id
-    WHERE u.user_id = ?
-      AND u.user_role = 0
+      c.customer_id,
+      c.customer_name AS user_name,
+      c.customer_password AS user_password,
+      c.customer_phone AS user_phone,
+      c.customer_email AS user_email,
+      c.customer_address AS user_address,
+      0 AS user_role,
+      c.customer_status
+    FROM customers c
+    WHERE c.customer_id = ?
     LIMIT 1
   ");
-  $stmt->bind_param('s', $user_id);
+  $stmt->bind_param('s', $customer_id);
   $stmt->execute();
 
   $result = $stmt->get_result();
@@ -48,7 +46,7 @@ if ($user_id === '') {
   redirect_to(app_system_url('admin/customers.php?status=error'));
 }
 
-$user = get_user_by_id($conn, $user_id);
+$user = get_customer_by_id($conn, $user_id);
 
 if (!$user) {
   redirect_to(app_system_url('admin/customers.php?status=error'));
@@ -79,19 +77,19 @@ if (
 
   if ($field === 'user_phone') {
     $stmt = $conn->prepare("
-      SELECT user_id
-      FROM `user`
-      WHERE user_phone = ?
-        AND user_id <> ?
+      SELECT customer_id AS user_id
+      FROM customers
+      WHERE customer_phone = ?
+        AND customer_id <> ?
       LIMIT 1
     ");
     $stmt->bind_param('ss', $value, $exclude_user_id);
   } else {
     $stmt = $conn->prepare("
-      SELECT user_id
-      FROM `user`
-      WHERE LOWER(user_email) = LOWER(?)
-        AND user_id <> ?
+      SELECT customer_id AS user_id
+      FROM customers
+      WHERE LOWER(customer_email) = LOWER(?)
+        AND customer_id <> ?
       LIMIT 1
     ");
     $stmt->bind_param('ss', $value, $exclude_user_id);
@@ -152,10 +150,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ตรวจเฉพาะเบอร์โทรศัพท์และอีเมล โดยแยกทีละช่องเพื่อแจ้งเตือนให้ตรงสาเหตุ
 
     $check_phone = $conn->prepare("
-      SELECT user_id
-      FROM `user`
-      WHERE user_phone = ?
-        AND user_id <> ?
+      SELECT customer_id AS user_id
+      FROM customers
+      WHERE customer_phone = ?
+        AND customer_id <> ?
       LIMIT 1
     ");
     $check_phone->bind_param('ss', $user_phone, $user_id);
@@ -173,10 +171,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $check_email = $conn->prepare("
-      SELECT user_id
-      FROM `user`
-      WHERE LOWER(user_email) = LOWER(?)
-        AND user_id <> ?
+      SELECT customer_id AS user_id
+      FROM customers
+      WHERE LOWER(customer_email) = LOWER(?)
+        AND customer_id <> ?
       LIMIT 1
     ");
     $check_email->bind_param('ss', $user_email, $user_id);
@@ -195,42 +193,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($change_password) {
       $stmt = $conn->prepare("
-        UPDATE `user`
-        SET user_name = ?,
-            user_password = ?,
-            user_phone = ?,
-            user_email = ?,
-            user_address = ?,
-            user_role = ?
-        WHERE user_id = ?
+        UPDATE customers
+        SET customer_name = ?,
+            customer_password = ?,
+            customer_phone = ?,
+            customer_email = ?,
+            customer_address = ?
+        WHERE customer_id = ?
       ");
       $stmt->bind_param(
-        'sssssis',
+        'ssssss',
         $user_name,
         $user_password,
         $user_phone,
         $user_email,
         $user_address,
-        $role_int,
         $user_id
       );
     } else {
       $stmt = $conn->prepare("
-        UPDATE `user`
-        SET user_name = ?,
-            user_phone = ?,
-            user_email = ?,
-            user_address = ?,
-            user_role = ?
-        WHERE user_id = ?
+        UPDATE customers
+        SET customer_name = ?,
+            customer_phone = ?,
+            customer_email = ?,
+            customer_address = ?
+        WHERE customer_id = ?
       ");
       $stmt->bind_param(
-        'ssssis',
+        'sssss',
         $user_name,
         $user_phone,
         $user_email,
         $user_address,
-        $role_int,
         $user_id
       );
     }
@@ -239,15 +233,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $transaction_started = true;
 
     $stmt->execute();
-    upsert_customer_profile(
-      $conn,
-      $user_id,
-      $user_name,
-      $user_phone,
-      $user_email,
-      $user_address,
-      (int) ($user['customer_status'] ?? 1)
-    );
 
     $conn->commit();
     redirect_to(app_system_url('admin/customers.php?status=updated'));
@@ -328,7 +313,7 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users');
     autocomplete="off"
     id="userEditForm"
     data-duplicate-url="<?= h(app_system_url('admin/customer_edit.php')) ?>"
-    data-current-user-id="<?= h($user['user_id']) ?>"
+    data-current-user-id="<?= h($user['customer_id']) ?>"
     data-original-password="<?= h($user['user_password'] ?: '1234') ?>"
     data-district-url="<?= h(app_system_url('ajax/get_districts.php')) ?>"
     data-sub-district-url="<?= h(app_system_url('ajax/get_subdistricts.php')) ?>"
@@ -337,7 +322,7 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users');
     data-selected-subdistrict-name="<?= h($selected_subdistrict_name) ?>"
     data-selected-zip-code="<?= h($selected_zip_code) ?>"
   >
-    <input type="hidden" name="user_id" value="<?= h($user['user_id']) ?>">
+    <input type="hidden" name="user_id" value="<?= h($user['customer_id']) ?>">
     <input type="hidden" name="change_password" id="change_password" value="0">
 
     <div class="staff-create-head staff-create-head-clean">
@@ -351,7 +336,7 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users');
         <label for="user_id_show">รหัสผู้ใช้ *</label>
         <div class="staff-input-wrap">
           <?= admin_form_icon_svg('id') ?>
-          <input type="text" id="user_id_show" value="<?= h($user['user_id']) ?>" readonly>
+          <input type="text" id="user_id_show" value="<?= h($user['customer_id']) ?>" readonly>
         </div>
       </div>
 

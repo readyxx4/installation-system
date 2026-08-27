@@ -158,7 +158,7 @@ $dashboard_rows = safe_rows($conn, "
         s.setup_id,
         s.setup_status,
         s.created_at,
-        u.user_name,
+        c.customer_name AS user_name,
         p.pro_name,
         a.assign_id,
         a.assign_status,
@@ -170,7 +170,7 @@ $dashboard_rows = safe_rows($conn, "
         t.tech_fullname,
         t.tech_status
     FROM setup s
-    LEFT JOIN `user` u ON s.user_id = u.user_id
+    LEFT JOIN customers c ON s.customer_id = c.customer_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     LEFT JOIN assignment a
       ON a.assign_id = (

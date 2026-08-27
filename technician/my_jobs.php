@@ -101,9 +101,9 @@ $sql = "
         s.setup_location,
         s.setup_status,
 
-        u.user_name,
-        u.user_phone,
-        u.user_email,
+        c.customer_name AS user_name,
+        c.customer_phone AS user_phone,
+        c.customer_email AS user_email,
 
         p.pro_name,
 
@@ -111,7 +111,7 @@ $sql = "
         d.install_total
     FROM assignment a
     LEFT JOIN setup s ON a.setup_id = s.setup_id
-    LEFT JOIN `user` u ON a.user_id = u.user_id
+    LEFT JOIN customers c ON COALESCE(a.customer_id, s.customer_id) = c.customer_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     LEFT JOIN install_detail d ON s.setup_id = d.setup_id
     WHERE a.tech_id = ?
@@ -132,9 +132,9 @@ if ($search !== '') {
         AND (
             a.assign_id LIKE ?
          OR s.setup_id LIKE ?
-         OR u.user_name LIKE ?
-         OR u.user_phone LIKE ?
-         OR u.user_email LIKE ?
+         OR c.customer_name LIKE ?
+         OR c.customer_phone LIKE ?
+         OR c.customer_email LIKE ?
          OR p.pro_name LIKE ?
          OR s.setup_address LIKE ?
          OR s.setup_location LIKE ?

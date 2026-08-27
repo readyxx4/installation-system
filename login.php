@@ -56,28 +56,60 @@ try {
         redirect_to(app_system_url('technician/index.php'));
     }
 
-    /*
-      ผู้ใช้ทั่วไป
-      0 = ลูกค้า
-      1 = หัวหน้าช่าง
-      2 = พนักงานการเงิน
-      3 = ผู้ดูแลระบบ
-    */
     if (!in_array($login_type, ['0', '1', '2', '3'], true)) {
         redirect_to(app_public_url('login.html?error=invalid'));
     }
 
     $user_role = (int) $login_type;
 
+    if ($user_role === 0) {
+        $stmt = $conn->prepare("
+            SELECT
+              customer_id,
+              customer_name,
+              customer_email,
+              customer_status
+            FROM customers
+            WHERE customer_email = ?
+              AND customer_password = ?
+            LIMIT 1
+        ");
+
+        $stmt->bind_param('ss', $login_email, $password);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if ($result->num_rows !== 1) {
+            redirect_to(app_public_url('login.html?error=invalid'));
+        }
+
+        $customer = $result->fetch_assoc();
+
+        if ((int) ($customer['customer_status'] ?? 1) === 0) {
+            redirect_to(app_public_url('login.html?error=suspended'));
+        }
+
+        $_SESSION['logged_in'] = true;
+        $_SESSION['login_type'] = 'customer';
+        $_SESSION['customer_id'] = $customer['customer_id'];
+        $_SESSION['customer_name'] = $customer['customer_name'];
+        $_SESSION['customer_email'] = $customer['customer_email'];
+        $_SESSION['customer_status'] = (string) $customer['customer_status'];
+        $_SESSION['user_name'] = $customer['customer_name'];
+        $_SESSION['user_email'] = $customer['customer_email'];
+        $_SESSION['user_role'] = '0';
+
+        redirect_to(app_system_url('customer/index.php'));
+    }
+
     $stmt = $conn->prepare("
         SELECT
           u.user_id,
           u.user_name,
           u.user_email,
-          u.user_role,
-          COALESCE(c.customer_status, 1) AS customer_status
+          u.user_role
         FROM `user` u
-        LEFT JOIN customers c ON c.user_id = u.user_id
         WHERE u.user_email = ?
           AND u.user_password = ?
           AND u.user_role = ?
@@ -95,20 +127,12 @@ try {
 
     $user = $result->fetch_assoc();
 
-    if ((int) $user['user_role'] === 0 && (int) ($user['customer_status'] ?? 1) === 0) {
-        redirect_to(app_public_url('login.html?error=suspended'));
-    }
-
     $_SESSION['logged_in'] = true;
     $_SESSION['login_type'] = 'user';
     $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['user_name'] = $user['user_name'];
     $_SESSION['user_email'] = $user['user_email'];
     $_SESSION['user_role'] = (string) $user['user_role'];
-
-    if ((int) $user['user_role'] === 0) {
-        redirect_to(app_system_url('customer/index.php'));
-    }
 
     if ((int) $user['user_role'] === 1) {
         redirect_to(app_system_url('manager/assignment_list.php'));

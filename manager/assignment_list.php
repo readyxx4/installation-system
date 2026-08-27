@@ -96,7 +96,7 @@ if ($action === 'cancel') {
 
     try {
         $setup_cancel_stmt = $conn->prepare("
-            SELECT setup_id, user_id, setup_status
+            SELECT setup_id, customer_id, setup_status
             FROM setup
             WHERE setup_id = ?
             LIMIT 1
@@ -135,17 +135,22 @@ if ($action === 'cancel') {
             $assign_by = $_SESSION['user_id'] ?? null;
             $assign_date = date('Y-m-d H:i:s');
             $cancel_status = 4;
+            $customer_id = $setup_cancel['customer_id'] ?? null;
+
+            if ($customer_id === null || $customer_id === '') {
+                redirect_to(app_system_url('manager/assignment_list.php?status=all&cancel=error'));
+            }
 
             $cancel_insert_stmt = $conn->prepare("
                 INSERT INTO assignment
-                    (assign_id, setup_id, tech_id, user_id, assign_by, assign_date, assign_status)
+                    (assign_id, setup_id, tech_id, customer_id, assign_by, assign_date, assign_status)
                 VALUES (?, ?, NULL, ?, ?, ?, ?)
             ");
             $cancel_insert_stmt->bind_param(
                 'sssssi',
                 $cancel_assign_id,
                 $setup_id_cancel,
-                $setup_cancel['user_id'],
+                $customer_id,
                 $assign_by,
                 $assign_date,
                 $cancel_status
@@ -366,18 +371,18 @@ function money_text($value): string
 
 $latest_assignment_join = "\n    LEFT JOIN assignment a\n        ON a.setup_id = s.setup_id\n       AND a.assign_id = (\n            SELECT a2.assign_id\n            FROM assignment a2\n            WHERE a2.setup_id = s.setup_id\n            ORDER BY a2.assign_date DESC, a2.assign_id DESC\n            LIMIT 1\n       )\n";
 
-$base_sql = "\n    SELECT\n        s.setup_id,\n        s.user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n\n        u.user_name,\n        u.user_phone,\n        u.user_email,\n        u.user_address,\n\n        p.pro_name,\n        p.pro_price_install,\n\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n        {$assign_install_date_select},\n        {$assign_install_time_select},\n\n        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n\n        m.user_name AS manager_name,\n\n        COUNT(idt.detail_id) AS item_count,\n        COALESCE(SUM(idt.install_total), 0) AS install_total\n\n    FROM setup s\n    LEFT JOIN `user` u ON s.user_id = u.user_id\n    LEFT JOIN product p ON s.pro_id = p.pro_id\n    {$latest_assignment_join}\n    LEFT JOIN technicians t ON a.tech_id = t.tech_id\n    LEFT JOIN `user` m ON a.assign_by = m.user_id\n    LEFT JOIN install_detail idt ON s.setup_id = idt.setup_id\n";
+$base_sql = "\n    SELECT\n        s.setup_id,\n        s.customer_id AS user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n\n        c.customer_name AS user_name,\n        c.customer_phone AS user_phone,\n        c.customer_email AS user_email,\n        c.customer_address AS user_address,\n\n        p.pro_name,\n        p.pro_price_install,\n\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n        {$assign_install_date_select},\n        {$assign_install_time_select},\n\n        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n\n        m.user_name AS manager_name,\n\n        COUNT(idt.detail_id) AS item_count,\n        COALESCE(SUM(COALESCE(idt.install_qty, 1) * COALESCE(p2.pro_price_install, 0)), 0) AS install_total\n\n    FROM setup s\n    LEFT JOIN customers c ON s.customer_id = c.customer_id\n    LEFT JOIN product p ON s.pro_id = p.pro_id\n    {$latest_assignment_join}\n    LEFT JOIN technicians t ON a.tech_id = t.tech_id\n    LEFT JOIN `user` m ON a.assign_by = m.user_id\n    LEFT JOIN install_detail idt ON s.setup_id = idt.setup_id\n    LEFT JOIN product p2 ON idt.pro_id = p2.pro_id\n";
 
 $install_date_group_sql = $has_install_date ? "        a.assign_install_date,\n" : "";
 $install_time_group_sql = $has_install_time ? "        a.assign_install_time,\n" : "";
 $install_end_time_group_sql = $has_install_end_time ? "        a.assign_install_end_time,\n" : "";
 
-$group_sql = "\n    GROUP BY\n        s.setup_id,\n        s.user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n        u.user_name,\n        u.user_phone,\n        u.user_email,\n        u.user_address,\n        p.pro_name,\n        p.pro_price_install,\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n{$install_date_group_sql}{$install_time_group_sql}{$install_end_time_group_sql}        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n        m.user_name\n";
+$group_sql = "\n    GROUP BY\n        s.setup_id,\n        s.customer_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n        c.customer_name,\n        c.customer_phone,\n        c.customer_email,\n        c.customer_address,\n        p.pro_name,\n        p.pro_price_install,\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n{$install_date_group_sql}{$install_time_group_sql}{$install_end_time_group_sql}        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n        m.user_name\n";
 
 if ($search !== '') {
     $like = '%' . $search . '%';
 
-    $stmt = $conn->prepare($base_sql . "\n        WHERE s.setup_id LIKE ?\n           OR u.user_name LIKE ?\n           OR u.user_phone LIKE ?\n           OR u.user_email LIKE ?\n           OR p.pro_name LIKE ?\n           OR t.tech_name LIKE ?\n           OR t.tech_fullname LIKE ?\n           OR t.tech_phone LIKE ?\n           OR m.user_name LIKE ?\n    " . $group_sql . "\n        ORDER BY
+    $stmt = $conn->prepare($base_sql . "\n        WHERE s.setup_id LIKE ?\n           OR c.customer_name LIKE ?\n           OR c.customer_phone LIKE ?\n           OR c.customer_email LIKE ?\n           OR p.pro_name LIKE ?\n           OR t.tech_name LIKE ?\n           OR t.tech_fullname LIKE ?\n           OR t.tech_phone LIKE ?\n           OR m.user_name LIKE ?\n    " . $group_sql . "\n        ORDER BY
             CASE
                 WHEN a.assign_id IS NULL OR (s.setup_status = 0 AND (a.assign_status IS NULL OR a.assign_status <> 4)) THEN 0
                 WHEN a.assign_status = 4 THEN 1

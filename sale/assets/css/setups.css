@@ -349,6 +349,129 @@ body.app-body.role-2 .cs-history-toolbar {
   margin: 0 0 12px !important;
 }
 
+body.app-body.role-2 .cs-history-status-tabs {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin: 0 0 12px !important;
+}
+
+body.app-body.role-2 .cs-history-status-tabs .status-progress {
+  color: #1d4ed8;
+  background: #f8fbff;
+  border-color: #bfdbfe;
+}
+
+body.app-body.role-2 .cs-history-status-tabs .status-canceled {
+  color: #1d4ed8;
+  background: #f8fbff;
+  border-color: #bfdbfe;
+}
+
+body.app-body.role-2 .cs-history-status-tabs .status-progress:hover {
+  color: #1e40af;
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+body.app-body.role-2 .cs-history-status-tabs .status-canceled:hover {
+  color: #1e40af;
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+body.app-body.role-2 .cs-history-status-tabs .status-progress.active {
+  color: #ffffff;
+  background: #2563eb;
+  border-color: #2563eb;
+  box-shadow: 0 10px 22px rgba(47, 111, 236, .18);
+}
+
+body.app-body.role-2 .cs-history-status-tabs .status-canceled.active {
+  color: #ffffff;
+  background: #2563eb;
+  border-color: #2563eb;
+  box-shadow: 0 10px 22px rgba(47, 111, 236, .18);
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table th,
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table td {
+  padding: 7px 8px !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table th:nth-child(1),
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table td:nth-child(1) {
+  width: 13% !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table th:nth-child(2),
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table td:nth-child(2) {
+  width: 15% !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table th:nth-child(3),
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table td:nth-child(3) {
+  width: 17% !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table th:nth-child(4),
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table td:nth-child(4) {
+  width: 11% !important;
+  text-align: center !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table th:nth-child(5),
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table td:nth-child(5) {
+  width: 13% !important;
+  text-align: right !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table th:nth-child(6),
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table td:nth-child(6) {
+  width: 16% !important;
+  text-align: center !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table th:nth-child(7),
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table td:nth-child(7) {
+  width: 15% !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table .cs-history-status-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  max-width: 100% !important;
+  padding: 4px 8px !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table .cs-history-status-badge.status-progress {
+  color: #0e7490;
+  background: #ecfeff;
+  border-color: #a5f3fc;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table .cs-history-status-badge.status-canceled {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table .cs-history-row-actions {
+  justify-content: center !important;
+}
+
+body.app-body.role-2 .cs-data-table.cs-setups-table-clean.cs-history-status-table .cs-history-view-btn {
+  min-width: 92px !important;
+  white-space: nowrap !important;
+}
+
 @media (max-width: 980px) {
   body.app-body.role-2 .cs-setups-page-panel .cs-sale-admin-toolbar {
     grid-template-columns: 1fr !important;

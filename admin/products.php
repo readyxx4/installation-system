@@ -7,6 +7,34 @@ require_login('3');
 $action = $_GET['action'] ?? '';
 $search = trim($_GET['q'] ?? '');
 
+function product_has_setup(mysqli $conn, string $pro_id): bool
+{
+    $check_setup = $conn->prepare("
+        SELECT setup_id
+        FROM setup
+        WHERE pro_id = ?
+        LIMIT 1
+    ");
+    $check_setup->bind_param('s', $pro_id);
+    $check_setup->execute();
+
+    return $check_setup->get_result()->num_rows > 0;
+}
+
+function product_has_install_detail(mysqli $conn, string $pro_id): bool
+{
+    $check_detail = $conn->prepare("
+        SELECT detail_id
+        FROM install_detail
+        WHERE pro_id = ?
+        LIMIT 1
+    ");
+    $check_detail->bind_param('s', $pro_id);
+    $check_detail->execute();
+
+    return $check_detail->get_result()->num_rows > 0;
+}
+
 if ($action === 'delete') {
     $delete_id = trim($_GET['id'] ?? '');
 
@@ -15,29 +43,11 @@ if ($action === 'delete') {
     }
 
     try {
-        $check_setup = $conn->prepare("
-            SELECT setup_id
-            FROM setup
-            WHERE pro_id = ?
-            LIMIT 1
-        ");
-        $check_setup->bind_param('s', $delete_id);
-        $check_setup->execute();
-
-        if ($check_setup->get_result()->num_rows > 0) {
+        if (product_has_setup($conn, $delete_id)) {
             redirect_to(app_system_url('admin/products.php?status=product_linked'));
         }
 
-        $check_detail = $conn->prepare("
-            SELECT detail_id
-            FROM install_detail
-            WHERE pro_id = ?
-            LIMIT 1
-        ");
-        $check_detail->bind_param('s', $delete_id);
-        $check_detail->execute();
-
-        if ($check_detail->get_result()->num_rows > 0) {
+        if (product_has_install_detail($conn, $delete_id)) {
             redirect_to(app_system_url('admin/products.php?status=product_linked'));
         }
 
@@ -151,6 +161,7 @@ layout_header('จัดการสินค้า', 'products');
         <?php endif; ?>
 
         <?php while ($row = $products->fetch_assoc()): ?>
+          <?php $is_product_linked = product_has_setup($conn, $row['pro_id']) || product_has_install_detail($conn, $row['pro_id']); ?>
           <tr>
             <td><?= h($row['pro_id']) ?></td>
             <td><?= h($row['pro_name']) ?></td>
@@ -170,20 +181,37 @@ layout_header('จัดการสินค้า', 'products');
                   <span>แก้ไข</span>
                 </a>
 
-                <a
-                  class="btn btn-delete"
-                  href="<?= h(app_system_url('admin/products.php?action=delete&id=' . urlencode($row['pro_id']))) ?>"
-                  data-confirm-delete="ยืนยันการลบสินค้านี้หรือไม่?"
-                >
-                  <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M3 6h18"></path>
-                    <path d="M8 6V4h8v2"></path>
-                    <path d="M19 6l-1 14H6L5 6"></path>
-                    <path d="M10 11v6"></path>
-                    <path d="M14 11v6"></path>
-                  </svg>
-                  <span>ลบ</span>
-                </a>
+                <?php if ($is_product_linked): ?>
+                  <span
+                    class="btn btn-delete disabled-link"
+                    aria-disabled="true"
+                    title="ไม่สามารถลบได้ เนื่องจากสินค้านี้ถูกใช้ในงานติดตั้งแล้ว"
+                  >
+                    <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M3 6h18"></path>
+                      <path d="M8 6V4h8v2"></path>
+                      <path d="M19 6l-1 14H6L5 6"></path>
+                      <path d="M10 11v6"></path>
+                      <path d="M14 11v6"></path>
+                    </svg>
+                    <span>ลบ</span>
+                  </span>
+                <?php else: ?>
+                  <a
+                    class="btn btn-delete"
+                    href="<?= h(app_system_url('admin/products.php?action=delete&id=' . urlencode($row['pro_id']))) ?>"
+                    data-confirm-delete="ยืนยันการลบสินค้านี้หรือไม่?"
+                  >
+                    <svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M3 6h18"></path>
+                      <path d="M8 6V4h8v2"></path>
+                      <path d="M19 6l-1 14H6L5 6"></path>
+                      <path d="M10 11v6"></path>
+                      <path d="M14 11v6"></path>
+                    </svg>
+                    <span>ลบ</span>
+                  </a>
+                <?php endif; ?>
               </div>
             </td>
           </tr>

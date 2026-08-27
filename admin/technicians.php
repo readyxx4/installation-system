@@ -22,6 +22,20 @@ function tech_status_badge($status): string
     };
 }
 
+function technician_has_assignment(mysqli $conn, string $tech_id): bool
+{
+    $check_assignment = $conn->prepare("
+        SELECT assign_id
+        FROM assignment
+        WHERE tech_id = ?
+        LIMIT 1
+    ");
+    $check_assignment->bind_param('s', $tech_id);
+    $check_assignment->execute();
+
+    return $check_assignment->get_result()->num_rows > 0;
+}
+
 $action = $_GET['action'] ?? '';
 $search = trim($_GET['q'] ?? '');
 
@@ -33,16 +47,7 @@ if ($action === 'delete') {
     }
 
     try {
-        $check_assignment = $conn->prepare("
-            SELECT assign_id
-            FROM assignment
-            WHERE tech_id = ?
-            LIMIT 1
-        ");
-        $check_assignment->bind_param('s', $delete_id);
-        $check_assignment->execute();
-
-        if ($check_assignment->get_result()->num_rows > 0) {
+        if (technician_has_assignment($conn, $delete_id)) {
             redirect_to(app_system_url('admin/technicians.php?status=tech_assigned'));
         }
 
@@ -128,6 +133,7 @@ layout_header('จัดการข้อมูลช่างติดตั�
         <?php endif; ?>
 
         <?php while ($row = $technicians->fetch_assoc()): ?>
+          <?php $has_assignment = technician_has_assignment($conn, $row['tech_id']); ?>
           <tr>
             <td><?= h($row['tech_id']) ?></td>
             <td><?= h($row['tech_name'] ?: '-') ?></td>
@@ -148,18 +154,33 @@ layout_header('จัดการข้อมูลช่างติดตั�
                 <span>แก้ไข</span>
               </a>
 
-              <a class="btn btn-delete"
-                 href="<?= h(app_system_url('admin/technicians.php?action=delete&id=' . urlencode($row['tech_id']))) ?>"
-                 data-confirm-delete="ยืนยันการลบข้อมูลช่างนี้หรือไม่?">
-                <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M3 6h18"></path>
-                  <path d="M8 6V4h8v2"></path>
-                  <path d="M19 6l-1 14H6L5 6"></path>
-                  <path d="M10 11v6"></path>
-                  <path d="M14 11v6"></path>
-                </svg>
-                <span>ลบ</span>
-              </a>
+              <?php if ($has_assignment): ?>
+                <span class="btn btn-delete disabled-link"
+                      aria-disabled="true"
+                      title="ไม่สามารถลบได้ เนื่องจากมีประวัติการมอบหมายงาน">
+                  <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 6h18"></path>
+                    <path d="M8 6V4h8v2"></path>
+                    <path d="M19 6l-1 14H6L5 6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
+                  </svg>
+                  <span>ลบ</span>
+                </span>
+              <?php else: ?>
+                <a class="btn btn-delete"
+                   href="<?= h(app_system_url('admin/technicians.php?action=delete&id=' . urlencode($row['tech_id']))) ?>"
+                   data-confirm-delete="ยืนยันการลบข้อมูลช่างนี้หรือไม่?">
+                  <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 6h18"></path>
+                    <path d="M8 6V4h8v2"></path>
+                    <path d="M19 6l-1 14H6L5 6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
+                  </svg>
+                  <span>ลบ</span>
+                </a>
+              <?php endif; ?>
             </td>
           </tr>
         <?php endwhile; ?>

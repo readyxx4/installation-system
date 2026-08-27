@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
 
       if ($duplicate['pro_name'] === $pro_name) {
-        redirect_to(app_system_url('admin/product_add.php?status=duplicate_name'));
+        redirect_to(app_system_url('admin/product_add.php?status=product_duplicate_name'));
       }
 
       redirect_to(app_system_url('admin/product_add.php?status=duplicate'));

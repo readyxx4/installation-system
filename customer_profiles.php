@@ -14,21 +14,34 @@ function customer_profiles_table_exists(mysqli $conn): bool
     return $stmt->get_result()->num_rows > 0;
 }
 
+function customer_profiles_column_exists(mysqli $conn, string $column): bool
+{
+    $stmt = $conn->prepare("
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'customers'
+          AND COLUMN_NAME = ?
+        LIMIT 1
+    ");
+    $stmt->bind_param('s', $column);
+    $stmt->execute();
+
+    return $stmt->get_result()->num_rows > 0;
+}
+
 function ensure_customer_profiles_schema(mysqli $conn): void
 {
     $conn->query("
         CREATE TABLE IF NOT EXISTS customers (
             customer_id CHAR(13) NOT NULL,
-            user_id CHAR(13) NOT NULL,
+            customer_password VARCHAR(255) NOT NULL,
             customer_name VARCHAR(100) NOT NULL,
             customer_phone CHAR(10) NOT NULL,
             customer_email VARCHAR(100) NOT NULL,
             customer_address TEXT NOT NULL,
             customer_status TINYINT(1) NOT NULL DEFAULT 1,
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME NULL DEFAULT NULL,
             PRIMARY KEY (customer_id),
-            UNIQUE KEY uniq_customers_user_id (user_id),
             KEY idx_customers_status (customer_status)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
     ");
@@ -39,20 +52,16 @@ function ensure_customer_profiles_schema(mysqli $conn): void
         COLLATE utf8mb4_general_ci
     ");
 
-    $conn->query("
-        INSERT IGNORE INTO customers
-            (customer_id, user_id, customer_name, customer_phone, customer_email, customer_address, customer_status)
-        SELECT
-            user_id,
-            user_id,
-            user_name,
-            user_phone,
-            user_email,
-            user_address,
-            1
-        FROM `user`
-        WHERE user_role = 0
-    ");
+    if (!customer_profiles_column_exists($conn, 'customer_password')) {
+        $conn->query("
+            ALTER TABLE customers
+            ADD COLUMN customer_password VARCHAR(255) NOT NULL DEFAULT '' AFTER customer_id
+        ");
+        $conn->query("
+            ALTER TABLE customers
+            ALTER customer_password DROP DEFAULT
+        ");
+    }
 
     migrate_legacy_customer_profile_ids($conn);
 }
@@ -88,7 +97,7 @@ function migrate_legacy_customer_profile_ids(mysqli $conn): void
         SELECT customer_id
         FROM customers
         WHERE customer_id NOT LIKE 'CUS-2569-%'
-        ORDER BY created_at ASC, customer_id ASC
+        ORDER BY customer_id ASC
     ");
 
     while ($profile = $legacy_profiles->fetch_assoc()) {
@@ -97,8 +106,7 @@ function migrate_legacy_customer_profile_ids(mysqli $conn): void
 
         $stmt = $conn->prepare("
             UPDATE customers
-            SET customer_id = ?,
-                updated_at = CURRENT_TIMESTAMP
+            SET customer_id = ?
             WHERE customer_id = ?
             LIMIT 1
         ");
@@ -107,9 +115,41 @@ function migrate_legacy_customer_profile_ids(mysqli $conn): void
     }
 }
 
+function create_customer_profile(
+    mysqli $conn,
+    string $customer_password,
+    string $customer_name,
+    string $customer_phone,
+    string $customer_email,
+    string $customer_address,
+    int $customer_status = 1
+): string {
+    $customer_id = make_customer_profile_id($conn);
+
+    $stmt = $conn->prepare("
+        INSERT INTO customers
+            (customer_id, customer_password, customer_name, customer_phone, customer_email, customer_address, customer_status)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+
+    $stmt->bind_param(
+        'ssssssi',
+        $customer_id,
+        $customer_password,
+        $customer_name,
+        $customer_phone,
+        $customer_email,
+        $customer_address,
+        $customer_status
+    );
+    $stmt->execute();
+
+    return $customer_id;
+}
+
 function upsert_customer_profile(
     mysqli $conn,
-    string $user_id,
+    string $customer_password,
     string $customer_name,
     string $customer_phone,
     string $customer_email,
@@ -120,21 +160,21 @@ function upsert_customer_profile(
 
     $stmt = $conn->prepare("
         INSERT INTO customers
-            (customer_id, user_id, customer_name, customer_phone, customer_email, customer_address, customer_status)
+            (customer_id, customer_password, customer_name, customer_phone, customer_email, customer_address, customer_status)
         VALUES (?, ?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE
+            customer_password = VALUES(customer_password),
             customer_name = VALUES(customer_name),
             customer_phone = VALUES(customer_phone),
             customer_email = VALUES(customer_email),
             customer_address = VALUES(customer_address),
-            customer_status = VALUES(customer_status),
-            updated_at = CURRENT_TIMESTAMP
+            customer_status = VALUES(customer_status)
     ");
 
     $stmt->bind_param(
         'ssssssi',
         $customer_id,
-        $user_id,
+        $customer_password,
         $customer_name,
         $customer_phone,
         $customer_email,

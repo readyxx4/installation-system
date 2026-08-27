@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $check_result = $check->get_result();
 
     if ($check_result->num_rows > 0) {
-      redirect_to(app_system_url('admin/product_edit.php?id=' . urlencode($pro_id) . '&status=duplicate_name'));
+      redirect_to(app_system_url('admin/product_edit.php?id=' . urlencode($pro_id) . '&status=product_duplicate_name'));
     }
 
     $stmt = $conn->prepare("

@@ -4,31 +4,6 @@ require_once __DIR__ . '/customer_profiles.php';
 
 ensure_customer_profiles_schema($conn);
 
-function make_customer_id(mysqli $conn): string
-{
-    $prefix = 'USR-2569-';
-
-    for ($i = 1; $i <= 9999; $i++) {
-        $running_no = str_pad((string) $i, 4, '0', STR_PAD_LEFT);
-        $user_id = $prefix . $running_no;
-
-        $stmt = $conn->prepare("
-            SELECT user_id
-            FROM `user`
-            WHERE user_id = ?
-            LIMIT 1
-        ");
-        $stmt->bind_param('s', $user_id);
-        $stmt->execute();
-
-        if ($stmt->get_result()->num_rows === 0) {
-            return $user_id;
-        }
-    }
-
-    throw new Exception('ไม่สามารถสร้างรหัสลูกค้าได้');
-}
-
 function normalize_full_name(string $name): string
 {
     return preg_replace('/\s+/u', ' ', trim($name)) ?? trim($name);
@@ -74,9 +49,9 @@ if (
         }
 
         $stmt = $conn->prepare("
-            SELECT user_id
-            FROM `user`
-            WHERE user_phone = ?
+            SELECT customer_id AS user_id
+            FROM customers
+            WHERE customer_phone = ?
             LIMIT 1
         ");
         $stmt->bind_param('s', $value);
@@ -89,9 +64,9 @@ if (
         }
 
         $stmt = $conn->prepare("
-            SELECT user_id
-            FROM `user`
-            WHERE LOWER(user_email) = ?
+            SELECT customer_id AS user_id
+            FROM customers
+            WHERE LOWER(customer_email) = ?
             LIMIT 1
         ");
         $stmt->bind_param('s', $value);
@@ -111,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirect_to(app_public_url('register.html'));
 }
 
-$user_id = make_customer_id($conn);
 $user_name = normalize_full_name($_POST['user_name'] ?? '');
 $user_phone = preg_replace('/\D+/', '', trim($_POST['user_phone'] ?? '')) ?? '';
 $user_email = strtolower(trim($_POST['user_email'] ?? ''));
@@ -122,9 +96,6 @@ $sub_district_id = (int) ($_POST['sub_district_id'] ?? 0);
 $zip_code = trim($_POST['zip_code'] ?? '');
 $user_password = trim($_POST['user_password'] ?? '');
 $confirm_password = trim($_POST['confirm_password'] ?? '');
-
-// Public registration is always customer role.
-$user_role = 0;
 
 if (
     $user_name === '' ||
@@ -196,9 +167,9 @@ try {
         ' ' . $zip_code;
 
     $check_phone = $conn->prepare("
-        SELECT user_id
-        FROM `user`
-        WHERE user_phone = ?
+        SELECT customer_id
+        FROM customers
+        WHERE customer_phone = ?
         LIMIT 1
     ");
     $check_phone->bind_param('s', $user_phone);
@@ -209,9 +180,9 @@ try {
     }
 
     $check_email = $conn->prepare("
-        SELECT user_id
-        FROM `user`
-        WHERE LOWER(user_email) = ?
+        SELECT customer_id
+        FROM customers
+        WHERE LOWER(customer_email) = ?
         LIMIT 1
     ");
     $check_email->bind_param('s', $user_email);
@@ -221,30 +192,12 @@ try {
         register_redirect('duplicate_email');
     }
 
-    $stmt = $conn->prepare("
-        INSERT INTO `user`
-        (user_id, user_name, user_password, user_phone, user_email, user_address, user_role)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ");
-
-    $stmt->bind_param(
-        'ssssssi',
-        $user_id,
-        $user_name,
-        $user_password,
-        $user_phone,
-        $user_email,
-        $user_address,
-        $user_role
-    );
-
     $conn->begin_transaction();
     $transaction_started = true;
 
-    $stmt->execute();
-    upsert_customer_profile(
+    create_customer_profile(
         $conn,
-        $user_id,
+        $user_password,
         $user_name,
         $user_phone,
         $user_email,

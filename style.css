@@ -1355,6 +1355,61 @@ a, button, .btn, .btn-small, .btn-secondary, .btn-danger, .submit-btn {
   line-height: 1.7;
 }
 
+.admin-users-table .admin-address-cell,
+.admin-customers-table .admin-address-cell {
+  max-width: 220px;
+  line-height: 1.65;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.admin-users-table .admin-address-cell .address-short,
+.admin-users-table .admin-address-cell .admin-address-full,
+.admin-customers-table .admin-address-cell .address-short,
+.admin-customers-table .admin-address-cell .admin-address-full {
+  max-width: 100%;
+  line-height: 1.7;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.product-type-table th:nth-child(1),
+.product-type-table td:nth-child(1) {
+  width: 16%;
+}
+
+.product-type-table th:nth-child(2),
+.product-type-table td:nth-child(2) {
+  width: 24%;
+}
+
+.product-type-table th:nth-child(3),
+.product-type-table td:nth-child(3),
+.product-type-detail-cell {
+  width: 42%;
+  max-width: none;
+  line-height: 1.65;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.product-type-detail-cell .address-short,
+.product-type-detail-cell .product-type-detail-full {
+  max-width: 100%;
+  line-height: 1.7;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.product-type-table th:nth-child(4),
+.product-type-table td:nth-child(4) {
+  width: 190px;
+}
+
 .text-more-btn {
   display: block;
   margin-top: 4px;

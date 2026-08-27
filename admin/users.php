@@ -38,7 +38,7 @@ function column_exists(mysqli $conn, string $table, string $column): bool
 function prepare_assignment_assign_by_column(mysqli $conn): void
 {
     if (table_exists($conn, 'assignment') && !column_exists($conn, 'assignment', 'assign_by')) {
-        $conn->query("ALTER TABLE assignment ADD COLUMN assign_by CHAR(13) NULL AFTER user_id");
+        $conn->query("ALTER TABLE assignment ADD COLUMN assign_by CHAR(13) NULL AFTER customer_id");
     }
 }
 
@@ -111,17 +111,40 @@ function format_user_created_date($value): string
     return "{$day} {$month} {$year}";
 }
 
-function wrap_text_every_chars(string $text, int $limit = 15): string
+function user_has_assignment_assign_by(mysqli $conn, string $user_id): bool
 {
-    $text = trim($text);
-    $length = mb_strlen($text, 'UTF-8');
-    $lines = [];
-
-    for ($i = 0; $i < $length; $i += $limit) {
-        $lines[] = mb_substr($text, $i, $limit, 'UTF-8');
+    if (!table_exists($conn, 'assignment') || !column_exists($conn, 'assignment', 'assign_by')) {
+        return false;
     }
 
-    return implode("\n", $lines);
+    $stmt = $conn->prepare("
+        SELECT assign_id
+        FROM assignment
+        WHERE assign_by = ?
+        LIMIT 1
+    ");
+    $stmt->bind_param('s', $user_id);
+    $stmt->execute();
+
+    return $stmt->get_result()->num_rows > 0;
+}
+
+function user_has_setup_sale_id(mysqli $conn, string $user_id): bool
+{
+    if (!table_exists($conn, 'setup') || !column_exists($conn, 'setup', 'sale_id')) {
+        return false;
+    }
+
+    $stmt = $conn->prepare("
+        SELECT setup_id
+        FROM setup
+        WHERE sale_id = ?
+        LIMIT 1
+    ");
+    $stmt->bind_param('s', $user_id);
+    $stmt->execute();
+
+    return $stmt->get_result()->num_rows > 0;
 }
 
 $action = $_GET['action'] ?? '';
@@ -155,64 +178,12 @@ if ($action === 'delete') {
 
         $delete_user = $user_result->fetch_assoc();
 
-        if ((int) $delete_user['user_role'] === 1 && table_exists($conn, 'assignment') && column_exists($conn, 'assignment', 'assign_by')) {
-            $check_assignment_by = $conn->prepare("
-                SELECT assign_id
-                FROM assignment
-                WHERE assign_by = ?
-                LIMIT 1
-            ");
-            $check_assignment_by->bind_param('s', $delete_id);
-            $check_assignment_by->execute();
-
-            if ($check_assignment_by->get_result()->num_rows > 0) {
-                redirect_to(app_system_url('admin/users.php?status=manager_assigned'));
-            }
+        if ((int) $delete_user['user_role'] === 1 && user_has_assignment_assign_by($conn, $delete_id)) {
+            redirect_to(app_system_url('admin/users.php?status=manager_assigned'));
         }
 
-        if (table_exists($conn, 'setup')) {
-            $check_setup = $conn->prepare("
-                SELECT setup_id
-                FROM setup
-                WHERE user_id = ?
-                LIMIT 1
-            ");
-            $check_setup->bind_param('s', $delete_id);
-            $check_setup->execute();
-
-            if ($check_setup->get_result()->num_rows > 0) {
-                redirect_to(app_system_url('admin/users.php?status=user_linked'));
-            }
-        }
-
-        if (table_exists($conn, 'assignment')) {
-            $check_assignment_user = $conn->prepare("
-                SELECT assign_id
-                FROM assignment
-                WHERE user_id = ?
-                LIMIT 1
-            ");
-            $check_assignment_user->bind_param('s', $delete_id);
-            $check_assignment_user->execute();
-
-            if ($check_assignment_user->get_result()->num_rows > 0) {
-                redirect_to(app_system_url('admin/users.php?status=user_linked'));
-            }
-        }
-
-        if (table_exists($conn, 'product_payment')) {
-            $check_payment = $conn->prepare("
-                SELECT paymentpro_id
-                FROM product_payment
-                WHERE user_id = ?
-                LIMIT 1
-            ");
-            $check_payment->bind_param('s', $delete_id);
-            $check_payment->execute();
-
-            if ($check_payment->get_result()->num_rows > 0) {
-                redirect_to(app_system_url('admin/users.php?status=user_linked'));
-            }
+        if ((int) $delete_user['user_role'] === 2 && user_has_setup_sale_id($conn, $delete_id)) {
+            redirect_to(app_system_url('admin/users.php?status=user_linked'));
         }
 
         $stmt = $conn->prepare("
@@ -298,7 +269,7 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
     </form>
 
     <div class="table-wrap">
-        <table class="data-table">
+            <table class="data-table admin-users-table">
             <thead>
                 <tr>
                     <th>รหัสพนักงาน</th>
@@ -325,6 +296,16 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                     $role_name = user_role_name($row['user_role']);
                     $role_badge = user_role_badge($row['user_role']);
                     $created_display = format_user_created_date($row['user_created_at'] ?? null);
+                    $delete_block_reason = '';
+
+                    if ((int) $row['user_role'] === 1 && user_has_assignment_assign_by($conn, $row['user_id'])) {
+                        $delete_block_reason = 'ไม่สามารถลบได้ เนื่องจากมีประวัติการมอบหมายงาน';
+                    } elseif ((int) $row['user_role'] === 2 && user_has_setup_sale_id($conn, $row['user_id'])) {
+                        $delete_block_reason = 'ไม่สามารถลบได้ เนื่องจากมีประวัติการสร้างใบงานติดตั้ง';
+                    }
+
+                    $is_current_user = $row['user_id'] === ($_SESSION['user_id'] ?? '');
+                    $can_delete_user = !$is_current_user && $delete_block_reason === '';
                     ?>
                     <tr class="user-detail-row"
                         tabindex="0"
@@ -350,7 +331,7 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                                 <?= h($role_name) ?>
                             </span>
                         </td>
-                        <td class="address-cell">
+                        <td class="address-cell admin-address-cell">
                             <?php
                             $is_long = mb_strlen($address, 'UTF-8') > 25;
 
@@ -358,12 +339,11 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                                 ? mb_substr($address, 0, 25, 'UTF-8') . '...'
                                 : $address;
 
-                            $wrapped_address = wrap_text_every_chars($address, 15);
                             ?>
 
                             <?php if ($is_long): ?>
                                 <span class="address-short"><?= h($short_address) ?></span>
-                                <span class="address-full" style="display:none;"><?= nl2br(h($wrapped_address)) ?></span>
+                                <span class="address-full admin-address-full" style="display:none;"><?= nl2br(h($address)) ?></span>
                                 <button type="button" class="text-more-btn" data-toggle-address>ดูเพิ่มเติม</button>
                             <?php else: ?>
                                 <?= h($address) ?>
@@ -379,7 +359,8 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                                 <span>แก้ไข</span>
                             </a>
 
-                            <?php if ($row['user_id'] !== ($_SESSION['user_id'] ?? '')): ?>
+                            <?php if (!$is_current_user): ?>
+                                <?php if ($can_delete_user): ?>
                                 <a class="btn btn-delete"
                                    href="<?= h(app_system_url('admin/users.php?action=delete&id=' . urlencode($row['user_id']))) ?>"
                                    data-confirm-delete="ยืนยันการลบข้อมูลพนักงานนี้หรือไม่?">
@@ -392,6 +373,20 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                                     </svg>
                                     <span>ลบ</span>
                                 </a>
+                                <?php else: ?>
+                                <span class="btn btn-delete disabled-link"
+                                      aria-disabled="true"
+                                      title="<?= h($delete_block_reason) ?>">
+                                    <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M8 6V4h8v2"></path>
+                                        <path d="M19 6l-1 14H6L5 6"></path>
+                                        <path d="M10 11v6"></path>
+                                        <path d="M14 11v6"></path>
+                                    </svg>
+                                    <span>ลบ</span>
+                                </span>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </td>
                     </tr>

@@ -286,18 +286,18 @@ function money_text($value): string
 
 $latest_assignment_join = "\n    LEFT JOIN assignment a\n        ON a.setup_id = s.setup_id\n       AND a.assign_id = (\n            SELECT a2.assign_id\n            FROM assignment a2\n            WHERE a2.setup_id = s.setup_id\n            ORDER BY a2.assign_date DESC, a2.assign_id DESC\n            LIMIT 1\n       )\n";
 
-$base_sql = "\n    SELECT\n        s.setup_id,\n        s.user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n\n        u.user_name,\n        u.user_phone,\n        u.user_email,\n        u.user_address,\n\n        p.pro_name,\n        p.pro_price_install,\n\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n        {$assign_install_date_select},\n        {$assign_install_time_select},\n        {$assign_install_end_time_select},\n\n        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n\n        m.user_name AS manager_name,\n\n        COUNT(idt.detail_id) AS item_count,\n        COALESCE(SUM(idt.install_total), 0) AS install_total\n\n    FROM setup s\n    LEFT JOIN `user` u ON s.user_id = u.user_id\n    LEFT JOIN product p ON s.pro_id = p.pro_id\n    {$latest_assignment_join}\n    LEFT JOIN technicians t ON a.tech_id = t.tech_id\n    LEFT JOIN `user` m ON a.assign_by = m.user_id\n    LEFT JOIN install_detail idt ON s.setup_id = idt.setup_id\n";
+$base_sql = "\n    SELECT\n        s.setup_id,\n        s.customer_id AS user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n\n        c.customer_name AS user_name,\n        c.customer_phone AS user_phone,\n        c.customer_email AS user_email,\n        c.customer_address AS user_address,\n\n        p.pro_name,\n        p.pro_price_install,\n\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n        {$assign_install_date_select},\n        {$assign_install_time_select},\n        {$assign_install_end_time_select},\n\n        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n\n        m.user_name AS manager_name,\n\n        COUNT(idt.detail_id) AS item_count,\n        COALESCE(SUM(COALESCE(idt.install_qty, 1) * COALESCE(p2.pro_price_install, 0)), 0) AS install_total\n\n    FROM setup s\n    LEFT JOIN customers c ON s.customer_id = c.customer_id\n    LEFT JOIN product p ON s.pro_id = p.pro_id\n    {$latest_assignment_join}\n    LEFT JOIN technicians t ON a.tech_id = t.tech_id\n    LEFT JOIN `user` m ON a.assign_by = m.user_id\n    LEFT JOIN install_detail idt ON s.setup_id = idt.setup_id\n    LEFT JOIN product p2 ON idt.pro_id = p2.pro_id\n";
 
 $install_date_group_sql = $has_install_date ? "        a.assign_install_date,\n" : "";
 $install_time_group_sql = $has_install_time ? "        a.assign_install_time,\n" : "";
 $install_end_time_group_sql = $has_install_end_time ? "        a.assign_install_end_time,\n" : "";
 
-$group_sql = "\n    GROUP BY\n        s.setup_id,\n        s.user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n        u.user_name,\n        u.user_phone,\n        u.user_email,\n        u.user_address,\n        p.pro_name,\n        p.pro_price_install,\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n{$install_date_group_sql}{$install_time_group_sql}{$install_end_time_group_sql}        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n        m.user_name\n";
+$group_sql = "\n    GROUP BY\n        s.setup_id,\n        s.customer_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n        c.customer_name,\n        c.customer_phone,\n        c.customer_email,\n        c.customer_address,\n        p.pro_name,\n        p.pro_price_install,\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n{$install_date_group_sql}{$install_time_group_sql}{$install_end_time_group_sql}        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n        m.user_name\n";
 
 if ($search !== '') {
     $like = '%' . $search . '%';
 
-    $stmt = $conn->prepare($base_sql . "\n        WHERE s.setup_id LIKE ?\n           OR u.user_name LIKE ?\n           OR u.user_phone LIKE ?\n           OR u.user_email LIKE ?\n           OR p.pro_name LIKE ?\n           OR t.tech_name LIKE ?\n           OR t.tech_fullname LIKE ?\n           OR t.tech_phone LIKE ?\n           OR m.user_name LIKE ?\n    " . $group_sql . "\n        ORDER BY
+    $stmt = $conn->prepare($base_sql . "\n        WHERE s.setup_id LIKE ?\n           OR c.customer_name LIKE ?\n           OR c.customer_phone LIKE ?\n           OR c.customer_email LIKE ?\n           OR p.pro_name LIKE ?\n           OR t.tech_name LIKE ?\n           OR t.tech_fullname LIKE ?\n           OR t.tech_phone LIKE ?\n           OR m.user_name LIKE ?\n    " . $group_sql . "\n        ORDER BY
             CASE
                 WHEN a.assign_id IS NULL OR (s.setup_status = 0 AND (a.assign_status IS NULL OR a.assign_status <> 4)) THEN 0
                 WHEN a.assign_status = 4 THEN 1
@@ -336,7 +336,7 @@ if ($search !== '') {
 $setups = [];
 while ($row = $result->fetch_assoc()) {
     $row['customer_display'] = $row['user_name'] ?: '-';
-    $row['tech_display'] = $row['tech_fullname'] ?: ($row['tech_name'] ?: '-');
+    $row['tech_display'] = $row['tech_name'] ?: '-';
     $row['manager_display'] = $row['manager_name'] ?: '-';
     $row['setup_date_display'] = thai_date($row['setup_date'] ?? null);
     $row['assign_date_display'] = thai_datetime($row['assign_date'] ?? null);
@@ -577,6 +577,7 @@ layout_header('ประวัติการมอบหมายงาน', 'a
                     <?php foreach ($visible_setups as $row): ?>
                         <?php
                         $can_cancel_row = assignment_cancel_allowed($row);
+                        $is_canceled_row = !empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4';
                         $cancel_title = $can_cancel_row
                             ? 'ยกเลิก'
                             : assignment_cancel_disabled_title($row);
@@ -608,26 +609,35 @@ layout_header('ประวัติการมอบหมายงาน', 'a
                             </td>
 
                             <td class="assignment-row-actions assignment-icon-actions">
-                                <a class="assignment-icon-btn edit-assignment"
-                                    href="<?= h(app_system_url('manager/assignments.php?setup_id=' . urlencode($row['setup_id']))) ?>"
-                                    title="แก้ไข" aria-label="แก้ไข">
-                                    <?= manager_icon_svg('edit') ?>
-                                    <span>แก้ไข</span>
-                                </a>
-
-                                <?php if ($can_cancel_row): ?>
-                                    <a class="assignment-icon-btn cancel-assign is-enabled"
-                                        href="<?= h(app_system_url('manager/assignment_list.php?action=cancel&id=' . urlencode($row['setup_id']))) ?>"
-                                        title="ยกเลิก" aria-label="ยกเลิก" data-confirm-cancel-assignment>
-                                        <?= manager_icon_svg('cancel') ?>
-                                        <span>ยกเลิก</span>
+                                <?php if ($is_canceled_row): ?>
+                                    <a class="assignment-icon-btn view-slip"
+                                        href="<?= h(app_system_url('manager/assignment_detail.php?id=' . urlencode($row['setup_id']))) ?>"
+                                        title="รายละเอียด" aria-label="รายละเอียด">
+                                        <?= manager_icon_svg('eye') ?>
+                                        <span>รายละเอียด</span>
                                     </a>
                                 <?php else: ?>
-                                    <button type="button" class="assignment-icon-btn cancel-assign is-disabled"
-                                        title="<?= h($cancel_title) ?>" aria-label="<?= h($cancel_title) ?>" disabled>
-                                        <?= manager_icon_svg('cancel') ?>
-                                        <span>ยกเลิก</span>
-                                    </button>
+                                    <a class="assignment-icon-btn edit-assignment"
+                                        href="<?= h(app_system_url('manager/assignments.php?setup_id=' . urlencode($row['setup_id']))) ?>"
+                                        title="แก้ไข" aria-label="แก้ไข">
+                                        <?= manager_icon_svg('edit') ?>
+                                        <span>แก้ไข</span>
+                                    </a>
+
+                                    <?php if ($can_cancel_row): ?>
+                                        <a class="assignment-icon-btn cancel-assign is-enabled"
+                                            href="<?= h(app_system_url('manager/assignment_list.php?action=cancel&id=' . urlencode($row['setup_id']))) ?>"
+                                            title="ยกเลิก" aria-label="ยกเลิก" data-confirm-cancel-assignment>
+                                            <?= manager_icon_svg('cancel') ?>
+                                            <span>ยกเลิก</span>
+                                        </a>
+                                    <?php else: ?>
+                                        <button type="button" class="assignment-icon-btn cancel-assign is-disabled"
+                                            title="<?= h($cancel_title) ?>" aria-label="<?= h($cancel_title) ?>" disabled>
+                                            <?= manager_icon_svg('cancel') ?>
+                                            <span>ยกเลิก</span>
+                                        </button>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </td>
                         </tr>

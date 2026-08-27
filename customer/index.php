@@ -4,17 +4,17 @@ require_once __DIR__ . '/../db.php';
 
 require_login('0');
 
-$user_id = $_SESSION['user_id'] ?? '';
+$customer_id = $_SESSION['customer_id'] ?? '';
 
-if ($user_id === '') {
+if ($customer_id === '') {
     redirect_to(app_public_url('login.html?error=login'));
 }
 
-function safe_count_customer(mysqli $conn, string $sql, string $user_id): int
+function safe_count_customer(mysqli $conn, string $sql, string $customer_id): int
 {
     try {
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param('s', $user_id);
+        $stmt->bind_param('s', $customer_id);
         $stmt->execute();
 
         $result = $stmt->get_result();
@@ -55,36 +55,36 @@ function setup_status_badge($status): string
 $total_setup = safe_count_customer($conn, "
     SELECT COUNT(*) AS total
     FROM setup
-    WHERE user_id = ?
-", $user_id);
+    WHERE customer_id = ?
+", $customer_id);
 
 $total_waiting = safe_count_customer($conn, "
     SELECT COUNT(*) AS total
     FROM setup
-    WHERE user_id = ?
+    WHERE customer_id = ?
       AND setup_status = 0
-", $user_id);
+", $customer_id);
 
 $total_assigned = safe_count_customer($conn, "
     SELECT COUNT(*) AS total
     FROM setup
-    WHERE user_id = ?
+    WHERE customer_id = ?
       AND setup_status = 1
-", $user_id);
+", $customer_id);
 
 $total_accepted = safe_count_customer($conn, "
     SELECT COUNT(*) AS total
     FROM setup
-    WHERE user_id = ?
+    WHERE customer_id = ?
       AND setup_status = 2
-", $user_id);
+", $customer_id);
 
 $total_finished = safe_count_customer($conn, "
     SELECT COUNT(*) AS total
     FROM setup
-    WHERE user_id = ?
+    WHERE customer_id = ?
       AND setup_status = 4
-", $user_id);
+", $customer_id);
 
 $stmt = $conn->prepare("
     SELECT
@@ -117,11 +117,11 @@ $stmt = $conn->prepare("
     LEFT JOIN install_detail d ON s.setup_id = d.setup_id
     LEFT JOIN assignment a ON s.setup_id = a.setup_id AND a.assign_status IN (1, 2, 5)
     LEFT JOIN technicians t ON a.tech_id = t.tech_id
-    WHERE s.user_id = ?
+    WHERE s.customer_id = ?
     ORDER BY s.created_at DESC, s.setup_id DESC
 ");
 
-$stmt->bind_param('s', $user_id);
+$stmt->bind_param('s', $customer_id);
 $stmt->execute();
 $setups = $stmt->get_result();
 

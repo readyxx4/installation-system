@@ -204,12 +204,12 @@ try {
     $setup_stmt = $conn->prepare("
         SELECT
             s.setup_id,
-            s.user_id,
+            s.customer_id AS user_id,
             s.pro_id,
             s.setup_status,
             s.created_at,
 
-            u.user_name,
+            c.customer_name AS user_name,
 
             p.pro_name,
 
@@ -225,17 +225,18 @@ try {
             t.tech_email,
             t.tech_status
         FROM setup s
-        LEFT JOIN `user` u
-            ON s.user_id = u.user_id
+        LEFT JOIN customers c
+            ON s.customer_id = c.customer_id
         LEFT JOIN product p
             ON s.pro_id = p.pro_id
         LEFT JOIN (
             SELECT
-                setup_id,
-                COUNT(detail_id) AS item_count,
-                SUM(install_total) AS setup_total
-            FROM install_detail
-            GROUP BY setup_id
+                d.setup_id,
+                COUNT(d.detail_id) AS item_count,
+                SUM(COALESCE(d.install_qty, 1) * COALESCE(p2.pro_price_install, 0)) AS setup_total
+            FROM install_detail d
+            LEFT JOIN product p2 ON d.pro_id = p2.pro_id
+            GROUP BY d.setup_id
         ) detail_summary
             ON s.setup_id = detail_summary.setup_id
         LEFT JOIN assignment a

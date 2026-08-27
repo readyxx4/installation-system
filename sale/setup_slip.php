@@ -169,11 +169,11 @@ $stmt = $conn->prepare("
         s.setup_status,
         s.created_at,
 
-        u.user_id,
-        u.user_name,
-        u.user_phone,
-        u.user_email,
-        u.user_address,
+        c.customer_id AS user_id,
+        c.customer_name AS user_name,
+        c.customer_phone AS user_phone,
+        c.customer_email AS user_email,
+        c.customer_address AS user_address,
 
         p.pro_id AS main_pro_id,
         p.pro_name AS main_pro_name,
@@ -192,7 +192,7 @@ $stmt = $conn->prepare("
         t.tech_phone,
         t.tech_email
     FROM setup s
-    LEFT JOIN `user` u ON s.user_id = u.user_id
+    LEFT JOIN customers c ON s.customer_id = c.customer_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     LEFT JOIN product_type pt ON p.protype_id = pt.protype_id
     LEFT JOIN assignment a ON s.setup_id = a.setup_id AND a.assign_status IN (1, 2, 5)
@@ -218,8 +218,8 @@ if (slip_table_exists($conn, 'install_detail')) {
             COALESCE(p.pro_name, d.pro_id) AS pro_name,
             COALESCE(pt.protype_name, '-') AS protype_name,
             COALESCE(d.install_qty, 1) AS install_qty,
-            COALESCE(d.install_price, p.pro_price_install, 0) AS install_price,
-            COALESCE(d.install_total, COALESCE(d.install_qty, 1) * COALESCE(d.install_price, p.pro_price_install, 0)) AS install_total
+            COALESCE(p.pro_price_install, 0) AS install_price,
+            COALESCE(d.install_qty, 1) * COALESCE(p.pro_price_install, 0) AS install_total
         FROM install_detail d
         LEFT JOIN product p ON d.pro_id = p.pro_id
         LEFT JOIN product_type pt ON p.protype_id = pt.protype_id

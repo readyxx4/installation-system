@@ -21,10 +21,9 @@ if ($action === 'set_status') {
 
     try {
         $check = $conn->prepare("
-            SELECT user_id, user_name, user_phone, user_email, user_address
-            FROM `user`
-            WHERE user_id = ?
-              AND user_role = 0
+            SELECT customer_id
+            FROM customers
+            WHERE customer_id = ?
             LIMIT 1
         ");
         $check->bind_param('s', $customer_id);
@@ -35,15 +34,14 @@ if ($action === 'set_status') {
             redirect_to(app_system_url('admin/customers.php?status=error'));
         }
 
-        upsert_customer_profile(
-            $conn,
-            $customer['user_id'],
-            $customer['user_name'],
-            $customer['user_phone'],
-            $customer['user_email'],
-            $customer['user_address'],
-            $customer_status
-        );
+        $update = $conn->prepare("
+            UPDATE customers
+            SET customer_status = ?
+            WHERE customer_id = ?
+            LIMIT 1
+        ");
+        $update->bind_param('is', $customer_status, $customer_id);
+        $update->execute();
 
         $status = $customer_status === 0 ? 'customer_suspended' : 'customer_restored';
         redirect_to(app_system_url('admin/customers.php?status=' . $status));
@@ -61,45 +59,36 @@ if ($search !== '') {
 
     $stmt = $conn->prepare("
         SELECT
-          u.user_id,
           c.customer_id,
-          COALESCE(c.customer_name, u.user_name) AS user_name,
-          COALESCE(c.customer_phone, u.user_phone) AS user_phone,
-          COALESCE(c.customer_email, u.user_email) AS user_email,
-          COALESCE(c.customer_address, u.user_address) AS user_address,
-          COALESCE(c.customer_status, 1) AS customer_status,
-          c.created_at
-        FROM `user` u
-        LEFT JOIN customers c ON c.user_id = u.user_id
-        WHERE u.user_role = 0
-          AND (
+          c.customer_name AS user_name,
+          c.customer_phone AS user_phone,
+          c.customer_email AS user_email,
+          c.customer_address AS user_address,
+          c.customer_status
+        FROM customers c
+        WHERE (
               c.customer_id LIKE ?
-           OR u.user_id LIKE ?
-           OR COALESCE(c.customer_name, u.user_name) LIKE ?
-           OR COALESCE(c.customer_phone, u.user_phone) LIKE ?
-           OR COALESCE(c.customer_email, u.user_email) LIKE ?
-           OR COALESCE(c.customer_address, u.user_address) LIKE ?
+           OR c.customer_name LIKE ?
+           OR c.customer_phone LIKE ?
+           OR c.customer_email LIKE ?
+           OR c.customer_address LIKE ?
           )
-        ORDER BY u.user_id DESC
+        ORDER BY c.customer_id DESC
     ");
-    $stmt->bind_param('ssssss', $like, $like, $like, $like, $like, $like);
+    $stmt->bind_param('sssss', $like, $like, $like, $like, $like);
     $stmt->execute();
     $customers = $stmt->get_result();
 } else {
     $customers = $conn->query("
         SELECT
-          u.user_id,
           c.customer_id,
-          COALESCE(c.customer_name, u.user_name) AS user_name,
-          COALESCE(c.customer_phone, u.user_phone) AS user_phone,
-          COALESCE(c.customer_email, u.user_email) AS user_email,
-          COALESCE(c.customer_address, u.user_address) AS user_address,
-          COALESCE(c.customer_status, 1) AS customer_status,
-          c.created_at
-        FROM `user` u
-        LEFT JOIN customers c ON c.user_id = u.user_id
-        WHERE u.user_role = 0
-        ORDER BY u.user_id DESC
+          c.customer_name AS user_name,
+          c.customer_phone AS user_phone,
+          c.customer_email AS user_email,
+          c.customer_address AS user_address,
+          c.customer_status
+        FROM customers c
+        ORDER BY c.customer_id DESC
     ");
 }
 
@@ -124,7 +113,7 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
   </form>
 
   <div class="table-wrap">
-    <table class="data-table">
+      <table class="data-table admin-customers-table">
       <thead>
         <tr>
           <th>รหัสลูกค้า</th>
@@ -153,10 +142,26 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
                 <?= h(customer_account_status_name($row['customer_status'])) ?>
               </span>
             </td>
-            <td><?= h(mb_strlen($row['user_address'], 'UTF-8') > 35 ? mb_substr($row['user_address'], 0, 35, 'UTF-8') . '...' : $row['user_address']) ?></td>
+            <td class="address-cell admin-address-cell">
+              <?php
+                $address = (string) ($row['user_address'] ?? '');
+                $is_long = mb_strlen($address, 'UTF-8') > 35;
+                $short_address = $is_long
+                  ? mb_substr($address, 0, 35, 'UTF-8') . '...'
+                  : $address;
+              ?>
+
+              <?php if ($is_long): ?>
+                <span class="address-short"><?= h($short_address) ?></span>
+                <span class="address-full admin-address-full" style="display:none;"><?= nl2br(h($address)) ?></span>
+                <button type="button" class="text-more-btn" data-toggle-address>ดูเพิ่มเติม</button>
+              <?php else: ?>
+                <?= h($address) ?>
+              <?php endif; ?>
+            </td>
             <td class="customer-action-cell">
               <a class="btn btn-edit action-btn customer-action-btn"
-                 href="<?= h(app_system_url('admin/customer_edit.php?id=' . urlencode($row['user_id']))) ?>">
+                 href="<?= h(app_system_url('admin/customer_edit.php?id=' . urlencode($row['customer_id']))) ?>">
                 <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 20h9"></path>
                   <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
@@ -166,23 +171,23 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
 
               <?php if ((int) $row['customer_status'] === 0): ?>
                 <a class="btn btn-restore action-btn customer-action-btn"
-                   href="<?= h(app_system_url('admin/customers.php?action=set_status&to=active&id=' . urlencode($row['user_id']))) ?>"
+                   href="<?= h(app_system_url('admin/customers.php?action=set_status&to=active&id=' . urlencode($row['customer_id']))) ?>"
                    data-confirm-delete="ยืนยันการกู้คืนบัญชีลูกค้านี้หรือไม่?">
                   <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M3 12a9 9 0 1 0 3-6.7"></path>
                     <path d="M3 4v6h6"></path>
                   </svg>
-                  <span>กู้คืน</span>
+                  <span>กู้คืนบัญชี</span>
                 </a>
               <?php else: ?>
                 <a class="btn btn-delete action-btn customer-action-btn"
-                   href="<?= h(app_system_url('admin/customers.php?action=set_status&to=suspended&id=' . urlencode($row['user_id']))) ?>"
+                   href="<?= h(app_system_url('admin/customers.php?action=set_status&to=suspended&id=' . urlencode($row['customer_id']))) ?>"
                    data-confirm-delete="ยืนยันการระงับบัญชีลูกค้านี้หรือไม่? ลูกค้าจะเข้าสู่ระบบไม่ได้">
                   <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
                     <circle cx="12" cy="12" r="9"></circle>
                     <path d="M5.7 5.7l12.6 12.6"></path>
                   </svg>
-                  <span>ระงับ</span>
+                  <span>ระงับบัญชี</span>
                 </a>
               <?php endif; ?>
             </td>
@@ -194,5 +199,6 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
 </div>
 
 <script src="<?= h(app_asset_url('admin/assets/js/confirm_delete.js')) ?>?v=<?= h(asset_version('admin/assets/js/confirm_delete.js')) ?>"></script>
+<script src="<?= h(app_asset_url('admin/assets/js/toggle_address.js')) ?>?v=<?= h(asset_version('admin/assets/js/toggle_address.js')) ?>"></script>
 
 <?php layout_footer(); ?>

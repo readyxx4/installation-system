@@ -21,16 +21,50 @@ function history_icon_svg(string $name): string
     return $icons[$name] ?? '';
 }
 
+function sale_history_status_group($status, bool $has_assignment = false): string
+{
+    if ((string) $status === '5') {
+        return 'canceled';
+    }
+
+    if ((string) $status === '4') {
+        return 'done';
+    }
+
+    if (in_array((string) $status, ['1', '2', '3'], true) || $has_assignment) {
+        return 'progress';
+    }
+
+    return '';
+}
+
+function sale_history_status_label(string $group): string
+{
+    return match ($group) {
+        'progress' => 'อยู่ระหว่างดำเนินการ',
+        'done' => 'เสร็จสิ้น',
+        'canceled' => 'ยกเลิกแล้ว',
+        default => 'ไม่ทราบสถานะ',
+    };
+}
+
 $history_setup_rows = [];
+$status_counts = [
+    'all' => 0,
+    'progress' => 0,
+    'done' => 0,
+    'canceled' => 0,
+];
 
 try {
     $setup_stmt = $conn->prepare("
         SELECT
             s.setup_id,
-            s.user_id,
+            s.customer_id AS user_id,
             s.created_at,
+            s.setup_status,
 
-            u.user_name,
+            c.customer_name AS user_name,
 
             COALESCE(detail_summary.item_count, 0) AS item_count,
             COALESCE(detail_summary.setup_total, 0) AS setup_total,
@@ -38,15 +72,16 @@ try {
             a.assign_id,
             a.assign_status
         FROM setup s
-        LEFT JOIN `user` u
-            ON s.user_id = u.user_id
+        LEFT JOIN customers c
+            ON s.customer_id = c.customer_id
         LEFT JOIN (
             SELECT
-                setup_id,
-                COUNT(detail_id) AS item_count,
-                SUM(install_total) AS setup_total
-            FROM install_detail
-            GROUP BY setup_id
+                d.setup_id,
+                COUNT(d.detail_id) AS item_count,
+                SUM(COALESCE(d.install_qty, 1) * COALESCE(p2.pro_price_install, 0)) AS setup_total
+            FROM install_detail d
+            LEFT JOIN product p2 ON d.pro_id = p2.pro_id
+            GROUP BY d.setup_id
         ) detail_summary
             ON s.setup_id = detail_summary.setup_id
         LEFT JOIN assignment a
@@ -60,11 +95,8 @@ try {
            )
         WHERE s.sale_id = ?
           AND (
-                s.setup_status = 5
-                OR (
-                    a.assign_id IS NOT NULL
-                    AND COALESCE(a.assign_status, 0) <> 0
-                )
+                s.setup_status IN (1, 2, 3, 4, 5)
+                OR a.assign_id IS NOT NULL
           )
         ORDER BY s.created_at DESC, s.setup_id DESC
         LIMIT 300
@@ -75,7 +107,19 @@ try {
     $setup_result = $setup_stmt->get_result();
 
     while ($row = $setup_result->fetch_assoc()) {
+        $status_group = sale_history_status_group(
+            $row['setup_status'] ?? '0',
+            !empty($row['assign_id'])
+        );
+
+        if ($status_group === '') {
+            continue;
+        }
+
+        $row['sale_status_group'] = $status_group;
         $history_setup_rows[] = $row;
+        $status_counts['all']++;
+        $status_counts[$status_group] = ($status_counts[$status_group] ?? 0) + 1;
     }
 } catch (Throwable $e) {
     $history_setup_rows = [];
@@ -119,8 +163,35 @@ layout_header('ประวัติใบงาน', 'setup_history');
         </button>
     </form>
 
+    <div class="cs-status-tabs cs-history-status-tabs" aria-label="ตัวกรองสถานะใบงาน">
+        <?php
+        $status_tabs = [
+            'all' => ['label' => 'ทั้งหมด', 'class' => 'status-all'],
+            'progress' => ['label' => 'อยู่ระหว่างดำเนินการ', 'class' => 'status-progress'],
+            'done' => ['label' => 'เสร็จสิ้น', 'class' => 'status-done'],
+            'canceled' => ['label' => 'ยกเลิกแล้ว', 'class' => 'status-canceled'],
+        ];
+        ?>
+
+        <?php foreach ($status_tabs as $key => $tab): ?>
+            <?php $tab_count = (int) ($status_counts[$key] ?? 0); ?>
+            <button
+                type="button"
+                class="cs-status-tab <?= h($tab['class']) ?><?= $key === 'all' ? ' active' : '' ?>"
+                data-history-filter="<?= h($key) ?>"
+            >
+                <span><?= h($tab['label']) ?></span>
+                <?php if ($key === 'all'): ?>
+                    <b><?= h((string) $tab_count) ?></b>
+                <?php elseif ($tab_count > 0): ?>
+                    <span class="status-count-badge"><?= h((string) $tab_count) ?></span>
+                <?php endif; ?>
+            </button>
+        <?php endforeach; ?>
+    </div>
+
     <div class="cs-table-wrap cs-job-status-table-wrap cs-setups-table-wrap cs-history-table-wrap">
-        <table class="cs-data-table cs-job-status-table cs-setups-table-clean">
+        <table class="cs-data-table cs-job-status-table cs-setups-table-clean cs-history-status-table">
             <thead>
                 <tr>
                     <th>รหัสใบงาน</th>
@@ -128,6 +199,7 @@ layout_header('ประวัติใบงาน', 'setup_history');
                     <th>ลูกค้า</th>
                     <th>จำนวนสินค้า</th>
                     <th>ค่าติดตั้ง</th>
+                    <th>สถานะ</th>
                     <th>จัดการ</th>
                 </tr>
             </thead>
@@ -135,13 +207,13 @@ layout_header('ประวัติใบงาน', 'setup_history');
             <tbody>
                 <?php if (count($history_setup_rows) === 0): ?>
                     <tr>
-                        <td colspan="6" class="cs-empty-cell">ยังไม่มีประวัติใบงาน</td>
+                        <td colspan="7" class="cs-empty-cell">ยังไม่มีประวัติใบงาน</td>
                     </tr>
                 <?php endif; ?>
 
                 <?php if (count($history_setup_rows) > 0): ?>
                     <tr data-history-search-empty style="display: none;">
-                        <td colspan="6" class="cs-empty-cell">ไม่พบใบงานที่ตรงกับคำค้นหา</td>
+                        <td colspan="7" class="cs-empty-cell">ไม่พบใบงานที่ตรงกับตัวกรองหรือคำค้นหา</td>
                     </tr>
                 <?php endif; ?>
 
@@ -150,6 +222,8 @@ layout_header('ประวัติใบงาน', 'setup_history');
                         $customer_name = trim((string) ($row['user_name'] ?? ''));
                         $created_at = trim((string) ($row['created_at'] ?? ''));
                         $created_text = '-';
+                        $status_group = (string) ($row['sale_status_group'] ?? sale_history_status_group($row['setup_status'] ?? '0', !empty($row['assign_id'])));
+                        $status_label = sale_history_status_label($status_group);
 
                         if ($created_at !== '') {
                             $created_timestamp = strtotime($created_at);
@@ -160,6 +234,7 @@ layout_header('ประวัติใบงาน', 'setup_history');
                     ?>
 
                     <tr
+                        data-history-status="<?= h($status_group) ?>"
                         data-history-search-text="<?= h(strtolower(
                             (string) $row['setup_id'] . ' ' .
                             $customer_name
@@ -185,6 +260,12 @@ layout_header('ประวัติใบงาน', 'setup_history');
 
                         <td class="setup-col-total">
                             <strong><?= h(number_format((float) ($row['setup_total'] ?? 0), 2)) ?> บาท</strong>
+                        </td>
+
+                        <td class="setup-col-status">
+                            <span class="setup-status-badge cs-history-status-badge status-<?= h($status_group) ?>">
+                                <?= h($status_label) ?>
+                            </span>
                         </td>
 
                         <td class="setup-col-actions">

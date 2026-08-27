@@ -256,3 +256,25 @@ body.app-body.role-1
     text-align: center !important;
     white-space: nowrap !important;
 }
+
+body.app-body.role-1
+.assignment-history-page
+.assignment-history-compact-table
+.assignment-row-actions
+.assignment-icon-btn.view-slip {
+    width: auto !important;
+    min-width: 92px !important;
+    padding: 0 10px !important;
+}
+
+@media (max-width: 1180px) {
+    body.app-body.role-1
+    .assignment-history-page
+    .assignment-history-compact-table
+    .assignment-row-actions
+    .assignment-icon-btn.view-slip {
+        width: auto !important;
+        min-width: 88px !important;
+        padding: 0 9px !important;
+    }
+}

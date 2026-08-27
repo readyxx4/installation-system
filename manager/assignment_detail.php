@@ -2,36 +2,17 @@
 require_once __DIR__ . '/../check_login.php';
 require_once __DIR__ . '/../db.php';
 
-require_login('2');
+require_login('1');
 
-$currentSaleId = trim((string) ($_SESSION['user_id'] ?? ''));
-$setupId = trim((string) ($_GET['id'] ?? ''));
+date_default_timezone_set('Asia/Bangkok');
 
-if ($currentSaleId === '') {
-    redirect_to(app_system_url('login.php'));
-}
+$setupId = trim((string) ($_GET['id'] ?? $_GET['setup_id'] ?? ''));
 
 if ($setupId === '') {
-    redirect_to(app_system_url('sale/setup_history.php'));
+    redirect_to(app_system_url('manager/assignment_history.php'));
 }
 
-function sale_detail_column_exists(mysqli $conn, string $table, string $column): bool
-{
-    $stmt = $conn->prepare("
-        SELECT COLUMN_NAME
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_SCHEMA = DATABASE()
-          AND TABLE_NAME = ?
-          AND COLUMN_NAME = ?
-        LIMIT 1
-    ");
-    $stmt->bind_param('ss', $table, $column);
-    $stmt->execute();
-
-    return $stmt->get_result()->num_rows > 0;
-}
-
-function sale_detail_date(?string $value, bool $withTime = false): string
+function manager_detail_date(?string $value, bool $withTime = false): string
 {
     $value = trim((string) $value);
 
@@ -50,7 +31,7 @@ function sale_detail_date(?string $value, bool $withTime = false): string
         : date('d/m/Y', $timestamp);
 }
 
-function sale_detail_time(?string $value): string
+function manager_detail_time(?string $value): string
 {
     $value = trim((string) $value);
 
@@ -63,13 +44,21 @@ function sale_detail_time(?string $value): string
     return $timestamp ? date('H:i', $timestamp) : $value;
 }
 
-$installDateSelect = sale_detail_column_exists($conn, 'assignment', 'assign_install_date')
-    ? 'a.assign_install_date'
-    : 'NULL AS assign_install_date';
+function manager_detail_time_range(?string $start, ?string $end): string
+{
+    $startText = manager_detail_time($start);
+    $endText = manager_detail_time($end);
 
-$installTimeSelect = sale_detail_column_exists($conn, 'assignment', 'assign_install_time')
-    ? 'a.assign_install_time'
-    : 'NULL AS assign_install_time';
+    if ($startText === '--') {
+        return '--';
+    }
+
+    if ($endText !== '--') {
+        return $startText . ' - ' . $endText . ' น.';
+    }
+
+    return $startText . ' น.';
+}
 
 $setupStmt = $conn->prepare("
     SELECT
@@ -91,12 +80,13 @@ $setupStmt = $conn->prepare("
         a.assign_id,
         a.assign_by,
         a.assign_date,
+        a.assign_install_date,
+        a.assign_install_time,
+        a.assign_install_end_time,
         a.assign_status,
-        {$installDateSelect},
-        {$installTimeSelect},
 
         t.tech_id,
-        COALESCE(NULLIF(TRIM(t.tech_fullname), ''), NULLIF(TRIM(t.tech_name), ''), t.tech_id) AS technician_name,
+        COALESCE(NULLIF(TRIM(t.tech_name), ''), t.tech_id) AS technician_name,
         t.tech_phone AS technician_phone,
         COALESCE(NULLIF(TRIM(assigner.user_name), ''), a.assign_by) AS assigner_name
     FROM setup s
@@ -116,20 +106,18 @@ $setupStmt = $conn->prepare("
     LEFT JOIN `user` assigner
         ON a.assign_by = assigner.user_id
     WHERE s.setup_id = ?
-      AND s.sale_id = ?
     LIMIT 1
 ");
 
-$setupStmt->bind_param('ss', $setupId, $currentSaleId);
+$setupStmt->bind_param('s', $setupId);
 $setupStmt->execute();
 $setup = $setupStmt->get_result()->fetch_assoc();
 
 if (!$setup) {
-    redirect_to(app_system_url('sale/setup_history.php?status=notfound'));
+    redirect_to(app_system_url('manager/assignment_history.php?status=notfound'));
 }
 
 $items = [];
-
 $detailStmt = $conn->prepare("
     SELECT
         d.pro_id,
@@ -154,75 +142,31 @@ while ($item = $detailResult->fetch_assoc()) {
 
 $itemCount = count($items);
 $totalAmount = 0.0;
-
 foreach ($items as $item) {
     $totalAmount += (float) ($item['install_total'] ?? 0);
 }
 
-/*
- * Sale เห็นเฉพาะสถานะภาพรวม
- * ไม่แสดงสถานะย่อยของ workflow หัวหน้าช่าง
- */
-$setupStatus = (int) ($setup['setup_status'] ?? 0);
-$hasAssignment = !empty($setup['assign_id']);
+$assignStatus = (string) ($setup['assign_status'] ?? '');
+$managerStatusText = $assignStatus === '4' ? 'ยกเลิกแล้ว' : 'รายละเอียดงาน';
+$managerStatusClass = $assignStatus === '4' ? 'cancelled' : 'progress';
 
-if ($setupStatus === 5) {
-    $saleStatusText = 'ยกเลิก';
-    $saleStatusClass = 'cancelled';
-} elseif ($setupStatus === 2) {
-    $saleStatusText = 'เสร็จสิ้น';
-    $saleStatusClass = 'done';
-} elseif ($hasAssignment) {
-    $saleStatusText = 'อยู่ระหว่างดำเนินการ';
-    $saleStatusClass = 'progress';
-} else {
-    $saleStatusText = 'รอมอบหมายงาน';
-    $saleStatusClass = 'waiting';
-}
+$assignmentId = trim((string) ($setup['assign_id'] ?? ''));
+$assignmentId = $assignmentId !== '' ? $assignmentId : '--';
+$assignmentDate = manager_detail_date($setup['assign_date'] ?? null, true);
+$assignerName = trim((string) ($setup['assigner_name'] ?? ''));
+$assignerName = $assignerName !== '' ? $assignerName : '--';
+$technicianName = trim((string) ($setup['technician_name'] ?? ''));
+$technicianName = $technicianName !== '' ? $technicianName : '--';
+$installDate = manager_detail_date($setup['assign_install_date'] ?? null);
+$installTime = manager_detail_time_range(
+    $setup['assign_install_time'] ?? null,
+    $setup['assign_install_end_time'] ?? null
+);
+$installDateTime = $installDate !== '--' && $installTime !== '--'
+    ? $installDate . ' ' . $installTime
+    : '--';
 
-$assignmentId = '--';
-$assignmentDate = '--';
-$assignerName = '--';
-$technicianName = '--';
-$installDate = '--';
-$installTime = '--';
-$installDateTime = '--';
-
-if ($hasAssignment) {
-    $assignmentId = trim((string) ($setup['assign_id'] ?? ''));
-    if ($assignmentId === '') {
-        $assignmentId = '--';
-    }
-
-    $assignmentDate = sale_detail_date(
-        $setup['assign_date'] ?? null,
-        true
-    );
-
-    $assignerName = trim((string) ($setup['assigner_name'] ?? ''));
-    if ($assignerName === '') {
-        $assignerName = '--';
-    }
-
-    $technicianName = trim((string) ($setup['technician_name'] ?? ''));
-    if ($technicianName === '') {
-        $technicianName = '--';
-    }
-
-    $installDate = sale_detail_date(
-        $setup['assign_install_date'] ?? null
-    );
-
-    $installTime = sale_detail_time(
-        $setup['assign_install_time'] ?? null
-    );
-
-    if ($installDate !== '--' && $installTime !== '--') {
-        $installDateTime = $installDate . ' ' . $installTime;
-    }
-}
-
-layout_header('รายละเอียดใบงานติดตั้ง', 'setup_history');
+layout_header('รายละเอียดงานมอบหมาย', 'assignment_history');
 ?>
 
 <link
@@ -230,21 +174,20 @@ layout_header('รายละเอียดใบงานติดตั้�
   href="<?= h(app_asset_url('sale/assets/css/setup_detail.css')) ?>?v=<?= h(asset_version('sale/assets/css/setup_detail.css')) ?>"
 >
 
-<section class="sale-detail-page">
-    <!-- การ์ดสรุปใบงาน -->
+<section class="sale-detail-page manager-assignment-detail-page">
     <section class="sale-detail-summary-card">
         <div class="sale-detail-summary-head">
             <div>
                 <a
                     class="sale-detail-back"
-                    href="<?= h(app_system_url('sale/setup_history.php')) ?>"
+                    href="<?= h(app_system_url('manager/assignment_history.php?status=canceled')) ?>"
                 >
-                    ← ประวัติใบงาน
+                    ← ประวัติการมอบหมายงาน
                 </a>
 
                 <div class="sale-detail-summary-title-row">
                     <div class="sale-detail-summary-title">
-                        <h1>สรุปใบงาน</h1>
+                        <h1>สรุปงานมอบหมาย</h1>
 
                         <p class="sale-detail-setup-code">
                             รหัสใบงาน
@@ -252,14 +195,14 @@ layout_header('รายละเอียดใบงานติดตั้�
                         </p>
 
                         <p class="sale-detail-summary-subtitle">
-                            ตรวจสอบรายละเอียดใบงานติดตั้ง
+                            ตรวจสอบรายละเอียดใบงานและข้อมูลการมอบหมาย
                         </p>
                     </div>
 
                     <div class="sale-detail-status-area">
-                        <span class="sale-detail-status <?= h($saleStatusClass) ?>">
-                            สถานะใบงานนี้ :
-                            <strong><?= h($saleStatusText) ?></strong>
+                        <span class="sale-detail-status <?= h($managerStatusClass) ?>">
+                            สถานะงานนี้ :
+                            <strong><?= h($managerStatusText) ?></strong>
                         </span>
                     </div>
                 </div>
@@ -267,7 +210,7 @@ layout_header('รายละเอียดใบงานติดตั้�
 
             <a
                 class="sale-detail-slip-btn"
-                href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($setupId))) ?>"
+                href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($setupId) . '&from=manager')) ?>"
             >
                 ดูใบติดตั้ง
             </a>
@@ -317,7 +260,7 @@ layout_header('รายละเอียดใบงานติดตั้�
             <div class="sale-detail-work-meta">
                 <div>
                     <span>วันที่สร้างใบงาน</span>
-                    <strong><?= h(sale_detail_date($setup['created_at'] ?? null, true)) ?></strong>
+                    <strong><?= h(manager_detail_date($setup['created_at'] ?? null, true)) ?></strong>
                 </div>
 
                 <div>
@@ -326,8 +269,8 @@ layout_header('รายละเอียดใบงานติดตั้�
                 </div>
 
                 <div class="wide">
-                    <span>ที่อยู่ลูกค้า</span>
-                    <strong><?= h($setup['user_address'] ?? '--') ?></strong>
+                    <span>สถานที่ติดตั้ง</span>
+                    <strong><?= h($setup['setup_address'] ?: ($setup['setup_location'] ?: '--')) ?></strong>
                 </div>
             </div>
 
@@ -382,18 +325,17 @@ layout_header('รายละเอียดใบงานติดตั้�
         </div>
     </section>
 
-    <!-- การ์ดข้อมูลการดำเนินงาน แยกออกมา -->
     <section class="sale-detail-process-card">
         <div class="sale-detail-process-head">
             <div>
                 <h2>ข้อมูลการมอบหมายงาน</h2>
-                <p>ข้อมูลหลังหัวหน้าช่างดำเนินการมอบหมาย</p>
+                <p>ข้อมูลล่าสุดที่หัวหน้าช่างเคยมอบหมายก่อนสถานะปัจจุบัน</p>
             </div>
         </div>
 
         <div class="sale-detail-process-row">
             <div>
-                <span>รหัสงานมอบหมาย</span>
+                <span>รหัสมอบหมายงาน</span>
                 <strong><?= h($assignmentId) ?></strong>
             </div>
 
@@ -408,13 +350,18 @@ layout_header('รายละเอียดใบงานติดตั้�
             </div>
 
             <div>
-                <span>ช่างผู้ติดตั้ง</span>
+                <span>ช่างที่เคยมอบหมาย</span>
                 <strong><?= h($technicianName) ?></strong>
             </div>
 
             <div>
-                <span>วันที่-เวลา</span>
-                <strong><?= h($installDateTime) ?></strong>
+                <span>วันที่ติดตั้ง</span>
+                <strong><?= h($installDate) ?></strong>
+            </div>
+
+            <div>
+                <span>เวลา</span>
+                <strong><?= h($installTime) ?></strong>
             </div>
         </div>
     </section>

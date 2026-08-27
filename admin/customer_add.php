@@ -23,27 +23,7 @@ function table_exists(mysqli $conn, string $table): bool
 
 function make_user_id(mysqli $conn): string
 {
-  $prefix = 'USR-2569-';
-
-  for ($i = 1; $i <= 9999; $i++) {
-    $running_no = str_pad((string) $i, 4, '0', STR_PAD_LEFT);
-    $user_id = $prefix . $running_no;
-
-    $stmt = $conn->prepare("
-      SELECT user_id
-      FROM `user`
-      WHERE user_id = ?
-      LIMIT 1
-    ");
-    $stmt->bind_param('s', $user_id);
-    $stmt->execute();
-
-    if ($stmt->get_result()->num_rows === 0) {
-      return $user_id;
-    }
-  }
-
-  throw new Exception('ไม่สามารถสร้างรหัสผู้ใช้ใหม่ได้');
+  return make_customer_profile_id($conn);
 }
 
 function normalize_full_name(string $name): string
@@ -93,17 +73,17 @@ if (
 
   if ($field === 'user_phone') {
     $stmt = $conn->prepare("
-      SELECT user_id
-      FROM `user`
-      WHERE user_phone = ?
+      SELECT customer_id AS user_id
+      FROM customers
+      WHERE customer_phone = ?
       LIMIT 1
     ");
     $stmt->bind_param('s', $value);
   } else {
     $stmt = $conn->prepare("
-      SELECT user_id
-      FROM `user`
-      WHERE LOWER(user_email) = LOWER(?)
+      SELECT customer_id AS user_id
+      FROM customers
+      WHERE LOWER(customer_email) = LOWER(?)
       LIMIT 1
     ");
     $stmt->bind_param('s', $value);
@@ -147,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect_to(app_system_url('admin/customer_add.php?status=error'));
   }
 
-  if (!preg_match('/^USR-2569-[0-9]{4}$/', $user_id)) {
+  if (!preg_match('/^CUS-2569-[0-9]{4}$/', $user_id)) {
     redirect_to(app_system_url('admin/customer_add.php?status=error'));
   }
 
@@ -203,9 +183,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       ' ' . $zip_code;
 
     $check_id = $conn->prepare("
-      SELECT user_id
-      FROM `user`
-      WHERE user_id = ?
+      SELECT customer_id
+      FROM customers
+      WHERE customer_id = ?
       LIMIT 1
     ");
     $check_id->bind_param('s', $user_id);
@@ -216,9 +196,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $check_phone = $conn->prepare("
-      SELECT user_id
-      FROM `user`
-      WHERE user_phone = ?
+      SELECT customer_id AS user_id
+      FROM customers
+      WHERE customer_phone = ?
       LIMIT 1
     ");
     $check_phone->bind_param('s', $user_phone);
@@ -235,9 +215,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $check_email = $conn->prepare("
-      SELECT user_id
-      FROM `user`
-      WHERE LOWER(user_email) = LOWER(?)
+      SELECT customer_id AS user_id
+      FROM customers
+      WHERE LOWER(customer_email) = LOWER(?)
       LIMIT 1
     ");
     $check_email->bind_param('s', $user_email);
@@ -253,44 +233,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       );
     }
 
-    $stmt = $conn->prepare("
-      INSERT INTO `user`
-      (
-        user_id,
-        user_name,
-        user_password,
-        user_phone,
-        user_email,
-        user_address,
-        user_role
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    ");
-
-    $stmt->bind_param(
-      'ssssssi',
-      $user_id,
-      $user_name,
-      $user_password,
-      $user_phone,
-      $user_email,
-      $user_address,
-      $user_role
-    );
-
     $conn->begin_transaction();
     $transaction_started = true;
 
-    $stmt->execute();
-    upsert_customer_profile(
-      $conn,
+    $stmt = $conn->prepare("
+      INSERT INTO customers
+      (
+        customer_id,
+        customer_password,
+        customer_name,
+        customer_phone,
+        customer_email,
+        customer_address,
+        customer_status
+      )
+      VALUES (?, ?, ?, ?, ?, ?, 1)
+    ");
+    $stmt->bind_param(
+      'ssssss',
       $user_id,
+      $user_password,
       $user_name,
       $user_phone,
       $user_email,
-      $user_address,
-      1
+      $user_address
     );
+    $stmt->execute();
 
     $conn->commit();
 

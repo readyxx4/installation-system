@@ -64,8 +64,7 @@ function badge_color($status): string
 
 $total_customers = safe_count($conn, "
     SELECT COUNT(*) AS total
-    FROM `user`
-    WHERE user_role = 0
+    FROM customers
 ");
 
 $total_setups = safe_count($conn, "
@@ -108,13 +107,13 @@ $recent_setups = $conn->query("
         s.setup_date,
         s.setup_status,
         s.setup_address,
-        u.user_name,
-        u.user_phone,
+        c.customer_name AS user_name,
+        c.customer_phone AS user_phone,
         p.pro_name,
         d.install_qty,
         d.install_total
     FROM setup s
-    LEFT JOIN `user` u ON s.user_id = u.user_id
+    LEFT JOIN customers c ON s.customer_id = c.customer_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     LEFT JOIN install_detail d ON s.setup_id = d.setup_id
     ORDER BY s.created_at DESC, s.setup_id DESC
@@ -127,12 +126,12 @@ $recent_payments = $conn->query("
         pp.paymentpro_date,
         pp.paymentpro_status,
         s.setup_id,
-        u.user_name,
-        u.user_phone,
+        c.customer_name AS user_name,
+        c.customer_phone AS user_phone,
         p.pro_name
     FROM product_payment pp
     LEFT JOIN setup s ON pp.setup_id = s.setup_id
-    LEFT JOIN `user` u ON pp.user_id = u.user_id
+    LEFT JOIN customers c ON COALESCE(pp.customer_id, s.customer_id) = c.customer_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     ORDER BY pp.paymentpro_date DESC, pp.paymentpro_id DESC
     LIMIT 10

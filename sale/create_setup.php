@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $setupId = trim($_POST['setup_id'] ?? '');
-$userId = trim($_POST['user_id'] ?? '');
+$customerId = trim($_POST['customer_id'] ?? '');
 $setupAddress = trim($_POST['setup_address'] ?? '');
 $setupNote = trim($_POST['setup_note'] ?? '');
 $itemsJson = $_POST['selected_items_json'] ?? '[]';
@@ -21,7 +21,7 @@ if ($saleId === '') {
 
 if (
     !preg_match('/^SET-[0-9]{7}$/', $setupId) ||
-    $userId === '' ||
+    $customerId === '' ||
     $setupAddress === ''
 ) {
     redirect_to(app_system_url('sale/index.php?status=error'));
@@ -37,10 +37,9 @@ $transactionStarted = false;
 
 try {
     $customerCheck = $conn->prepare("
-        SELECT user_id
-        FROM `user`
-        WHERE user_id = ?
-          AND user_role = 0
+        SELECT customer_id
+        FROM customers
+        WHERE customer_id = ?
         LIMIT 1
     ");
 
@@ -48,10 +47,11 @@ try {
         throw new RuntimeException('ไม่สามารถตรวจสอบข้อมูลลูกค้าได้');
     }
 
-    $customerCheck->bind_param('s', $userId);
+    $customerCheck->bind_param('s', $customerId);
     $customerCheck->execute();
+    $customer = $customerCheck->get_result()->fetch_assoc();
 
-    if ($customerCheck->get_result()->num_rows !== 1) {
+    if (!$customer) {
         throw new RuntimeException('ไม่พบข้อมูลลูกค้า');
     }
 
@@ -123,7 +123,7 @@ try {
     $insertSetup = $conn->prepare("
         INSERT INTO setup (
             setup_id,
-            user_id,
+            customer_id,
             sale_id,
             pro_id,
             setup_date,
@@ -143,7 +143,7 @@ try {
     $insertSetup->bind_param(
         'ssssssiss',
         $setupId,
-        $userId,
+        $customerId,
         $saleId,
         $firstProductId,
         $setupDate,

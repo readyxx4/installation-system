@@ -46,10 +46,16 @@ function create_setup_icon(string $name): string
 
 $customers = [];
 $customerResult = $conn->query("
-    SELECT user_id, user_name, user_phone, user_email, user_address
-    FROM `user`
-    WHERE user_role = 0
-    ORDER BY user_name ASC, user_id ASC
+    SELECT
+        customer_id AS user_id,
+        customer_id,
+        customer_name AS user_name,
+        customer_phone AS user_phone,
+        customer_email AS user_email,
+        customer_address AS user_address,
+        customer_status
+    FROM customers
+    ORDER BY customer_name ASC, customer_id ASC
 ");
 if ($customerResult) {
     while ($row = $customerResult->fetch_assoc()) {

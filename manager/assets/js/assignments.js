@@ -312,7 +312,6 @@ function getTechById(techId) {
 function techDisplayName(tech) {
   return tech
     ? (
-      tech.tech_fullname ||
       tech.tech_name ||
       '-'
     )

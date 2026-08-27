@@ -33,7 +33,7 @@ function prepare_assignment_table(mysqli $conn): void
         'assign_id',
         'setup_id',
         'tech_id',
-        'user_id',
+        'customer_id',
         'assign_by',
         'assign_date',
         'assign_install_date',
@@ -214,7 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        $stmt_setup = $conn->prepare("SELECT setup_id, user_id, setup_status FROM setup WHERE setup_id = ? LIMIT 1");
+        $stmt_setup = $conn->prepare("SELECT setup_id, customer_id, setup_status FROM setup WHERE setup_id = ? LIMIT 1");
         $stmt_setup->bind_param('s', $setup_id);
         $stmt_setup->execute();
         $setup = $stmt_setup->get_result()->fetch_assoc();
@@ -324,14 +324,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $update_setup_status->execute();
         } else {
             $assign_id = make_assign_id($conn);
-            $user_id = $setup['user_id'];
+            $customer_id = $setup['customer_id'] ?? null;
+
+            if ($customer_id === null || $customer_id === '') {
+                redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=error'));
+            }
 
             $insert_assign = $conn->prepare("
                 INSERT INTO assignment
-                (assign_id, setup_id, tech_id, user_id, assign_by, assign_date, assign_install_date, assign_install_time, assign_install_end_time, assign_status)
+                (assign_id, setup_id, tech_id, customer_id, assign_by, assign_date, assign_install_date, assign_install_time, assign_install_end_time, assign_status)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
-            $insert_assign->bind_param('sssssssssi', $assign_id, $setup_id, $tech_id, $user_id, $assign_by, $assign_date, $install_date, $install_time_db, $install_end_time_db, $assign_status);
+            $insert_assign->bind_param('sssssssssi', $assign_id, $setup_id, $tech_id, $customer_id, $assign_by, $assign_date, $install_date, $install_time_db, $install_end_time_db, $assign_status);
             $insert_assign->execute();
         }
 
@@ -365,20 +369,20 @@ $setup_stmt = $conn->prepare("
         s.setup_status,
         s.setup_note,
         s.created_at,
-        u.user_id,
-        u.user_name,
-        u.user_phone,
-        u.user_email,
-        u.user_address,
+        c.customer_id AS user_id,
+        c.customer_name AS user_name,
+        c.customer_phone AS user_phone,
+        c.customer_email AS user_email,
+        c.customer_address AS user_address,
         COALESCE(
             NULLIF(GROUP_CONCAT(DISTINCT p2.pro_name ORDER BY p2.pro_name SEPARATOR ', '), ''),
             p.pro_name,
             '-'
         ) AS product_names,
         COUNT(idt.detail_id) AS item_count,
-        COALESCE(SUM(idt.install_total), 0) AS install_total
+        COALESCE(SUM(COALESCE(idt.install_qty, 1) * COALESCE(p2.pro_price_install, 0)), 0) AS install_total
     FROM setup s
-    LEFT JOIN `user` u ON s.user_id = u.user_id
+    LEFT JOIN customers c ON s.customer_id = c.customer_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     LEFT JOIN install_detail idt ON s.setup_id = idt.setup_id
     LEFT JOIN product p2 ON idt.pro_id = p2.pro_id
@@ -391,11 +395,11 @@ $setup_stmt = $conn->prepare("
         s.setup_status,
         s.setup_note,
         s.created_at,
-        u.user_id,
-        u.user_name,
-        u.user_phone,
-        u.user_email,
-        u.user_address,
+        c.customer_id,
+        c.customer_name,
+        c.customer_phone,
+        c.customer_email,
+        c.customer_address,
         p.pro_name
     LIMIT 1
 ");
@@ -414,11 +418,8 @@ $product_items_stmt = $conn->prepare("
         COALESCE(p.pro_name, d.pro_id) AS pro_name,
         COALESCE(pt.protype_name, '-') AS protype_name,
         COALESCE(d.install_qty, 1) AS install_qty,
-        COALESCE(d.install_price, p.pro_price_install, 0) AS install_price,
-        COALESCE(
-            d.install_total,
-            COALESCE(d.install_qty, 1) * COALESCE(d.install_price, p.pro_price_install, 0)
-        ) AS install_total
+        COALESCE(p.pro_price_install, 0) AS install_price,
+        COALESCE(d.install_qty, 1) * COALESCE(p.pro_price_install, 0) AS install_total
     FROM install_detail d
     LEFT JOIN product p ON d.pro_id = p.pro_id
     LEFT JOIN product_type pt ON p.protype_id = pt.protype_id
@@ -438,8 +439,8 @@ if (count($product_items) === 0 && !empty($selected_setup['product_names'])) {
         'pro_name' => $selected_setup['product_names'],
         'protype_name' => '-',
         'install_qty' => 1,
-        'install_price' => (float) ($selected_setup['install_total'] ?? 0),
-        'install_total' => (float) ($selected_setup['install_total'] ?? 0),
+        'install_price' => (float) ($selected_setup['pro_price_install'] ?? 0),
+        'install_total' => (float) ($selected_setup['pro_price_install'] ?? 0),
     ];
 }
 
@@ -511,8 +512,8 @@ $tech_schedules_result = $conn->query("
         TIME_FORMAT(a.assign_install_time, '%H:%i') AS assign_install_time,
         TIME_FORMAT(a.assign_install_end_time, '%H:%i') AS assign_install_end_time,
         a.assign_status,
-        u.user_name,
-        u.user_phone,
+        c.customer_name AS user_name,
+        c.customer_phone AS user_phone,
         (
             SELECT COUNT(*)
             FROM install_detail idc
@@ -523,7 +524,7 @@ $tech_schedules_result = $conn->query("
         s.setup_location
     FROM assignment a
     INNER JOIN setup s ON a.setup_id = s.setup_id
-    LEFT JOIN `user` u ON a.user_id = u.user_id
+    LEFT JOIN customers c ON s.customer_id = c.customer_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     WHERE a.assign_status IN (1, 2)
       AND COALESCE(a.assign_install_date, DATE(a.assign_date)) IS NOT NULL
@@ -537,6 +538,10 @@ $selected_setup['customer_display'] = $selected_setup['user_name'] ?: '-';
 $selected_setup['setup_address_display'] = $selected_setup['setup_address'] ?: ($selected_setup['setup_location'] ?: '-');
 $selected_setup['setup_date_display'] = manager_thai_date($selected_setup['setup_date'] ?? null);
 $selected_setup['created_at_display'] = manager_thai_date($selected_setup['created_at'] ?? null);
+$selected_setup['install_total'] = array_sum(array_map(
+    static fn(array $item): float => (float) ($item['install_total'] ?? 0),
+    $product_items
+));
 $selected_setup['install_total_display'] = manager_money($selected_setup['install_total'] ?? 0);
 $selected_setup['item_count_display'] = (int) ($selected_setup['item_count'] ?? 0);
 
@@ -575,7 +580,7 @@ $can_change_date = !$is_read_only && $current_setup_status !== 3;
 $can_change_time = !$is_read_only;
 $show_unavailable_tech_warning = $current_assignment && $current_tech_unavailable && !$is_read_only;
 $unavailable_tech_name = $show_unavailable_tech_warning
-    ? (($current_assignment['tech_fullname'] ?: $current_assignment['tech_name']) ?: '-')
+    ? ($current_assignment['tech_name'] ?: '-')
     : '';
 $unavailable_tech_reason = 'ถูกตั้งสถานะเป็นไม่พร้อมรับงาน';
 
@@ -790,7 +795,7 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                 <div class="install-summary-current">
                     <strong>การมอบหมายปัจจุบัน:</strong>
                     <span>
-                        <?= h(($current_assignment['tech_fullname'] ?: $current_assignment['tech_name']) ?: '-') ?>
+                        <?= h($current_assignment['tech_name'] ?: '-') ?>
                         · <?= h(manager_thai_date($current_assignment['assign_install_date'] ?? null)) ?>
                         · <?= h(time_label($current_assignment['assign_install_time'] ?? '', $current_assignment['assign_install_end_time'] ?? '')) ?>
                         · <?= h(assign_status_name($current_assignment['assign_status'] ?? '')) ?>

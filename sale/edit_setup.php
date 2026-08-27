@@ -38,7 +38,7 @@ if ($setupId === '') {
 $setupStmt = $conn->prepare("
     SELECT
         s.setup_id,
-        s.user_id,
+        s.customer_id,
         s.pro_id,
         s.setup_status,
         s.setup_address,
@@ -72,10 +72,16 @@ if (!edit_setup_can_modify($setup)) {
 
 $customers = [];
 $customerResult = $conn->query("
-    SELECT user_id, user_name, user_phone, user_email, user_address
-    FROM `user`
-    WHERE user_role = 0
-    ORDER BY user_name ASC, user_id ASC
+    SELECT
+        customer_id AS user_id,
+        customer_id,
+        customer_name AS user_name,
+        customer_phone AS user_phone,
+        customer_email AS user_email,
+        customer_address AS user_address,
+        customer_status
+    FROM customers
+    ORDER BY customer_name ASC, customer_id ASC
 ");
 
 while ($row = $customerResult->fetch_assoc()) {
@@ -127,12 +133,12 @@ if (count($currentItems) === 0 && !empty($setup['pro_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $userId = trim($_POST['user_id'] ?? '');
+  $customerId = trim($_POST['customer_id'] ?? '');
   $setupAddress = trim($_POST['setup_address'] ?? '');
   $setupNote = trim($_POST['setup_note'] ?? '');
   $itemsJson = $_POST['selected_items_json'] ?? '[]';
 
-  if ($userId === '' || $setupAddress === '') {
+  if ($customerId === '' || $setupAddress === '') {
     redirect_to(app_system_url('sale/edit_setup.php?id=' . urlencode($setupId) . '&status=error'));
   }
 
@@ -171,16 +177,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $customerCheck = $conn->prepare("
-            SELECT user_id
-            FROM `user`
-            WHERE user_id = ?
-              AND user_role = 0
+            SELECT customer_id
+            FROM customers
+            WHERE customer_id = ?
             LIMIT 1
         ");
-    $customerCheck->bind_param('s', $userId);
+    $customerCheck->bind_param('s', $customerId);
     $customerCheck->execute();
+    $customer = $customerCheck->get_result()->fetch_assoc();
 
-    if ($customerCheck->get_result()->num_rows !== 1) {
+    if (!$customer) {
       throw new RuntimeException('ไม่พบข้อมูลลูกค้า');
     }
 
@@ -239,7 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $updateSetup = $conn->prepare("
             UPDATE setup
             SET
-                user_id = ?,
+                customer_id = ?,
                 pro_id = ?,
                 setup_location = ?,
                 setup_address = ?,
@@ -249,7 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
     $updateSetup->bind_param(
       'ssssss',
-      $userId,
+      $customerId,
       $firstProductId,
       $setupAddress,
       $setupAddress,
@@ -320,7 +326,7 @@ layout_header('แก้ไขใบงานติดตั้ง', 'setups');
     <form id="createSetupForm" method="POST"
       action="<?= h(app_system_url('sale/edit_setup.php?id=' . urlencode($setupId))) ?>" autocomplete="off">
       <input type="hidden" name="setup_id" value="<?= h($setupId) ?>">
-      <input type="hidden" name="user_id" id="selectedCustomerId">
+      <input type="hidden" name="customer_id" id="selectedCustomerId">
       <input type="hidden" name="selected_items_json" id="selectedItemsJson" value="[]">
 
       <div class="setup-split-layout">
@@ -505,7 +511,7 @@ layout_header('แก้ไขใบงานติดตั้ง', 'setups');
     products: <?= json_encode($products, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
   };
   window.createSetupInitial = {
-    customerId: <?= json_encode($setup['user_id'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+    customerId: <?= json_encode($setup['customer_id'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
     setupAddress: <?= json_encode((string) ($setup['setup_address'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
     setupNote: <?= json_encode((string) ($setup['setup_note'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
     items: <?= json_encode($currentItems, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>

@@ -39,6 +39,39 @@ function column_exists(mysqli $conn, string $table, string $column): bool
     return $result->num_rows > 0;
 }
 
+function index_exists(mysqli $conn, string $table, string $index): bool
+{
+    $stmt = $conn->prepare("
+        SELECT INDEX_NAME
+        FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = ?
+          AND INDEX_NAME = ?
+        LIMIT 1
+    ");
+    $stmt->bind_param('ss', $table, $index);
+    $stmt->execute();
+
+    return $stmt->get_result()->num_rows > 0;
+}
+
+function foreign_key_exists(mysqli $conn, string $table, string $constraint): bool
+{
+    $stmt = $conn->prepare("
+        SELECT CONSTRAINT_NAME
+        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = ?
+          AND CONSTRAINT_NAME = ?
+          AND REFERENCED_TABLE_NAME IS NOT NULL
+        LIMIT 1
+    ");
+    $stmt->bind_param('ss', $table, $constraint);
+    $stmt->execute();
+
+    return $stmt->get_result()->num_rows > 0;
+}
+
 function prepare_product_payment_table(mysqli $conn): void
 {
     if (!table_exists($conn, 'product_payment')) {
@@ -46,10 +79,12 @@ function prepare_product_payment_table(mysqli $conn): void
             CREATE TABLE product_payment (
                 paymentpro_id CHAR(11) PRIMARY KEY,
                 paymentpro_date DATETIME NOT NULL,
-                user_id CHAR(13) NOT NULL,
+                customer_id CHAR(13) NULL,
                 setup_id CHAR(11) NOT NULL,
-                paymentpro_status INT(1) NOT NULL DEFAULT 0
-            )
+                paymentpro_status INT(1) NOT NULL DEFAULT 0,
+                KEY idx_product_payment_customer_id (customer_id),
+                CONSTRAINT fk_product_payment_customer_id FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
         ");
     }
 
@@ -67,10 +102,26 @@ function prepare_product_payment_table(mysqli $conn): void
         ");
     }
 
-    if (!column_exists($conn, 'product_payment', 'user_id')) {
+    if (!column_exists($conn, 'product_payment', 'customer_id')) {
         $conn->query("
             ALTER TABLE product_payment
-            ADD COLUMN user_id CHAR(13) NULL
+            ADD COLUMN customer_id CHAR(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL AFTER paymentpro_date
+        ");
+    }
+
+    if (!index_exists($conn, 'product_payment', 'idx_product_payment_customer_id')) {
+        $conn->query("
+            ALTER TABLE product_payment
+            ADD INDEX idx_product_payment_customer_id (customer_id)
+        ");
+    }
+
+    if (!foreign_key_exists($conn, 'product_payment', 'fk_product_payment_customer_id')) {
+        $conn->query("
+            ALTER TABLE product_payment
+            ADD CONSTRAINT fk_product_payment_customer_id
+            FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+            ON UPDATE CASCADE
         ");
     }
 
@@ -168,11 +219,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt_setup = $conn->prepare("
             SELECT 
                 s.setup_id,
-                s.user_id,
-                u.user_name,
+                s.customer_id,
+                c.customer_name AS user_name,
                 p.pro_name
             FROM setup s
-            LEFT JOIN `user` u ON s.user_id = u.user_id
+            LEFT JOIN customers c ON s.customer_id = c.customer_id
             LEFT JOIN product p ON s.pro_id = p.pro_id
             WHERE s.setup_id = ?
             LIMIT 1
@@ -187,7 +238,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $setup = $setup_result->fetch_assoc();
-        $user_id = $setup['user_id'];
+        $customer_id = $setup['customer_id'];
+
+        if ($customer_id === null || $customer_id === '') {
+            redirect_to(app_system_url('sale/payment.php?status=error'));
+        }
 
         /*
           ถ้างานติดตั้งนี้เคยมีการบันทึกจ่ายสินค้าแล้ว
@@ -211,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("
                 UPDATE product_payment
                 SET paymentpro_date = ?,
-                    user_id = ?,
+                    customer_id = ?,
                     paymentpro_status = ?
                 WHERE paymentpro_id = ?
             ");
@@ -221,7 +276,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param(
                 'ssis',
                 $payment_date_sql,
-                $user_id,
+                $customer_id,
                 $status_int,
                 $paymentpro_id
             );
@@ -238,7 +293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 (
                     paymentpro_id,
                     paymentpro_date,
-                    user_id,
+                    customer_id,
                     setup_id,
                     paymentpro_status
                 )
@@ -249,7 +304,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'ssssi',
                 $paymentpro_id,
                 $payment_date_sql,
-                $user_id,
+                $customer_id,
                 $setup_id,
                 $status_int
             );
@@ -270,17 +325,17 @@ $setups = $conn->query("
         s.setup_id,
         s.setup_date,
         s.setup_status,
-        s.user_id,
+        s.customer_id AS user_id,
 
-        u.user_name,
-        u.user_phone,
+        c.customer_name AS user_name,
+        c.customer_phone AS user_phone,
 
         p.pro_name,
 
         pp.paymentpro_id,
         pp.paymentpro_status
     FROM setup s
-    LEFT JOIN `user` u ON s.user_id = u.user_id
+    LEFT JOIN customers c ON s.customer_id = c.customer_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     LEFT JOIN product_payment pp ON s.setup_id = pp.setup_id
     ORDER BY s.created_at DESC, s.setup_id DESC
@@ -295,13 +350,13 @@ $payments = $conn->query("
         s.setup_id,
         s.setup_date,
 
-        u.user_name,
-        u.user_phone,
+        c.customer_name AS user_name,
+        c.customer_phone AS user_phone,
 
         p.pro_name
     FROM product_payment pp
     LEFT JOIN setup s ON pp.setup_id = s.setup_id
-    LEFT JOIN `user` u ON pp.user_id = u.user_id
+    LEFT JOIN customers c ON COALESCE(pp.customer_id, s.customer_id) = c.customer_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     ORDER BY pp.paymentpro_date DESC, pp.paymentpro_id DESC
 ");
