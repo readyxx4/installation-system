@@ -1,0 +1,1168 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+body.app-body.role-technician,
+body.app-body.role-technician :not(i):not(.fa):not(.fa-solid):not(.fa-regular):not(.fa-brands):not(.fas):not(.far):not(.fab):not(.cs-icon) {
+  font-family: 'Noto Sans Thai', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+}
+
+body.app-body.role-technician .job-id,
+body.app-body.role-technician .job-id strong,
+body.app-body.role-technician .summary-value,
+body.app-body.role-technician .chip-count,
+body.app-body.role-technician .status-count-badge,
+body.app-body.role-technician .job-total-value,
+body.app-body.role-technician .qty-pill,
+body.app-body.role-technician time,
+body.app-body.role-technician .shell-topbar-pill,
+body.app-body.role-technician .admin-date-pill {
+  font-family: 'Inter', 'Noto Sans Thai', sans-serif !important;
+  font-variant-numeric: tabular-nums !important;
+}
+.technician-action-col {
+  width: 190px;
+}
+
+/*
+ * Technician dashboard summary cards
+ * คัดค่าขนาด/โครงจาก admin/index.php โดยตรง
+ * - 5 columns เหมือน Admin (Technician มี 4 ใบ จึงเหลือช่องที่ 5 ว่าง)
+ * - card min-height 84px
+ * - padding 14px
+ * - radius 12px
+ * - label 12px / value 26px / subtext 11px
+ */
+
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-card {
+  position: relative;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+
+  height: auto !important;
+  min-height: 84px !important;
+  max-height: none !important;
+  padding: 14px !important;
+
+  background: #ffffff !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 12px !important;
+  color: #0f172a !important;
+  overflow: hidden !important;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* เส้น accent ด้านบนแบบการ์ด Admin */
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--card-accent, #2563eb);
+}
+
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-card::after {
+  display: none !important;
+}
+
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-card > div:first-child {
+  display: block !important;
+  min-width: 0 !important;
+  text-align: left !important;
+}
+
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-card .summary-icon {
+  position: static !important;
+  order: -1 !important;
+  width: 30px !important;
+  height: 30px !important;
+  flex: 0 0 30px !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  background: color-mix(
+    in srgb,
+    var(--card-accent, #2563eb) 12%,
+    white
+  ) !important;
+  color: var(--card-accent, #2563eb) !important;
+}
+
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-card .summary-icon i {
+  font-size: 16px !important;
+}
+
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-card span,
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-card p {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 1.35 !important;
+  text-align: left !important;
+}
+
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-card strong,
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-card h2 {
+  display: block !important;
+  margin: 5px 0 4px !important;
+  padding: 0 !important;
+  color: var(--card-accent, #2563eb) !important;
+  font-size: 26px !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+  text-align: left !important;
+}
+
+body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-card small {
+  display: block !important;
+  max-width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: #64748b !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  text-align: left !important;
+}
+
+/* ใช้ accent ตามลำดับการ์ด โดยคงพื้นขาวเหมือน Admin */
+body.app-body.role-technician .admin-summary-card:nth-child(1) {
+  --card-accent: #2563eb;
+}
+
+body.app-body.role-technician .admin-summary-card:nth-child(2) {
+  --card-accent: #0891b2;
+}
+
+body.app-body.role-technician .admin-summary-card:nth-child(3) {
+  --card-accent: #f59e0b;
+}
+
+body.app-body.role-technician .admin-summary-card:nth-child(4) {
+  --card-accent: #7c3aed;
+}
+
+/* responsive ตามแนวเดียวกับ Admin */
+@media (max-width: 1100px) {
+  body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  body.app-body.role-technician .technician-floating-notification {
+    right: 16px;
+    left: 16px;
+  }
+}
+@media (max-width: 760px) {
+  body.app-body.role-technician .admin-dashboard-summary-page .admin-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+body.app-body.role-technician .technician-notification-menu {
+  display: none !important;
+}
+
+body.app-body.role-technician .technician-bell-pill {
+  position: relative;
+  min-width: 42px;
+  justify-content: center;
+  border: 0;
+  cursor: pointer;
+}
+
+body.app-body.role-technician .technician-bell-pill span {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+body.app-body.role-technician .technician-notification-dropdown {
+  position: fixed;
+  top: var(--technician-notification-top, 76px);
+  right: var(--technician-notification-right, 28px);
+  z-index: 9998;
+  display: none;
+  width: min(420px, calc(100vw - 240px));
+  min-width: 360px;
+  max-height: 520px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, .18);
+}
+
+body.app-body.role-technician .technician-notification-dropdown.show {
+  display: block;
+}
+
+body.app-body.role-technician .technician-notification-dropdown-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+body.app-body.role-technician .technician-notification-items {
+  padding: 6px 0;
+}
+
+body.app-body.role-technician .technician-notification-item {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 10px;
+  padding: 11px 14px;
+  color: #0f172a;
+  text-decoration: none;
+}
+
+body.app-body.role-technician .technician-notification-item:hover {
+  background: #f8fafc;
+}
+
+body.app-body.role-technician .technician-notification-job {
+  grid-template-columns: 34px minmax(0, 1fr);
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+body.app-body.role-technician .technician-notification-job:last-child {
+  border-bottom: 0;
+}
+
+body.app-body.role-technician .technician-notification-job .technician-notification-dot {
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+}
+
+body.app-body.role-technician .technician-notification-job .technician-notification-copy strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 13px;
+}
+
+body.app-body.role-technician .technician-notification-job .technician-notification-copy small {
+  margin-top: 2px;
+}
+
+body.app-body.role-technician .technician-notification-status {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+body.app-body.role-technician .technician-notification-job.yellow .technician-notification-status {
+  color: #a16207;
+}
+
+body.app-body.role-technician .technician-notification-job.orange .technician-notification-status {
+  color: #c2410c;
+}
+
+body.app-body.role-technician .technician-notification-job.indigo .technician-notification-status {
+  color: #1e3a8a;
+}
+
+body.app-body.role-technician .technician-notification-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 15px;
+}
+
+body.app-body.role-technician .technician-notification-item.yellow .technician-notification-dot {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+body.app-body.role-technician .technician-notification-item.orange .technician-notification-dot {
+  background: #ffedd5;
+  color: #c2410c;
+}
+body.app-body.role-technician .technician-notification-item.indigo .technician-notification-dot {
+  background: #e0e7ff;
+  color: #1e3a8a;
+}
+
+body.app-body.role-technician .technician-notification-item.red .technician-notification-dot {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+body.app-body.role-technician .technician-notification-copy {
+  min-width: 0;
+}
+
+body.app-body.role-technician .technician-notification-copy strong {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+body.app-body.role-technician .technician-notification-copy b {
+  flex: 0 0 auto;
+  color: #0d47a1;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-notification-copy small {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+body.app-body.role-technician .technician-notification-empty {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 34px 22px 38px;
+  text-align: center;
+}
+
+body.app-body.role-technician .technician-notification-empty i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 24px;
+}
+
+body.app-body.role-technician .technician-notification-empty strong {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+body.app-body.role-technician .technician-notification-empty small {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+body.app-body.role-technician .technician-floating-notification {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  left: calc(200px + 20px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 10px 14px;
+  border: 1px solid rgba(147, 197, 253, .95);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(239, 246, 255, .96), rgba(254, 249, 195, .94));
+  box-shadow: 0 22px 52px rgba(30, 64, 175, .20), 0 8px 18px rgba(15, 23, 42, .10);
+  color: #0f172a;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-18px);
+  transition: opacity .28s ease, transform .28s ease;
+}
+
+@supports (backdrop-filter: blur(12px)) {
+  body.app-body.role-technician .technician-floating-notification {
+    backdrop-filter: blur(14px);
+  }
+}
+
+body.app-body.role-technician .technician-floating-notification.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+body.app-body.role-technician .technician-floating-notification.hide {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-18px);
+}
+
+body.app-body.role-technician .technician-floating-notification-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 12px;
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 16px;
+}
+
+body.app-body.role-technician .technician-floating-notification-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  width: 100%;
+}
+
+body.app-body.role-technician .technician-floating-notification-body > strong {
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+body.app-body.role-technician .technician-floating-notification-list {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+body.app-body.role-technician .technician-floating-notification-list a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: max-content;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(248, 250, 252, .82);
+  color: #334155;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+body.app-body.role-technician .technician-floating-notification-list a:hover {
+  background: #eff6ff;
+}
+
+body.app-body.role-technician .technician-floating-notification-list a.yellow {
+  color: #a16207;
+}
+
+body.app-body.role-technician .technician-floating-notification-list a.orange {
+  color: #c2410c;
+}
+body.app-body.role-technician .technician-floating-notification-list a.indigo {
+  color: #1e3a8a;
+}
+
+body.app-body.role-technician .technician-floating-notification-list a.red {
+  color: #dc2626;
+}
+
+body.app-body.role-technician .technician-floating-notification-list b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: currentColor;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+@media (max-width: 760px) {
+  body.app-body.role-technician .technician-floating-notification {
+    right: 12px;
+    left: 12px;
+    align-items: flex-start;
+  }
+
+  body.app-body.role-technician .technician-floating-notification-body {
+    display: grid;
+    gap: 7px;
+  }
+
+  body.app-body.role-technician .technician-notification-dropdown {
+    top: var(--technician-notification-top, 72px);
+    right: 12px;
+    left: 12px;
+    width: auto;
+    min-width: 0;
+    max-height: min(520px, calc(100vh - 96px));
+  }
+}
+
+
+/* === PHASE 1-2 TECHNICIAN REFERENCE UI START === */
+body.app-body.role-technician {
+  --tech-bg: var(--bg, #f6f8fb);
+  --tech-surface: var(--surface, #ffffff);
+  --tech-border: var(--border, #e6ebf2);
+  --tech-border-strong: var(--border-strong, #d5dde8);
+  --tech-ink: var(--slate-900, #0f172a);
+  --tech-muted: var(--slate-500, #64748b);
+  --tech-primary: var(--brand-600, #2563eb);
+  --tech-primary-dark: var(--brand-700, #1d4ed8);
+  --tech-primary-soft: var(--brand-50, #eff6ff);
+  --tech-sidebar-width: var(--sidebar-width, 264px);
+  --tech-content-max: var(--content-max, 1240px);
+  --tech-radius: var(--radius-lg, 14px);
+  --tech-shadow: var(--shadow-md, 0 4px 12px rgba(15,23,42,.07));
+  background: var(--tech-bg) !important;
+  color: var(--tech-ink);
+}
+
+body.app-body.role-technician .app-shell {
+  grid-template-columns: var(--tech-sidebar-width) minmax(0, 1fr) !important;
+  background: var(--tech-bg) !important;
+}
+
+body.app-body.role-technician .sidebar {
+  width: var(--tech-sidebar-width) !important;
+  min-width: var(--tech-sidebar-width) !important;
+  padding: 20px 12px !important;
+  background: #ffffff !important;
+  color: var(--tech-ink) !important;
+  border-right: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .sidebar .brand {
+  padding: 0 2px 10px !important;
+  margin-bottom: 6px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  gap: 7px !important;
+  order: 1 !important;
+}
+
+body.app-body.role-technician .brand-logo,
+body.app-body.role-technician .brand-mark {
+  width: 34px !important;
+  height: 34px !important;
+  flex-basis: 34px !important;
+  border-radius: 9px !important;
+  border: 1px solid var(--brand-100, #dbeafe) !important;
+  background: var(--tech-primary-soft) !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, .16) !important;
+}
+
+body.app-body.role-technician .brand strong {
+  color: var(--tech-ink) !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-technician .sidebar-profile-info strong {
+  color: var(--tech-ink) !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-technician .brand span,
+body.app-body.role-technician .sidebar-profile-info span {
+  color: var(--tech-muted) !important;
+}
+
+body.app-body.role-technician .nav-section-title {
+  margin: 0 0 2px !important;
+  padding: 0 !important;
+  color: #94a3b8 !important;
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+}
+
+body.app-body.role-technician .sidebar > .nav-section-title {
+  order: 2 !important;
+}
+
+body.app-body.role-technician .nav-link {
+  min-height: 40px !important;
+  margin-bottom: 3px !important;
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+  gap: 5px !important;
+  color: var(--slate-700, #334155) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: background-color .2s ease, color .2s ease, box-shadow .2s ease !important;
+}
+
+body.app-body.role-technician .nav-icon {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  flex-basis: 18px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--slate-600, #475569) !important;
+}
+
+body.app-body.role-technician .shell-icon {
+  display: inline-block !important;
+  width: 20px !important;
+  height: 20px !important;
+  flex: 0 0 auto !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  fill: none !important;
+  vertical-align: -0.125em !important;
+}
+
+body.app-body.role-technician .shell-topbar-pill .shell-icon,
+body.app-body.role-technician .shell-logout .shell-icon {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+body.app-body.role-technician .nav-icon .shell-icon {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+body.app-body.role-technician .nav-link:hover {
+  background: #f8fafc !important;
+  color: var(--slate-700, #334155) !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .nav-link.active {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .nav-link:hover .nav-icon {
+  background: transparent !important;
+  color: var(--slate-600, #475569) !important;
+}
+
+body.app-body.role-technician .nav-link.active .nav-icon {
+  background: transparent !important;
+  color: #2563eb !important;
+}
+
+body.app-body.role-technician .sidebar-profile {
+  margin-top: auto !important;
+  min-height: 54px !important;
+  padding: 8px 10px !important;
+  border: 1px solid var(--tech-border) !important;
+  border-radius: 12px !important;
+  background: var(--slate-50, #f8fafc) !important;
+  box-shadow: var(--shadow-xs, 0 1px 2px rgba(15,23,42,.04)) !important;
+  order: 10 !important;
+}
+
+body.app-body.role-technician .sidebar-profile-avatar {
+  width: 30px !important;
+  height: 30px !important;
+  flex-basis: 30px !important;
+  border-radius: 9px !important;
+  background: var(--tech-primary) !important;
+  color: #ffffff !important;
+}
+
+body.app-body.role-technician .logout-menu:hover {
+  background: var(--danger-50, #fef2f2) !important;
+  color: var(--danger-600, #dc2626) !important;
+}
+body.app-body.role-technician .shell-brand-copy {
+  display: grid !important;
+  gap: 0 !important;
+  min-width: 0 !important;
+}
+
+body.app-body.role-technician .shell-brand-copy strong {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.22 !important;
+}
+
+body.app-body.role-technician .shell-brand-copy span {
+  font-size: 10.5px !important;
+  line-height: 1.25 !important;
+}
+
+body.app-body.role-technician .shell-nav-item {
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+body.app-body.role-technician .sidebar > .shell-nav-item {
+  order: 3 !important;
+}
+
+body.app-body.role-technician .nav-label {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-technician .nav-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 24px !important;
+  min-width: 24px !important;
+  height: 24px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-technician .sidebar-account {
+  margin-top: 8px !important;
+  padding-top: 10px !important;
+  border-top: 1px solid #e5e7eb !important;
+  order: 11 !important;
+}
+
+body.app-body.role-technician .shell-logout {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .shell-topbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  height: var(--topbar-height, 68px) !important;
+  min-height: var(--topbar-height, 68px) !important;
+  padding: 0 32px !important;
+  border-bottom: 1px solid var(--tech-border) !important;
+  background: #ffffff !important;
+  overflow: visible !important;
+  box-shadow: var(--shadow-xs, 0 1px 2px rgba(15,23,42,.04)) !important;
+}
+
+body.app-body.role-technician .shell-topbar-title {
+  min-width: 0 !important;
+}
+
+body.app-body.role-technician .shell-topbar-title h1 {
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+}
+
+body.app-body.role-technician .shell-topbar-title p {
+  margin: 2px 0 0 !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+}
+
+body.app-body.role-technician .shell-topbar-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  flex: 0 0 auto !important;
+}
+
+body.app-body.role-technician .shell-topbar-pill,
+body.app-body.role-technician .shell-topbar-user {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 38px !important;
+  padding: 0 4px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--slate-700, #334155) !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .shell-topbar-avatar {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 999px !important;
+  background: var(--tech-primary) !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-technician .shell-topbar-user-copy {
+  display: grid !important;
+  gap: 1px !important;
+  line-height: 1.1 !important;
+}
+
+body.app-body.role-technician .shell-topbar-user-copy strong {
+  color: #0f172a !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-technician .shell-topbar-user-copy small {
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+}
+
+body.app-body.role-technician .main {
+  background: var(--tech-bg) !important;
+}
+
+body.app-body.role-technician .content {
+  height: calc(100vh - var(--topbar-height, 68px)) !important;
+  min-height: 0 !important;
+  padding: 28px 32px !important;
+  background: var(--tech-bg) !important;
+}
+
+body.app-body.role-technician .admin-dashboard-v2 {
+  width: min(100%, var(--tech-content-max)) !important;
+  max-width: var(--tech-content-max) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+body.app-body.role-technician .admin-dashboard-top {
+  margin-bottom: 18px !important;
+}
+
+body.app-body.role-technician .admin-dashboard-top {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  min-height: var(--topbar-height, 68px) !important;
+  padding: 0 0 4px !important;
+  overflow: visible !important;
+}
+
+body.app-body.role-technician .admin-dashboard-top h1 {
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+body.app-body.role-technician .admin-dashboard-top p {
+  margin: 5px 0 0 !important;
+  color: #64748b !important;
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+}
+
+body.app-body.role-technician .admin-date-pill,
+body.app-body.role-technician .technician-bell-pill {
+  min-height: 36px !important;
+  padding: 0 4px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--slate-700, #334155) !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .admin-summary-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  margin: 0 0 18px !important;
+}
+
+body.app-body.role-technician .admin-summary-card,
+body.app-body.role-technician .panel {
+  border: 1px solid var(--tech-border) !important;
+  border-radius: var(--tech-radius) !important;
+  background: var(--tech-surface) !important;
+  box-shadow: var(--tech-shadow) !important;
+}
+
+body.app-body.role-technician .admin-summary-card {
+  min-height: 104px !important;
+  padding: 18px !important;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease !important;
+  text-decoration: none !important;
+}
+
+body.app-body.role-technician a.admin-summary-card:hover {
+  border-color: var(--brand-100, #dbeafe) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(37, 99, 235, .10) !important;
+}
+
+body.app-body.role-technician .panel {
+  padding: 18px !important;
+}
+
+body.app-body.role-technician .panel-title-row {
+  border-bottom: 1px solid var(--tech-border) !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 14px !important;
+}
+
+body.app-body.role-technician .btn,
+body.app-body.role-technician .btn-small {
+  border-radius: 10px !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-technician .technician-floating-notification {
+  left: calc(var(--tech-sidebar-width) + 28px) !important;
+  right: 32px !important;
+  top: 16px !important;
+  border-color: rgba(147, 197, 253, .95) !important;
+  background: linear-gradient(135deg, rgba(239,246,255,.98), rgba(255,251,235,.96)) !important;
+  box-shadow: 0 18px 42px rgba(37, 99, 235, .16), 0 4px 12px rgba(15,23,42,.08) !important;
+}
+
+body.app-body.role-technician .technician-notification-dropdown {
+  width: min(420px, calc(100vw - var(--tech-sidebar-width) - 56px)) !important;
+  border: 1px solid var(--tech-border) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: 0 24px 52px rgba(15,23,42,.18) !important;
+}
+
+@media (max-width: 980px) {
+  body.app-body.role-technician .app-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-technician .shell-topbar {
+    height: auto !important;
+    min-height: 58px !important;
+    padding: 10px 14px !important;
+  }
+
+  body.app-body.role-technician .shell-topbar-user {
+    display: none !important;
+  }
+
+  body.app-body.role-technician .content {
+    height: calc(100vh - 58px) !important;
+    padding: 20px 14px !important;
+  }
+
+  body.app-body.role-technician .admin-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  body.app-body.role-technician .technician-floating-notification {
+    left: 14px !important;
+    right: 14px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body.app-body.role-technician .admin-dashboard-top {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-technician .admin-summary-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* === PHASE 2.5 TECHNICIAN REFERENCE MATCH === */
+body.app-body.role-technician .technician-reference-dashboard {
+  display: grid !important;
+  gap: 18px !important;
+}
+
+body.app-body.role-technician .technician-reference-page-head {
+  min-height: auto !important;
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+body.app-body.role-technician .technician-reference-page-head h1 {
+  font-size: 24px !important;
+  font-weight: 900 !important;
+}
+
+body.app-body.role-technician .technician-reference-page-head p {
+  font-size: 13px !important;
+}
+
+body.app-body.role-technician .technician-date-subtle {
+  color: var(--tech-muted) !important;
+  background: rgba(255,255,255,.72) !important;
+}
+
+body.app-body.role-technician .technician-reference-summary-grid {
+  margin: 0 !important;
+}
+
+body.app-body.role-technician .technician-dashboard-columns {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+body.app-body.role-technician .technician-dashboard-card-list-panel .panel-title-row {
+  align-items: flex-start !important;
+}
+
+body.app-body.role-technician .technician-dashboard-card-list-panel .panel-title-row p {
+  margin: 4px 0 0 !important;
+  color: #64748b !important;
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+}
+
+body.app-body.role-technician .technician-mini-job-list {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+body.app-body.role-technician .technician-mini-job,
+body.app-body.role-technician .technician-mini-empty {
+  display: grid !important;
+  grid-template-columns: 38px minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 58px !important;
+  padding: 10px !important;
+  border: 1px solid var(--tech-border) !important;
+  border-radius: 12px !important;
+  background: var(--slate-50, #f8fafc) !important;
+  color: var(--tech-ink) !important;
+  text-decoration: none !important;
+}
+
+body.app-body.role-technician .technician-mini-job:hover {
+  border-color: var(--tech-primary-soft) !important;
+  background: #ffffff !important;
+}
+
+body.app-body.role-technician .technician-mini-job-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  background: var(--tech-primary-soft) !important;
+  color: var(--tech-primary) !important;
+}
+
+body.app-body.role-technician .technician-mini-job strong,
+body.app-body.role-technician .technician-mini-job small,
+body.app-body.role-technician .technician-mini-job em {
+  display: block !important;
+  min-width: 0 !important;
+  line-height: 1.35 !important;
+}
+
+body.app-body.role-technician .technician-mini-job strong {
+  color: #0f172a !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-technician .technician-mini-job small {
+  margin-top: 2px !important;
+  color: #64748b !important;
+  font-size: 12.5px !important;
+  font-weight: 400 !important;
+}
+
+body.app-body.role-technician .technician-mini-job em {
+  color: var(--tech-primary-dark) !important;
+  font-size: 12px !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-technician .technician-mini-empty {
+  grid-template-columns: 1fr !important;
+  color: var(--tech-muted) !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+}
+
+@media (max-width: 980px) {
+  body.app-body.role-technician .technician-dashboard-columns {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-technician .technician-mini-job {
+    grid-template-columns: 36px minmax(0, 1fr) !important;
+  }
+
+  body.app-body.role-technician .technician-mini-job em {
+    grid-column: 2 !important;
+  }
+}
+/* === PHASE 2.5 TECHNICIAN REFERENCE MATCH END === */
+/* === PHASE 1-2 TECHNICIAN REFERENCE UI END === */
