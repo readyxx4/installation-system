@@ -1434,3 +1434,61 @@ button.manager-mini-day:hover {
 .manager-mini-day {
     font-size: 9.5px !important;
 }
+.manager-home:has(.manager-warning-overview-card) {
+    grid-template-rows: 72px minmax(0, 1fr) auto minmax(0, 1fr);
+}
+
+.manager-warning-overview-card {
+    min-height: 0;
+}
+
+.manager-warning-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.manager-warning-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid var(--mgr-line);
+    border-radius: 10px;
+    background: #FFFFFF;
+    text-decoration: none;
+}
+
+.manager-warning-card span {
+    overflow: hidden;
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.manager-warning-card b {
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.manager-warning-card.yellow {
+    border-color: #FDE68A;
+    background: #FEFCE8;
+    color: #A16207;
+}
+
+.manager-warning-card.orange {
+    border-color: #FED7AA;
+    background: #FFF7ED;
+    color: var(--mgr-orange-text);
+}
+
+.manager-warning-card.red {
+    border-color: #FECACA;
+    background: #FEF2F2;
+    color: var(--mgr-red);
+}

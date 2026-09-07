@@ -47,7 +47,6 @@ prepare_assignment_assign_by_column($conn);
 function user_role_name($role): string
 {
     return match ((string) $role) {
-        '0' => 'ลูกค้า',
         '1' => 'หัวหน้าช่าง',
         '2' => 'พนักงานขาย',
         '3' => 'ผู้ดูแลระบบ',

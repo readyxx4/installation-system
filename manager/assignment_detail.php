@@ -60,6 +60,19 @@ function manager_detail_time_range(?string $start, ?string $end): string
     return $startText . ' น.';
 }
 
+function manager_assignment_status_text($status): string
+{
+    return match ((string) $status) {
+        '0' => 'ยังไม่มอบหมาย',
+        '1' => 'มอบหมายงานแล้ว',
+        '2' => 'ช่างรับงานแล้ว',
+        '3' => 'ช่างปฏิเสธงาน',
+        '4' => 'ยกเลิกการมอบหมาย',
+        '5' => 'งานเสร็จสิ้น',
+        default => 'ไม่ทราบสถานะ',
+    };
+}
+
 $setupStmt = $conn->prepare("
     SELECT
         s.setup_id,
@@ -147,7 +160,7 @@ foreach ($items as $item) {
 }
 
 $assignStatus = (string) ($setup['assign_status'] ?? '');
-$managerStatusText = $assignStatus === '4' ? 'ยกเลิกแล้ว' : 'รายละเอียดงาน';
+$managerStatusText = manager_assignment_status_text($assignStatus);
 $managerStatusClass = $assignStatus === '4' ? 'cancelled' : 'progress';
 
 $assignmentId = trim((string) ($setup['assign_id'] ?? ''));
@@ -165,6 +178,55 @@ $installTime = manager_detail_time_range(
 $installDateTime = $installDate !== '--' && $installTime !== '--'
     ? $installDate . ' ' . $installTime
     : '--';
+
+$productReceive = null;
+$receiveProofUrl = '';
+if ($assignmentId !== '--') {
+    $receiveStmt = $conn->prepare("
+        SELECT
+            receive_id,
+            assign_id,
+            receive_date,
+            receive_status,
+            receive_note,
+            receive_proof
+        FROM product_receive
+        WHERE assign_id = ?
+        LIMIT 1
+    ");
+    $receiveStmt->bind_param('s', $assignmentId);
+    $receiveStmt->execute();
+    $productReceive = $receiveStmt->get_result()->fetch_assoc() ?: null;
+
+    if (!empty($productReceive['receive_proof'])) {
+        $receiveProofUrl = app_public_url((string) $productReceive['receive_proof']);
+    }
+}
+
+$assignmentHistory = [];
+$historyStmt = $conn->prepare("
+    SELECT
+        a.assign_id,
+        a.assign_date,
+        a.assign_install_date,
+        a.assign_install_time,
+        a.assign_install_end_time,
+        a.assign_status,
+        a.tech_id,
+        COALESCE(NULLIF(TRIM(t.tech_name), ''), a.tech_id, '--') AS technician_name
+    FROM assignment a
+    LEFT JOIN technicians t
+        ON TRIM(a.tech_id) = TRIM(t.tech_id)
+    WHERE a.setup_id = ?
+    ORDER BY a.assign_date DESC, a.assign_id DESC
+");
+$historyStmt->bind_param('s', $setupId);
+$historyStmt->execute();
+$historyResult = $historyStmt->get_result();
+
+while ($history = $historyResult->fetch_assoc()) {
+    $assignmentHistory[] = $history;
+}
 
 layout_header('รายละเอียดงานมอบหมาย', 'assignment_history');
 ?>
@@ -363,6 +425,110 @@ layout_header('รายละเอียดงานมอบหมาย', 'a
                 <span>เวลา</span>
                 <strong><?= h($installTime) ?></strong>
             </div>
+        </div>
+    </section>
+
+    <section class="sale-detail-process-card">
+        <div class="sale-detail-process-head">
+            <div>
+                <h2>ข้อมูลการรับสินค้า</h2>
+                <p>ข้อมูลยืนยันการรับสินค้าจากช่างที่ได้รับมอบหมาย</p>
+            </div>
+        </div>
+
+        <?php if (!$productReceive): ?>
+            <div class="sale-detail-process-row">
+                <div>
+                    <span>สถานะ</span>
+                    <strong>ยังไม่ได้ยืนยันรับสินค้า</strong>
+                </div>
+
+                <div>
+                    <span>ช่างผู้รับสินค้า</span>
+                    <strong><?= h($technicianName) ?></strong>
+                </div>
+
+                <div>
+                    <span>วันที่และเวลารับสินค้า</span>
+                    <strong>--</strong>
+                </div>
+
+                <div>
+                    <span>หมายเหตุ</span>
+                    <strong>--</strong>
+                </div>
+
+                <div>
+                    <span>หลักฐาน</span>
+                    <strong>-</strong>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="sale-detail-process-row">
+                <div>
+                    <span>สถานะ</span>
+                    <strong><?= (string) ($productReceive['receive_status'] ?? '') === '1' ? 'ยืนยันรับสินค้าแล้ว' : 'ไม่ทราบสถานะ' ?></strong>
+                </div>
+
+                <div>
+                    <span>ช่างผู้รับสินค้า</span>
+                    <strong><?= h($technicianName) ?></strong>
+                </div>
+
+                <div>
+                    <span>วันที่และเวลารับสินค้า</span>
+                    <strong><?= h(manager_detail_date($productReceive['receive_date'] ?? null, true)) ?></strong>
+                </div>
+
+                <div>
+                    <span>หมายเหตุ</span>
+                    <strong><?= h(trim((string) ($productReceive['receive_note'] ?? '')) !== '' ? $productReceive['receive_note'] : '--') ?></strong>
+                </div>
+
+                <div>
+                    <span>หลักฐาน</span>
+                    <?php if ($receiveProofUrl !== ''): ?>
+                        <strong><a href="<?= h($receiveProofUrl) ?>" target="_blank" rel="noopener">ดูหลักฐาน</a></strong>
+                    <?php else: ?>
+                        <strong>-</strong>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+    </section>
+
+    <section class="sale-detail-process-card">
+        <div class="sale-detail-process-head">
+            <div>
+                <h2>ประวัติการมอบหมาย</h2>
+                <p>รายการมอบหมายงานทั้งหมดของใบงานนี้</p>
+            </div>
+        </div>
+
+        <div class="sale-detail-product-table">
+            <div class="sale-detail-product-head">
+                <span>รหัสมอบหมาย</span>
+                <span>ชื่อช่าง</span>
+                <span>วันที่มอบหมาย</span>
+                <span>วันที่ติดตั้ง</span>
+                <span>เวลา</span>
+                <span>สถานะการมอบหมาย</span>
+            </div>
+
+            <?php if (count($assignmentHistory) === 0): ?>
+                <div class="sale-detail-empty">ไม่พบประวัติการมอบหมาย</div>
+            <?php endif; ?>
+
+            <?php foreach ($assignmentHistory as $history): ?>
+                <div class="sale-detail-product-row">
+                    <strong><?= h($history['assign_id'] ?? '--') ?></strong>
+                    <span><?= h($history['technician_name'] ?? '--') ?></span>
+                    <span><?= h(manager_detail_date($history['assign_date'] ?? null, true)) ?></span>
+                    <span><?= h(manager_detail_date($history['assign_install_date'] ?? null)) ?></span>
+                    <span><?= h(manager_detail_time_range($history['assign_install_time'] ?? null, $history['assign_install_end_time'] ?? null)) ?></span>
+                    <strong><?= h(manager_assignment_status_text($history['assign_status'] ?? '')) ?></strong>
+                </div>
+            <?php endforeach; ?>
         </div>
     </section>
 </section>

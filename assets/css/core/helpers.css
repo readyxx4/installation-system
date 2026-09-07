@@ -1,0 +1,73 @@
+/* =========================================================
+   Core Helpers
+   Utility classes only. Existing selectors are not renamed.
+   ========================================================= */
+
+.u-hidden {
+  display: none !important;
+}
+
+.u-flex {
+  display: flex !important;
+}
+
+.u-inline-flex {
+  display: inline-flex !important;
+}
+
+.u-grid {
+  display: grid !important;
+}
+
+.u-items-center {
+  align-items: center !important;
+}
+
+.u-items-start {
+  align-items: flex-start !important;
+}
+
+.u-justify-between {
+  justify-content: space-between !important;
+}
+
+.u-justify-center {
+  justify-content: center !important;
+}
+
+.u-gap-1 {
+  gap: var(--space-1) !important;
+}
+
+.u-gap-2 {
+  gap: var(--space-2) !important;
+}
+
+.u-gap-3 {
+  gap: var(--space-3) !important;
+}
+
+.u-gap-4 {
+  gap: var(--space-4) !important;
+}
+
+.u-text-muted {
+  color: var(--muted) !important;
+}
+
+.u-text-right {
+  text-align: right !important;
+}
+
+.u-text-center {
+  text-align: center !important;
+}
+
+.u-nowrap {
+  white-space: nowrap !important;
+}
+
+.u-tabular {
+  font-family: var(--font-number) !important;
+  font-variant-numeric: tabular-nums !important;
+}

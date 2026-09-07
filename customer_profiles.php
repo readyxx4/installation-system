@@ -35,7 +35,6 @@ function ensure_customer_profiles_schema(mysqli $conn): void
     $conn->query("
         CREATE TABLE IF NOT EXISTS customers (
             customer_id CHAR(13) NOT NULL,
-            customer_password VARCHAR(255) NOT NULL,
             customer_name VARCHAR(100) NOT NULL,
             customer_phone CHAR(10) NOT NULL,
             customer_email VARCHAR(100) NOT NULL,
@@ -51,17 +50,6 @@ function ensure_customer_profiles_schema(mysqli $conn): void
         CONVERT TO CHARACTER SET utf8mb4
         COLLATE utf8mb4_general_ci
     ");
-
-    if (!customer_profiles_column_exists($conn, 'customer_password')) {
-        $conn->query("
-            ALTER TABLE customers
-            ADD COLUMN customer_password VARCHAR(255) NOT NULL DEFAULT '' AFTER customer_id
-        ");
-        $conn->query("
-            ALTER TABLE customers
-            ALTER customer_password DROP DEFAULT
-        ");
-    }
 
     migrate_legacy_customer_profile_ids($conn);
 }
@@ -117,7 +105,6 @@ function migrate_legacy_customer_profile_ids(mysqli $conn): void
 
 function create_customer_profile(
     mysqli $conn,
-    string $customer_password,
     string $customer_name,
     string $customer_phone,
     string $customer_email,
@@ -128,14 +115,13 @@ function create_customer_profile(
 
     $stmt = $conn->prepare("
         INSERT INTO customers
-            (customer_id, customer_password, customer_name, customer_phone, customer_email, customer_address, customer_status)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+            (customer_id, customer_name, customer_phone, customer_email, customer_address, customer_status)
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
 
     $stmt->bind_param(
-        'ssssssi',
+        'sssssi',
         $customer_id,
-        $customer_password,
         $customer_name,
         $customer_phone,
         $customer_email,
@@ -149,7 +135,6 @@ function create_customer_profile(
 
 function upsert_customer_profile(
     mysqli $conn,
-    string $customer_password,
     string $customer_name,
     string $customer_phone,
     string $customer_email,
@@ -160,10 +145,9 @@ function upsert_customer_profile(
 
     $stmt = $conn->prepare("
         INSERT INTO customers
-            (customer_id, customer_password, customer_name, customer_phone, customer_email, customer_address, customer_status)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+            (customer_id, customer_name, customer_phone, customer_email, customer_address, customer_status)
+        VALUES (?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE
-            customer_password = VALUES(customer_password),
             customer_name = VALUES(customer_name),
             customer_phone = VALUES(customer_phone),
             customer_email = VALUES(customer_email),
@@ -172,9 +156,8 @@ function upsert_customer_profile(
     ");
 
     $stmt->bind_param(
-        'ssssssi',
+        'sssssi',
         $customer_id,
-        $customer_password,
         $customer_name,
         $customer_phone,
         $customer_email,

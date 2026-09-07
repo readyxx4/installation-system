@@ -21,6 +21,143 @@ body.app-body.role-technician {
   --sky-deep: var(--role-primary);
 }
 
+/* Shared Sidebar Layout — Manager and Technician */
+body.app-body.role-1 .sidebar,
+body.app-body.role-technician .sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 264px !important;
+  min-width: 264px !important;
+  padding: 20px 12px !important;
+}
+
+body.app-body.role-1 .sidebar .brand,
+body.app-body.role-technician .sidebar .brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 0 2px 10px !important;
+  margin-bottom: 6px !important;
+  order: 1 !important;
+}
+
+body.app-body.role-1 .brand-logo,
+body.app-body.role-1 .brand-mark,
+body.app-body.role-technician .brand-logo,
+body.app-body.role-technician .brand-mark {
+  width: 34px !important;
+  height: 34px !important;
+  flex: 0 0 34px !important;
+  flex-basis: 34px !important;
+  border-radius: 9px !important;
+}
+
+body.app-body.role-1 .shell-brand-copy,
+body.app-body.role-technician .shell-brand-copy {
+  display: grid !important;
+  gap: 0 !important;
+  min-width: 0 !important;
+}
+
+body.app-body.role-1 .shell-brand-copy strong,
+body.app-body.role-technician .shell-brand-copy strong {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  font-size: 13.5px !important;
+  line-height: 1.22 !important;
+}
+
+body.app-body.role-1 .shell-brand-copy span,
+body.app-body.role-technician .shell-brand-copy span {
+  display: block !important;
+  font-size: 10.5px !important;
+  line-height: 1.25 !important;
+}
+
+body.app-body.role-1 .nav-section-title,
+body.app-body.role-technician .nav-section-title {
+  margin: 0 0 10px !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+}
+
+body.app-body.role-1 .nav-link,
+body.app-body.role-technician .nav-link {
+  min-height: 40px !important;
+  margin-bottom: 3px !important;
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+  gap: 5px !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .shell-nav-item,
+body.app-body.role-technician .shell-nav-item {
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+body.app-body.role-1 .nav-icon,
+body.app-body.role-technician .nav-icon {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  flex: 0 0 18px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+body.app-body.role-1 .nav-label,
+body.app-body.role-technician .nav-label {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-1 .sidebar-profile,
+body.app-body.role-technician .sidebar-profile {
+  min-height: 54px !important;
+  padding: 8px 10px !important;
+  border-radius: 12px !important;
+  order: 10 !important;
+}
+
+body.app-body.role-1 .sidebar-profile-avatar,
+body.app-body.role-technician .sidebar-profile-avatar {
+  width: 30px !important;
+  height: 30px !important;
+  flex: 0 0 30px !important;
+  flex-basis: 30px !important;
+  border-radius: 9px !important;
+}
+
+body.app-body.role-1 .sidebar-profile-info,
+body.app-body.role-technician .sidebar-profile-info {
+  min-width: 0 !important;
+}
+
+body.app-body.role-1 .sidebar-account,
+body.app-body.role-technician .sidebar-account {
+  margin-top: 8px !important;
+  padding-top: 10px !important;
+  order: 11 !important;
+}
+
+body.app-body.role-1 .shell-logout,
+body.app-body.role-technician .shell-logout {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
 body.app-body.role-1 {
   --role-primary: var(--brand-blue-500);
   --role-primary-hover: var(--brand-blue-900);
@@ -11856,59 +11993,32 @@ body.app-body.role-1 .app-shell {
 }
 
 body.app-body.role-1 .sidebar {
-  width: 264px !important;
-  min-width: 264px !important;
-  padding: 24px 18px !important;
 }
 
 body.app-body.role-1 .brand-logo,
 body.app-body.role-1 .brand-mark {
-  width: 42px !important;
-  height: 42px !important;
-  flex-basis: 42px !important;
-  border-radius: 12px !important;
 }
 
 body.app-body.role-1 .brand strong {
-  font-size: 16px !important;
   font-weight: 700 !important;
 }
 
 body.app-body.role-1 .brand span {
-  font-size: 12px !important;
   color: #64748b !important;
 }
 
 body.app-body.role-1 .sidebar .brand {
-  gap: 12px !important;
-  padding: 0 0 20px !important;
-  margin-bottom: 18px !important;
 }
 
 body.app-body.role-1 .sidebar .nav-section-title {
-  margin: 0 0 10px !important;
-  font-size: 13px !important;
   font-weight: 600 !important;
   color: #94a3b8 !important;
 }
 
 body.app-body.role-1 .nav-link {
-  gap: 12px !important;
-  min-height: 48px !important;
-  padding: 12px 16px !important;
-  margin-bottom: 4px !important;
-  border-radius: 12px !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
 }
 
 body.app-body.role-1 .nav-icon {
-  width: 40px !important;
-  min-width: 40px !important;
-  height: 40px !important;
-  flex-basis: 40px !important;
-  border-radius: 10px !important;
-  font-size: 22px !important;
 }
 
 body.app-body.role-1 .nav-icon i {
@@ -11916,16 +12026,9 @@ body.app-body.role-1 .nav-icon i {
 }
 
 body.app-body.role-1 .sidebar-profile {
-  padding: 9px !important;
-  border-radius: 12px !important;
-  gap: 8px !important;
 }
 
 body.app-body.role-1 .sidebar-profile-avatar {
-  width: 31px !important;
-  height: 31px !important;
-  flex-basis: 31px !important;
-  border-radius: 10px !important;
 }
 
 body.app-body.role-1 .sidebar-profile-info strong {
@@ -12174,6 +12277,180 @@ body.app-body.role-1 .address-cell {
 @media (max-width: 640px) {
   body.app-body.role-1 .content {
     padding: 13px !important;
+  }
+}
+
+/* Manager sidebar alignment with the Technician shell */
+body.app-body.role-1 .app-shell {
+  grid-template-columns: 264px minmax(0, 1fr) !important;
+}
+
+body.app-body.role-1 .sidebar {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-right: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .sidebar .brand {
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+body.app-body.role-1 .brand-logo,
+body.app-body.role-1 .brand-mark {
+  border: 1px solid var(--brand-100, #dbeafe) !important;
+  background: var(--role-primary-soft, #eff6ff) !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, .16) !important;
+}
+
+body.app-body.role-1 .brand strong {
+  color: var(--role-ink, #0f172a) !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-1 .brand span {
+  color: var(--role-muted, #64748b) !important;
+}
+
+body.app-body.role-1 .shell-brand-copy {
+}
+
+body.app-body.role-1 .shell-brand-copy strong {
+}
+
+body.app-body.role-1 .shell-brand-copy span {
+}
+
+body.app-body.role-1 .nav-link {
+  color: #334155 !important;
+}
+
+body.app-body.role-1 .shell-nav-item {
+}
+
+body.app-body.role-1 .nav-icon {
+  color: #475569 !important;
+}
+
+body.app-body.role-1 .nav-icon i {
+  width: 18px !important;
+  height: 18px !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+
+body.app-body.role-1 .nav-link:hover .nav-icon,
+body.app-body.role-1 .nav-link.active .nav-icon {
+  background: transparent !important;
+}
+
+body.app-body.role-1 .nav-label {
+  white-space: nowrap !important;
+}
+
+body.app-body.role-1 .sidebar > .nav-section-title {
+  order: 2 !important;
+}
+
+body.app-body.role-1 .sidebar > .shell-nav-item {
+  order: 3 !important;
+}
+
+body.app-body.role-1 .sidebar-profile {
+  margin-top: auto !important;
+}
+
+body.app-body.role-1 .nav-link:hover {
+  background: #f8fafc !important;
+  color: #334155 !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .nav-link.active {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .nav-link:focus-visible {
+  outline: 2px solid var(--role-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Shared Sidebar Interaction */
+body.app-body.role-1 .nav-link,
+body.app-body.role-technician .nav-link {
+  transition: background-color .2s ease, color .2s ease, box-shadow .2s ease !important;
+}
+
+body.app-body.role-1 .nav-link:hover,
+body.app-body.role-technician .nav-link:hover,
+body.app-body.role-1 .shell-nav-item:hover,
+body.app-body.role-technician .shell-nav-item:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .nav-link.active,
+body.app-body.role-technician .nav-link.active,
+body.app-body.role-1 .shell-nav-item.active,
+body.app-body.role-technician .shell-nav-item.active {
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .nav-link:focus-visible,
+body.app-body.role-technician .nav-link:focus-visible {
+  outline: 2px solid var(--role-primary, #2563eb) !important;
+  outline-offset: 2px !important;
+}
+
+body.app-body.role-1 .nav-link,
+body.app-body.role-technician .nav-link {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+body.app-body.role-1 .sidebar-profile {
+  border: 1px solid var(--role-border, #e3e8ef) !important;
+  background: var(--slate-50, #f8fafc) !important;
+  box-shadow: var(--shadow-xs, 0 1px 2px rgba(15,23,42,.04)) !important;
+}
+
+body.app-body.role-1 .sidebar-profile-avatar {
+  background: var(--role-primary) !important;
+  color: #ffffff !important;
+}
+
+body.app-body.role-1 .sidebar-profile-info strong {
+  color: var(--role-ink, #0f172a) !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-1 .sidebar-profile-info span {
+  color: var(--role-muted, #64748b) !important;
+}
+
+body.app-body.role-1 .sidebar-account {
+  border-top: 1px solid #e5e7eb !important;
+}
+
+body.app-body.role-1 .shell-logout {
+}
+
+body.app-body.role-1 .shell-logout .nav-icon i {
+  width: 16px !important;
+  height: 16px !important;
+  font-size: 16px !important;
+}
+
+@media (max-width: 980px) {
+  body.app-body.role-1 .app-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-1 .sidebar {
+    width: 264px !important;
+    min-width: 264px !important;
   }
 }
 

@@ -55,30 +55,14 @@ function manager_home_time(?string $time): string
 
 function manager_home_is_overdue(array $row): bool
 {
-    $assign_status = (int) ($row['assign_status'] ?? 0);
-    if (!in_array($assign_status, [1, 2], true)) {
-        return false;
-    }
+    $warning = assignment_install_due_warning(
+        $row['assign_install_date'] ?? '',
+        $row['assign_install_time'] ?? '',
+        $row['assign_status'] ?? '',
+        'manager'
+    );
 
-    $install_date = trim((string) ($row['assign_install_date'] ?? ''));
-    $install_start = trim((string) ($row['assign_install_time'] ?? ''));
-    $install_end = trim((string) ($row['assign_install_end_time'] ?? ''));
-
-    if ($install_date === '') {
-        return false;
-    }
-
-    if ($install_end === '' && $install_start !== '') {
-        $start_ts = strtotime($install_date . ' ' . $install_start);
-        if ($start_ts !== false) {
-            $install_end = date('H:i:s', $start_ts + 7200);
-        }
-    }
-
-    $compare_time = $install_end !== '' ? $install_end : ($install_start !== '' ? $install_start : '23:59:59');
-    $deadline = strtotime($install_date . ' ' . $compare_time);
-
-    return $deadline !== false && $deadline < time();
+    return ($warning['level'] ?? '') === 'overdue';
 }
 
 function manager_home_status_text(array $row): string
@@ -226,6 +210,69 @@ usort($actionable_jobs, static function (array $a, array $b): int {
 });
 
 $actionable_jobs = array_slice($actionable_jobs, 0, 3);
+$manager_warning_counts = [
+    'waiting_near' => 0,
+    'today' => 0,
+    'overdue' => 0,
+    'reassign' => 0,
+];
+
+foreach ($dashboard_rows as $warning_row) {
+    $warning = assignment_install_due_warning(
+        $warning_row['assign_install_date'] ?? '',
+        $warning_row['assign_install_time'] ?? '',
+        $warning_row['assign_status'] ?? '',
+        'manager'
+    );
+    $assignStatus = (string) ($warning_row['assign_status'] ?? '');
+
+    if ($assignStatus === '1' && ($warning['level'] ?? '') === 'near') {
+        $manager_warning_counts['waiting_near']++;
+    }
+
+    if (assignment_install_due_filter_match('today', $warning, $assignStatus)) {
+        $manager_warning_counts['today']++;
+    }
+
+    if (($warning['level'] ?? '') === 'overdue') {
+        $manager_warning_counts['overdue']++;
+    }
+
+    if (assignment_install_due_filter_match('reassign', $warning, $assignStatus)) {
+        $manager_warning_counts['reassign']++;
+    }
+}
+
+$manager_warning_cards = [
+    [
+        'count' => $manager_warning_counts['waiting_near'],
+        'label' => '&#3591;&#3634;&#3609;&#3619;&#3629;&#3594;&#3656;&#3634;&#3591;&#3619;&#3633;&#3610;&#3651;&#3585;&#3621;&#3657;&#3606;&#3638;&#3591;&#3585;&#3635;&#3627;&#3609;&#3604;',
+        'class' => 'yellow',
+        'url' => app_system_url('manager/assignment_history.php?warning=near'),
+    ],
+    [
+        'count' => $manager_warning_counts['today'],
+        'label' => assignment_install_due_text('today'),
+        'class' => 'orange',
+        'url' => app_system_url('manager/assignment_history.php?warning=today'),
+    ],
+    [
+        'count' => $manager_warning_counts['overdue'],
+        'label' => assignment_install_due_text('overdue'),
+        'class' => 'red',
+        'url' => app_system_url('manager/assignment_history.php?warning=overdue'),
+    ],
+    [
+        'count' => $manager_warning_counts['reassign'],
+        'label' => assignment_install_due_text('manager_change_tech'),
+        'class' => 'red',
+        'url' => app_system_url('manager/assignment_history.php?warning=reassign'),
+    ],
+];
+
+$manager_warning_cards = array_values(array_filter($manager_warning_cards, static function (array $card): bool {
+    return (int) ($card['count'] ?? 0) > 0;
+}));
 
 $today = date('Y-m-d');
 $today_jobs = array_values(array_filter($dashboard_rows, static function (array $row) use ($today): bool {
@@ -512,6 +559,26 @@ layout_header('หน้าหลักหัวหน้าช่าง', 'dash
             </div>
         </section>
     </div>
+
+    <?php if (count($manager_warning_cards) > 0): ?>
+        <section class="manager-home-card manager-warning-overview-card">
+            <div class="manager-card-head">
+                <div>
+                    <h2>&#3591;&#3634;&#3609;&#3607;&#3637;&#3656;&#3605;&#3657;&#3629;&#3591;&#3605;&#3636;&#3604;&#3605;&#3634;&#3617;</h2>
+                    <p>&#3626;&#3619;&#3640;&#3611;&#3591;&#3634;&#3609;&#3607;&#3637;&#3656;&#3588;&#3623;&#3619;&#3605;&#3619;&#3623;&#3592;&#3626;&#3629;&#3610;&#3592;&#3634;&#3585;&#3585;&#3635;&#3627;&#3609;&#3604;&#3605;&#3636;&#3604;&#3605;&#3633;&#3657;&#3591;</p>
+                </div>
+            </div>
+
+            <div class="manager-warning-grid">
+                <?php foreach ($manager_warning_cards as $card): ?>
+                    <a class="manager-warning-card <?= h($card['class']) ?>" href="<?= h($card['url']) ?>">
+                        <span><?= $card['label'] ?></span>
+                        <b><?= h((string) $card['count']) ?></b>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </section>
+    <?php endif; ?>
 
     <div class="manager-home-row manager-home-row-bottom">
         <!-- งานเกินกำหนด -->

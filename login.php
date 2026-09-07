@@ -1,9 +1,5 @@
 <?php
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/customer_profiles.php';
-
-ensure_customer_profiles_schema($conn);
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirect_to(app_public_url('login.html'));
 }
@@ -56,52 +52,12 @@ try {
         redirect_to(app_system_url('technician/index.php'));
     }
 
-    if (!in_array($login_type, ['0', '1', '2', '3'], true)) {
+
+    if (!in_array($login_type, ['1', '2', '3'], true)) {
         redirect_to(app_public_url('login.html?error=invalid'));
     }
 
     $user_role = (int) $login_type;
-
-    if ($user_role === 0) {
-        $stmt = $conn->prepare("
-            SELECT
-              customer_id,
-              customer_name,
-              customer_email,
-              customer_status
-            FROM customers
-            WHERE customer_email = ?
-              AND customer_password = ?
-            LIMIT 1
-        ");
-
-        $stmt->bind_param('ss', $login_email, $password);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-
-        if ($result->num_rows !== 1) {
-            redirect_to(app_public_url('login.html?error=invalid'));
-        }
-
-        $customer = $result->fetch_assoc();
-
-        if ((int) ($customer['customer_status'] ?? 1) === 0) {
-            redirect_to(app_public_url('login.html?error=suspended'));
-        }
-
-        $_SESSION['logged_in'] = true;
-        $_SESSION['login_type'] = 'customer';
-        $_SESSION['customer_id'] = $customer['customer_id'];
-        $_SESSION['customer_name'] = $customer['customer_name'];
-        $_SESSION['customer_email'] = $customer['customer_email'];
-        $_SESSION['customer_status'] = (string) $customer['customer_status'];
-        $_SESSION['user_name'] = $customer['customer_name'];
-        $_SESSION['user_email'] = $customer['customer_email'];
-        $_SESSION['user_role'] = '0';
-
-        redirect_to(app_system_url('customer/index.php'));
-    }
 
     $stmt = $conn->prepare("
         SELECT

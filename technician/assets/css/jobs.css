@@ -1,0 +1,529 @@
+/* Shared Technician assignment/job list UI: accept_job.php + my_jobs.php */
+body.app-body.role-technician .technician-assignments-page {
+  display: grid !important;
+  gap: 16px !important;
+  width: min(100%, 1240px) !important;
+  max-width: 1240px !important;
+  margin: 0 auto !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .ref-icon {
+  display: inline-block !important;
+  flex: 0 0 auto !important;
+  width: 1em;
+  height: 1em;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  fill: none !important;
+  vertical-align: -0.125em !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .page-header {
+  margin: 0 0 2px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .page-header h1 {
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .page-header p {
+  margin: 4px 0 0 !important;
+  color: #64748b !important;
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .search-bar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 0 0 2px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .input-wrap {
+  position: relative !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .input-wrap .lead {
+  position: absolute !important;
+  top: 50% !important;
+  left: 14px !important;
+  display: inline-flex !important;
+  width: 18px !important;
+  height: 18px !important;
+  color: #64748b !important;
+  transform: translateY(-50%) !important;
+  pointer-events: none !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .input-wrap .lead .ref-icon {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .input {
+  width: 100% !important;
+  height: 40px !important;
+  border: 1px solid #d5dde8 !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .input.with-lead {
+  padding: 10px 14px 10px 42px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 auto !important;
+  gap: 8px !important;
+  min-height: 38px !important;
+  padding: 9px 16px !important;
+  border-radius: 9px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .btn-primary {
+  border: 1px solid #2563eb !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .btn-outline {
+  border: 1px solid #d5dde8 !important;
+  background: #ffffff !important;
+  color: #334155 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .flex {
+  display: flex !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .items-center {
+  align-items: center !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .justify-between {
+  justify-content: space-between !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .gap-4 {
+  gap: 4px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .gap-12 {
+  gap: 12px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .mb-16 {
+  margin-bottom: 2px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .text-xs {
+  font-size: 12px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .text-muted {
+  color: #64748b !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .technician-filter-row {
+  margin-top: 0 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .chip-group {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-height: 34px !important;
+  padding: 7px 14px !important;
+  border: 1px solid #e6ebf2 !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  color: #64748b !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .chip:hover {
+  color: #64748b !important;
+  font-weight: 500 !important;
+  transform: none !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .chip.active {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .chip-count {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 22px !important;
+  height: 22px !important;
+  padding: 0 7px !important;
+  border-radius: 999px !important;
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+  font-family: 'Inter', 'Noto Sans Thai', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .chip.active .chip-count {
+  background: rgba(255, 255, 255, .24) !important;
+  color: #ffffff !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .technician-sort-note {
+  white-space: nowrap !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-list {
+  display: grid !important;
+  gap: 14px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .card {
+  border: 1px solid #e6ebf2 !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .04) !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-card {
+  display: block;
+  padding: 18px 20px !important;
+  border: 1px solid #e6ebf2 !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .04) !important;
+  transition: box-shadow 150ms ease, transform 150ms ease, border-color 150ms ease !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-card:hover {
+  border-color: #d5dde8 !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, .07), 0 2px 4px rgba(15, 23, 42, .04) !important;
+  transform: translateY(-1px) !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-card-head,
+body.app-body.role-technician .technician-assignments-page .job-card-foot {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 20px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-card-head {
+  padding-bottom: 14px !important;
+  margin-bottom: 14px !important;
+  border-bottom: 1px dashed #e6ebf2 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-id {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  color: #64748b !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-id strong {
+  color: #0f172a !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-id .ref-icon {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  min-height: 24px !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .badge .dot {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 999px !important;
+  background: currentColor !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .badge.blue {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .badge.green,
+body.app-body.role-technician .technician-assignments-page .badge.success {
+  background: #ecfdf5 !important;
+  color: #059669 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .badge.info {
+  background: #eef2ff !important;
+  color: #4f46e5 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-body {
+  display: grid !important;
+  grid-template-columns: 1.4fr 1fr 1fr !important;
+  gap: 20px !important;
+  padding: 0 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-field {
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-field-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-bottom: 6px !important;
+  color: #94a3b8 !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-field-value {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .customer-avatar {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  flex: 0 0 36px !important;
+  border-radius: 999px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-field-sub {
+  display: block !important;
+  margin-top: 2px !important;
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+  color: #64748b !important;
+  font-size: 12.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-field-sub.inline-sub {
+  display: inline !important;
+  margin-top: 0 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .address-sub {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .qty-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3px 10px !important;
+  border-radius: 999px !important;
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .product-summary-line {
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-total {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-total-label {
+  color: #94a3b8 !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-total-value {
+  color: #0f172a !important;
+  font-family: 'Inter', 'Noto Sans Thai', sans-serif !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums !important;
+  line-height: 1.1 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-total-value .unit {
+  margin-left: 2px !important;
+  color: #64748b !important;
+  font-size: 12.5px !important;
+  font-weight: 400 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-card-foot {
+  margin-top: 16px !important;
+  padding: 14px 0 0 !important;
+  border-top: 1px solid #e6ebf2 !important;
+  background: #ffffff !important;
+  justify-content: flex-end !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .job-actions form {
+  margin: 0 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .empty {
+  display: grid !important;
+  justify-items: center !important;
+  gap: 8px !important;
+  padding: 38px 18px !important;
+  text-align: center !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .empty-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 54px !important;
+  height: 54px !important;
+  border-radius: 18px !important;
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  font-size: 24px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .empty h3 {
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .empty p {
+  margin: 0 !important;
+  color: #64748b !important;
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+}
+
+@media (max-width: 980px) {
+  body.app-body.role-technician .technician-assignments-page .search-bar,
+  body.app-body.role-technician .technician-assignments-page .job-body {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-technician .technician-assignments-page .search-bar {
+    display: grid !important;
+  }
+
+  body.app-body.role-technician .technician-assignments-page .search-bar .btn {
+    width: 100% !important;
+  }
+
+  body.app-body.role-technician .technician-assignments-page .job-card-head,
+  body.app-body.role-technician .technician-assignments-page .job-card-foot {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+
+  body.app-body.role-technician .technician-assignments-page .job-actions,
+  body.app-body.role-technician .technician-assignments-page .job-actions form,
+  body.app-body.role-technician .technician-assignments-page .job-actions .btn {
+    width: 100% !important;
+  }
+}

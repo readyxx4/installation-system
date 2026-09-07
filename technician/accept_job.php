@@ -185,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $conn->commit();
 
-            redirect_to(app_system_url('technician/accept_job.php?status=accept_updated'));
+            redirect_to(app_system_url('technician/my_jobs.php?status=accept_updated'));
         }
 
         if ($action === 'reject') {
@@ -441,7 +441,7 @@ layout_header('ยืนยันการรับงาน', 'accept_job', '�
             </div>
 
             <?php if ($job_warning_badge): ?>
-              <span class="badge warning"><span class="dot"></span>งานด่วน</span>
+              <span class="badge warning accept-urgent-badge"><span class="dot"></span>งานด่วน</span>
             <?php endif; ?>
           </div>
 
@@ -530,10 +530,6 @@ layout_header('ยืนยันการรับงาน', 'accept_job', '�
     <?php endforeach; ?>
   </div>
 </section>
-<script
-  src="<?= h(app_asset_url('sale/assets/js/setups.js')) ?>?v=<?= h(asset_version('sale/assets/js/setups.js')) ?>"
-  defer
-></script>
 <script
   src="<?= h(app_asset_url('technician/assets/js/technician.js')) ?>?v=<?= h(asset_version('technician/assets/js/technician.js')) ?>"
   defer

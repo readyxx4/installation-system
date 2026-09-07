@@ -1,0 +1,79 @@
+/* =========================================================
+   Core Design Tokens
+   Shared variables for Admin, Sale, Manager, Technician, and Customer.
+   Keep values aligned with the legacy root tokens to preserve visuals.
+   ========================================================= */
+
+:root {
+  --brand-blue-50: #E3F2FD;
+  --brand-blue-200: #90CAF9;
+  --brand-blue-500: #2196F3;
+  --brand-blue-900: #0D47A1;
+  --primary: #2f6fed;
+  --primary-dark: #1f4fc4;
+  --sky-light: #d9ecff;
+  --sky-deep: #4f8ef7;
+  --ink: #1d2939;
+  --muted: #667085;
+  --border: #e3e8ef;
+  --danger: #e23b3b;
+  --danger-bg: #fdecec;
+  --success: #1a7f4a;
+  --success-bg: #edfdf5;
+  --warning: #c2410c;
+  --warning-bg: #fff7ed;
+  --panel-bg: #ffffff;
+  --soft-bg: #f8faff;
+  --page-bg: #f3f6fb;
+  --shadow-soft: 0 14px 34px -26px rgba(15, 23, 42, 0.35);
+  --role-primary: var(--primary);
+  --role-primary-hover: var(--primary-dark);
+  --role-soft: var(--sky-light);
+  --role-border: var(--border);
+  --role-ink: var(--ink);
+  --role-muted: var(--muted);
+
+  --color-white: #ffffff;
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-900: #0f172a;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-pill: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.07);
+  --shadow-md: 0 10px 24px rgba(15, 23, 42, 0.10);
+  --shadow-lg: 0 18px 50px -22px rgba(31, 79, 196, 0.35);
+
+  --font-main: "Noto Sans Thai", "Sarabun", "Segoe UI", sans-serif;
+  --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-number: "Inter", "Noto Sans Thai", sans-serif;
+
+  --transition-fast: 0.18s ease;
+  --transition-base: 0.2s ease;
+
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal: 9999;
+  --z-toast: 99999;
+}

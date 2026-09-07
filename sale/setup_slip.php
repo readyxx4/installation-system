@@ -254,9 +254,9 @@ foreach ($items as $item) {
     $total_amount += (float) ($item['install_total'] ?? 0);
 }
 
-$company_name = 'ห้างโอวเปงฮง จำกัด';
-$company_address = 'บริการติดตั้งและจัดการงานติดตั้งเครื่องใช้ไฟฟ้า';
-$logo_path = 'uploads/system/owpenghong_logo.jpg';
+$company_name = '';
+$company_address = '';
+$logo_path = '';
 
 if (slip_table_exists($conn, 'system')) {
     $system_result = $conn->query("SELECT system_name, system_desc, system_logo FROM system LIMIT 1");
@@ -279,7 +279,7 @@ if (slip_table_exists($conn, 'system')) {
  * ข้อมูลบริษัทสำหรับเอกสารใบติดตั้ง
  * อ้างอิงสำนักงานใหญ่ของ บริษัท ห้างโอวเปงฮง (2009) จำกัด
  */
-$slip_company_name = 'บริษัท ห้างโอวเปงฮง (2009) จำกัด';
+$slip_company_name = $company_name !== '' ? $company_name : 'บริษัท ห้างโอวเปงฮง (2009) จำกัด';
 $slip_company_branch = 'สำนักงานใหญ่';
 $slip_company_address = '311-315 หมู่ที่ 2 ถนนราชนิกูล ตำบลในเมือง อำเภอบ้านไผ่ จังหวัดขอนแก่น 40110';
 $slip_company_phone = '043-272-136';
@@ -454,3 +454,5 @@ layout_header('ใบติดตั้ง', 'setups');
 
 
 <?php layout_footer(); ?>
+
+

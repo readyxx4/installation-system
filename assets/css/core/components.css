@@ -1,0 +1,699 @@
+/* =========================================================
+   Core Components
+   Reserved for shared card, button, badge, input, search,
+   table, timeline, alert, avatar, dropdown, modal,
+   pagination, empty-state, and loading rules after duplicate
+   role selectors are safely consolidated.
+   ========================================================= */
+
+.card,
+.panel,
+.summary-card,
+.admin-summary-card,
+.manager-summary-card,
+.manager-home-summary-card,
+.manager-home-panel,
+.dashboard-panel,
+.admin-widget,
+.stat-card,
+.job-card,
+.sale-detail-summary-card,
+.sale-detail-process-card,
+.sales-summary-card {
+  background: var(--panel-bg, #ffffff);
+  border: 1px solid var(--border, #e3e8ef);
+  border-radius: var(--radius-xl, 18px);
+  box-shadow: var(--shadow-soft, 0 14px 34px -26px rgba(15, 23, 42, 0.35));
+}
+
+.card-header,
+.panel-title-row,
+.admin-widget-head,
+.dashboard-panel-head,
+.manager-home-panel-head,
+.job-card-head {
+  min-width: 0;
+}
+
+.card-body,
+.panel-body {
+  min-width: 0;
+}
+
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-success,
+.btn-warning,
+.btn-outline,
+.btn-small,
+.btn-sm,
+.btn-edit,
+.btn-delete,
+.btn-search,
+.btn-reset,
+.btn-add,
+.action-btn,
+.detail-btn,
+.cancel-btn,
+.accept-btn,
+.reject-btn,
+.submit-btn,
+.back-btn,
+.cs-add-btn,
+.cs-save-btn,
+.cs-back-btn,
+.cs-row-add-btn,
+.staff-save-btn,
+.staff-cancel-btn,
+.manager-action-btn,
+.assignment-search-btn,
+.assignment-reset-btn,
+.assignment-add-btn-inline,
+.assignment-top-assign-btn,
+.assignment-assign-now-btn,
+.manager-custom-time-btn,
+.manager-modal-cancel-btn,
+.product-detail-btn,
+.setup-submit-btn,
+.product-detail-button,
+.customer-detail-button,
+.btn-detail {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  border-radius: var(--radius-md, 10px);
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--transition-fast, 0.18s ease),
+    box-shadow var(--transition-fast, 0.18s ease),
+    background var(--transition-fast, 0.18s ease),
+    color var(--transition-fast, 0.18s ease),
+    border-color var(--transition-fast, 0.18s ease);
+}
+
+.btn:disabled,
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-danger:disabled,
+.btn-success:disabled,
+.btn-warning:disabled,
+.btn-outline:disabled,
+.btn-small:disabled,
+.btn-sm:disabled,
+.btn-edit:disabled,
+.btn-delete:disabled,
+.btn-search:disabled,
+.btn-reset:disabled,
+.btn-add:disabled,
+.action-btn:disabled,
+.detail-btn:disabled,
+.cancel-btn:disabled,
+.accept-btn:disabled,
+.reject-btn:disabled,
+.submit-btn:disabled,
+.back-btn:disabled,
+.cs-add-btn:disabled,
+.cs-save-btn:disabled,
+.cs-back-btn:disabled,
+.cs-row-add-btn:disabled,
+.staff-save-btn:disabled,
+.staff-cancel-btn:disabled,
+.manager-action-btn:disabled,
+.assignment-search-btn:disabled,
+.assignment-reset-btn:disabled,
+.assignment-add-btn-inline:disabled,
+.assignment-top-assign-btn:disabled,
+.assignment-assign-now-btn:disabled,
+.manager-custom-time-btn:disabled,
+.manager-modal-cancel-btn:disabled,
+.product-detail-btn:disabled,
+.setup-submit-btn:disabled,
+.product-detail-button:disabled,
+.customer-detail-button:disabled,
+.btn-detail:disabled,
+.btn.is-disabled,
+.disabled-link {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.badge,
+.status-badge,
+.status-pill,
+.pill,
+.tag,
+.chip,
+.count-badge,
+.nav-badge,
+.sidebar-badge,
+.status-count-badge,
+.qty-pill,
+.payment-status,
+.sales-payment-status,
+.setup-status-badge,
+.cs-status-tab,
+.cs-history-status-badge,
+.assignment-status-tab,
+.admin-soft-badge,
+.admin-date-pill,
+.manager-badge,
+.manager-soft-badge,
+.manager-queue-status,
+.manager-overdue-badge,
+.manager-home-pill,
+.manager-tech-chip,
+.setup-item-count,
+.install-due-badge,
+.detail-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: var(--radius-pill, 999px);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body.app-body :where(.toolbar, .search-bar, .filter-bar, .input-group) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+}
+
+body.app-body :where(
+  .form-control,
+  .form-input,
+  .form-select,
+  .form-textarea,
+  .search-input,
+  .select-control,
+  .toolbar input,
+  .toolbar select,
+  .search-bar input,
+  .search-box input,
+  .filter-bar input,
+  .filter-bar select,
+  .input-group input,
+  .input-group select,
+  .admin-form input,
+  .admin-form select,
+  .admin-form textarea,
+  .staff-input-wrap input,
+  .staff-input-wrap select,
+  .staff-textarea-wrap textarea,
+  .cs-form-field input,
+  .cs-form-field select,
+  .cs-form-field textarea,
+  .manager-select-card select,
+  .manager-note-card textarea,
+  .manager-custom-time-grid input[type="time"],
+  .assignment-search-form input,
+  .assignment-search-field input,
+  .summary-form-section textarea,
+  .action-panel__form textarea
+) {
+  min-width: 0;
+  font-family: inherit;
+  border-radius: var(--radius-md, 10px);
+  background: var(--panel-bg, #ffffff);
+  transition: border-color var(--transition-fast, 0.18s ease),
+    box-shadow var(--transition-fast, 0.18s ease),
+    background var(--transition-fast, 0.18s ease),
+    color var(--transition-fast, 0.18s ease);
+}
+
+body.app-body :where(
+  .form-control,
+  .form-input,
+  .form-select,
+  .form-textarea,
+  .search-input,
+  .select-control,
+  .toolbar input,
+  .toolbar select,
+  .search-bar input,
+  .search-box input,
+  .filter-bar input,
+  .filter-bar select,
+  .input-group input,
+  .input-group select,
+  .admin-form input,
+  .admin-form select,
+  .admin-form textarea,
+  .staff-input-wrap input,
+  .staff-input-wrap select,
+  .staff-textarea-wrap textarea,
+  .cs-form-field input,
+  .cs-form-field select,
+  .cs-form-field textarea,
+  .manager-select-card select,
+  .manager-note-card textarea,
+  .manager-custom-time-grid input[type="time"],
+  .assignment-search-form input,
+  .assignment-search-field input,
+  .summary-form-section textarea,
+  .action-panel__form textarea
+):focus,
+body.app-body :where(
+  .form-control,
+  .form-input,
+  .form-select,
+  .form-textarea,
+  .search-input,
+  .select-control,
+  .toolbar input,
+  .toolbar select,
+  .search-bar input,
+  .search-box input,
+  .filter-bar input,
+  .filter-bar select,
+  .input-group input,
+  .input-group select,
+  .admin-form input,
+  .admin-form select,
+  .admin-form textarea,
+  .staff-input-wrap input,
+  .staff-input-wrap select,
+  .staff-textarea-wrap textarea,
+  .cs-form-field input,
+  .cs-form-field select,
+  .cs-form-field textarea,
+  .manager-select-card select,
+  .manager-note-card textarea,
+  .manager-custom-time-grid input[type="time"],
+  .assignment-search-form input,
+  .assignment-search-field input,
+  .summary-form-section textarea,
+  .action-panel__form textarea
+):focus-visible {
+  outline: none;
+  border-color: var(--role-primary, var(--primary, #2f6fed));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--role-primary, var(--primary, #2f6fed)) 14%, transparent);
+}
+
+body.app-body :where(
+  .form-control,
+  .form-input,
+  .form-select,
+  .form-textarea,
+  .search-input,
+  .select-control,
+  .toolbar input,
+  .toolbar select,
+  .search-bar input,
+  .search-box input,
+  .filter-bar input,
+  .filter-bar select,
+  .input-group input,
+  .input-group select,
+  .admin-form input,
+  .admin-form select,
+  .admin-form textarea,
+  .staff-input-wrap input,
+  .staff-input-wrap select,
+  .staff-textarea-wrap textarea,
+  .cs-form-field input,
+  .cs-form-field select,
+  .cs-form-field textarea,
+  .manager-select-card select,
+  .manager-note-card textarea,
+  .manager-custom-time-grid input[type="time"],
+  .assignment-search-form input,
+  .assignment-search-field input,
+  .summary-form-section textarea,
+  .action-panel__form textarea
+):disabled,
+body.app-body :where(
+  .form-control,
+  .form-input,
+  .form-select,
+  .form-textarea,
+  .search-input,
+  .select-control
+)[readonly] {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+body.app-body :where(
+  .table-wrap,
+  .table-wrapper,
+  .table-responsive,
+  .manager-table-wrap,
+  .assignment-table-wrap,
+  .cs-table-wrap,
+  .cs-choice-table-wrap,
+  .cs-job-status-table-wrap,
+  .cs-setups-table-wrap,
+  .manager-tech-queue-table-wrap
+) {
+  min-width: 0;
+}
+
+body.app-body :where(
+  .table,
+  .data-table,
+  .admin-table,
+  .sale-table,
+  .manager-table,
+  .assignment-table,
+  .assignment-detail-table,
+  .assignment-history-compact-table,
+  .payment-table,
+  .history-table,
+  .cs-data-table,
+  .cs-job-status-table,
+  .cs-setups-table-clean,
+  .setup-source-table,
+  .customer-data-table,
+  .manager-tech-queue-table,
+  .manager-tech-week-table,
+  .install-slip-table,
+  .slip-table,
+  .sale-detail-product-table,
+  .product-table__table
+) {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-family: inherit;
+}
+
+body.app-body :where(
+  .table,
+  .data-table,
+  .admin-table,
+  .sale-table,
+  .manager-table,
+  .assignment-table,
+  .assignment-detail-table,
+  .assignment-history-compact-table,
+  .payment-table,
+  .history-table,
+  .cs-data-table,
+  .cs-job-status-table,
+  .cs-setups-table-clean,
+  .setup-source-table,
+  .customer-data-table,
+  .manager-tech-queue-table,
+  .manager-tech-week-table,
+  .install-slip-table,
+  .slip-table
+) :where(th, td) {
+  vertical-align: middle;
+  text-align: left;
+}
+
+body.app-body :where(
+  .modal-overlay,
+  .modal-backdrop,
+  .dialog-overlay,
+  .popup-overlay,
+  .product-detail-modal,
+  .cs-cancel-modal,
+  .assignment-cancel-modal
+) {
+  position: fixed;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal, 9999);
+}
+
+body.app-body :where(
+  .modal-backdrop,
+  .dialog-overlay,
+  .popup-overlay,
+  .product-detail-backdrop,
+  .cs-cancel-modal-backdrop,
+  .assignment-cancel-backdrop
+) {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.48);
+}
+
+body.app-body :where(
+  .modal-box,
+  .modal-content,
+  .modal-card,
+  .modal-dialog,
+  .dialog,
+  .popup,
+  .product-detail-dialog,
+  .cs-cancel-modal-dialog,
+  .assignment-cancel-dialog
+) {
+  position: relative;
+  width: 100%;
+  max-width: min(100%, 560px);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: var(--radius-xl, 18px);
+  background: var(--panel-bg, #ffffff);
+  box-shadow: var(--shadow-modal, 0 30px 80px rgba(15, 23, 42, 0.25));
+  z-index: 1;
+}
+
+body.app-body :where(
+  .modal-header,
+  .modal-head,
+  .modal-body,
+  .modal-footer,
+  .manager-modal-head,
+  .cs-cancel-modal-content,
+  .cs-cancel-modal-actions,
+  .assignment-cancel-copy,
+  .assignment-cancel-actions
+) {
+  min-width: 0;
+}
+
+body.app-body :where(
+  .alert,
+  .alert-success,
+  .alert-warning,
+  .alert-danger,
+  .alert-info,
+  .notice,
+  .notice-box,
+  .warning-box,
+  .info-box,
+  .callout,
+  .hint,
+  .flash,
+  .manager-warning,
+  .manager-page-alert,
+  .manager-unavailable-tech-warning,
+  .manager-overdue-action-alert,
+  .assignment-tech-warning,
+  .history-tech-warning,
+  .technician-warning,
+  .detail-alert,
+  .install-warning,
+  .due-warning,
+  .next-step-callout,
+  .action-panel__state
+) {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 12px);
+  border-radius: var(--radius-md, 10px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  border: 1px solid var(--border, #e3e8ef);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+body.app-body :where(
+  .alert,
+  .alert-success,
+  .alert-warning,
+  .alert-danger,
+  .alert-info,
+  .notice,
+  .notice-box,
+  .warning-box,
+  .info-box,
+  .callout,
+  .hint,
+  .flash,
+  .manager-warning,
+  .manager-page-alert,
+  .manager-unavailable-tech-warning,
+  .manager-overdue-action-alert,
+  .assignment-tech-warning,
+  .history-tech-warning,
+  .technician-warning,
+  .detail-alert,
+  .install-warning,
+  .due-warning,
+  .next-step-callout,
+  .action-panel__state
+) :where(svg, .icon, .alert-icon, .callout-icon, .manager-unavailable-warning-icon, .manager-overdue-alert-icon, .history-tech-warning-dot) {
+  flex: 0 0 auto;
+}
+
+body.app-body :where(
+  .empty-state,
+  .empty-message,
+  .admin-empty-mini,
+  .empty-dashboard,
+  .manager-empty-state,
+  .manager-home-empty,
+  .manager-empty-cell,
+  .manager-schedule-empty-day,
+  .calendar-empty,
+  .cs-empty-cell,
+  .cs-cart-empty,
+  .summary-empty,
+  .setup-empty-state,
+  .sale-detail-empty,
+  .technician-mini-empty,
+  .technician-notification-empty,
+  .product-table__empty
+) {
+  min-width: 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+body.app-body :where(
+  .timeline,
+  .detail-timeline,
+  .assignment-timeline,
+  .setup-timeline,
+  .status-timeline,
+  .stepper,
+  .setup-tabs,
+  .progress
+) {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4, 16px);
+  min-width: 0;
+  font-family: inherit;
+}
+
+body.app-body :where(
+  .timeline-step,
+  .timeline-content,
+  .step,
+  .setup-tab,
+  .progress-bar
+) {
+  min-width: 0;
+  transition: background var(--transition-fast, 0.18s ease),
+    color var(--transition-fast, 0.18s ease),
+    border-color var(--transition-fast, 0.18s ease),
+    box-shadow var(--transition-fast, 0.18s ease),
+    transform var(--transition-fast, 0.18s ease);
+}
+
+body.app-body :where(
+  .timeline-step,
+  .step
+) {
+  position: relative;
+}
+
+body.app-body :where(
+  .timeline-node,
+  .step-node,
+  .setup-tab span
+) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: var(--radius-pill, 999px);
+  font-family: inherit;
+  line-height: 1;
+  transition: background var(--transition-fast, 0.18s ease),
+    color var(--transition-fast, 0.18s ease),
+    border-color var(--transition-fast, 0.18s ease),
+    box-shadow var(--transition-fast, 0.18s ease);
+}
+
+body.app-body :where(
+  .timeline-line,
+  .step-line,
+  .progress-bar
+) {
+  min-width: 0;
+}
+
+body.app-body :where(
+  .timeline-label,
+  .timeline-meta,
+  .step-label,
+  .step-meta
+) {
+  min-width: 0;
+  line-height: 1.4;
+}
+
+body.app-body :where(
+  .dropdown,
+  .notification,
+  .technician-notification-menu,
+  .user-menu,
+  .profile-menu,
+  .menu-popup,
+  .popover,
+  .tooltip,
+  .address-dropdown
+) {
+  position: relative;
+  min-width: 0;
+}
+
+body.app-body :where(
+  .dropdown-menu,
+  .notification-menu,
+  .notification-dropdown,
+  .technician-notification-dropdown,
+  .menu-popup,
+  .popover,
+  .tooltip,
+  .address-select-menu
+) {
+  position: absolute;
+  min-width: 0;
+  border-radius: var(--radius-lg, 14px);
+  border: 1px solid var(--border, #e3e8ef);
+  background: var(--panel-bg, #ffffff);
+  box-shadow: var(--shadow-popover, 0 18px 45px rgba(15, 23, 42, 0.16));
+  padding: 0;
+  z-index: var(--z-dropdown, 1000);
+  overflow: hidden;
+  transition: opacity var(--transition-fast, 0.18s ease),
+    transform var(--transition-fast, 0.18s ease),
+    visibility var(--transition-fast, 0.18s ease),
+    box-shadow var(--transition-fast, 0.18s ease);
+}
+
+body.app-body :where(
+  .dropdown-item,
+  .notification-item,
+  .technician-notification-item,
+  .address-select-option
+) {
+  min-width: 0;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-fast, 0.18s ease),
+    color var(--transition-fast, 0.18s ease);
+}
+
+body.app-body :where(
+  .account-menu,
+  .sidebar-account
+) {
+  min-width: 0;
+}

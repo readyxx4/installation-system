@@ -1,0 +1,16 @@
+/* my_jobs.php only */
+body.app-body.role-technician .technician-my-jobs-page .badge.blue {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+}
+
+body.app-body.role-technician .technician-my-jobs-page .badge.green,
+body.app-body.role-technician .technician-my-jobs-page .badge.success {
+  background: #ecfdf5 !important;
+  color: #059669 !important;
+}
+
+body.app-body.role-technician .technician-my-jobs-page .badge.info {
+  background: #eef2ff !important;
+  color: #4f46e5 !important;
+}

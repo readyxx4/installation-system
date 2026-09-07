@@ -1,0 +1,60 @@
+/* setup_slip.php only */
+body.app-body.role-technician .install-slip-page {
+  width: min(100%, var(--tech-content-max)) !important;
+  max-width: var(--tech-content-max) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 0 !important;
+}
+
+body.app-body.role-technician .install-slip-toolbar {
+  margin-bottom: 14px !important;
+}
+
+body.app-body.role-technician .install-slip-paper {
+  padding: 26px !important;
+  border: 1px solid var(--tech-border) !important;
+  border-radius: var(--tech-radius) !important;
+  background: var(--tech-surface) !important;
+  box-shadow: var(--tech-shadow) !important;
+}
+
+body.app-body.role-technician .install-slip-back,
+body.app-body.role-technician .install-slip-print {
+  border-radius: 10px !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-technician .install-slip-print {
+  border-color: var(--tech-primary) !important;
+  background: var(--tech-primary) !important;
+  color: #ffffff !important;
+}
+
+body.app-body.role-technician .install-slip-back {
+  border: 1px solid var(--tech-border) !important;
+  background: var(--slate-100, #f1f5f9) !important;
+  color: var(--slate-700, #334155) !important;
+}
+
+body.app-body.role-technician .install-slip-table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  width: 100% !important;
+}
+
+body.app-body.role-technician .install-slip-table th {
+  background: var(--slate-50, #f8fafc) !important;
+  color: var(--slate-600, #475569) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--tech-border) !important;
+}
+
+body.app-body.role-technician .install-slip-table td {
+  color: var(--tech-ink) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  border-bottom: 1px solid var(--tech-border) !important;
+}

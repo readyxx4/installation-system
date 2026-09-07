@@ -1,6 +1,8 @@
+@import url("core/variables.css");
+
 :root {
-  --brand-light: #E3F2FD;
-  --brand-soft: #90CAF9;
-  --brand-primary: #2196F3;
-  --brand-dark: #0D47A1;
+  --brand-light: var(--brand-blue-50);
+  --brand-soft: var(--brand-blue-200);
+  --brand-primary: var(--brand-blue-500);
+  --brand-dark: var(--brand-blue-900);
 }

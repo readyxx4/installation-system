@@ -43,7 +43,6 @@ function icon_svg(string $name): string
     'user' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>',
     'mail' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg>',
     'phone' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7"></path></svg>',
-    'role' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.4 8.4-8 9-4.6-.6-8-4-8-9V7l8-4z"></path><path d="M9 12l2 2 4-5"></path></svg>',
     'lock' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>',
     'map' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"></path><path d="M9 3v15"></path><path d="M15 6v15"></path></svg>',
     'save' => '<svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><path d="M17 21v-8H7v8"></path></svg>',
@@ -109,8 +108,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $district_id = (int) ($_POST['district_id'] ?? 0);
   $sub_district_id = (int) ($_POST['sub_district_id'] ?? 0);
   $zip_code = trim($_POST['zip_code'] ?? '');
-  $user_role = 0;
-  $user_password = '1234';
 
   if (
     $user_id === '' ||
@@ -121,8 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $province_id <= 0 ||
     $district_id <= 0 ||
     $sub_district_id <= 0 ||
-    $zip_code === '' ||
-    $user_role === ''
+    $zip_code === ''
   ) {
     redirect_to(app_system_url('admin/customer_add.php?status=error'));
   }
@@ -144,7 +140,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   
-  $user_role = 0;
 
   try {
     $transaction_started = false;
@@ -240,19 +235,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       INSERT INTO customers
       (
         customer_id,
-        customer_password,
         customer_name,
         customer_phone,
         customer_email,
         customer_address,
         customer_status
       )
-      VALUES (?, ?, ?, ?, ?, ?, 1)
+      VALUES (?, ?, ?, ?, ?, 1)
     ");
     $stmt->bind_param(
-      'ssssss',
+      'sssss',
       $user_id,
-      $user_password,
       $user_name,
       $user_phone,
       $user_email,
@@ -334,7 +327,6 @@ layout_header('เพิ่มข้อมูลลูกค้า', 'users');
         </div>
       </div>
 
-      <div class="staff-field readonly-field"><label>สิทธิ์การใช้งาน</label><div class="staff-input-wrap"><input type="text" value="ลูกค้า" readonly></div></div>
 
       <div class="staff-field staff-field-full">
         <label for="user_name">ชื่อ-นามสกุล *</label>
@@ -382,19 +374,6 @@ layout_header('เพิ่มข้อมูลลูกค้า', 'users');
           >
         </div>
         <div class="field-live-error" id="emailDuplicateError" aria-live="polite"></div>
-      </div>
-
-      <div class="staff-field staff-field-full">
-        <label for="default_password">รหัสผ่านเริ่มต้น</label>
-        <div class="staff-input-wrap readonly-field">
-          <?= icon_svg('lock') ?>
-          <input
-            type="text"
-            id="default_password"
-            value="1234"
-            readonly
-          >
-        </div>
       </div>
 
       <div class="staff-field staff-field-full staff-address-section">

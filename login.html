@@ -354,11 +354,11 @@
       <div class="login-form-card-final">
         <div class="login-brand-final">
           <div class="login-logo-final">
-            <img src="uploads/system/owpenghong_logo.jpg" alt="โลโก้ห้างโอวเปงฮง">
+            <img id="systemLogo" src="uploads/system/owpenghong_logo.jpg" alt="โลโก้ห้างโอวเปงฮง">
           </div>
           <div>
-            <strong>ห้างโอวเปงฮง จำกัด</strong>
-            <span>Installation System</span>
+            <strong id="systemName">ห้างโอวเปงฮง จำกัด</strong>
+            <span id="systemDesc">Installation System</span>
           </div>
         </div>
 
@@ -410,7 +410,6 @@
               <span class="login-icon-final">☷</span>
               <select id="login_type" name="login_type" required>
                 <option value="" selected disabled>กรุณาเลือกประเภทผู้ใช้งาน</option>
-                <option value="0">ลูกค้า</option>
                 <option value="1">หัวหน้าช่าง</option>
                 <option value="2">พนักงานขาย</option>
                 <option value="3">ผู้ดูแลระบบ</option>
@@ -423,10 +422,6 @@
         </form>
 
         <div class="login-links-final">
-          <div class="login-register-link-final">
-            <a href="register.html">สมัครสมาชิก</a>
-          </div>
-
           <a class="forgot-password-link-final" href="forgot_password.html">
             ลืมรหัสผ่าน
           </a>
@@ -436,6 +431,39 @@
   </main>
 
   <script>
+    (function loadSystemInfo() {
+      const systemLogo = document.getElementById('systemLogo');
+      const systemName = document.getElementById('systemName');
+      const systemDesc = document.getElementById('systemDesc');
+
+      fetch('system_info.php', { cache: 'no-store' })
+        .then(function (response) {
+          if (!response.ok) throw new Error('system_info_error');
+          return response.json();
+        })
+        .then(function (data) {
+          if (!data || data.success !== true) return;
+
+          const name = String(data.system_name || '').trim();
+          const logo = String(data.system_logo || '').trim();
+          const desc = String(data.system_desc || '').trim();
+
+          if (name) {
+            if (systemName) systemName.textContent = name;
+            document.title = 'เข้าสู่ระบบ - ' + name;
+          }
+
+          if (logo && systemLogo) {
+            systemLogo.src = logo;
+            systemLogo.alt = 'โลโก้' + (name || 'ระบบ');
+          }
+
+          if (desc && systemDesc) {
+            systemDesc.textContent = desc;
+          }
+        })
+        .catch(function () {});
+    }());
     const togglePass = document.getElementById('togglePass');
     const passwordInput = document.getElementById('user_password');
 
@@ -446,7 +474,6 @@
     }
 
     const params = new URLSearchParams(window.location.search);
-    const success = params.get('success');
     const error = params.get('error');
     const alertBox = document.getElementById('loginAlert');
     const alertText = document.getElementById('loginAlertText');
@@ -458,11 +485,6 @@
       suspended: 'บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ',
       invalid: 'อีเมล รหัสผ่าน หรือสิทธิ์การใช้งานไม่ถูกต้อง'
     };
-
-    if (success === 'register' && alertBox && alertText) {
-      alertText.textContent = 'สมัครสมาชิกสำเร็จ กรุณาเข้าสู่ระบบ';
-      alertBox.classList.add('show', 'success');
-    }
 
     if (error && errorMessages[error] && alertBox && alertText) {
       alertText.textContent = errorMessages[error];

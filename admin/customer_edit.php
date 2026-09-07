@@ -12,11 +12,9 @@ function get_customer_by_id(mysqli $conn, string $customer_id): ?array
     SELECT
       c.customer_id,
       c.customer_name AS user_name,
-      c.customer_password AS user_password,
       c.customer_phone AS user_phone,
       c.customer_email AS user_email,
       c.customer_address AS user_address,
-      0 AS user_role,
       c.customer_status
     FROM customers c
     WHERE c.customer_id = ?
@@ -107,12 +105,10 @@ if (
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $user_name = normalize_full_name($_POST['user_name'] ?? '');
-  $user_password = trim($_POST['user_password'] ?? '');
-  $change_password = ($_POST['change_password'] ?? '') === '1';
+
   $user_phone = trim($_POST['user_phone'] ?? '');
   $user_email = trim($_POST['user_email'] ?? '');
   $user_address = trim($_POST['user_address'] ?? '');
-  $user_role = 0;
 
   if (
     $user_name === '' ||
@@ -136,12 +132,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect_to(app_system_url('admin/customer_edit.php?id=' . urlencode($user_id) . '&status=email'));
   }
 
-  
-  if ($change_password && $user_password === '') {
-    redirect_to(app_system_url('admin/customer_edit.php?id=' . urlencode($user_id) . '&status=error'));
-  }
-
-  $role_int = 0;
 
   try {
     $transaction_started = false;
@@ -191,43 +181,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       );
     }
 
-    if ($change_password) {
-      $stmt = $conn->prepare("
-        UPDATE customers
-        SET customer_name = ?,
-            customer_password = ?,
-            customer_phone = ?,
-            customer_email = ?,
-            customer_address = ?
-        WHERE customer_id = ?
-      ");
-      $stmt->bind_param(
-        'ssssss',
-        $user_name,
-        $user_password,
-        $user_phone,
-        $user_email,
-        $user_address,
-        $user_id
-      );
-    } else {
-      $stmt = $conn->prepare("
-        UPDATE customers
-        SET customer_name = ?,
-            customer_phone = ?,
-            customer_email = ?,
-            customer_address = ?
-        WHERE customer_id = ?
-      ");
-      $stmt->bind_param(
-        'sssss',
-        $user_name,
-        $user_phone,
-        $user_email,
-        $user_address,
-        $user_id
-      );
-    }
+    $stmt = $conn->prepare("
+      UPDATE customers
+      SET customer_name = ?,
+          customer_phone = ?,
+          customer_email = ?,
+          customer_address = ?
+      WHERE customer_id = ?
+    ");
+    $stmt->bind_param(
+      'sssss',
+      $user_name,
+      $user_phone,
+      $user_email,
+      $user_address,
+      $user_id
+    );
 
     $conn->begin_transaction();
     $transaction_started = true;
@@ -253,7 +222,6 @@ if (!function_exists('admin_form_icon_svg')) {
       'user' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>',
       'mail' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg>',
       'phone' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7"></path></svg>',
-      'role' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.4 8.4-8 9-4.6-.6-8-4-8-9V7l8-4z"></path><path d="M9 12l2 2 4-5"></path></svg>',
       'lock' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>',
       'map' => '<svg class="form-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"></path><path d="M9 3v15"></path><path d="M15 6v15"></path></svg>',
       'save' => '<svg class="action-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><path d="M17 21v-8H7v8"></path></svg>',
@@ -314,7 +282,6 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users');
     id="userEditForm"
     data-duplicate-url="<?= h(app_system_url('admin/customer_edit.php')) ?>"
     data-current-user-id="<?= h($user['customer_id']) ?>"
-    data-original-password="<?= h($user['user_password'] ?: '1234') ?>"
     data-district-url="<?= h(app_system_url('ajax/get_districts.php')) ?>"
     data-sub-district-url="<?= h(app_system_url('ajax/get_subdistricts.php')) ?>"
     data-selected-province-name="<?= h($selected_province_name) ?>"
@@ -323,7 +290,6 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users');
     data-selected-zip-code="<?= h($selected_zip_code) ?>"
   >
     <input type="hidden" name="user_id" value="<?= h($user['customer_id']) ?>">
-    <input type="hidden" name="change_password" id="change_password" value="0">
 
     <div class="staff-create-head staff-create-head-clean">
       <div>
@@ -340,13 +306,6 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users');
         </div>
       </div>
 
-      <div class="staff-field readonly-field">
-        <label>สิทธิ์การใช้งาน</label>
-        <div class="staff-input-wrap">
-          <?= admin_form_icon_svg('role') ?>
-          <input type="text" value="ลูกค้า" readonly>
-        </div>
-      </div>
 
       <div class="staff-field staff-field-full">
         <label for="user_name">ชื่อ-นามสกุล *</label>
@@ -396,28 +355,6 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users');
           >
         </div>
         <div class="field-live-error" id="emailDuplicateError" aria-live="polite"></div>
-      </div>
-
-      <div class="staff-field staff-field-full">
-        <label for="user_password">รหัสผ่าน</label>
-
-        <div class="password-inline-row">
-          <div class="staff-input-wrap password-input-wrap">
-            <?= admin_form_icon_svg('lock') ?>
-            <input
-              type="text"
-              id="user_password"
-              name="user_password"
-              maxlength="50"
-              value="<?= h($user['user_password'] ?: '1234') ?>"
-              readonly
-            >
-          </div>
-
-          <button type="button" class="password-change-trigger password-change-trigger-small" id="passwordChangeTrigger">
-            แก้รหัสผ่าน
-          </button>
-        </div>
       </div>
 
       <input type="hidden" id="user_address" name="user_address" value="<?= h($user['user_address']) ?>">

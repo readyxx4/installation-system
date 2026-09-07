@@ -9,6 +9,11 @@ date_default_timezone_set('Asia/Bangkok');
 $keyword = trim($_GET['q'] ?? '');
 $search = $keyword;
 $status_filter = trim($_GET['status'] ?? 'all');
+$warning_filter = trim($_GET['warning'] ?? '');
+$allowed_warning_filters = ['near', 'urgent', 'today', 'overdue', 'reassign'];
+if (!in_array($warning_filter, $allowed_warning_filters, true)) {
+    $warning_filter = '';
+}
 $allowed_status_filters = ['all', 'canceled', 'assigned', 'accepted', 'working', 'done'];
 if (!in_array($status_filter, $allowed_status_filters, true)) {
     $status_filter = 'all';
@@ -150,55 +155,18 @@ function assignment_is_overdue(array $row): bool
         return false;
     }
 
-    $assign_status = (int) ($row['assign_status'] ?? 0);
-    if (!in_array($assign_status, [1, 2], true)) {
-        return false;
-    }
-
-    $install_date = trim((string) ($row['assign_install_date'] ?? ''));
-    $install_start = trim((string) ($row['assign_install_time'] ?? ''));
-    $install_end = trim((string) ($row['assign_install_end_time'] ?? ''));
-
-    if ($install_date === '') {
-        return false;
-    }
-
-    if ($install_end === '' && $install_start !== '') {
-        $start_timestamp = strtotime($install_date . ' ' . $install_start);
-        if ($start_timestamp !== false) {
-            $install_end = date('H:i:s', $start_timestamp + 7200);
-        }
-    }
-
-    if ($install_end === '') {
-        return false;
-    }
-
-    $timezone = new DateTimeZone('Asia/Bangkok');
-    $deadline = DateTimeImmutable::createFromFormat(
-        'Y-m-d H:i:s',
-        $install_date . ' ' . $install_end,
-        $timezone
+    $warning = assignment_install_due_warning(
+        $row['assign_install_date'] ?? '',
+        $row['assign_install_time'] ?? '',
+        $row['assign_status'] ?? '',
+        'manager'
     );
 
-    if (!$deadline) {
-        $deadline = DateTimeImmutable::createFromFormat(
-            'Y-m-d H:i',
-            $install_date . ' ' . substr($install_end, 0, 5),
-            $timezone
-        );
-    }
-
-    return $deadline instanceof DateTimeImmutable
-        && $deadline < new DateTimeImmutable('now', $timezone);
+    return ($warning['level'] ?? '') === 'overdue';
 }
 
 function display_assignment_status(array $row): string
 {
-    if (assignment_is_overdue($row)) {
-        return 'เกินกำหนด';
-    }
-
     if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
         return 'ยกเลิกแล้ว';
     }
@@ -225,10 +193,6 @@ function assignment_has_unavailable_active_tech(array $row): bool
 
 function display_assignment_badge(array $row): string
 {
-    if (assignment_is_overdue($row)) {
-        return 'red';
-    }
-
     if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
         return 'slate';
     }
@@ -364,7 +328,14 @@ while ($row = $result->fetch_assoc()) {
 
     $row['item_count_display'] = (int) ($row['item_count'] ?? 0);
     $row['install_total_display'] = money_text($row['install_total'] ?? 0);
-    $row['is_overdue'] = assignment_is_overdue($row);
+    $row['install_warning'] = assignment_install_due_warning(
+        $row['assign_install_date'] ?? '',
+        $row['assign_install_time'] ?? '',
+        $row['assign_status'] ?? '',
+        'manager'
+    );
+
+    $row['is_overdue'] = ($row['install_warning']['level'] ?? '') === 'overdue';
     $row['status_name'] = display_assignment_status($row);
     $row['status_badge'] = display_assignment_badge($row);
     $row['assign_status_name'] = !empty($row['assign_id']) ? assign_status_name($row['assign_status']) : 'ยังไม่มอบหมาย';
@@ -463,9 +434,17 @@ foreach ($status_tabs as $key => $tab) {
     }));
 }
 
-$visible_setups = array_values(array_filter($setups, function ($row) use ($status_filter, $status_tabs) {
+$visible_setups = array_values(array_filter($setups, function ($row) use ($status_filter, $status_tabs, $warning_filter) {
     if (!assignment_history_row($row)) {
         return false;
+    }
+
+    if ($warning_filter !== '') {
+        return assignment_install_due_filter_match(
+            $warning_filter,
+            $row['install_warning'] ?? [],
+            $row['assign_status'] ?? ''
+        );
     }
 
     if ($status_filter === 'all') {
@@ -577,7 +556,7 @@ layout_header('ประวัติการมอบหมายงาน', 'a
                     <?php foreach ($visible_setups as $row): ?>
                         <?php
                         $can_cancel_row = assignment_cancel_allowed($row);
-                        $is_canceled_row = !empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4';
+                        $can_edit_row = !empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '1';
                         $cancel_title = $can_cancel_row
                             ? 'ยกเลิก'
                             : assignment_cancel_disabled_title($row);
@@ -609,7 +588,7 @@ layout_header('ประวัติการมอบหมายงาน', 'a
                             </td>
 
                             <td class="assignment-row-actions assignment-icon-actions">
-                                <?php if ($is_canceled_row): ?>
+                                <?php if (!$can_edit_row): ?>
                                     <a class="assignment-icon-btn view-slip"
                                         href="<?= h(app_system_url('manager/assignment_detail.php?id=' . urlencode($row['setup_id']))) ?>"
                                         title="รายละเอียด" aria-label="รายละเอียด">

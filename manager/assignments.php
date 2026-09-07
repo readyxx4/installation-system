@@ -239,7 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             FROM assignment a
             LEFT JOIN technicians t ON a.tech_id = t.tech_id
             WHERE a.setup_id = ?
-              AND a.assign_status IN (1, 2, 4, 5)
+              AND a.assign_status IN (1, 2, 3, 4, 5)
             ORDER BY a.assign_date DESC, a.assign_id DESC
             LIMIT 1
         ");
@@ -254,6 +254,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($setup_status === 4 || $current_assign_status === 5) {
+            redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=readonly'));
+        }
+
+        if ($active_assignment && !in_array($current_assign_status, [1, 2], true)) {
             redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=readonly'));
         }
 
@@ -274,6 +278,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$is_editing_current_tech || (string) $install_date !== (string) $active_assignment['assign_install_date']) {
                 redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=assignment_locked'));
             }
+        }
+
+        if ($active_assignment && $current_assign_status === 2 && $is_editing_current_tech) {
+            redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=readonly'));
         }
 
         if ($active_assignment && $current_assign_status === 2 && !$is_editing_current_tech && !$confirm_tech_change) {
@@ -302,32 +310,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $conn->begin_transaction();
 
-        if ($active_assignment) {
-            $next_assign_status = (!$is_editing_current_tech && $current_assign_status === 2) ? 1 : $current_assign_status;
-            $next_setup_status = (!$is_editing_current_tech && $current_assign_status === 2) ? 1 : $setup_status;
-            $update_assign = $conn->prepare("
-                UPDATE assignment
-                SET tech_id = ?,
-                    assign_by = ?,
-                    assign_date = ?,
-                    assign_install_date = ?,
-                    assign_install_time = ?,
-                    assign_install_end_time = ?,
-                    assign_status = ?
-                WHERE assign_id = ?
-            ");
-            $update_assign->bind_param('ssssssis', $tech_id, $assign_by, $assign_date, $install_date, $install_time_db, $install_end_time_db, $next_assign_status, $active_assignment['assign_id']);
-            $update_assign->execute();
+        $new_setup_status = null;
 
-            $update_setup_status = $conn->prepare("UPDATE setup SET setup_status = ? WHERE setup_id = ?");
-            $update_setup_status->bind_param('is', $next_setup_status, $setup_id);
-            $update_setup_status->execute();
+        if ($active_assignment) {
+            if (!$is_editing_current_tech) {
+                $cancel_assign_status = 4;
+                $cancel_assign = $conn->prepare("
+                    UPDATE assignment
+                    SET assign_status = ?
+                    WHERE assign_id = ?
+                ");
+                $cancel_assign->bind_param('is', $cancel_assign_status, $active_assignment['assign_id']);
+                $cancel_assign->execute();
+
+                $assign_id = make_assign_id($conn);
+                $customer_id = $setup['customer_id'] ?? null;
+
+                if ($customer_id === null || $customer_id === '') {
+                    throw new RuntimeException('Missing customer_id for assignment.');
+                }
+
+                $insert_assign = $conn->prepare("
+                    INSERT INTO assignment
+                    (assign_id, setup_id, tech_id, customer_id, assign_by, assign_date, assign_install_date, assign_install_time, assign_install_end_time, assign_status)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ");
+                $insert_assign->bind_param('sssssssssi', $assign_id, $setup_id, $tech_id, $customer_id, $assign_by, $assign_date, $install_date, $install_time_db, $install_end_time_db, $assign_status);
+                $insert_assign->execute();
+
+                $new_setup_status = 1;
+            } else {
+                $update_assign = $conn->prepare("
+                    UPDATE assignment
+                    SET tech_id = ?,
+                        assign_by = ?,
+                        assign_date = ?,
+                        assign_install_date = ?,
+                        assign_install_time = ?,
+                        assign_install_end_time = ?,
+                        assign_status = ?
+                    WHERE assign_id = ?
+                ");
+                $update_assign->bind_param('ssssssis', $tech_id, $assign_by, $assign_date, $install_date, $install_time_db, $install_end_time_db, $current_assign_status, $active_assignment['assign_id']);
+                $update_assign->execute();
+            }
         } else {
             $assign_id = make_assign_id($conn);
             $customer_id = $setup['customer_id'] ?? null;
 
             if ($customer_id === null || $customer_id === '') {
-                redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=error'));
+                throw new RuntimeException('Missing customer_id for assignment.');
             }
 
             $insert_assign = $conn->prepare("
@@ -337,9 +369,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ");
             $insert_assign->bind_param('sssssssssi', $assign_id, $setup_id, $tech_id, $customer_id, $assign_by, $assign_date, $install_date, $install_time_db, $install_end_time_db, $assign_status);
             $insert_assign->execute();
+
+            $new_setup_status = 1;
         }
 
-        $new_setup_status = $active_assignment ? null : 1;
         $update_setup = $conn->prepare("UPDATE setup SET setup_note = ?" . ($new_setup_status === null ? '' : ', setup_status = ?') . " WHERE setup_id = ?");
         if ($new_setup_status === null) {
             $update_setup->bind_param('ss', $setup_note, $setup_id);
@@ -462,7 +495,7 @@ $current_assignment_stmt = $conn->prepare("
     LEFT JOIN technicians t ON a.tech_id = t.tech_id
     LEFT JOIN `user` m ON a.assign_by = m.user_id
     WHERE a.setup_id = ?
-      AND a.assign_status IN (1, 2, 4, 5)
+      AND a.assign_status IN (1, 2, 3, 4, 5)
     ORDER BY a.assign_date DESC, a.assign_id DESC
     LIMIT 1
 ");

@@ -1,0 +1,1197 @@
+/* === TECHNICIAN DETAIL REFERENCE LAYOUT START === */
+body.app-body.role-technician .technician-detail-page {
+    display: grid;
+    gap: 18px;
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 12px 32px 60px;
+    font-family: 'Noto Sans Thai', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+body.app-body.role-technician .technician-detail-page .ref-icon {
+    flex: 0 0 auto;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-page-header {
+    display: grid;
+    gap: 12px;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    color: #64748b;
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-back-link:hover {
+    color: #2563eb;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-title-row>div:first-child {
+    min-width: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-title-row h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-title-row p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 13.5px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+body.app-body.role-technician .technician-detail-page .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 21px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-badges {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 0 0 auto;
+    max-width: 100%;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-status-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
+    flex: 0 0 6px;
+}
+
+body.app-body.role-technician .technician-detail-page .badge.blue {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+body.app-body.role-technician .technician-detail-page .badge.waiting {
+    border: 1px solid #fde7c7;
+    background: #fffbeb;
+    color: #a16207;
+}
+
+body.app-body.role-technician .technician-detail-page .badge.warning {
+    border: 1px solid #fde7c7;
+    background: #fff7ed;
+    color: #b45309;
+}
+
+body.app-body.role-technician .technician-detail-page .badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
+    flex: 0 0 6px;
+}
+
+body.app-body.role-technician .technician-detail-page .badge.green,
+body.app-body.role-technician .technician-detail-page .badge.success {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+body.app-body.role-technician .technician-detail-page .badge.info {
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-alert.yellow {
+    border: 1px solid #fde68a;
+    background: #fffbeb;
+    color: #92400e;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-alert.orange {
+    border: 1px solid #fed7aa;
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-alert.indigo {
+    border: 1px solid #c7d2fe;
+    background: #eef2ff;
+    color: #3730a3;
+}
+
+body.app-body.role-technician .technician-detail-page .card {
+    border: 1px solid #e6ebf2;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+    overflow: hidden;
+}
+
+body.app-body.role-technician .technician-detail-page .timeline-card {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+body.app-body.role-technician .technician-detail-page .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid #e6ebf2;
+}
+
+body.app-body.role-technician .technician-detail-page .card-header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+body.app-body.role-technician .technician-detail-page .card-header p {
+    margin: 3px 0 0;
+    color: #64748b;
+    font-size: 12.5px;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+body.app-body.role-technician .technician-detail-page .card-body {
+    padding: 18px;
+}
+
+body.app-body.role-technician .technician-detail-page .timeline-card .card-body {
+    padding: 26px 56px 30px !important;
+}
+
+body.app-body.role-technician .technician-detail-page .timeline {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(230px, 1fr)) !important;
+    column-gap: 20px !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body.app-body.role-technician .technician-detail-page .timeline-step {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    text-align: center !important;
+}
+
+body.app-body.role-technician .technician-detail-page .timeline-node {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 2px solid #e2e8f0;
+    border-radius: 50%;
+    background: #fff;
+    color: #94a3b8;
+    font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+body.app-body.role-technician .technician-detail-page .timeline-step.is-done .timeline-node {
+    border-color: #10b981;
+    background: #10b981;
+    color: #fff;
+}
+
+body.app-body.role-technician .technician-detail-page .timeline-step.is-active .timeline-node {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
+}
+
+body.app-body.role-technician .technician-detail-page .timeline-line {
+    position: absolute !important;
+    top: 17px !important;
+    left: calc(50% + 22px) !important;
+    width: calc(100% - 44px) !important;
+    height: 2px !important;
+    background: #e6ebf2;
+    z-index: 1;
+}
+
+body.app-body.role-technician .technician-detail-page .timeline-step.is-done .timeline-line {
+    background: #10b981;
+}
+
+body.app-body.role-technician .technician-detail-page .timeline-label {
+    margin-top: 8px;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+body.app-body.role-technician .technician-detail-page .timeline-meta {
+    margin-top: 2px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.35;
+}
+
+body.app-body.role-technician .technician-detail-page .callout {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
+}
+
+body.app-body.role-technician .technician-detail-page .callout.is-warning {
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1e3a8a;
+}
+
+body.app-body.role-technician .technician-detail-page .callout.is-ready {
+    border: 1px solid #bbf7d0;
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+body.app-body.role-technician .technician-detail-page .callout-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .75);
+}
+
+body.app-body.role-technician .technician-detail-page .callout h2 {
+    margin: 0;
+    color: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+body.app-body.role-technician .technician-detail-page .callout p {
+    margin: 3px 0 0;
+    color: inherit;
+    font-size: 12.5px;
+    font-weight: 400;
+    line-height: 1.45;
+    opacity: .86;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 20px;
+    align-items: start;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-main {
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .detail-side {
+    min-width: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .customer-info,
+body.app-body.role-technician .technician-detail-page .product-table,
+body.app-body.role-technician .technician-detail-page .action-panel {
+    border: 1px solid #e5ecf6;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .04);
+    overflow: hidden;
+}
+
+body.app-body.role-technician .technician-detail-page .customer-info__header,
+body.app-body.role-technician .technician-detail-page .product-table__header,
+body.app-body.role-technician .technician-detail-page .action-panel__header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5ecf6;
+}
+
+body.app-body.role-technician .technician-detail-page .customer-info__header h2,
+body.app-body.role-technician .technician-detail-page .product-table__header h2,
+body.app-body.role-technician .technician-detail-page .action-panel__header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__header p,
+body.app-body.role-technician .technician-detail-page .action-panel__header p {
+    margin: 3px 0 0;
+    color: #64748b;
+    font-size: 12.5px;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+body.app-body.role-technician .technician-detail-page .customer-info__body {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 28px;
+}
+
+body.app-body.role-technician .technician-detail-page .customer-info__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    flex: 0 0 60px;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+body.app-body.role-technician .technician-detail-page .customer-info__content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .customer-info__content h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+body.app-body.role-technician .technician-detail-page .customer-info__meta,
+body.app-body.role-technician .technician-detail-page .customer-info__address {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    color: #5b6b86;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+body.app-body.role-technician .technician-detail-page .customer-info__meta span,
+body.app-body.role-technician .technician-detail-page .customer-info__address span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .customer-info__meta .ref-icon-muted,
+body.app-body.role-technician .technician-detail-page .customer-info__address .ref-icon-muted {
+    color: #5b6b86;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__table {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__head {
+    display: table-header-group;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__body {
+    display: table-row-group;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__row {
+    display: table-row;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__head .product-table__row {
+    background: #f8fafc;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__row>* {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5ecf6;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__head span {
+    height: 52px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__row>*:nth-child(1) {
+    width: 58%;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__row>*:nth-child(2) {
+    width: 12%;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__row>*:nth-child(3) {
+    width: 17%;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__row>*:nth-child(4) {
+    width: 13%;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__head span:nth-child(2),
+body.app-body.role-technician .technician-detail-page .product-table__head span:nth-child(3),
+body.app-body.role-technician .technician-detail-page .product-table__head span:nth-child(4),
+body.app-body.role-technician .technician-detail-page .product-table__body .product-table__row>*:nth-child(2),
+body.app-body.role-technician .technician-detail-page .product-table__money {
+    text-align: right;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__body .product-table__row>* {
+    height: 72px;
+    color: #5b6b86;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__item {
+    display: table-cell;
+    min-width: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__item strong {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__item span {
+    color: #5b6b86;
+    font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__qty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 22px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__money {
+    font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+    font-variant-numeric: tabular-nums;
+}
+
+body.app-body.role-technician .technician-detail-page strong.product-table__money {
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__empty {
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5ecf6;
+    color: #64748b;
+    font-size: 13px;
+    text-align: center;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 20px;
+    border-top: 1px solid #e5ecf6;
+    background: #f8fafc;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__total span {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+body.app-body.role-technician .technician-detail-page .product-table__total strong {
+    color: #2563eb;
+    font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-info-grid>div {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-info-grid>div.wide {
+    grid-column: 1 / -1;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-info-grid span,
+body.app-body.role-technician .technician-detail-page .proof-gallery-block>span {
+    color: #94a3b8;
+    font-size: 11.5px;
+    font-weight: 600;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-info-grid strong,
+body.app-body.role-technician .technician-detail-page .proof-gallery-block>strong {
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+body.app-body.role-technician .technician-detail-page .proof-gallery-block {
+    display: grid;
+    gap: 10px;
+}
+
+body.app-body.role-technician .technician-detail-page .proof-gallery {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+}
+
+body.app-body.role-technician .technician-detail-page .proof-gallery a,
+body.app-body.role-technician .technician-detail-page .action-panel__preview img {
+    display: block;
+    aspect-ratio: 1 / 1;
+    border: 1px solid #e6ebf2;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+body.app-body.role-technician .technician-detail-page .proof-gallery img,
+body.app-body.role-technician .technician-detail-page .action-panel__preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel {
+    position: sticky;
+    top: 18px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__body--summary {
+    gap: 18px;
+    padding: 20px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__summary {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__summary-row,
+body.app-body.role-technician .technician-detail-page .action-panel__summary-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__summary-row span,
+body.app-body.role-technician .technician-detail-page .action-panel__summary-total span {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__summary-row strong {
+    color: #0f172a;
+    font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__summary-total {
+    margin-top: 2px;
+    padding-top: 16px;
+    border-top: 1px solid #e5ecf6;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__summary-total strong {
+    color: #2563eb;
+    font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__install-info {
+    gap: 11px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__summary-total--compact strong {
+    font-size: 20px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__actions,
+body.app-body.role-technician .technician-detail-page .action-panel__decision-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__decision {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__decision:hover {
+    transform: translateY(-1px);
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__decision--accept {
+    border: 1px solid #059669;
+    background: #059669;
+    color: #fff;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__decision--accept:hover {
+    border-color: #047857;
+    background: #047857;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__decision--reject {
+    border: 1px solid #fecaca;
+    background: #fff;
+    color: #dc2626;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__decision--reject:hover {
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #fde68a;
+    border-radius: 14px;
+    background: #fffbeb;
+    color: #92400e;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__notice .ref-icon {
+    flex: 0 0 auto;
+    margin-top: 1px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__notice span {
+    color: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.55;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__state {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__state.is-warning {
+    border: 1px solid #fde68a;
+    background: #fffbeb;
+    color: #92400e;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__state.is-ready {
+    border: 1px solid #bbf7d0;
+    background: #ecfdf5;
+    color: #047857;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__state strong {
+    display: block;
+    color: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__state span {
+    display: block;
+    margin-top: 2px;
+    color: inherit;
+    font-size: 12.5px;
+    font-weight: 400;
+    opacity: .86;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__form,
+body.app-body.role-technician .technician-detail-page .receive-confirm-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__form label,
+body.app-body.role-technician .technician-detail-page .receive-confirm-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: #64748b;
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__form textarea,
+body.app-body.role-technician .technician-detail-page .action-panel__form input[type="file"],
+body.app-body.role-technician .technician-detail-page .receive-confirm-form textarea,
+body.app-body.role-technician .technician-detail-page .receive-confirm-form input[type="file"] {
+    width: 100%;
+    border: 1px solid #d5dde8;
+    border-radius: 10px;
+    background: #fff;
+    color: #0f172a;
+    font-size: 13px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__form textarea,
+body.app-body.role-technician .technician-detail-page .receive-confirm-form textarea {
+    min-height: 84px;
+    padding: 10px 12px;
+    resize: vertical;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__form input[type="file"],
+body.app-body.role-technician .technician-detail-page .receive-confirm-form input[type="file"] {
+    padding: 9px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__upload,
+body.app-body.role-technician .technician-detail-page .receive-confirm-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__upload p,
+body.app-body.role-technician .technician-detail-page .receive-confirm-upload p {
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__preview,
+body.app-body.role-technician .technician-detail-page .receive-confirm-preview {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+body.app-body.role-technician .technician-detail-page .callout .btn,
+body.app-body.role-technician .technician-detail-page .action-panel__submit,
+body.app-body.role-technician .technician-detail-page .action-panel__link,
+body.app-body.role-technician .technician-detail-page .receive-confirm-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 9px 16px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__submit,
+body.app-body.role-technician .technician-detail-page .action-panel__link,
+body.app-body.role-technician .technician-detail-page .receive-confirm-submit {
+    width: 100%;
+}
+
+body.app-body.role-technician .technician-detail-page .callout .btn-primary,
+body.app-body.role-technician .technician-detail-page .action-panel__submit,
+body.app-body.role-technician .technician-detail-page .receive-confirm-submit {
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #fff;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-confirm-submit:disabled {
+    border-color: #cbd5e1;
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+body.app-body.role-technician .technician-detail-page .callout .btn-outline,
+body.app-body.role-technician .technician-detail-page .action-panel__link {
+    border: 1px solid #d5dde8;
+    background: #fff;
+    color: #334155;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__phone {
+    border-color: transparent;
+    color: #2563eb;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__phone:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+body.app-body.role-technician .technician-detail-page.receive-confirm-page {
+    max-width: 1480px;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-confirm-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 24px;
+    align-items: start;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-confirm-main {
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-confirm-side {
+    position: sticky;
+    top: 18px;
+    min-width: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-checklist-card {
+    display: block;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-checklist-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 8px 12px;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #2563eb;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-checklist-toggle:disabled {
+    border-color: #e2e8f0;
+    background: #f8fafc;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-checklist-list {
+    display: grid;
+    gap: 0;
+    width: 100%;
+    margin-top: 0;
+    padding: 4px 18px;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-confirm-form .receive-checklist-list .receive-checklist-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    justify-content: stretch;
+    gap: 14px;
+    width: 100%;
+    min-height: 52px;
+    padding: 12px 0;
+    border: 0;
+    border-bottom: 1px solid #e5e7eb;
+    border-radius: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-confirm-form .receive-checklist-list .receive-checklist-item:last-child {
+    border-bottom: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-confirm-form .receive-checklist-list .receive-checklist-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    justify-self: end;
+    margin: 0;
+    accent-color: #2563eb;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-confirm-form .receive-checklist-list .receive-checklist-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    min-width: 0;
+    text-align: left;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-confirm-form .receive-checklist-list .receive-checklist-copy strong {
+    overflow: hidden;
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-confirm-form .receive-checklist-list .receive-checklist-copy span {
+    color: #64748b;
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-confirm-form .receive-checklist-list .receive-checklist-qty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: end;
+    min-height: 24px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-note-card {
+    display: block;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-note-card .card-header {
+    padding: 14px 18px 6px;
+    border-bottom: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-note-card .card-body {
+    display: block;
+    padding: 0 18px 16px;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-note-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    color: #64748b;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-note-field > span {
+    display: none;
+}
+
+body.app-body.role-technician .technician-detail-page .receive-note-field textarea {
+    min-height: 66px;
+    height: 66px;
+}
+
+@media (max-width: 1024px) {
+    body.app-body.role-technician .technician-detail-page .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    body.app-body.role-technician .technician-detail-page .action-panel,
+    body.app-body.role-technician .technician-detail-page .receive-confirm-side {
+        position: static;
+    }
+
+    body.app-body.role-technician .technician-detail-page .receive-confirm-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+
+    body.app-body.role-technician .technician-detail-page .detail-title-row,
+    body.app-body.role-technician .technician-detail-page .callout {
+        grid-template-columns: 1fr;
+        display: grid;
+    }
+
+    body.app-body.role-technician .technician-detail-page .detail-badges {
+        justify-content: flex-start;
+    }
+
+    body.app-body.role-technician .technician-detail-page .timeline-card .card-body {
+        padding: 18px;
+    }
+
+    body.app-body.role-technician .technician-detail-page .timeline {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr;
+    }
+
+    body.app-body.role-technician .technician-detail-page .timeline-step {
+        align-items: flex-start;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        text-align: left;
+    }
+
+    body.app-body.role-technician .technician-detail-page .timeline-line {
+        display: none;
+    }
+
+    body.app-body.role-technician .technician-detail-page .timeline-label,
+    body.app-body.role-technician .technician-detail-page .timeline-meta {
+        grid-column: 2;
+    }
+
+    body.app-body.role-technician .technician-detail-page .customer-info__body {
+        align-items: flex-start;
+    }
+
+    body.app-body.role-technician .technician-detail-page .customer-info__meta,
+    body.app-body.role-technician .technician-detail-page .customer-info__address {
+        font-size: 13px;
+    }
+
+    body.app-body.role-technician .technician-detail-page .proof-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.app-body.role-technician .technician-detail-page .callout-action .btn,
+    body.app-body.role-technician .technician-detail-page .action-panel__link,
+    body.app-body.role-technician .technician-detail-page .action-panel__submit {
+        width: 100%;
+    }
+}
+
+/* === TECHNICIAN DETAIL REFERENCE LAYOUT END === */

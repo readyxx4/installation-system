@@ -9,49 +9,61 @@ ensure_customer_profiles_schema($conn);
 $action = $_GET['action'] ?? '';
 $search = trim($_GET['q'] ?? '');
 
-if ($action === 'set_status') {
-    $customer_id = trim($_GET['id'] ?? '');
-    $status_to = trim($_GET['to'] ?? '');
+function customer_table_has_column(mysqli $conn, string $table, string $column): bool
+{
+    $stmt = $conn->prepare("
+        SELECT 1
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = ?
+          AND COLUMN_NAME = ?
+        LIMIT 1
+    ");
+    $stmt->bind_param('ss', $table, $column);
+    $stmt->execute();
 
-    if ($customer_id === '' || !in_array($status_to, ['active', 'suspended'], true)) {
-        redirect_to(app_system_url('admin/customers.php?status=error'));
-    }
+    return $stmt->get_result()->num_rows > 0;
+}
 
-    $customer_status = $status_to === 'suspended' ? 0 : 1;
-
-    try {
-        $check = $conn->prepare("
-            SELECT customer_id
-            FROM customers
-            WHERE customer_id = ?
-            LIMIT 1
-        ");
-        $check->bind_param('s', $customer_id);
-        $check->execute();
-        $customer = $check->get_result()->fetch_assoc();
-
-        if (!$customer) {
-            redirect_to(app_system_url('admin/customers.php?status=error'));
+function customer_has_related_work(mysqli $conn, string $customer_id): bool
+{
+    foreach (['setup', 'assignment', 'product_payment'] as $table) {
+        if (!customer_table_has_column($conn, $table, 'customer_id')) {
+            continue;
         }
 
-        $update = $conn->prepare("
-            UPDATE customers
-            SET customer_status = ?
-            WHERE customer_id = ?
-            LIMIT 1
-        ");
-        $update->bind_param('is', $customer_status, $customer_id);
-        $update->execute();
+        $stmt = $conn->prepare("SELECT 1 FROM `{$table}` WHERE customer_id = ? LIMIT 1");
+        $stmt->bind_param('s', $customer_id);
+        $stmt->execute();
 
-        $status = $customer_status === 0 ? 'customer_suspended' : 'customer_restored';
-        redirect_to(app_system_url('admin/customers.php?status=' . $status));
-    } catch (Throwable $e) {
-        redirect_to(app_system_url('admin/customers.php?status=error'));
+        if ($stmt->get_result()->num_rows > 0) {
+            return true;
+        }
     }
+
+    return false;
 }
 
 if ($action === 'delete') {
-    redirect_to(app_system_url('admin/customers.php?status=customer_delete_disabled'));
+    $delete_id = trim($_GET['id'] ?? '');
+
+    if ($delete_id === '') {
+        redirect_to(app_system_url('admin/customers.php?status=error'));
+    }
+
+    try {
+        if (customer_has_related_work($conn, $delete_id)) {
+            redirect_to(app_system_url('admin/customers.php?status=error'));
+        }
+
+        $stmt = $conn->prepare('DELETE FROM customers WHERE customer_id = ? LIMIT 1');
+        $stmt->bind_param('s', $delete_id);
+        $stmt->execute();
+
+        redirect_to(app_system_url('admin/customers.php?status=deleted'));
+    } catch (Throwable $e) {
+        redirect_to(app_system_url('admin/customers.php?status=error'));
+    }
 }
 
 if ($search !== '') {
@@ -63,8 +75,7 @@ if ($search !== '') {
           c.customer_name AS user_name,
           c.customer_phone AS user_phone,
           c.customer_email AS user_email,
-          c.customer_address AS user_address,
-          c.customer_status
+          c.customer_address AS user_address
         FROM customers c
         WHERE (
               c.customer_id LIKE ?
@@ -85,8 +96,7 @@ if ($search !== '') {
           c.customer_name AS user_name,
           c.customer_phone AS user_phone,
           c.customer_email AS user_email,
-          c.customer_address AS user_address,
-          c.customer_status
+          c.customer_address AS user_address
         FROM customers c
         ORDER BY c.customer_id DESC
     ");
@@ -102,13 +112,23 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
 
   <form class="toolbar customer-toolbar" method="GET" action="<?= h(app_system_url('admin/customers.php')) ?>">
     <input type="text" name="q" placeholder="ค้นหารหัสลูกค้า ชื่อ-นามสกุล เบอร์โทร อีเมล หรือที่อยู่" value="<?= h($search) ?>">
-    <button class="btn btn-search" type="submit">ค้นหา</button>
+
+    <button class="btn btn-search" type="submit">
+      <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+      <span>ค้นหา</span>
+    </button>
+
     <a class="btn btn-reset" href="<?= h(app_system_url('admin/customers.php')) ?>">
       <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M3 12a9 9 0 1 0 3-6.7"></path>
         <path d="M3 4v6h6"></path>
       </svg>
       <span>ล้างค้นหา</span>
+    </a>
+
+    <a class="btn btn-add customer-add-in-toolbar" href="<?= h(app_system_url('admin/customer_add.php')) ?>">
+      <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+      <span>เพิ่มข้อมูลลูกค้า</span>
     </a>
   </form>
 
@@ -120,7 +140,6 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
           <th>ชื่อ-นามสกุล</th>
           <th>เบอร์โทรศัพท์</th>
           <th>อีเมล</th>
-          <th>สถานะบัญชี</th>
           <th>ที่อยู่</th>
           <th style="width:160px;">จัดการ</th>
         </tr>
@@ -128,7 +147,7 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
 
       <tbody>
         <?php if ($customers->num_rows === 0): ?>
-          <tr><td colspan="7" class="empty-state">ไม่พบข้อมูลลูกค้า</td></tr>
+          <tr><td colspan="6" class="empty-state">ไม่พบข้อมูลลูกค้า</td></tr>
         <?php endif; ?>
 
         <?php while ($row = $customers->fetch_assoc()): ?>
@@ -137,11 +156,6 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
             <td><?= h($row['user_name'] ?: '-') ?></td>
             <td><?= h($row['user_phone']) ?></td>
             <td><?= h($row['user_email']) ?></td>
-            <td>
-              <span class="badge <?= h(customer_account_status_badge($row['customer_status'])) ?>">
-                <?= h(customer_account_status_name($row['customer_status'])) ?>
-              </span>
-            </td>
             <td class="address-cell admin-address-cell">
               <?php
                 $address = (string) ($row['user_address'] ?? '');
@@ -160,6 +174,7 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
               <?php endif; ?>
             </td>
             <td class="customer-action-cell">
+              <?php $can_delete_customer = !customer_has_related_work($conn, $row['customer_id']); ?>
               <a class="btn btn-edit action-btn customer-action-btn"
                  href="<?= h(app_system_url('admin/customer_edit.php?id=' . urlencode($row['customer_id']))) ?>">
                 <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -169,26 +184,32 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
                 <span>แก้ไข</span>
               </a>
 
-              <?php if ((int) $row['customer_status'] === 0): ?>
-                <a class="btn btn-restore action-btn customer-action-btn"
-                   href="<?= h(app_system_url('admin/customers.php?action=set_status&to=active&id=' . urlencode($row['customer_id']))) ?>"
-                   data-confirm-delete="ยืนยันการกู้คืนบัญชีลูกค้านี้หรือไม่?">
+              <?php if ($can_delete_customer): ?>
+                <a class="btn btn-delete action-btn customer-action-btn"
+                   href="<?= h(app_system_url('admin/customers.php?action=delete&id=' . urlencode($row['customer_id']))) ?>"
+                   data-confirm-delete="ยืนยันการลบข้อมูลลูกค้านี้หรือไม่?">
                   <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M3 12a9 9 0 1 0 3-6.7"></path>
-                    <path d="M3 4v6h6"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M8 6V4h8v2"></path>
+                    <path d="M19 6l-1 14H6L5 6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
                   </svg>
-                  <span>กู้คืนบัญชี</span>
+                  <span>ลบ</span>
                 </a>
               <?php else: ?>
-                <a class="btn btn-delete action-btn customer-action-btn"
-                   href="<?= h(app_system_url('admin/customers.php?action=set_status&to=suspended&id=' . urlencode($row['customer_id']))) ?>"
-                   data-confirm-delete="ยืนยันการระงับบัญชีลูกค้านี้หรือไม่? ลูกค้าจะเข้าสู่ระบบไม่ได้">
+                <span class="btn btn-delete disabled-link action-btn customer-action-btn"
+                      aria-disabled="true"
+                      title="ไม่สามารถลบได้ เนื่องจากมีประวัติใบงานหรือข้อมูลที่เกี่ยวข้อง">
                   <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <path d="M5.7 5.7l12.6 12.6"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M8 6V4h8v2"></path>
+                    <path d="M19 6l-1 14H6L5 6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
                   </svg>
-                  <span>ระงับบัญชี</span>
-                </a>
+                  <span>ลบ</span>
+                </span>
               <?php endif; ?>
             </td>
           </tr>
@@ -202,3 +223,5 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
 <script src="<?= h(app_asset_url('admin/assets/js/toggle_address.js')) ?>?v=<?= h(asset_version('admin/assets/js/toggle_address.js')) ?>"></script>
 
 <?php layout_footer(); ?>
+
+

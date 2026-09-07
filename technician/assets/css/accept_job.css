@@ -1,0 +1,37 @@
+/* accept_job.php only */
+body.app-body.role-technician .technician-assignments-page .technician-focused-assignment-row {
+  background: #dbeafe !important;
+  outline: 2px solid #60a5fa !important;
+  outline-offset: -2px !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .badge.warning {
+  background: #fff7ed !important;
+  border: 1px solid #fed7aa !important;
+  color: #c2410c !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-urgent-badge {
+  min-height: 24px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-urgent-badge .dot {
+  width: 7px !important;
+  height: 7px !important;
+  background: #ea580c !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .btn-success {
+  border: 1px solid #059669 !important;
+  background: #059669 !important;
+  color: #ffffff !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .btn-danger-ghost {
+  border: 1px solid #fecaca !important;
+  background: #fff1f2 !important;
+  color: #dc2626 !important;
+}
