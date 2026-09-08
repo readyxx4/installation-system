@@ -559,7 +559,6 @@ body.app-body.role-technician {
 }
 
 body.app-body.role-technician .app-shell {
-  grid-template-columns: var(--tech-sidebar-width) minmax(0, 1fr) !important;
   background: var(--tech-bg) !important;
 }
 
@@ -592,16 +591,8 @@ body.app-body.role-technician .sidebar-profile-info span {
 }
 
 body.app-body.role-technician .nav-section-title {
-  margin: 0 0 2px !important;
-  padding: 0 !important;
   color: #94a3b8 !important;
-  font-size: 9.5px !important;
   font-weight: 600 !important;
-  line-height: 1.2 !important;
-}
-
-body.app-body.role-technician .sidebar > .nav-section-title {
-  order: 2 !important;
 }
 
 body.app-body.role-technician .nav-link {
@@ -680,10 +671,6 @@ body.app-body.role-technician .shell-brand-copy span {
 }
 
 body.app-body.role-technician .shell-nav-item {
-}
-
-body.app-body.role-technician .sidebar > .shell-nav-item {
-  order: 3 !important;
 }
 
 body.app-body.role-technician .nav-label {
