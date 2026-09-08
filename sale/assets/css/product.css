@@ -1,0 +1,95 @@
+.product-type-table td:nth-child(1) {
+  width: 16%;
+}
+
+.product-type-table th:nth-child(2),
+.product-type-table td:nth-child(2) {
+  width: 24%;
+}
+
+.product-type-table th:nth-child(3),
+.product-type-table td:nth-child(3),
+.product-type-detail-cell {
+  width: 42%;
+  max-width: none;
+  line-height: 1.65;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.product-type-detail-cell .address-short,
+.product-type-detail-cell .product-type-detail-full {
+  max-width: 100%;
+  line-height: 1.7;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.product-type-table th:nth-child(4),
+.product-type-table td:nth-child(4) {
+  width: 190px;
+}
+
+.text-more-btn {
+  display: block;
+  margin-top: 4px;
+  padding: 0;
+  border: none;
+
+.product-type-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  flex-wrap: nowrap !important;
+}
+
+.user-toolbar input,
+.customer-toolbar input,
+.technician-toolbar input,
+.product-toolbar input,
+.product-type-toolbar input {
+  flex: 1 1 auto !important;
+  min-width: 280px !important;
+  height: 46px !important;
+  border-radius: 14px !important;
+}
+
+.user-add-in-toolbar,
+.technician-add-in-toolbar,
+.product-add-in-toolbar,
+.product-type-add-in-toolbar {
+  margin-left: auto !important;
+}
+
+.data-table td .btn,
+.data-table td .btn-edit,
+.data-table td .btn-delete,
+.data-table td .btn-small,
+
+.data-table td .btn:last-child,
+.data-table td .btn-delete:last-child,
+
+
+
+
+.product-type-add-in-toolbar {
+  margin-left: auto !important;
+}
+
+.data-table td .btn,
+.data-table td .btn-edit,
+.data-table td .btn-delete,
+.data-table td .btn-small,
+
+.product-card:hover {
+  border-color: #fdba74;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, .07);
+  transform: translateY(-1px);
+}
+
+
+
+
+

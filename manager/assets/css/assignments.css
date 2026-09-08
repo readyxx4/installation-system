@@ -365,35 +365,35 @@ body.app-body.role-1 .calendar-day.today span {
     background: #eff6ff !important;
 }
 
-/* ว่าง: hover ยังเป็นเขียว */
+/* Ã Â¸Â§Ã Â¹Ë†Ã Â¸Â²Ã Â¸â€¡: hover Ã Â¸Â¢Ã Â¸Â±Ã Â¸â€¡Ã Â¹â‚¬Ã Â¸â€ºÃ Â¹â€¡Ã Â¸â„¢Ã Â¹â‚¬Ã Â¸â€šÃ Â¸ÂµÃ Â¸Â¢Ã Â¸Â§ */
 body.app-body.role-1 .calendar-day.available:hover {
     background: #dcfce7 !important;
     border-color: #86efac !important;
     box-shadow: inset 0 0 0 2px rgba(34, 197, 94, .12) !important;
 }
 
-/* มีคิว: hover ยังเป็นส้ม */
+/* Ã Â¸Â¡Ã Â¸ÂµÃ Â¸â€žÃ Â¸Â´Ã Â¸Â§: hover Ã Â¸Â¢Ã Â¸Â±Ã Â¸â€¡Ã Â¹â‚¬Ã Â¸â€ºÃ Â¹â€¡Ã Â¸â„¢Ã Â¸ÂªÃ Â¹â€°Ã Â¸Â¡ */
 body.app-body.role-1 .calendar-day.partial:hover {
     background: #ffedd5 !important;
     border-color: #fdba74 !important;
     box-shadow: inset 0 0 0 2px rgba(249, 115, 22, .12) !important;
 }
 
-/* คิวเต็ม / ไม่พร้อมรับงาน: คงแดง */
+/* Ã Â¸â€žÃ Â¸Â´Ã Â¸Â§Ã Â¹â‚¬Ã Â¸â€¢Ã Â¹â€¡Ã Â¸Â¡ / Ã Â¹â€žÃ Â¸Â¡Ã Â¹Ë†Ã Â¸Å¾Ã Â¸Â£Ã Â¹â€°Ã Â¸Â­Ã Â¸Â¡Ã Â¸Â£Ã Â¸Â±Ã Â¸Å¡Ã Â¸â€¡Ã Â¸Â²Ã Â¸â„¢: Ã Â¸â€žÃ Â¸â€¡Ã Â¹ÂÃ Â¸â€Ã Â¸â€¡ */
 body.app-body.role-1 .calendar-day.busy:hover {
     background: #fef2f2 !important;
     border-color: #fca5a5 !important;
     box-shadow: inset 0 0 0 2px rgba(239, 68, 68, .10) !important;
 }
 
-/* วันหยุด / หมดเวลา: คงเทา */
+/* Ã Â¸Â§Ã Â¸Â±Ã Â¸â„¢Ã Â¸Â«Ã Â¸Â¢Ã Â¸Â¸Ã Â¸â€ / Ã Â¸Â«Ã Â¸Â¡Ã Â¸â€Ã Â¹â‚¬Ã Â¸Â§Ã Â¸Â¥Ã Â¸Â²: Ã Â¸â€žÃ Â¸â€¡Ã Â¹â‚¬Ã Â¸â€”Ã Â¸Â² */
 body.app-body.role-1 .calendar-day.holiday:hover {
     background: #f1f5f9 !important;
     border-color: #cbd5e1 !important;
     box-shadow: none !important;
 }
 
-/* วันที่เลือก */
+/* Ã Â¸Â§Ã Â¸Â±Ã Â¸â„¢Ã Â¸â€”Ã Â¸ÂµÃ Â¹Ë†Ã Â¹â‚¬Ã Â¸Â¥Ã Â¸Â·Ã Â¸Â­Ã Â¸Â */
 body.app-body.role-1 .calendar-day.selected {
     border-color: #3b82f6 !important;
     background: #eff6ff !important;
@@ -1280,7 +1280,7 @@ body.app-body.role-1 .manager-assign-er-page .manager-tech-card.is-disabled .man
 
 
 /* =========================================================
-   v9 — Match Manager assignment page to Admin color system
+   v9 Ã¢â‚¬â€ Match Manager assignment page to Admin color system
    Source palette: admin/style.css + admin/dashboard.css
    No text / flow / status logic changes.
    ========================================================= */
@@ -1518,7 +1518,7 @@ body.app-body.role-1 .manager-assign-er-page .manager-overdue-action-alert {
 }
 
 /* =========================================================
-   LEFT CARD ONLY — Sale-detail style summary for Manager
+   LEFT CARD ONLY Ã¢â‚¬â€ Sale-detail style summary for Manager
    ========================================================= */
 
 body.app-body.role-1 .manager-assign-er-page .manager-selected-setup-panel {
@@ -2192,4 +2192,669 @@ body.app-body.role-1 .manager-assign-er-page .manager-note-card textarea {
     body.app-body.role-1 .manager-assign-er-page .manager-time-slots {
         grid-template-columns: 1fr !important;
     }
+}
+
+.manager-assignment-summary-panel {
+  width: 100% !important;
+}
+
+.manager-assignment-summary-panel .manager-mini-stat {
+  min-height: 116px !important;
+}
+
+.manager-assign-v2 {
+  padding-bottom: 30px;
+}
+
+.manager-assign-panel {
+  margin-bottom: 18px;
+  padding: 24px;
+  border: 1px solid #eadcc7;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(116, 84, 45, .08);
+}
+
+.manager-assign-search {
+  height: 48px;
+  margin-bottom: 14px;
+  padding: 0 15px;
+  border: 1px solid #dbe5f0;
+  border-radius: 15px;
+  background: #f8fbff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #64748b;
+}
+
+.manager-assign-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #18324a;
+  font-weight: 800;
+}
+
+.manager-setup-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  max-height: 430px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.manager-setup-card {
+  min-height: 116px;
+  border: 1px solid #eadcc7;
+  border-radius: 18px;
+  background: #fffaf2;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  transition: .18s ease;
+}
+
+.manager-setup-card.active {
+  border-color: #f59e0b;
+  background: #fff7ed;
+  box-shadow: 0 12px 26px rgba(217, 119, 6, .13);
+  transform: translateY(-2px);
+}
+
+.manager-setup-card.is-new-item {
+  border-color: #f59e0b !important;
+  background: #fff7ed !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, .18), 0 12px 28px rgba(217, 119, 6, .14) !important;
+}
+
+.manager-setup-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.manager-setup-card-title strong {
+  color: #25180b;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.manager-setup-card-title span {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.manager-setup-card p {
+  margin: 0 0 4px;
+  color: #25180b;
+  font-weight: 900;
+}
+
+.manager-setup-card small {
+  display: block;
+  color: #8a755d;
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.manager-assign-v2 * {
+  box-sizing: border-box;
+}
+
+.manager-setup-card.active {
+  border-color: #f59e0b !important;
+  background: #fff7ed !important;
+  box-shadow: inset 0 0 0 2px rgba(245, 158, 11, .42), 0 10px 22px rgba(217, 119, 6, .10) !important;
+}
+
+.assignment-detail-table td:last-child {
+  width: 150px;
+  text-align: center;
+}
+
+.assignment-row-actions {
+  white-space: nowrap;
+}
+
+.assignment-detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.assignment-detail-modal.show {
+  display: flex;
+}
+
+.assignment-detail-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, .42);
+  backdrop-filter: blur(6px);
+}
+
+.assignment-detail-card {
+  position: relative;
+  z-index: 1;
+  width: min(1120px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid #eadcc7;
+  border-radius: 28px;
+  background: #ffffff;
+  box-shadow: 0 30px 90px rgba(15, 23, 42, .28);
+  padding: 28px;
+}
+
+.assignment-detail-close {
+  position: absolute;
+  right: 22px;
+  top: 22px;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 14px;
+  background: #fee2e2;
+  color: #dc2626;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.assignment-detail-close:hover {
+  background: #fecaca;
+  transform: translateY(-1px);
+}
+
+.assignment-detail-header {
+  padding-right: 56px;
+  margin-bottom: 14px;
+}
+
+.assignment-detail-header h2 {
+  margin: 6px 0 4px;
+  color: #25180b;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.assignment-detail-header p {
+  margin: 0;
+  color: #8a755d;
+  font-weight: 900;
+}
+
+.assignment-detail-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid #eadcc7;
+  background: #fffaf2;
+  color: #8a755d;
+  font-weight: 800;
+}
+
+.assignment-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.assignment-detail-section {
+  border: 1px solid #eadcc7;
+  border-radius: 22px;
+  background: #fffdf8;
+  padding: 18px;
+}
+
+.assignment-detail-section h3 {
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #25180b;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.assignment-detail-section dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.assignment-detail-section dl div {
+  min-width: 0;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #f0e2cf;
+  padding: 11px 12px;
+}
+
+.assignment-detail-section dl div.full {
+  grid-column: 1 / -1;
+}
+
+.assignment-detail-section dt {
+  margin: 0 0 4px;
+  color: #8a755d;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.assignment-detail-section dd {
+  margin: 0;
+  color: #18324a;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.assignment-add-btn-inline {
+  min-height: 52px !important;
+  padding: 0 22px !important;
+  border-radius: 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  border: 1px solid transparent !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+.assignment-reset-btn {
+  background: #eef2f7 !important;
+  color: #475569 !important;
+  border-color: #dbe3ef !important;
+  box-shadow: none !important;
+}
+
+.assignment-add-btn-inline {
+  border: 1px solid #f59e0b !important;
+  background: linear-gradient(135deg, #f59e0b, #ea580c) !important;
+  color: #ffffff !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 10px 22px rgba(234, 88, 12, 0.24) !important;
+}
+
+.assignment-add-btn-inline:hover {
+  transform: translateY(-1px) !important;
+}
+
+.assignment-detail-table .assignment-row-actions {
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.assignment-from-setup-page .manager-list-topbar {
+  margin-bottom: 18px;
+}
+
+.assignment-from-setup-page .btn-add {
+  display: none !important;
+}
+
+.assignment-from-setup-card {
+  min-height: calc(100vh - 170px);
+}
+
+.assignment-icon-btn {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  border: 1px solid #dbe7f7 !important;
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  transition: .15s ease !important;
+}
+
+.assignment-icon-btn .manager-icon {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: currentColor !important;
+  stroke-width: 2.2 !important;
+}
+
+.assignment-icon-btn:hover {
+  transform: translateY(-1px) !important;
+  filter: brightness(.98) !important;
+}
+
+.assignment-icon-btn.edit-assign {
+  background: #fff7ed !important;
+  border-color: #fed7aa !important;
+  color: #ea580c !important;
+}
+
+.assignment-icon-btn.cancel-assign {
+  background: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  color: #e11d48 !important;
+}
+
+.assignment-icon-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  white-space: nowrap !important;
+}
+
+.assignment-icon-btn.view-slip.manager-eye-green {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 13px !important;
+  border: 1px solid #bbf7d0 !important;
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  box-shadow: 0 8px 18px rgba(34, 197, 94, 0.12) !important;
+}
+
+.assignment-icon-btn.view-slip.manager-eye-green:hover {
+  background: #bbf7d0 !important;
+  color: #166534 !important;
+  transform: translateY(-1px) !important;
+}
+
+.assignment-icon-btn.view-slip.manager-eye-green .manager-icon {
+  width: 19px !important;
+  height: 19px !important;
+  stroke: currentColor !important;
+}
+
+.assignment-icon-actions .assignment-row-assign-btn {
+  display: none !important;
+}
+
+.manager-slip-toolbar {
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+.manager-assign-top-btn {
+  min-height: 46px !important;
+  padding: 0 18px !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #f59e0b, #ea580c) !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  box-shadow: 0 12px 26px rgba(234, 88, 12, .18) !important;
+  white-space: nowrap !important;
+}
+
+.manager-assign-top-btn .manager-icon {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: currentColor !important;
+}
+
+.assignment-status-tabs {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+  margin: 16px 0 18px !important;
+}
+
+.assignment-status-tab {
+  min-height: 42px !important;
+  padding: 0 14px !important;
+  border: 1px solid #eadcc7 !important;
+  border-radius: 999px !important;
+  background: #fffaf2 !important;
+  color: #8a6a3f !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  font-weight: 900 !important;
+}
+
+.assignment-status-tab b {
+  min-width: 24px !important;
+  height: 24px !important;
+  padding: 0 7px !important;
+  border-radius: 999px !important;
+  background: #fff2d7 !important;
+  color: #b45309 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 13px !important;
+}
+
+.assignment-status-tab.active {
+  background: linear-gradient(135deg, #f59e0b, #ea580c) !important;
+  border-color: #f97316 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(234, 88, 12, .18) !important;
+}
+
+.assignment-status-tab.active b {
+  background: rgba(255, 255, 255, .22) !important;
+  color: #ffffff !important;
+}
+
+.assignment-assign-now-btn {
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 13px !important;
+  background: #fff7ed !important;
+  border: 1px solid #fed7aa !important;
+  color: #ea580c !important;
+  font-weight: 900 !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  white-space: nowrap !important;
+}
+
+.assignment-assign-now-btn:hover {
+  background: #ffedd5 !important;
+}
+
+.assignment-detail-actions .manager-icon {
+  width: 17px !important;
+  height: 17px !important;
+  stroke: currentColor !important;
+}
+
+.assignment-detail-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+  padding-top: 18px !important;
+  margin-top: 18px !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+.assignment-row-assign-btn {
+  display: none !important;
+}
+
+body.assignment-mode .assignment-row-assign-btn {
+  display: inline-flex !important;
+}
+
+.manager-assign-top-btn.assignment-top-assign-btn {
+  border: 1px solid #bbf7d0 !important;
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  box-shadow: 0 10px 22px rgba(34, 197, 94, 0.16) !important;
+  cursor: pointer !important;
+}
+
+.manager-assign-top-btn.assignment-top-assign-btn:hover {
+  background: #bbf7d0 !important;
+  color: #166534 !important;
+}
+
+.manager-assign-top-btn.assignment-top-assign-btn .manager-icon {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: currentColor !important;
+}
+
+.assignment-assign-now-btn.assignment-row-assign-btn {
+  border: 1px solid #bbf7d0 !important;
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  box-shadow: none !important;
+}
+
+.assignment-assign-now-btn.assignment-row-assign-btn:hover {
+  background: #bbf7d0 !important;
+  color: #166534 !important;
+}
+
+.manager-assign-er-page .manager-dashboard-head.compact {
+  margin-bottom: 18px;
+}
+
+.manager-tech-queue-table-wrap {
+  overflow: auto;
+  border: 1px solid #e5edf6;
+  border-radius: 18px;
+  margin-bottom: 18px;
+  background: #ffffff;
+}
+
+.manager-tech-queue-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.manager-tech-queue-table th {
+  background: #f8fafc;
+  color: #61708a;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: left;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5edf6;
+}
+
+.manager-tech-queue-table td {
+  padding: 14px 16px;
+  color: #10233f;
+  font-weight: 800;
+  border-bottom: 1px solid #eef2f7;
+  vertical-align: top;
+}
+
+.manager-tech-queue-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.manager-tech-queue-table small {
+  color: #8a755d;
+  font-weight: 700;
+}
+
+.manager-tech-queue-table td {
+  white-space: nowrap !important;
+}
+
+.manager-tech-queue-table td:nth-child(4) {
+  white-space: normal !important;
+}
+
+.manager-tech-queue-table td:nth-child(5) {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.assignment-tech-warning {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #b45309;
+}
+
+.assignment-status-tab:hover {
+  text-decoration: none;
+}
+
+body.app-body .assignment-status-tab.active {
+  background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+  border-color: var(--role-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--role-primary-hover) 22%, transparent) !important;
+}
+
+body.app-body.role-1 .assignment-form-page {
+  font-size: 13px !important;
+}
+
+body.app-body.role-1 .manager-tech-queue-table {
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+}
+
+body.app-body.role-1 .manager-tech-queue-table td {
+  padding: 7px 8px !important;
+  line-height: 1.35 !important;
+  vertical-align: middle !important;
+}
+
+body.app-body.role-1 .assignment-icon-btn {
+  min-height: 26px !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  font-size: 11px !important;
+}
+
+body.app-body.role-1 .assignment-status-tab b {
+  min-width: 19px !important;
+  height: 19px !important;
+  padding: 0 6px !important;
+  font-size: 10.5px !important;
 }

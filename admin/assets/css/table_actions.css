@@ -14,3 +14,270 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+body.app-body.role-3 .admin-user-list-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.app-body.role-3 .admin-user-list-pane.panel {
+  margin-bottom: 0 !important;
+}
+
+body.app-body.role-3 .admin-user-list-pane .panel-title {
+  margin-bottom: 0;
+}
+
+body.app-body.role-3 .admin-user-list-pane .user-toolbar {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  gap: 10px !important;
+  margin: 0 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+body.app-body.role-3 .admin-user-list-pane .user-toolbar input {
+  min-width: 0 !important;
+}
+
+body.app-body.role-3 .admin-user-list-pane .table-wrap {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  overflow: auto;
+}
+
+body.app-body.role-3 .admin-user-list-pane .data-table {
+  min-width: 900px;
+}
+
+body.app-body.role-3 .user-detail-row {
+  cursor: pointer;
+}
+
+body.app-body.role-3 .user-detail-row td {
+  transition: background-color .16s ease, border-color .16s ease;
+}
+
+body.app-body.role-3 .user-detail-row:hover td {
+  background: #F8FBFF !important;
+}
+
+body.app-body.role-3 .user-detail-row.is-selected td {
+  background: #EAF4FF !important;
+  border-color: #BFDBFE !important;
+}
+
+body.app-body.role-3 .user-detail-row.is-selected td:first-child {
+  box-shadow: inset 4px 0 0 #1565C0;
+}
+
+body.app-body.role-3 .admin-user-detail-panel {
+  display: none;
+  position: sticky;
+  top: 16px;
+  margin-top: 0;
+  height: 100%;
+  max-height: calc(100vh - 128px);
+  width: 320px;
+  max-width: 100%;
+  min-height: 0;
+  padding: 14px;
+  overflow: hidden;
+  border: 1px solid #BFDBFE;
+  border-radius: 16px;
+  background: #FFFFFF;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, .08);
+}
+
+body.app-body.role-3 .admin-user-split-layout.has-detail .admin-user-detail-panel {
+  display: block;
+}
+
+body.app-body.role-3 .admin-user-detail-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+body.app-body.role-3 .admin-user-detail-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #BFDBFE;
+  border-radius: 10px;
+  background: #F8FBFF;
+  color: #0F3F7A;
+  cursor: pointer;
+}
+
+body.app-body.role-3 .admin-user-detail-close:hover {
+  background: #EFF6FF;
+  color: #1565C0;
+}
+
+body.app-body.role-3 .admin-user-detail-title {
+  margin: 0 0 8px;
+  color: #0F3F7A;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+body.app-body.role-3 .admin-user-detail-head h2 {
+  margin: 0;
+  color: #0F3F7A;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+body.app-body.role-3 .admin-user-detail-head span {
+  margin: 2px 0 0;
+  color: #64748B;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+body.app-body.role-3 .admin-user-detail-role {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  margin-top: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #DCFCE7;
+  color: #15803D;
+  font-weight: 900;
+}
+
+body.app-body.role-3 .admin-user-detail-role.green {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+body.app-body.role-3 .admin-user-detail-role.orange {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+body.app-body.role-3 .admin-user-detail-role.red {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+body.app-body.role-3 .admin-user-detail-role.blue {
+  background: #DBEAFE;
+  color: #1D4ED8;
+}
+
+body.app-body.role-3 .admin-user-detail-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  margin: 0 0 6px;
+  border-radius: 999px;
+  background: #EAF4FF;
+  color: #1565C0;
+  font-size: 24px;
+}
+
+body.app-body.role-3 .admin-user-detail-head {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #E2E8F0;
+  text-align: left;
+}
+
+body.app-body.role-3 .admin-user-detail-head .admin-user-detail-avatar {
+  flex: 0 0 58px;
+}
+
+body.app-body.role-3 .admin-user-detail-head>div:last-child {
+  min-width: 0;
+}
+
+body.app-body.role-3 .admin-user-detail-list {
+  display: grid;
+  gap: 0;
+  margin-top: 8px;
+}
+
+body.app-body.role-3 .admin-user-detail-item {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  column-gap: 8px;
+  row-gap: 2px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #E2E8F0;
+  background: transparent;
+}
+
+body.app-body.role-3 .admin-user-detail-item span {
+  color: #64748B;
+  font-size: 11.5px;
+  font-weight: 800;
+}
+
+body.app-body.role-3 .admin-user-detail-icon {
+  grid-row: span 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  background: #EFF6FF;
+  color: #1565C0 !important;
+}
+
+body.app-body.role-3 .admin-user-detail-item strong {
+  overflow-wrap: anywhere;
+  color: #0F172A;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.3;
+  text-align: right;
+}
+
+body.app-body.role-3 .admin-user-detail-address strong {
+  text-align: right;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+body.app-body.role-3 .admin-user-detail-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+body.app-body.role-3 .admin-user-detail-actions .btn {
+  justify-content: center;
+  width: 100%;
+  min-height: 38px !important;
+}

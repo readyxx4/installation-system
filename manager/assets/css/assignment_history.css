@@ -1,10 +1,10 @@
 /* =========================================================
-   Manager — Assignment History
-   ใช้รูปแบบหลักจาก assignment_list.css โดยตรง
-   ไฟล์นี้เก็บเฉพาะส่วนที่แตกต่างของหน้า History เท่านั้น
+   Manager Ã¢â‚¬â€ Assignment History
+   Ã Â¹Æ’Ã Â¸Å Ã Â¹â€°Ã Â¸Â£Ã Â¸Â¹Ã Â¸â€ºÃ Â¹ÂÃ Â¸Å¡Ã Â¸Å¡Ã Â¸Â«Ã Â¸Â¥Ã Â¸Â±Ã Â¸ÂÃ Â¸Ë†Ã Â¸Â²Ã Â¸Â assignment_list.css Ã Â¹â€šÃ Â¸â€Ã Â¸Â¢Ã Â¸â€¢Ã Â¸Â£Ã Â¸â€¡
+   Ã Â¹â€žÃ Â¸Å¸Ã Â¸Â¥Ã Â¹Å’Ã Â¸â„¢Ã Â¸ÂµÃ Â¹â€°Ã Â¹â‚¬Ã Â¸ÂÃ Â¹â€¡Ã Â¸Å¡Ã Â¹â‚¬Ã Â¸â€°Ã Â¸Å¾Ã Â¸Â²Ã Â¸Â°Ã Â¸ÂªÃ Â¹Ë†Ã Â¸Â§Ã Â¸â„¢Ã Â¸â€”Ã Â¸ÂµÃ Â¹Ë†Ã Â¹ÂÃ Â¸â€¢Ã Â¸ÂÃ Â¸â€¢Ã Â¹Ë†Ã Â¸Â²Ã Â¸â€¡Ã Â¸â€šÃ Â¸Â­Ã Â¸â€¡Ã Â¸Â«Ã Â¸â„¢Ã Â¹â€°Ã Â¸Â² History Ã Â¹â‚¬Ã Â¸â€”Ã Â¹Ë†Ã Â¸Â²Ã Â¸â„¢Ã Â¸Â±Ã Â¹â€°Ã Â¸â„¢
    ========================================================= */
 
-/* ปุ่มจัดการ: แก้ไข / ยกเลิก ให้เล็กและขนาดเท่ากัน */
+/* Ã Â¸â€ºÃ Â¸Â¸Ã Â¹Ë†Ã Â¸Â¡Ã Â¸Ë†Ã Â¸Â±Ã Â¸â€Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£: Ã Â¹ÂÃ Â¸ÂÃ Â¹â€°Ã Â¹â€žÃ Â¸â€š / Ã Â¸Â¢Ã Â¸ÂÃ Â¹â‚¬Ã Â¸Â¥Ã Â¸Â´Ã Â¸Â Ã Â¹Æ’Ã Â¸Â«Ã Â¹â€°Ã Â¹â‚¬Ã Â¸Â¥Ã Â¹â€¡Ã Â¸ÂÃ Â¹ÂÃ Â¸Â¥Ã Â¸Â°Ã Â¸â€šÃ Â¸â„¢Ã Â¸Â²Ã Â¸â€Ã Â¹â‚¬Ã Â¸â€”Ã Â¹Ë†Ã Â¸Â²Ã Â¸ÂÃ Â¸Â±Ã Â¸â„¢ */
 body.app-body.role-1
 .assignment-history-page
 .assignment-history-compact-table
@@ -48,7 +48,7 @@ body.app-body.role-1
     flex: 0 0 12px !important;
 }
 
-/* คอลัมน์จัดการ */
+/* Ã Â¸â€žÃ Â¸Â­Ã Â¸Â¥Ã Â¸Â±Ã Â¸Â¡Ã Â¸â„¢Ã Â¹Å’Ã Â¸Ë†Ã Â¸Â±Ã Â¸â€Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£ */
 body.app-body.role-1 .assignment-history-page .assignment-detail-table th:last-child,
 body.app-body.role-1 .assignment-history-page .assignment-detail-table td:last-child {
     width: 154px !important;
@@ -56,14 +56,14 @@ body.app-body.role-1 .assignment-history-page .assignment-detail-table td:last-c
     text-align: center !important;
 }
 
-/* ยกเลิกแล้วเป็นสีเทาแบบสถานะสิ้นสุด */
+/* Ã Â¸Â¢Ã Â¸ÂÃ Â¹â‚¬Ã Â¸Â¥Ã Â¸Â´Ã Â¸ÂÃ Â¹ÂÃ Â¸Â¥Ã Â¹â€°Ã Â¸Â§Ã Â¹â‚¬Ã Â¸â€ºÃ Â¹â€¡Ã Â¸â„¢Ã Â¸ÂªÃ Â¸ÂµÃ Â¹â‚¬Ã Â¸â€”Ã Â¸Â²Ã Â¹ÂÃ Â¸Å¡Ã Â¸Å¡Ã Â¸ÂªÃ Â¸â€“Ã Â¸Â²Ã Â¸â„¢Ã Â¸Â°Ã Â¸ÂªÃ Â¸Â´Ã Â¹â€°Ã Â¸â„¢Ã Â¸ÂªÃ Â¸Â¸Ã Â¸â€ */
 body.app-body.role-1 .assignment-history-page .badge.slate {
     color: #475569 !important;
     background: #f8fafc !important;
     border: 1px solid #cbd5e1 !important;
 }
 
-/* จอแคบ: คงปุ่มทั้งสองให้ขนาดเท่ากัน */
+/* Ã Â¸Ë†Ã Â¸Â­Ã Â¹ÂÃ Â¸â€žÃ Â¸Å¡: Ã Â¸â€žÃ Â¸â€¡Ã Â¸â€ºÃ Â¸Â¸Ã Â¹Ë†Ã Â¸Â¡Ã Â¸â€”Ã Â¸Â±Ã Â¹â€°Ã Â¸â€¡Ã Â¸ÂªÃ Â¸Â­Ã Â¸â€¡Ã Â¹Æ’Ã Â¸Â«Ã Â¹â€°Ã Â¸â€šÃ Â¸â„¢Ã Â¸Â²Ã Â¸â€Ã Â¹â‚¬Ã Â¸â€”Ã Â¹Ë†Ã Â¸Â²Ã Â¸ÂÃ Â¸Â±Ã Â¸â„¢ */
 @media (max-width: 1180px) {
     body.app-body.role-1
     .assignment-history-page
@@ -86,7 +86,7 @@ body.app-body.role-1 .assignment-history-page .badge.slate {
 
 
 /* =========================================================
-   v7 — Separate job status from technician availability
+   v7 Ã¢â‚¬â€ Separate job status from technician availability
    ========================================================= */
 
 body.app-body.role-1 .assignment-history-page .history-status-stack {
@@ -127,7 +127,7 @@ body.app-body.role-1 .assignment-history-page .assignment-detail-table td:nth-ch
 
 
 /* =========================================================
-   v8 — Technician readiness dot moves to technician name
+   v8 Ã¢â‚¬â€ Technician readiness dot moves to technician name
    ========================================================= */
 
 /* Remove previous status-under-badge layout effects. */
@@ -173,7 +173,7 @@ body.app-body.role-1 .assignment-history-page .history-tech-dot.is-unavailable {
     box-shadow: 0 0 0 2px rgba(220, 38, 38, .10) !important;
 }
 
-/* ให้ข้อความในแถว History ใช้สีเดียวกับหน้ารายการมอบหมายงาน */
+/* Ã Â¹Æ’Ã Â¸Â«Ã Â¹â€°Ã Â¸â€šÃ Â¹â€°Ã Â¸Â­Ã Â¸â€žÃ Â¸Â§Ã Â¸Â²Ã Â¸Â¡Ã Â¹Æ’Ã Â¸â„¢Ã Â¹ÂÃ Â¸â€“Ã Â¸Â§ History Ã Â¹Æ’Ã Â¸Å Ã Â¹â€°Ã Â¸ÂªÃ Â¸ÂµÃ Â¹â‚¬Ã Â¸â€Ã Â¸ÂµÃ Â¸Â¢Ã Â¸Â§Ã Â¸ÂÃ Â¸Â±Ã Â¸Å¡Ã Â¸Â«Ã Â¸â„¢Ã Â¹â€°Ã Â¸Â²Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¸Â¡Ã Â¸Â­Ã Â¸Å¡Ã Â¸Â«Ã Â¸Â¡Ã Â¸Â²Ã Â¸Â¢Ã Â¸â€¡Ã Â¸Â²Ã Â¸â„¢ */
 body.app-body.role-1
 .assignment-history-page
 .assignment-history-compact-table {
@@ -181,7 +181,7 @@ body.app-body.role-1
     table-layout: fixed !important;
 }
 
-/* รหัสมอบหมายงาน */
+/* Ã Â¸Â£Ã Â¸Â«Ã Â¸Â±Ã Â¸ÂªÃ Â¸Â¡Ã Â¸Â­Ã Â¸Å¡Ã Â¸Â«Ã Â¸Â¡Ã Â¸Â²Ã Â¸Â¢Ã Â¸â€¡Ã Â¸Â²Ã Â¸â„¢ */
 body.app-body.role-1
 .assignment-history-page
 .assignment-history-compact-table th:nth-child(1),
@@ -191,7 +191,7 @@ body.app-body.role-1
     width: 14% !important;
 }
 
-/* ลูกค้า */
+/* Ã Â¸Â¥Ã Â¸Â¹Ã Â¸ÂÃ Â¸â€žÃ Â¹â€°Ã Â¸Â² */
 body.app-body.role-1
 .assignment-history-page
 .assignment-history-compact-table th:nth-child(2),
@@ -201,7 +201,7 @@ body.app-body.role-1
     width: 18% !important;
 }
 
-/* ช่างติดตั้ง */
+/* Ã Â¸Å Ã Â¹Ë†Ã Â¸Â²Ã Â¸â€¡Ã Â¸â€¢Ã Â¸Â´Ã Â¸â€Ã Â¸â€¢Ã Â¸Â±Ã Â¹â€°Ã Â¸â€¡ */
 body.app-body.role-1
 .assignment-history-page
 .assignment-history-compact-table th:nth-child(3),
@@ -211,7 +211,7 @@ body.app-body.role-1
     width: 16% !important;
 }
 
-/* จำนวนสินค้า */
+/* Ã Â¸Ë†Ã Â¸Â³Ã Â¸â„¢Ã Â¸Â§Ã Â¸â„¢Ã Â¸ÂªÃ Â¸Â´Ã Â¸â„¢Ã Â¸â€žÃ Â¹â€°Ã Â¸Â² */
 body.app-body.role-1
 .assignment-history-page
 .assignment-history-compact-table th:nth-child(4),
@@ -222,7 +222,7 @@ body.app-body.role-1
     text-align: center !important;
 }
 
-/* วันที่มอบหมาย */
+/* Ã Â¸Â§Ã Â¸Â±Ã Â¸â„¢Ã Â¸â€”Ã Â¸ÂµÃ Â¹Ë†Ã Â¸Â¡Ã Â¸Â­Ã Â¸Å¡Ã Â¸Â«Ã Â¸Â¡Ã Â¸Â²Ã Â¸Â¢ */
 body.app-body.role-1
 .assignment-history-page
 .assignment-history-compact-table th:nth-child(5),
@@ -233,7 +233,7 @@ body.app-body.role-1
     text-align: center !important;
 }
 
-/* วันที่-เวลาติดตั้ง */
+/* Ã Â¸Â§Ã Â¸Â±Ã Â¸â„¢Ã Â¸â€”Ã Â¸ÂµÃ Â¹Ë†-Ã Â¹â‚¬Ã Â¸Â§Ã Â¸Â¥Ã Â¸Â²Ã Â¸â€¢Ã Â¸Â´Ã Â¸â€Ã Â¸â€¢Ã Â¸Â±Ã Â¹â€°Ã Â¸â€¡ */
 body.app-body.role-1
 .assignment-history-page
 .assignment-history-compact-table th:nth-child(6),
@@ -245,7 +245,7 @@ body.app-body.role-1
     white-space: nowrap !important;
 }
 
-/* จัดการ */
+/* Ã Â¸Ë†Ã Â¸Â±Ã Â¸â€Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£ */
 body.app-body.role-1
 .assignment-history-page
 .assignment-history-compact-table th:nth-child(7),

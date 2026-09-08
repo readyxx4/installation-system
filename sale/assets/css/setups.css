@@ -515,7 +515,7 @@ body.app-body.role-2 .cs-data-table.cs-setups-table-clean .cs-row-actions a[href
 
   gap: 4px !important;
 
-  /* คงขนาดข้อความเดิม */
+  /* Ã Â¸â€žÃ Â¸â€¡Ã Â¸â€šÃ Â¸â„¢Ã Â¸Â²Ã Â¸â€Ã Â¸â€šÃ Â¹â€°Ã Â¸Â­Ã Â¸â€žÃ Â¸Â§Ã Â¸Â²Ã Â¸Â¡Ã Â¹â‚¬Ã Â¸â€Ã Â¸Â´Ã Â¸Â¡ */
   font-size: 11px !important;
   font-weight: 800 !important;
   line-height: 1 !important;
@@ -568,14 +568,14 @@ body.app-body.role-2
   table-layout: fixed !important;
 }
 
-/* รหัสใบงาน */
+/* Ã Â¸Â£Ã Â¸Â«Ã Â¸Â±Ã Â¸ÂªÃ Â¹Æ’Ã Â¸Å¡Ã Â¸â€¡Ã Â¸Â²Ã Â¸â„¢ */
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean
 .setup-col-id {
   width: 15%;
 }
 
-/* วันที่เวลา */
+/* Ã Â¸Â§Ã Â¸Â±Ã Â¸â„¢Ã Â¸â€”Ã Â¸ÂµÃ Â¹Ë†Ã Â¹â‚¬Ã Â¸Â§Ã Â¸Â¥Ã Â¸Â² */
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean
 .setup-col-created {
@@ -584,14 +584,14 @@ body.app-body.role-2
   color: #475569;
 }
 
-/* ลูกค้า */
+/* Ã Â¸Â¥Ã Â¸Â¹Ã Â¸ÂÃ Â¸â€žÃ Â¹â€°Ã Â¸Â² */
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean
 .setup-col-customer {
   width: 18%;
 }
 
-/* จำนวนสินค้า */
+/* Ã Â¸Ë†Ã Â¸Â³Ã Â¸â„¢Ã Â¸Â§Ã Â¸â„¢Ã Â¸ÂªÃ Â¸Â´Ã Â¸â„¢Ã Â¸â€žÃ Â¹â€°Ã Â¸Â² */
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean
 .setup-col-items {
@@ -599,7 +599,7 @@ body.app-body.role-2
   text-align: center;
 }
 
-/* รวมค่าติดตั้ง */
+/* Ã Â¸Â£Ã Â¸Â§Ã Â¸Â¡Ã Â¸â€žÃ Â¹Ë†Ã Â¸Â²Ã Â¸â€¢Ã Â¸Â´Ã Â¸â€Ã Â¸â€¢Ã Â¸Â±Ã Â¹â€°Ã Â¸â€¡ */
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean
 .setup-col-total {
@@ -608,7 +608,7 @@ body.app-body.role-2
   white-space: nowrap;
 }
 
-/* จัดการ */
+/* Ã Â¸Ë†Ã Â¸Â±Ã Â¸â€Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£ */
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean
 .setup-col-actions {
@@ -617,7 +617,7 @@ body.app-body.role-2
 }
 
 
-/* หัวตาราง */
+/* Ã Â¸Â«Ã Â¸Â±Ã Â¸Â§Ã Â¸â€¢Ã Â¸Â²Ã Â¸Â£Ã Â¸Â²Ã Â¸â€¡ */
 
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean th:nth-child(4) {
@@ -630,7 +630,7 @@ body.app-body.role-2
 }
 
 
-/* รหัสใบงาน */
+/* Ã Â¸Â£Ã Â¸Â«Ã Â¸Â±Ã Â¸ÂªÃ Â¹Æ’Ã Â¸Å¡Ã Â¸â€¡Ã Â¸Â²Ã Â¸â„¢ */
 
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean
@@ -640,7 +640,7 @@ body.app-body.role-2
 }
 
 
-/* จำนวนสินค้า */
+/* Ã Â¸Ë†Ã Â¸Â³Ã Â¸â„¢Ã Â¸Â§Ã Â¸â„¢Ã Â¸ÂªÃ Â¸Â´Ã Â¸â„¢Ã Â¸â€žÃ Â¹â€°Ã Â¸Â² */
 
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean
@@ -664,7 +664,7 @@ body.app-body.role-2
 }
 
 
-/* รวมค่าติดตั้ง */
+/* Ã Â¸Â£Ã Â¸Â§Ã Â¸Â¡Ã Â¸â€žÃ Â¹Ë†Ã Â¸Â²Ã Â¸â€¢Ã Â¸Â´Ã Â¸â€Ã Â¸â€¢Ã Â¸Â±Ã Â¹â€°Ã Â¸â€¡ */
 
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean
@@ -678,7 +678,7 @@ body.app-body.role-2
 }
 
 
-/* ปุ่มจัดการ */
+/* Ã Â¸â€ºÃ Â¸Â¸Ã Â¹Ë†Ã Â¸Â¡Ã Â¸Ë†Ã Â¸Â±Ã Â¸â€Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£ */
 
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean
@@ -695,7 +695,7 @@ body.app-body.role-2
 }
 
 
-/* ทำให้แต่ละแถวอ่านง่ายขึ้น */
+/* Ã Â¸â€”Ã Â¸Â³Ã Â¹Æ’Ã Â¸Â«Ã Â¹â€°Ã Â¹ÂÃ Â¸â€¢Ã Â¹Ë†Ã Â¸Â¥Ã Â¸Â°Ã Â¹ÂÃ Â¸â€“Ã Â¸Â§Ã Â¸Â­Ã Â¹Ë†Ã Â¸Â²Ã Â¸â„¢Ã Â¸â€¡Ã Â¹Ë†Ã Â¸Â²Ã Â¸Â¢Ã Â¸â€šÃ Â¸Â¶Ã Â¹â€°Ã Â¸â„¢ */
 
 body.app-body.role-2
 .cs-data-table.cs-setups-table-clean
@@ -880,4 +880,385 @@ body.cs-modal-open {
 .cs-cancel-modal-confirm .cs-icon {
   width: 13px;
   height: 13px;
+}
+
+.cs-job-status-panel {
+  max-width: 1540px;
+  margin: 0 auto 18px;
+  padding: 24px;
+  border: 1px solid #eadcc7;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 18px 36px rgba(116, 84, 45, .08);
+}
+
+.cs-job-status-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.cs-job-status-head h2 {
+  margin: 0 0 5px;
+  color: #25180b;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.cs-job-status-head p {
+  margin: 0;
+  color: #8a755d;
+  font-size: 13px;
+  line-height: 1.7;
+  font-weight: 700;
+}
+
+.cs-status-link {
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: #eaf2ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.cs-status-tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.cs-status-tab {
+  min-height: 42px;
+  border: 1px solid #eadcc7;
+  border-radius: 999px;
+  background: #fffaf2;
+  color: #8a6a3f;
+  padding: 0 14px;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cs-status-tab b {
+  display: inline-flex;
+  min-width: 24px;
+  height: 24px;
+  margin-left: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #fff1cf;
+  color: #9a6500;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-status-tab.active {
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  color: #ffffff;
+  border-color: #f59e0b;
+}
+
+.cs-status-tab.active b {
+  background: rgba(255, 255, 255, .22);
+  color: #ffffff;
+}
+
+.cs-table-wrap {
+  width: 100%;
+  overflow: auto;
+  border: 1px solid #e8eef6;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.cs-choice-table-wrap {
+  max-height: 390px;
+}
+
+.cs-job-status-table-wrap {
+  max-height: 360px;
+}
+
+.cs-data-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  font-size: 13px;
+}
+
+.cs-data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f8fafc;
+  color: #64748b;
+  padding: 14px 13px;
+  text-align: left;
+  border-bottom: 1px solid #e8eef6;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.cs-data-table tbody td {
+  padding: 13px;
+  border-bottom: 1px solid #edf2f7;
+  color: #18324a;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.cs-data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.cs-data-table small {
+  display: block;
+  margin-top: 4px;
+  color: #8a755d;
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+.cs-empty-cell {
+  padding: 26px !important;
+  text-align: center;
+  color: #8a755d !important;
+  background: #fffaf2;
+  font-weight: 900 !important;
+}
+
+.cs-table-action {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid #bfdbfe;
+  background: #eaf2ff;
+  color: #2563eb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cs-table-action:hover {
+  background: #dbeafe;
+}
+
+.cs-row-add-btn {
+  border-color: #fed7aa;
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.cs-row-add-btn:hover {
+  background: #ffedd5;
+}
+
+.cs-job-status-panel.cs-setups-page-panel {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: calc(100vh - 145px) !important;
+  margin: 0 !important;
+  padding: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+.cs-setups-page-panel .cs-job-status-head {
+  flex-shrink: 0 !important;
+}
+
+.cs-setups-page-panel .cs-status-tabs {
+  flex-shrink: 0 !important;
+}
+
+.cs-setups-table-wrap .cs-data-table {
+  height: 100% !important;
+}
+
+.cs-setups-page-panel .cs-job-status-table td:nth-child(8) {
+  text-align: center !important;
+}
+
+.cs-setups-page-panel .cs-job-status-table td small {
+  display: none !important;
+}
+
+.cs-setups-page-panel {
+  min-height: calc(100vh - 90px);
+  padding: 24px;
+  border-radius: 26px;
+}
+
+.cs-setups-table-wrap {
+  flex: 1 1 auto !important;
+  min-height: 520px !important;
+  max-height: calc(100vh - 310px);
+  overflow: auto;
+  border: 1px solid #e8edf5;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.cs-setups-table-clean {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.cs-setups-table-clean thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f7f9fc;
+  color: #516174;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: left;
+  padding: 16px 14px;
+  border-bottom: 1px solid #e8edf5;
+  white-space: nowrap;
+}
+
+.cs-setups-table-clean tbody td {
+  padding: 16px 14px;
+  border-bottom: 1px solid #edf1f7;
+  color: #10233f;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.cs-setups-table-clean tbody tr:hover {
+  background: #fffaf2;
+}
+
+.cs-setups-table-clean td b {
+  color: #10233f;
+  font-weight: 900;
+}
+
+.cs-status-tab.status-all {
+  color: #B45309;
+  background: #FFF7ED;
+  border-color: #FED7AA;
+}
+
+.cs-status-tab.status-all.active {
+  color: #FFFFFF;
+  background: #F59E0B;
+  border-color: #F59E0B;
+}
+
+.cs-status-tab.status-created.active {
+  color: #FFFFFF;
+  background: #4B5563;
+  border-color: #4B5563;
+}
+
+.cs-status-tab.status-assigned.active {
+  color: #FFFFFF;
+  background: #D97706;
+  border-color: #D97706;
+}
+
+.cs-status-tab.status-accepted.active {
+  color: #FFFFFF;
+  background: #2563EB;
+  border-color: #2563EB;
+}
+
+.cs-status-tab.status-installing.active {
+  color: #FFFFFF;
+  background: #7C3AED;
+  border-color: #7C3AED;
+}
+
+.cs-status-tab.status-done.active {
+  color: #FFFFFF;
+  background: #16A34A;
+  border-color: #16A34A;
+}
+
+.cs-status-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid #2563EB;
+  border-radius: 14px;
+  background: #2563EB;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.18);
+}
+
+.cs-status-link:hover {
+  background: #1D4ED8;
+  border-color: #1D4ED8;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.cs-status-link .cs-icon {
+  width: 19px;
+  height: 19px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cs-table-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid #BFDBFE;
+  border-radius: 12px;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.cs-table-action:hover {
+  background: #DBEAFE;
+  border-color: #93C5FD;
+  color: #1D4ED8;
+  transform: translateY(-1px);
+}
+
+.cs-table-action .cs-icon {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }

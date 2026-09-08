@@ -498,7 +498,7 @@ body.app-body.role-2,
     color: #6d7f96;
 }
 
-/* ลดพื้นที่ว่างของฟอร์มเมื่ออยู่หน้า Dashboard */
+/* ÃƒÂ Ã‚Â¸Ã‚Â¥ÃƒÂ Ã‚Â¸Ã¢â‚¬ÂÃƒÂ Ã‚Â¸Ã…Â¾ÃƒÂ Ã‚Â¸Ã‚Â·ÃƒÂ Ã‚Â¹Ã¢â‚¬Â°ÃƒÂ Ã‚Â¸Ã¢â€žÂ¢ÃƒÂ Ã‚Â¸Ã¢â‚¬â€ÃƒÂ Ã‚Â¸Ã‚ÂµÃƒÂ Ã‚Â¹Ã‹â€ ÃƒÂ Ã‚Â¸Ã‚Â§ÃƒÂ Ã‚Â¹Ã‹â€ ÃƒÂ Ã‚Â¸Ã‚Â²ÃƒÂ Ã‚Â¸Ã¢â‚¬Â¡ÃƒÂ Ã‚Â¸Ã¢â‚¬Å¡ÃƒÂ Ã‚Â¸Ã‚Â­ÃƒÂ Ã‚Â¸Ã¢â‚¬Â¡ÃƒÂ Ã‚Â¸Ã…Â¸ÃƒÂ Ã‚Â¸Ã‚Â­ÃƒÂ Ã‚Â¸Ã‚Â£ÃƒÂ Ã‚Â¹Ã…â€™ÃƒÂ Ã‚Â¸Ã‚Â¡ÃƒÂ Ã‚Â¹Ã¢â€šÂ¬ÃƒÂ Ã‚Â¸Ã‚Â¡ÃƒÂ Ã‚Â¸Ã‚Â·ÃƒÂ Ã‚Â¹Ã‹â€ ÃƒÂ Ã‚Â¸Ã‚Â­ÃƒÂ Ã‚Â¸Ã‚Â­ÃƒÂ Ã‚Â¸Ã‚Â¢ÃƒÂ Ã‚Â¸Ã‚Â¹ÃƒÂ Ã‚Â¹Ã‹â€ ÃƒÂ Ã‚Â¸Ã‚Â«ÃƒÂ Ã‚Â¸Ã¢â€žÂ¢ÃƒÂ Ã‚Â¹Ã¢â‚¬Â°ÃƒÂ Ã‚Â¸Ã‚Â² Dashboard */
 .sales-dashboard-page .setup-page {
     flex: 1 1 auto;
     margin: 0;
@@ -577,4 +577,241 @@ body.app-body.role-2,
 
 .sales-dashboard-page .setup-submit-btn {
     min-height: 42px;
+}
+
+/* ===== PURE SALE ===== */
+.sales-dashboard-page {
+  padding-bottom: 28px;
+}
+.sales-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(360px, .9fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.sales-dashboard-grid.lower {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.sales-payment-status {
+  display: grid;
+  gap: 14px;
+}
+.payment-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 17px;
+  border-radius: 16px;
+  border: 1px solid #eadcc7;
+  background: #fffaf2;
+}
+.payment-status-row strong {
+  display: block;
+  color: #25180b;
+  font-weight: 900;
+}
+.payment-status-row span {
+  display: block;
+  margin-top: 4px;
+  color: #8a755d;
+  font-size: 13px;
+  font-weight: 700;
+}
+.payment-status-row b {
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+.payment-status-row.wait b {
+  background: #fff1d6;
+  color: #d97706;
+}
+.payment-status-row.paid b {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.payment-status-row.cancel b {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.simple-list {
+  display: grid;
+  gap: 12px;
+}
+.simple-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f0e2cf;
+}
+.simple-list-item:last-child {
+  border-bottom: 0;
+}
+.simple-list-item strong {
+  display: block;
+  color: #25180b;
+  font-weight: 900;
+}
+.simple-list-item span {
+  display: block;
+  margin-top: 4px;
+  color: #8a755d;
+  font-size: 13px;
+  font-weight: 700;
+}
+.sales-menu-panel .admin-menu-grid,
+.sales-menu-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  width: 100% !important;
+}
+.sales-menu-panel .admin-menu-card,
+.sales-menu-grid .admin-menu-card {
+  width: 100% !important;
+  min-height: 230px !important;
+  padding: 22px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+.sales-menu-panel .admin-menu-card h3,
+.sales-menu-grid .admin-menu-card h3 {
+  min-height: 48px !important;
+  margin-bottom: 10px !important;
+  line-height: 1.35 !important;
+}
+.sales-menu-panel .admin-menu-card p,
+.sales-menu-grid .admin-menu-card p {
+  line-height: 1.65 !important;
+}
+.sales-setups-page,
+
+.sales-dashboard-page {
+  padding-bottom: 28px;
+}
+
+.sales-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(360px, .9fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.sales-dashboard-grid.lower {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sales-payment-status {
+  display: grid;
+  gap: 14px;
+}
+
+.payment-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 17px;
+  border-radius: 16px;
+  border: 1px solid #eadcc7;
+  background: #fffaf2;
+}
+
+.payment-status-row strong {
+  display: block;
+  color: #25180b;
+  font-weight: 900;
+}
+
+.payment-status-row span {
+  display: block;
+  margin-top: 4px;
+  color: #8a755d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.payment-status-row b {
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.payment-status-row.wait b {
+  background: #fff1d6;
+  color: #d97706;
+}
+
+.payment-status-row.paid b {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.payment-status-row.cancel b {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.simple-list {
+  display: grid;
+  gap: 12px;
+}
+
+.simple-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f0e2cf;
+}
+
+.simple-list-item:last-child {
+  border-bottom: 0;
+}
+
+.simple-list-item strong {
+  display: block;
+  color: #25180b;
+  font-weight: 900;
+}
+
+.simple-list-item span {
+  display: block;
+  margin-top: 4px;
+  color: #8a755d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sales-menu-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  width: 100% !important;
+}
+
+.sales-menu-grid .admin-menu-card {
+  width: 100% !important;
+  min-height: 230px !important;
+  padding: 22px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+.sales-menu-grid .admin-menu-card h3 {
+  min-height: 48px !important;
+  margin-bottom: 10px !important;
+  line-height: 1.35 !important;
+}
+
+.sales-menu-grid .admin-menu-card p {
+  line-height: 1.65 !important;
 }

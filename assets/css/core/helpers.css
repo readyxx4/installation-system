@@ -71,3 +71,19 @@
   font-family: var(--font-number) !important;
   font-variant-numeric: tabular-nums !important;
 }
+
+.muted-text {
+  color: var(--muted);
+}
+
+.muted-text {
+  font-size: 13px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}

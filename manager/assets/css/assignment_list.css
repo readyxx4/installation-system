@@ -858,20 +858,20 @@ body.app-body.role-1 .assignment-detail-table td:nth-child(5) {
     text-align: center !important;
 }
 
-/* ให้ช่องจัดการยังเป็น table-cell ไม่แยกออกจากตาราง */
+/* Ã Â¹Æ’Ã Â¸Â«Ã Â¹â€°Ã Â¸Å Ã Â¹Ë†Ã Â¸Â­Ã Â¸â€¡Ã Â¸Ë†Ã Â¸Â±Ã Â¸â€Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¸Â¢Ã Â¸Â±Ã Â¸â€¡Ã Â¹â‚¬Ã Â¸â€ºÃ Â¹â€¡Ã Â¸â„¢ table-cell Ã Â¹â€žÃ Â¸Â¡Ã Â¹Ë†Ã Â¹ÂÃ Â¸Â¢Ã Â¸ÂÃ Â¸Â­Ã Â¸Â­Ã Â¸ÂÃ Â¸Ë†Ã Â¸Â²Ã Â¸ÂÃ Â¸â€¢Ã Â¸Â²Ã Â¸Â£Ã Â¸Â²Ã Â¸â€¡ */
 body.app-body.role-1 .assignment-detail-table td.assignment-row-actions {
     display: table-cell !important;
     text-align: center !important;
     vertical-align: middle !important;
 }
 
-/* จัดปุ่มมอบหมายงานให้อยู่ตรงกลางหัวข้อ "จัดการ" */
+/* Ã Â¸Ë†Ã Â¸Â±Ã Â¸â€Ã Â¸â€ºÃ Â¸Â¸Ã Â¹Ë†Ã Â¸Â¡Ã Â¸Â¡Ã Â¸Â­Ã Â¸Å¡Ã Â¸Â«Ã Â¸Â¡Ã Â¸Â²Ã Â¸Â¢Ã Â¸â€¡Ã Â¸Â²Ã Â¸â„¢Ã Â¹Æ’Ã Â¸Â«Ã Â¹â€°Ã Â¸Â­Ã Â¸Â¢Ã Â¸Â¹Ã Â¹Ë†Ã Â¸â€¢Ã Â¸Â£Ã Â¸â€¡Ã Â¸ÂÃ Â¸Â¥Ã Â¸Â²Ã Â¸â€¡Ã Â¸Â«Ã Â¸Â±Ã Â¸Â§Ã Â¸â€šÃ Â¹â€°Ã Â¸Â­ "Ã Â¸Ë†Ã Â¸Â±Ã Â¸â€Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£" */
 body.app-body.role-1 .assignment-detail-table td.assignment-row-actions .assignment-icon-btn {
     display: inline-flex !important;
     margin: 0 auto !important;
 }
 
-/* ===== v5: keep "ทั้งหมด" count visible when inactive ===== */
+/* ===== v5: keep "Ã Â¸â€”Ã Â¸Â±Ã Â¹â€°Ã Â¸â€¡Ã Â¸Â«Ã Â¸Â¡Ã Â¸â€" count visible when inactive ===== */
 body.app-body.role-1 .assignment-status-tab.status-all b {
     display: inline-flex !important;
     align-items: center !important;
@@ -895,7 +895,7 @@ body.app-body.role-1 .assignment-status-tab.status-all.active b {
     color: #ffffff !important;
 }
 
-/* ===== Manager Assignment Header — copied directly from Sale dashboard header values ===== */
+/* ===== Manager Assignment Header Ã¢â‚¬â€ copied directly from Sale dashboard header values ===== */
 body.app-body.role-1 .assignment-sale-header {
   margin-bottom: 14px;
 }
@@ -1123,4 +1123,166 @@ body.app-body.role-1 .assignment-detail-table td:nth-child(5) {
 body.app-body.role-1 .assignment-detail-table th,
 body.app-body.role-1 .assignment-detail-table td {
     vertical-align: middle !important;
+}
+
+.assignment-list-toolbar {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 12px !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 14px !important;
+  border: 1px solid #e4edf8 !important;
+  border-radius: 18px !important;
+  background: #f8fbff !important;
+  margin: 18px 0 14px !important;
+}
+
+.assignment-list-search {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #dbe5f0;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 0 14px;
+}
+
+.assignment-list-search .manager-icon {
+  color: #64748b;
+}
+
+.assignment-list-search input {
+  width: 100%;
+  height: 46px;
+  border: 0 !important;
+  outline: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: #18324a;
+  font-weight: 800;
+  min-width: 0 !important;
+}
+
+.assignment-toolbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.assignment-toolbar-actions .btn {
+  min-height: 46px !important;
+  border-radius: 14px !important;
+  padding: 0 18px !important;
+}
+
+.assignment-search-form {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+.assignment-search-form input {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.assignment-search-form .assignment-add-btn-inline {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+}
+
+.assignment-search-field .manager-icon {
+  width: 20px !important;
+  height: 20px !important;
+  color: #64748b !important;
+  stroke: currentColor !important;
+  flex: 0 0 20px !important;
+}
+
+.assignment-search-field input::placeholder {
+  color: #64748b !important;
+  font-weight: 700 !important;
+}
+
+.assignment-search-btn {
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.20) !important;
+}
+
+.assignment-toolbar-buttons .manager-icon {
+  width: 19px !important;
+  height: 19px !important;
+  stroke: currentColor !important;
+  flex: 0 0 19px !important;
+}
+
+.assignment-toolbar-card {
+  width: 100% !important;
+  margin: 18px 0 16px !important;
+  padding: 14px 16px !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 18px !important;
+  background: #f8fbff !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04) !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 14px !important;
+  align-items: center !important;
+}
+
+.assignment-search-field {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 52px !important;
+  box-sizing: border-box !important;
+  min-height: 54px;
+  border: 1px solid #dbe6f3;
+  border-radius: 16px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.assignment-search-field input {
+  height: 100% !important;
+  min-width: 0 !important;
+  font-size: 14px !important;
+  box-shadow: none !important;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-weight: 700;
+  color: #10233f;
+}
+
+.assignment-toolbar-buttons {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.assignment-list-no-tophead {
+  padding-top: 0 !important;
+}
+
+.assignment-list-no-tophead .assignment-from-setup-card {
+  margin-top: 0 !important;
+}
+
+.assignment-list-head-action {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
 }
