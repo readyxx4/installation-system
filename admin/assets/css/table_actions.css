@@ -15,6 +15,41 @@
   stroke-linejoin: round;
 }
 
+/* Keep Admin row actions compact instead of inheriting large form buttons. */
+body.app-body.role-3 .data-table td .btn-edit,
+body.app-body.role-3 .data-table td .btn-delete,
+body.app-body.role-3 .table-action-buttons .btn-edit,
+body.app-body.role-3 .table-action-buttons .btn-delete {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: row !important;
+  min-width: 0 !important;
+  min-height: 29px !important;
+  width: auto !important;
+  padding: 5px 10px !important;
+  gap: 6px !important;
+  border-radius: 8px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-3 .data-table td .btn-edit .action-icon,
+body.app-body.role-3 .data-table td .btn-delete .action-icon,
+body.app-body.role-3 .table-action-buttons .action-icon {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  flex: 0 0 16px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  stroke: currentColor !important;
+  fill: none !important;
+}
+
 body.app-body.role-3 .admin-user-list-pane {
   display: flex;
   flex-direction: column;
