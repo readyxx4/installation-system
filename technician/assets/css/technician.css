@@ -564,24 +564,15 @@ body.app-body.role-technician .app-shell {
 }
 
 body.app-body.role-technician .sidebar {
-  padding: 20px 12px !important;
   color: var(--tech-ink) !important;
 }
 
 body.app-body.role-technician .sidebar .brand {
-  padding: 0 2px 10px !important;
-  margin-bottom: 6px !important;
   border-bottom: 1px solid #e5e7eb !important;
-  gap: 7px !important;
-  order: 1 !important;
 }
 
 body.app-body.role-technician .brand-logo,
 body.app-body.role-technician .brand-mark {
-  width: 34px !important;
-  height: 34px !important;
-  flex-basis: 34px !important;
-  border-radius: 9px !important;
   border: 1px solid var(--brand-100, #dbeafe) !important;
   background: var(--tech-primary-soft) !important;
   box-shadow: 0 8px 18px rgba(37, 99, 235, .16) !important;
@@ -614,24 +605,10 @@ body.app-body.role-technician .sidebar > .nav-section-title {
 }
 
 body.app-body.role-technician .nav-link {
-  min-height: 40px !important;
-  margin-bottom: 3px !important;
-  padding: 8px 12px !important;
-  border-radius: 10px !important;
-  gap: 5px !important;
   color: var(--slate-700, #334155) !important;
-  font-size: 12.5px !important;
-  background: transparent !important;
-  transition: background-color .2s ease, color .2s ease, box-shadow .2s ease !important;
 }
 
 body.app-body.role-technician .nav-icon {
-  width: 18px !important;
-  height: 18px !important;
-  min-width: 18px !important;
-  flex-basis: 18px !important;
-  border-radius: 0 !important;
-  background: transparent !important;
   color: var(--slate-600, #475569) !important;
 }
 
@@ -680,20 +657,12 @@ body.app-body.role-technician .nav-link.active .nav-icon {
 }
 
 body.app-body.role-technician .sidebar-profile {
-  min-height: 54px !important;
-  padding: 8px 10px !important;
   border: 1px solid var(--tech-border) !important;
-  border-radius: 12px !important;
   background: var(--slate-50, #f8fafc) !important;
   box-shadow: var(--shadow-xs, 0 1px 2px rgba(15,23,42,.04)) !important;
-  order: 10 !important;
 }
 
 body.app-body.role-technician .sidebar-profile-avatar {
-  width: 30px !important;
-  height: 30px !important;
-  flex-basis: 30px !important;
-  border-radius: 9px !important;
   background: var(--tech-primary) !important;
 }
 
@@ -702,29 +671,15 @@ body.app-body.role-technician .logout-menu:hover {
   color: var(--danger-600, #dc2626) !important;
 }
 body.app-body.role-technician .shell-brand-copy {
-  display: grid !important;
-  gap: 0 !important;
 }
 
 body.app-body.role-technician .shell-brand-copy strong {
-  display: -webkit-box !important;
-  -webkit-line-clamp: 2 !important;
-  -webkit-box-orient: vertical !important;
-  overflow: hidden !important;
-  font-size: 13.5px !important;
-  line-height: 1.22 !important;
 }
 
 body.app-body.role-technician .shell-brand-copy span {
-  font-size: 10.5px !important;
-  line-height: 1.25 !important;
 }
 
 body.app-body.role-technician .shell-nav-item {
-  display: grid !important;
-  grid-template-columns: 18px minmax(0, 1fr) auto !important;
-  align-items: center !important;
-  gap: 5px !important;
 }
 
 body.app-body.role-technician .sidebar > .shell-nav-item {
@@ -732,7 +687,6 @@ body.app-body.role-technician .sidebar > .shell-nav-item {
 }
 
 body.app-body.role-technician .nav-label {
-  white-space: nowrap !important;
 }
 
 body.app-body.role-technician .nav-badge {
@@ -751,10 +705,7 @@ body.app-body.role-technician .nav-badge {
 }
 
 body.app-body.role-technician .sidebar-account {
-  margin-top: 8px !important;
-  padding-top: 10px !important;
   border-top: 1px solid #e5e7eb !important;
-  order: 11 !important;
 }
 
 body.app-body.role-technician .shell-logout {
