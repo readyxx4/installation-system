@@ -102,9 +102,11 @@ if ($search !== '') {
 layout_header('จัดการสินค้า', 'products');
 ?>
 
+<link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/admin_lists.css')) ?>?v=<?= h(asset_version('admin/assets/css/admin_lists.css')) ?>">
+
 <?= flash_message() ?>
 
-<div class="panel">
+<div class="panel admin-list-page admin-products-page">
   <div class="panel-title">รายการข้อมูลสินค้าทั้งหมด</div>
 
   <form class="toolbar product-toolbar" method="GET" action="<?= h(app_system_url('admin/products.php')) ?>">

@@ -1,0 +1,69 @@
+/* =========================================================
+   Admin system settings page
+   ========================================================= */
+
+body.app-body.role-3:has(.admin-system-page) .content {
+    background: #f6f8fb !important;
+}
+
+body.app-body.role-3 .admin-system-page {
+    width: 100%;
+    max-width: 1180px;
+    min-height: calc(100vh - 64px);
+    margin: 0 auto;
+    padding: 28px 32px 40px;
+    box-sizing: border-box;
+    background: transparent;
+}
+
+body.app-body.role-3 .admin-system-page .staff-page-back-row {
+    margin: 0 0 16px;
+}
+
+body.app-body.role-3 .admin-system-page .staff-create-card {
+    padding: 0 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .04) !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-create-head {
+    padding: 20px 22px !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    border-radius: 16px 16px 0 0 !important;
+    background: #ffffff !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-create-head h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 22px !important;
+    font-weight: 800;
+}
+
+body.app-body.role-3 .admin-system-page .staff-form-grid,
+body.app-body.role-3 .admin-system-page .staff-form-actions {
+    padding-left: 22px;
+    padding-right: 22px;
+}
+
+body.app-body.role-3 .admin-system-page .staff-form-grid {
+    padding-top: 22px;
+}
+
+body.app-body.role-3 .admin-system-page .staff-form-actions {
+    padding-bottom: 22px;
+}
+
+@media (max-width: 760px) {
+    body.app-body.role-3 .admin-system-page {
+        padding: 22px 16px 32px;
+    }
+
+    body.app-body.role-3 .admin-system-page .staff-form-grid,
+    body.app-body.role-3 .admin-system-page .staff-form-actions {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}

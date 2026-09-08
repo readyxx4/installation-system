@@ -69,9 +69,11 @@ if ($search !== '') {
 layout_header('จัดการประเภทสินค้า', 'product_types');
 ?>
 
+<link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/admin_lists.css')) ?>?v=<?= h(asset_version('admin/assets/css/admin_lists.css')) ?>">
+
 <?= flash_message() ?>
 
-<div class="panel">
+<div class="panel admin-list-page admin-product-types-page">
   <div class="panel-title">รายการข้อมูลประเภทสินค้าทั้งหมด</div>
 
   <form class="toolbar product-type-toolbar" method="GET" action="<?= h(app_system_url('admin/product_types.php')) ?>">

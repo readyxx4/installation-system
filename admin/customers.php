@@ -105,9 +105,11 @@ if ($search !== '') {
 layout_header('จัดการข้อมูลลูกค้า', 'customers');
 ?>
 
+<link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/admin_lists.css')) ?>?v=<?= h(asset_version('admin/assets/css/admin_lists.css')) ?>">
+
 <?= flash_message() ?>
 
-<div class="panel">
+<div class="panel admin-list-page admin-customers-page">
   <div class="panel-title">รายการข้อมูลลูกค้าทั้งหมด</div>
 
   <form class="toolbar customer-toolbar" method="GET" action="<?= h(app_system_url('admin/customers.php')) ?>">

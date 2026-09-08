@@ -233,11 +233,20 @@ if ($search !== '') {
 layout_header('จัดการข้อมูลพนักงาน', 'users');
 ?>
 
+<link
+    rel="stylesheet"
+    href="<?= h(app_asset_url('admin/assets/css/users.css')) ?>?v=<?= h(asset_version('admin/assets/css/users.css')) ?>"
+>
+
 <?= flash_message() ?>
 
-<div class="admin-user-split-layout">
+<div class="admin-user-split-layout admin-users-page">
         <div class="panel admin-user-list-pane">
-    <div class="panel-title">รายการข้อมูลพนักงานทั้งหมด</div>
+    <div class="admin-users-page-head">
+        <div>
+            <h1>รายการข้อมูลพนักงานทั้งหมด</h1>
+        </div>
+    </div>
 
     <form class="toolbar user-toolbar" method="GET" action="<?= h(app_system_url('admin/users.php')) ?>">
         <input type="text" name="q" placeholder="ค้นหารหัส ชื่อ-นามสกุล เบอร์โทร อีเมล หรือที่อยู่" value="<?= h($search) ?>">

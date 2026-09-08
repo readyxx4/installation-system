@@ -380,134 +380,11 @@ layout_header('หน้าหลักผู้ดูแลระบบ', 'dash
     href="<?= h(app_asset_url('admin/assets/css/dashboard.css')) ?>?v=<?= h(asset_version('admin/assets/css/dashboard.css')) ?>"
 >
 
-<style>
-    .admin-dashboard-summary-page {
-        height: auto;
-        min-height: calc(100vh - 40px);
-        overflow: visible;
-    }
-
-    .admin-dashboard-summary-page .admin-dashboard-top {
-        min-height: auto;
-        padding: 18px 22px;
-    }
-
-    .admin-dashboard-summary-page .admin-summary-grid {
-        display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 12px;
-        margin-top: 14px;
-    }
-
-    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card {
-        align-items: flex-start !important;
-        height: auto !important;
-        min-height: 84px !important;
-        max-height: none !important;
-        padding: 14px !important;
-        border-radius: 12px !important;
-    }
-
-    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card > div:first-child {
-        display: block !important;
-    }
-
-    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card span,
-    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card p {
-        font-size: 12px !important;
-        line-height: 1.35 !important;
-    }
-
-    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card strong,
-    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card h2 {
-        margin: 5px 0 4px !important;
-        font-size: 26px !important;
-        line-height: 1.1 !important;
-    }
-
-    body.app-body.role-3 .admin-dashboard-summary-page .admin-summary-card small {
-        font-size: 11px !important;
-        line-height: 1.35 !important;
-    }
-
-    .admin-dashboard-brief-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 14px;
-        margin-top: 14px;
-    }
-
-    .admin-dashboard-summary-page .admin-brief-card {
-        min-height: 0;
-        padding: 18px;
-    }
-
-    .admin-dashboard-summary-page .admin-status-chart {
-        display: none;
-    }
-
-    .admin-dashboard-summary-page .admin-status-metrics {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 0;
-        margin-top: 12px;
-    }
-
-    .admin-dashboard-summary-page .admin-simple-list {
-        display: grid;
-        gap: 10px;
-        margin-top: 12px;
-    }
-
-    .admin-dashboard-summary-page .admin-simple-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 10px 0;
-        border-bottom: 1px solid #E2E8F0;
-    }
-
-    .admin-dashboard-summary-page .admin-simple-row:last-child {
-        border-bottom: 0;
-    }
-
-    .admin-dashboard-summary-page .admin-simple-row span {
-        color: #64748B;
-        font-size: 13px;
-        font-weight: 700;
-    }
-
-    .admin-dashboard-summary-page .admin-simple-row strong {
-        color: #0F3F7A;
-        font-size: 15px;
-        font-weight: 900;
-        white-space: nowrap;
-    }
-
-    @media (max-width: 1100px) {
-        .admin-dashboard-summary-page .admin-summary-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-
-        .admin-dashboard-brief-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 760px) {
-        .admin-dashboard-summary-page .admin-summary-grid,
-        .admin-dashboard-summary-page .admin-status-metrics {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-
 <div class="admin-dashboard-v2 admin-dashboard-summary-page">
 
     <div class="admin-dashboard-top">
         <div>
             <h1>ภาพรวมผู้ดูแลระบบ</h1>
-            <p>สรุปข้อมูลพนักงาน บุคลากร สินค้า และสถานะระบบ</p>
         </div>
 
         <div class="admin-dashboard-actions">
@@ -592,6 +469,71 @@ layout_header('หน้าหลักผู้ดูแลระบบ', 'dash
         </div>
 
     </div>
+
+    <section class="admin-quick-section" aria-labelledby="admin-quick-title">
+        <div class="admin-section-heading">
+            <div>
+                <h2 id="admin-quick-title">ทางลัดการจัดการ</h2>
+                <p>เข้าถึงหมวดข้อมูลได้อย่างรวดเร็ว</p>
+            </div>
+        </div>
+
+        <div class="admin-quick-grid">
+            <a class="admin-quick-card" href="<?= h(app_system_url('admin/users.php')) ?>">
+                <span class="admin-quick-icon blue"><i class="fa-regular fa-user"></i></span>
+                <span class="admin-quick-copy">
+                    <strong>จัดการพนักงาน</strong>
+                    <small><?= h((string) $total_system_users) ?> บัญชีผู้ใช้งาน</small>
+                </span>
+                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
+            </a>
+
+            <a class="admin-quick-card" href="<?= h(app_system_url('admin/technicians.php')) ?>">
+                <span class="admin-quick-icon teal"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                <span class="admin-quick-copy">
+                    <strong>จัดการช่าง</strong>
+                    <small><?= h((string) $total_technicians) ?> คน</small>
+                </span>
+                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
+            </a>
+
+            <a class="admin-quick-card" href="<?= h(app_system_url('admin/customers.php')) ?>">
+                <span class="admin-quick-icon orange"><i class="fa-regular fa-address-card"></i></span>
+                <span class="admin-quick-copy">
+                    <strong>จัดการลูกค้า</strong>
+                    <small><?= h((string) $total_customers) ?> ราย</small>
+                </span>
+                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
+            </a>
+
+            <a class="admin-quick-card" href="<?= h(app_system_url('admin/product_types.php')) ?>">
+                <span class="admin-quick-icon indigo"><i class="fa-regular fa-rectangle-list"></i></span>
+                <span class="admin-quick-copy">
+                    <strong>ประเภทสินค้า</strong>
+                    <small><?= h((string) $total_product_types) ?> ประเภท</small>
+                </span>
+                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
+            </a>
+
+            <a class="admin-quick-card" href="<?= h(app_system_url('admin/products.php')) ?>">
+                <span class="admin-quick-icon slate"><i class="fa-solid fa-cube"></i></span>
+                <span class="admin-quick-copy">
+                    <strong>สินค้า</strong>
+                    <small><?= h((string) $total_products) ?> รายการ</small>
+                </span>
+                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
+            </a>
+
+            <a class="admin-quick-card" href="<?= h(app_system_url('admin/system.php')) ?>">
+                <span class="admin-quick-icon sky"><i class="fa-solid fa-circle-info"></i></span>
+                <span class="admin-quick-copy">
+                    <strong>ข้อมูลระบบ</strong>
+                    <small>ตั้งค่าข้อมูลพื้นฐาน</small>
+                </span>
+                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
+            </a>
+        </div>
+    </section>
 
 </div>
 

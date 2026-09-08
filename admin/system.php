@@ -197,8 +197,10 @@ if (!function_exists('admin_form_icon_svg')) {
 
 layout_header('จัดการข้อมูลระบบ', 'system');
 ?>
+<link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/system.css')) ?>?v=<?= h(asset_version('admin/assets/css/system.css')) ?>">
+
 <?= flash_message() ?>
-<div class="staff-form-page">
+<div class="staff-form-page admin-system-page">
   <div class="staff-page-back-row"><a class="staff-back-link" href="<?= h(app_system_url('admin/index.php')) ?>"><?= admin_form_icon_svg('back') ?> กลับหน้าหลัก</a></div>
   <form class="staff-create-card" method="POST" action="<?= h(app_system_url('admin/system.php')) ?>" enctype="multipart/form-data" autocomplete="off">
     <input type="hidden" name="old_logo" value="<?= h($system['system_logo']) ?>">

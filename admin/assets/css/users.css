@@ -1,0 +1,374 @@
+/* =========================================================
+   Admin Users page
+   ========================================================= */
+
+body.app-body.role-3 .admin-users-page {
+    width: 100%;
+    max-width: 1180px;
+    min-height: calc(100vh - 64px);
+    height: auto !important;
+    margin: 0 auto;
+    padding: 28px 32px 40px;
+    box-sizing: border-box;
+    display: block !important;
+    background: transparent;
+}
+
+body.app-body.role-3:has(.admin-users-page) .content {
+    background: #f6f8fb !important;
+}
+
+body.app-body.role-3 .admin-users-page.has-detail {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 20px;
+    align-items: stretch;
+}
+
+body.app-body.role-3 .admin-users-page .admin-user-list-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: auto !important;
+    min-height: 0;
+    padding: 0 !important;
+    overflow: visible;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-page-head h1 {
+    margin: 0 0 6px;
+    color: #0f172a;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+body.app-body.role-3 .admin-users-page .user-toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-3 .admin-users-page .user-toolbar input {
+    width: 100%;
+    min-width: 0 !important;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid #dbe3ec !important;
+    border-radius: 11px;
+    background: #ffffff !important;
+    color: #1e293b;
+    font-size: 14px;
+    box-shadow: none !important;
+}
+
+body.app-body.role-3 .admin-users-page .user-toolbar input::placeholder {
+    color: #94a3b8;
+}
+
+body.app-body.role-3 .admin-users-page .user-toolbar input:focus {
+    border-color: #93c5fd !important;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .1) !important;
+}
+
+body.app-body.role-3 .admin-users-page .user-toolbar .btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 15px !important;
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    text-decoration: none;
+}
+
+body.app-body.role-3 .admin-users-page .user-toolbar .btn-search,
+body.app-body.role-3 .admin-users-page .user-toolbar .btn-add {
+    border: 1px solid #2563eb !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+}
+
+body.app-body.role-3 .admin-users-page .user-toolbar .btn-search:hover,
+body.app-body.role-3 .admin-users-page .user-toolbar .btn-add:hover {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+}
+
+body.app-body.role-3 .admin-users-page .user-toolbar .btn-reset {
+    border: 1px solid #dbe3ec !important;
+    background: #ffffff !important;
+    color: #475569 !important;
+}
+
+body.app-body.role-3 .admin-users-page .user-toolbar .btn-reset:hover {
+    border-color: #bfdbfe !important;
+    background: #f8fbff !important;
+    color: #1d4ed8 !important;
+}
+
+body.app-body.role-3 .admin-users-page .user-toolbar .action-icon {
+    width: 16px !important;
+    height: 16px !important;
+    flex: 0 0 16px !important;
+    stroke: currentColor !important;
+    fill: none !important;
+}
+
+body.app-body.role-3 .admin-users-page .table-wrap {
+    width: 100%;
+    min-height: 0;
+    overflow: auto;
+    padding: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .04);
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table {
+    width: 100%;
+    min-width: 980px !important;
+    table-layout: fixed;
+    border: 0 !important;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #ffffff;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table th {
+    height: 48px;
+    padding: 0 16px;
+    border-bottom: 1px solid #e5e7eb !important;
+    background: #f8fafc !important;
+    color: #475569 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    text-align: left;
+    white-space: nowrap;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td {
+    height: 64px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eef2f7 !important;
+    color: #334155 !important;
+    font-size: 13px !important;
+    vertical-align: middle;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table tbody tr:last-child td {
+    border-bottom: 0 !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(1),
+body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(1) {
+    width: 12%;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(2),
+body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(2) {
+    width: 17%;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(3),
+body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(3) {
+    width: 14%;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(4),
+body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(4) {
+    width: 20%;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(5),
+body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(5) {
+    width: 13%;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(6),
+body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(6) {
+    width: 18%;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(7),
+body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(7) {
+    width: 150px;
+    text-align: center;
+}
+
+body.app-body.role-3 .admin-users-page .user-row-name-trigger {
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #1e3a8a;
+    font-size: inherit;
+    font-weight: 700;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.app-body.role-3 .admin-users-page .admin-address-cell {
+    max-width: none !important;
+    overflow: hidden;
+    color: #64748b !important;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+}
+
+body.app-body.role-3 .admin-users-page .text-more-btn {
+    display: inline-flex;
+    margin-left: 4px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child {
+    white-space: nowrap;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-edit,
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-delete {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    margin: 0 2px;
+    padding: 0 9px !important;
+    gap: 5px !important;
+    border-radius: 9px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-edit {
+    border: 1px solid #bfdbfe !important;
+    background: #eff6ff !important;
+    color: #2563eb !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-delete {
+    border: 1px solid #fecaca !important;
+    background: #fff1f2 !important;
+    color: #dc2626 !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .action-icon {
+    width: 14px !important;
+    height: 14px !important;
+    flex: 0 0 14px !important;
+    background: transparent !important;
+    border: 0 !important;
+    stroke: currentColor !important;
+}
+
+body.app-body.role-3 .admin-users-page .badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+body.app-body.role-3 .admin-users-page .badge.red {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+body.app-body.role-3 .admin-users-page .badge.green {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+body.app-body.role-3 .admin-users-page .badge.orange {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+body.app-body.role-3 .admin-users-page .empty-state {
+    height: 180px;
+    color: #64748b;
+    text-align: center;
+}
+
+body.app-body.role-3 .admin-users-page .admin-user-detail-panel {
+    border-color: #e5e7eb;
+    background: #ffffff;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .08);
+}
+
+@media (max-width: 1100px) {
+    body.app-body.role-3 .admin-users-page {
+        padding-right: 24px;
+        padding-left: 24px;
+    }
+
+    body.app-body.role-3 .admin-users-page .user-toolbar {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+    }
+
+    body.app-body.role-3 .admin-users-page .user-add-in-toolbar {
+        grid-column: 1 / -1;
+        justify-self: end;
+    }
+}
+
+@media (max-width: 760px) {
+    body.app-body.role-3 .admin-users-page {
+        padding: 22px 16px 32px;
+    }
+
+    body.app-body.role-3 .admin-users-page .admin-users-page-head h1 {
+        font-size: 24px;
+    }
+
+    body.app-body.role-3 .admin-users-page .user-toolbar {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    body.app-body.role-3 .admin-users-page .user-toolbar input,
+    body.app-body.role-3 .admin-users-page .user-add-in-toolbar {
+        grid-column: 1 / -1;
+    }
+
+    body.app-body.role-3 .admin-users-page .user-add-in-toolbar {
+        justify-self: stretch;
+    }
+
+    body.app-body.role-3 .admin-users-page.has-detail {
+        display: block !important;
+    }
+}
