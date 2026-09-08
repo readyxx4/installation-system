@@ -371,6 +371,41 @@ function technician_shell_icon_svg(string $name, int $size = 20): string
 
   return '<svg class="shell-icon" width="' . h((string) $size) . '" height="' . h((string) $size) . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $paths[$name] . '</svg>';
 }
+
+function admin_shell_icon_svg(string $name, int $size = 20): string
+{
+  $paths = [
+    'home' => '<path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"></path><path d="M9 21v-6h6v6"></path>',
+    'users' => '<circle cx="9" cy="8" r="3"></circle><path d="M3 20a6 6 0 0 1 12 0"></path><path d="M16 5.5a3 3 0 0 1 0 5.8"></path><path d="M18 20a5 5 0 0 0-3-4.6"></path>',
+    'technicians' => '<path d="M14.7 6.3a4.5 4.5 0 0 0-5.9 5.9L3.5 17.5a2.1 2.1 0 0 0 3 3l5.3-5.3a4.5 4.5 0 0 0 5.9-5.9l-2.9 2.1-2.7-2.7 2.1-2.9Z"></path>',
+    'customers' => '<rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="9" cy="11" r="2"></circle><path d="M6 16a3 3 0 0 1 6 0M14 10h4M14 14h4"></path>',
+    'product-types' => '<rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M8 8h8M8 12h8M8 16h5"></path>',
+    'products' => '<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"></path><path d="m4.5 7.5 7.5 4 7.5-4M12 11.5V21"></path>',
+    'system' => '<circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path>',
+  ];
+
+  if (!isset($paths[$name])) {
+    return '';
+  }
+
+  return '<svg class="shell-icon" width="' . h((string) $size) . '" height="' . h((string) $size) . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $paths[$name] . '</svg>';
+}
+
+function sale_manager_shell_icon_svg(string $name, int $size = 20): string
+{
+  $paths = [
+    'document-plus' => '<path d="M6 3h8l4 4v14H6z"></path><path d="M14 3v5h5M12 12v6M9 15h6"></path>',
+    'document-list' => '<path d="M6 3h8l4 4v14H6z"></path><path d="M14 3v5h5M9 12h6M9 16h6M9 8h1"></path>',
+    'history' => '<path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 5v5h5M12 7v5l3 2"></path>',
+    'clipboard-list' => '<rect x="5" y="4" width="14" height="17" rx="2"></rect><path d="M9 4V3h6v1M9 9h6M9 13h6M9 17h4"></path>',
+  ];
+
+  if (!isset($paths[$name])) {
+    return '';
+  }
+
+  return '<svg class="shell-icon" width="' . h((string) $size) . '" height="' . h((string) $size) . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $paths[$name] . '</svg>';
+}
 function nav_item(
   string $label,
   string $icon,
@@ -528,7 +563,9 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
           <?php
           nav_item(
             'หน้าหลัก',
-            $roleKey === 'technician' ? technician_shell_icon_svg('home', 20) : '<i class="fa-solid fa-house"></i>',
+            $roleKey === 'technician'
+              ? technician_shell_icon_svg('home', 20)
+              : ($roleKey === '3' ? admin_shell_icon_svg('home', 20) : '<i class="fa-solid fa-house"></i>'),
             role_dashboard($role),
             'dashboard',
             $active
@@ -549,7 +586,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
           <?php
           nav_item(
             'มอบหมายงาน',
-            '<i class="fa-solid fa-clipboard-list"></i>',
+            sale_manager_shell_icon_svg('clipboard-list', 20),
             app_system_url('manager/assignment_list.php'),
             'assignment_list',
             $active
@@ -557,7 +594,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
 
           nav_item(
             'รายการมอบหมายงาน',
-            '<i class="fa-solid fa-clock-rotate-left"></i>',
+            sale_manager_shell_icon_svg('history', 20),
             app_system_url('manager/assignment_history.php'),
             'assignment_history',
             $active
@@ -578,7 +615,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
           <?php
           nav_item(
             'สร้างใบงานติดตั้ง',
-            '<i class="fa-solid fa-file-circle-plus"></i>',
+            sale_manager_shell_icon_svg('document-plus', 20),
             app_system_url('sale/index.php'),
             'create_setup',
             $active
@@ -586,7 +623,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
 
           nav_item(
             'รายการงานติดตั้ง',
-            '<i class="fa-solid fa-file-lines"></i>',
+            sale_manager_shell_icon_svg('document-list', 20),
             app_system_url('sale/setups.php'),
             'setups',
             $active
@@ -594,7 +631,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
 
           nav_item(
             'ประวัติใบงาน',
-            '<i class="fa-solid fa-clock-rotate-left"></i>',
+            sale_manager_shell_icon_svg('history', 20),
             app_system_url('sale/setup_history.php'),
             'setup_history',
             $active
@@ -635,7 +672,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
           <?php
           nav_item(
             'จัดการพนักงาน',
-            '<i class="fa-solid fa-users"></i>',
+            admin_shell_icon_svg('users', 20),
             app_system_url('admin/users.php'),
             'users',
             $active
@@ -643,7 +680,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
 
           nav_item(
             'จัดการข้อมูลช่าง',
-            '<i class="fa-solid fa-screwdriver-wrench"></i>',
+            admin_shell_icon_svg('technicians', 20),
             app_system_url('admin/technicians.php'),
             'technicians',
             $active
@@ -651,7 +688,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
 
           nav_item(
             'จัดการข้อมูลลูกค้า',
-            '<i class="fa-solid fa-address-book"></i>',
+            admin_shell_icon_svg('customers', 20),
             app_system_url('admin/customers.php'),
             'customers',
             $active
@@ -659,7 +696,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
 
           nav_item(
             'ประเภทสินค้า',
-            '<i class="fa-solid fa-table-cells-large"></i>',
+            admin_shell_icon_svg('product-types', 20),
             app_system_url('admin/product_types.php'),
             'product_types',
             $active
@@ -667,7 +704,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
 
           nav_item(
             'สินค้า',
-            '<i class="fa-solid fa-box"></i>',
+            admin_shell_icon_svg('products', 20),
             app_system_url('admin/products.php'),
             'products',
             $active
@@ -675,7 +712,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
 
           nav_item(
             'ข้อมูลระบบ',
-            '<i class="fa-solid fa-gear"></i>',
+            admin_shell_icon_svg('system', 20),
             app_system_url('admin/system.php'),
             'system',
             $active
