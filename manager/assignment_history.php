@@ -8,13 +8,29 @@ date_default_timezone_set('Asia/Bangkok');
 
 $keyword = trim($_GET['q'] ?? '');
 $search = $keyword;
+$history_view = trim($_GET['view'] ?? 'active');
+if (!in_array($history_view, ['active', 'archive'], true)) {
+    $history_view = 'active';
+}
+
 $status_filter = trim($_GET['status'] ?? 'all');
 $warning_filter = trim($_GET['warning'] ?? '');
 $allowed_warning_filters = ['near', 'urgent', 'today', 'overdue', 'reassign'];
 if (!in_array($warning_filter, $allowed_warning_filters, true)) {
     $warning_filter = '';
 }
-$allowed_status_filters = ['all', 'canceled', 'assigned', 'accepted', 'working', 'done'];
+if ($status_filter === 'canceled') {
+    $status_filter = 'cancelled';
+}
+
+if ($history_view === 'active' && in_array($status_filter, ['done', 'cancelled'], true)) {
+    $history_view = 'archive';
+}
+
+$allowed_status_filters = $history_view === 'archive'
+    ? ['all', 'done', 'cancelled']
+    : ['all', 'assigned', 'accepted', 'ready', 'working', 'review'];
+
 if (!in_array($status_filter, $allowed_status_filters, true)) {
     $status_filter = 'all';
 }
@@ -139,12 +155,12 @@ function setup_status_name($status): string
 function setup_status_badge($status): string
 {
     return match ((string) $status) {
-        '0' => 'orange',
-        '1' => 'blue',
-        '2' => 'cyan',
-        '3' => 'purple',
-        '4' => 'green',
-        default => 'red',
+        '0' => 'unassigned',
+        '1' => 'assigned',
+        '2' => 'accepted',
+        '3' => 'working',
+        '4' => 'done',
+        default => 'waiting',
     };
 }
 
@@ -167,8 +183,45 @@ function assignment_is_overdue(array $row): bool
 
 function display_assignment_status(array $row): string
 {
-    if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
+    $setupStatus = (string) ($row['setup_status'] ?? '');
+    $assignStatus = (string) ($row['assign_status'] ?? '');
+    $hasReceive = (string) ($row['has_receive'] ?? '0') === '1';
+    $hasInstallResult = (string) ($row['has_install_result'] ?? '0') === '1';
+
+    if ($setupStatus === '5' || $assignStatus === '4') {
         return 'ยกเลิกแล้ว';
+    }
+
+    if ($assignStatus === '3') {
+        return 'ช่างปฏิเสธงาน';
+    }
+
+    if ($setupStatus === '4' || $assignStatus === '5') {
+        return 'เสร็จสิ้น';
+    }
+
+    if ($hasInstallResult && $setupStatus === '3') {
+        return 'รอหัวหน้าช่างยืนยัน';
+    }
+
+    if ($setupStatus === '3') {
+        return 'กำลังติดตั้ง';
+    }
+
+    if ($hasReceive) {
+        return 'ยืนยันรับสินค้าแล้ว';
+    }
+
+    if ($setupStatus === '2') {
+        return 'ช่างรับงานแล้ว';
+    }
+
+    if ($setupStatus === '1' || $assignStatus === '1') {
+        return setup_status_name('1');
+    }
+
+    if (assignment_is_overdue($row)) {
+        return 'เกินกำหนด';
     }
 
     return setup_status_name($row['setup_status']);
@@ -193,11 +246,52 @@ function assignment_has_unavailable_active_tech(array $row): bool
 
 function display_assignment_badge(array $row): string
 {
-    if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
-        return 'slate';
+    $setupStatus = (string) ($row['setup_status'] ?? '');
+    $assignStatus = (string) ($row['assign_status'] ?? '');
+    $hasReceive = (string) ($row['has_receive'] ?? '0') === '1';
+    $hasInstallResult = (string) ($row['has_install_result'] ?? '0') === '1';
+
+    if ($setupStatus === '5' || $assignStatus === '4') {
+        return 'cancelled';
     }
 
-    return setup_status_badge($row['setup_status']);
+    if ($assignStatus === '3') {
+        return 'rejected';
+    }
+
+    if ($setupStatus === '4' || $assignStatus === '5') {
+        return 'done';
+    }
+
+    if ($hasInstallResult && $setupStatus === '3') {
+        return 'review';
+    }
+
+    if ($setupStatus === '3') {
+        return 'working';
+    }
+
+    if ($hasReceive) {
+        return 'ready';
+    }
+
+    if ($setupStatus === '2') {
+        return 'accepted';
+    }
+
+    if ($setupStatus === '1' || $assignStatus === '1') {
+        return 'assigned';
+    }
+
+    if ($setupStatus === '0') {
+        return 'unassigned';
+    }
+
+    if (assignment_is_overdue($row)) {
+        return 'overdue';
+    }
+
+    return setup_status_badge($setupStatus);
 }
 
 function assign_status_name($status): string
@@ -250,7 +344,7 @@ function money_text($value): string
 
 $latest_assignment_join = "\n    LEFT JOIN assignment a\n        ON a.setup_id = s.setup_id\n       AND a.assign_id = (\n            SELECT a2.assign_id\n            FROM assignment a2\n            WHERE a2.setup_id = s.setup_id\n            ORDER BY a2.assign_date DESC, a2.assign_id DESC\n            LIMIT 1\n       )\n";
 
-$base_sql = "\n    SELECT\n        s.setup_id,\n        s.customer_id AS user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n\n        c.customer_name AS user_name,\n        c.customer_phone AS user_phone,\n        c.customer_email AS user_email,\n        c.customer_address AS user_address,\n\n        p.pro_name,\n        p.pro_price_install,\n\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n        {$assign_install_date_select},\n        {$assign_install_time_select},\n        {$assign_install_end_time_select},\n\n        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n\n        m.user_name AS manager_name,\n\n        COUNT(idt.detail_id) AS item_count,\n        COALESCE(SUM(COALESCE(idt.install_qty, 1) * COALESCE(p2.pro_price_install, 0)), 0) AS install_total\n\n    FROM setup s\n    LEFT JOIN customers c ON s.customer_id = c.customer_id\n    LEFT JOIN product p ON s.pro_id = p.pro_id\n    {$latest_assignment_join}\n    LEFT JOIN technicians t ON a.tech_id = t.tech_id\n    LEFT JOIN `user` m ON a.assign_by = m.user_id\n    LEFT JOIN install_detail idt ON s.setup_id = idt.setup_id\n    LEFT JOIN product p2 ON idt.pro_id = p2.pro_id\n";
+$base_sql = "\n    SELECT\n        s.setup_id,\n        s.customer_id AS user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n\n        c.customer_name AS user_name,\n        c.customer_phone AS user_phone,\n        c.customer_email AS user_email,\n        c.customer_address AS user_address,\n\n        p.pro_name,\n        p.pro_price_install,\n\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n        {$assign_install_date_select},\n        {$assign_install_time_select},\n        {$assign_install_end_time_select},\n\n        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n\n        m.user_name AS manager_name,\n\n        COUNT(idt.detail_id) AS item_count,\n        COALESCE(SUM(COALESCE(idt.install_qty, 1) * COALESCE(p2.pro_price_install, 0)), 0) AS install_total,\n        MAX(CASE WHEN pr.receive_id IS NOT NULL THEN 1 ELSE 0 END) AS has_receive,\n        MAX(CASE WHEN ir.result_id IS NOT NULL THEN 1 ELSE 0 END) AS has_install_result\n\n    FROM setup s\n    LEFT JOIN customers c ON s.customer_id = c.customer_id\n    LEFT JOIN product p ON s.pro_id = p.pro_id\n    {$latest_assignment_join}\n    LEFT JOIN technicians t ON a.tech_id = t.tech_id\n    LEFT JOIN `user` m ON a.assign_by = m.user_id\n    LEFT JOIN install_detail idt ON s.setup_id = idt.setup_id\n    LEFT JOIN product p2 ON idt.pro_id = p2.pro_id\n    LEFT JOIN product_receive pr ON pr.assign_id = a.assign_id AND pr.receive_status = 1\n    LEFT JOIN installation_result ir ON ir.setup_id = s.setup_id\n";
 
 $install_date_group_sql = $has_install_date ? "        a.assign_install_date,\n" : "";
 $install_time_group_sql = $has_install_time ? "        a.assign_install_time,\n" : "";
@@ -303,7 +397,7 @@ while ($row = $result->fetch_assoc()) {
     $row['tech_display'] = $row['tech_name'] ?: '-';
     $row['manager_display'] = $row['manager_name'] ?: '-';
     $row['setup_date_display'] = thai_date($row['setup_date'] ?? null);
-    $row['assign_date_display'] = thai_datetime($row['assign_date'] ?? null);
+    $row['assign_date_display'] = thai_date($row['assign_date'] ?? null);
     $row['created_at_display'] = thai_datetime($row['created_at'] ?? null);
     $row['install_date_display'] = thai_date($row['assign_install_date'] ?? null);
     $row['install_time_display'] = thai_time($row['assign_install_time'] ?? null);
@@ -325,6 +419,10 @@ while ($row = $result->fetch_assoc()) {
     } else {
         $row['install_datetime_display'] = $install_date_text . ' ' . $install_start_text . ' น.';
     }
+
+    $row['install_time_display'] = $install_start_text === ''
+        ? '-'
+        : ($install_end_text !== '' ? $install_start_text . ' - ' . $install_end_text . ' น.' : $install_start_text . ' น.');
 
     $row['item_count_display'] = (int) ($row['item_count'] ?? 0);
     $row['install_total_display'] = money_text($row['install_total'] ?? 0);
@@ -384,10 +482,40 @@ $status_tabs = [
     'all' => ['label' => 'ทั้งหมด', 'status' => null],
     'assigned' => ['label' => 'มอบหมายงานแล้ว', 'status' => '1'],
     'accepted' => ['label' => 'ช่างรับงานแล้ว', 'status' => '2'],
+    'ready' => ['label' => 'ยืนยันรับสินค้าแล้ว', 'status' => 'ready'],
     'working' => ['label' => 'กำลังติดตั้ง', 'status' => '3'],
+    'review' => ['label' => 'รอหัวหน้าช่างยืนยัน', 'status' => 'review'],
     'done' => ['label' => 'เสร็จสิ้น', 'status' => '4'],
-    'canceled' => ['label' => 'ยกเลิกแล้ว', 'status' => 'canceled'],
+    'cancelled' => ['label' => 'ยกเลิกแล้ว', 'status' => 'cancelled'],
 ];
+
+if ($history_view === 'archive') {
+    $status_tabs = array_intersect_key(
+        $status_tabs,
+        array_flip(['all', 'done', 'cancelled'])
+    );
+} else {
+    $status_tabs = array_diff_key(
+        $status_tabs,
+        array_flip(['done', 'cancelled'])
+    );
+}
+
+function assignment_history_status_matches(array $row, string $filter): bool
+{
+    $statusBadge = display_assignment_badge($row);
+
+    return match ($filter) {
+        'assigned' => $statusBadge === 'assigned',
+        'accepted' => $statusBadge === 'accepted',
+        'ready' => $statusBadge === 'ready',
+        'working' => $statusBadge === 'working',
+        'review' => $statusBadge === 'review',
+        'done' => $statusBadge === 'done',
+        'canceled', 'cancelled' => in_array($statusBadge, ['cancelled', 'rejected'], true),
+        default => false,
+    };
+}
 
 function assignment_history_row(array $row): bool
 {
@@ -410,32 +538,38 @@ function assignment_history_row(array $row): bool
     return true;
 }
 
+function assignment_history_view_row(array $row, string $view): bool
+{
+    $is_archived = in_array(
+        display_assignment_badge($row),
+        ['done', 'cancelled', 'rejected'],
+        true
+    );
+
+    if ($view === 'archive') {
+        return !empty($row['assign_id']) && $is_archived;
+    }
+
+    return assignment_history_row($row) && !$is_archived;
+}
+
 $status_counts = [];
 foreach ($status_tabs as $key => $tab) {
     if ($key === 'all') {
-        $status_counts[$key] = count(array_filter($setups, 'assignment_history_row'));
+        $status_counts[$key] = count(array_filter($setups, function ($row) use ($history_view) {
+            return assignment_history_view_row($row, $history_view);
+        }));
         continue;
     }
 
-    $status_counts[$key] = count(array_filter($setups, function ($row) use ($key, $tab) {
-        if (!assignment_history_row($row)) {
-            return false;
-        }
-
-        if ($key === 'canceled') {
-            return !empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4';
-        }
-
-        if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
-            return false;
-        }
-
-        return (string) ($row['setup_status'] ?? '') === (string) $tab['status'];
+    $status_counts[$key] = count(array_filter($setups, function ($row) use ($key, $history_view) {
+        return assignment_history_view_row($row, $history_view)
+            && assignment_history_status_matches($row, $key);
     }));
 }
 
-$visible_setups = array_values(array_filter($setups, function ($row) use ($status_filter, $status_tabs, $warning_filter) {
-    if (!assignment_history_row($row)) {
+$visible_setups = array_values(array_filter($setups, function ($row) use ($status_filter, $warning_filter, $history_view) {
+    if (!assignment_history_view_row($row, $history_view)) {
         return false;
     }
 
@@ -451,20 +585,14 @@ $visible_setups = array_values(array_filter($setups, function ($row) use ($statu
         return true;
     }
 
-    if ($status_filter === 'canceled') {
-        return !empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4';
-    }
-
-    if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
-        return false;
-    }
-
-    $status = $status_tabs[$status_filter]['status'] ?? null;
-    return (string) ($row['setup_status'] ?? '') === (string) $status;
+    return assignment_history_status_matches($row, $status_filter);
 }));
-function assignment_status_url(string $status, string $keyword): string
+function assignment_status_url(string $status, string $keyword, string $view = 'active'): string
 {
     $params = [];
+    if ($view === 'archive') {
+        $params['view'] = 'archive';
+    }
     if ($keyword !== '') {
         $params['q'] = $keyword;
     }
@@ -478,7 +606,16 @@ function assignment_status_url(string $status, string $keyword): string
 
 $setups_json = json_encode($visible_setups, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-layout_header('ประวัติการมอบหมายงาน', 'assignment_history');
+$history_title = $history_view === 'archive' ? 'ประวัติงาน' : 'รายการมอบหมายงาน';
+$history_active = $history_view === 'archive' ? 'assignment_archive' : 'assignment_history';
+$history_subtitle = $history_view === 'archive'
+    ? 'ตรวจสอบงานที่เสร็จสิ้นหรือยกเลิกแล้ว'
+    : 'ติดตามงานที่อยู่ระหว่างการมอบหมายและติดตั้ง';
+$history_page_url = app_system_url(
+    'manager/assignment_history.php' . ($history_view === 'archive' ? '?view=archive' : '')
+);
+
+layout_header($history_title, $history_active, $history_subtitle);
 ?>
 
 <div
@@ -486,16 +623,8 @@ layout_header('ประวัติการมอบหมายงาน', 'a
     <?= flash_message() ?>
 
     <section class="manager-panel manager-list-panel assignment-from-setup-card">
-        <div class="manager-panel-head manager-list-panel-head assignment-list-head-action">
-            <div>
-                <h2>ประวัติการมอบหมายงาน</h2>
-                <p>ตรวจสอบประวัติการมอบหมายและสถานะงานย้อนหลัง</p>
-            </div>
-
-        </div>
-
         <form class="assignment-search-form assignment-toolbar-card" method="GET"
-            action="<?= h(app_system_url('manager/assignment_history.php')) ?>">
+            action="<?= h($history_page_url) ?>">
             <div class="assignment-search-field">
                 <?= manager_icon_svg('search') ?>
                 <input type="text" name="q" value="<?= h($keyword) ?>"
@@ -509,7 +638,7 @@ layout_header('ประวัติการมอบหมายงาน', 'a
                 </button>
 
                 <a class="btn-reset assignment-reset-btn"
-                    href="<?= h(app_system_url('manager/assignment_history.php')) ?>">
+                    href="<?= h($history_page_url) ?>">
                     <?= manager_icon_svg('reset') ?>
                     ล้างค้นหา
                 </a>
@@ -519,7 +648,7 @@ layout_header('ประวัติการมอบหมายงาน', 'a
         <div class="assignment-status-tabs">
             <?php foreach ($status_tabs as $key => $tab): ?>
                 <a class="assignment-status-tab status-<?= h($key) ?> <?= $status_filter === $key ? 'active' : '' ?>"
-                    href="<?= h(assignment_status_url($key, $keyword)) ?>">
+                    href="<?= h(assignment_status_url($key, $keyword, $history_view)) ?>">
                     <span><?= h($tab['label']) ?></span>
                     <?php $tab_count = (int) ($status_counts[$key] ?? 0); ?>
                     <?php if ($key === 'all'): ?>
@@ -540,8 +669,9 @@ layout_header('ประวัติการมอบหมายงาน', 'a
                         <th>ลูกค้า</th>
                         <th>ช่างติดตั้ง</th>
                         <th>จำนวนสินค้า</th>
-                        <th>วันที่มอบหมาย</th>
-                        <th>วันที่-เวลาติดตั้ง</th>
+                        <th class="text-center">สถานะ</th>
+                        <th>วันที่ติดตั้ง</th>
+                        <th>เวลาติดตั้ง</th>
                         <th class="text-center">จัดการ</th>
                     </tr>
                 </thead>
@@ -549,7 +679,9 @@ layout_header('ประวัติการมอบหมายงาน', 'a
                 <tbody>
                     <?php if (count($visible_setups) === 0): ?>
                         <tr>
-                            <td colspan="7" class="empty-state">ยังไม่มีประวัติการมอบหมายงาน</td>
+                            <td colspan="8" class="empty-state">
+                                <?= $history_view === 'archive' ? 'ยังไม่มีงานในประวัติ' : 'ยังไม่มีงานที่อยู่ระหว่างดำเนินการ' ?>
+                            </td>
                         </tr>
                     <?php endif; ?>
 
@@ -579,12 +711,18 @@ layout_header('ประวัติการมอบหมายงาน', 'a
                                 <?= h((string) ($row['item_count_display'] ?? 0)) ?> รายการ
                             </td>
 
-                            <td>
-                                <?= h($row['assign_date_display']) ?>
+                            <td class="text-center assignment-status-cell">
+                                <span class="badge <?= h($row['status_badge']) ?>">
+                                    <?= h($row['status_name']) ?>
+                                </span>
                             </td>
 
-                            <td>
-                                <?= h($row['install_datetime_display']) ?>
+                            <td class="assignment-install-date">
+                                <?= h($row['install_date_display']) ?>
+                            </td>
+
+                            <td class="assignment-install-time">
+                                <?= h($row['install_time_display']) ?>
                             </td>
 
                             <td class="assignment-row-actions assignment-icon-actions">

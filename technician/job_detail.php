@@ -104,7 +104,7 @@ function technician_detail_ui_status(array $job, ?array $productReceive): array
     $receiveStatus = (string) ($productReceive['receive_status'] ?? '');
 
     if ($assignStatus === '5' || $setupStatus === '4') {
-        return ['label' => 'เสร็จแล้ว', 'class' => 'success'];
+        return ['label' => 'งานเสร็จสิ้นแล้ว', 'class' => 'success'];
     }
 
     if ($setupStatus === '3') {
@@ -406,7 +406,7 @@ if (!$job) {
     redirect_to(app_system_url('technician/accept_job.php?status=notfound'));
 }
 
-if (!in_array((string) ($job['assign_status'] ?? ''), ['1', '2'], true)) {
+if (!in_array((string) ($job['assign_status'] ?? ''), ['1', '2', '5'], true)) {
     redirect_to(app_system_url('technician/accept_job.php?status=notfound'));
 }
 
@@ -667,8 +667,8 @@ $isInstallDone = (string) ($job['setup_status'] ?? '') === '4' || (string) ($job
 $isInstalling = (string) ($job['setup_status'] ?? '') === '3';
 $isAwaitingInstallReview = $isInstalling && $hasInstallResult;
 if ($isAwaitingInstallReview) {
-    $installStatusText = 'รอหัวหน้างานตรวจสอบ';
-    $detailUiStatus = ['label' => 'รอหัวหน้างานตรวจสอบ', 'class' => 'waiting'];
+    $installStatusText = 'รอหัวหน้าช่างยืนยัน';
+    $detailUiStatus = ['label' => 'รอหัวหน้าช่างยืนยัน', 'class' => 'waiting'];
 }
 $isInstallCompleteMode = ($_GET['install'] ?? '') === 'complete' && $isInstalling && $canConfirmReceive && !$hasInstallResult;
 $hasAcceptedJob = in_array((string) ($job['assign_status'] ?? ''), ['2', '5'], true);
@@ -703,9 +703,9 @@ $timelineSteps = [
         'meta' => $productReceive ? technician_job_detail_date($productReceive['receive_date'] ?? null, true) : 'ยังไม่ได้รับสินค้า',
     ],
     [
-        'label' => $isAwaitingInstallReview ? 'รอหัวหน้างานตรวจสอบ' : ($isInstalling ? 'กำลังติดตั้ง' : 'ติดตั้งเสร็จ'),
+        'label' => $isAwaitingInstallReview ? 'รอหัวหน้าช่างยืนยัน' : ($isInstalling ? 'กำลังติดตั้ง' : 'ติดตั้งเสร็จ'),
         'state' => $isInstallDone ? 'done' : ($isAwaitingInstallReview ? 'active' : (($hasReceivedProducts || $isInstalling) ? 'active' : 'future')),
-        'meta' => $isInstallDone ? 'เสร็จสิ้น' : ($isAwaitingInstallReview ? 'ช่างบันทึกผลแล้ว · รอตรวจสอบและอนุมัติ' : ($isInstalling ? 'กำลังติดตั้ง' : 'รอดำเนินการ')),
+        'meta' => $isInstallDone ? 'เสร็จสิ้น' : ($isAwaitingInstallReview ? 'ช่างบันทึกผลแล้ว · รอหัวหน้าช่างยืนยัน' : ($isInstalling ? 'กำลังติดตั้ง' : 'รอดำเนินการ')),
     ],
 ];
 
@@ -716,8 +716,8 @@ $nextStepText = $hasReceivedProducts
 
 if ($isInstalling) {
     if ($isAwaitingInstallReview) {
-        $nextStepTitle = 'ช่างบันทึกผลการติดตั้งเรียบร้อยแล้ว';
-        $nextStepText = 'กำลังรอหัวหน้างานตรวจสอบและอนุมัติ';
+        $nextStepTitle = 'รอหัวหน้าช่างยืนยัน';
+        $nextStepText = 'ช่างบันทึกผลการติดตั้งแล้ว และกำลังรอหัวหน้าช่างยืนยันงาน';
     } else {
         $nextStepTitle = 'กำลังติดตั้ง';
         $nextStepText = 'อยู่ระหว่างดำเนินการติดตั้ง กรุณาตรวจสอบอุปกรณ์และความเรียบร้อยของงานก่อนส่งมอบให้ลูกค้า';
@@ -1460,6 +1460,26 @@ body.app-body.role-technician .technician-detail-page.install-complete-page #ins
 })();
 </script>
 
+<script>
+(() => {
+    const openButton = document.querySelector('[data-installation-result-open]');
+    const modal = document.querySelector('[data-installation-result-modal]');
+    const closeButton = document.querySelector('[data-installation-result-close]');
+
+    if (!openButton || !modal || !closeButton) {
+        return;
+    }
+
+    openButton.addEventListener('click', () => modal.showModal());
+    closeButton.addEventListener('click', () => modal.close());
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.close();
+        }
+    });
+})();
+</script>
+
 <?php
 layout_footer();
 exit;
@@ -1602,26 +1622,37 @@ endif;
             </section>
 
             <?php if ($hasInstallResult): ?>
-                <section class="card installation-result-card" id="installation-result">
-                    <header class="card-header">
-                        <div>
-                            <h2>ผลการติดตั้ง</h2>
+                <section class="card installation-result-card" id="installation-result" aria-labelledby="installation-result-title">
+                    <header class="card-header installation-result-header">
+                        <div class="installation-result-heading">
+                            <h2 id="installation-result-title">ผลการติดตั้ง</h2>
                             <p>รูปงานติดตั้งที่ช่างบันทึกไว้</p>
                         </div>
+                        <?php if ($installResultPhotos): ?>
+                            <span class="installation-result-count"><?= h((string) count($installResultPhotos)) ?> รูป</span>
+                        <?php endif; ?>
                     </header>
-                    <div class="card-body">
-                        <div class="proof-gallery-block">
-                            <span>รูปงานติดตั้ง</span>
+                    <div class="card-body installation-result-body">
+                        <div class="proof-gallery-block installation-result-content">
+                            <span class="installation-result-label">รูปงานติดตั้ง</span>
                             <?php if ($installResultPhotos): ?>
-                                <div class="proof-gallery">
-                                    <?php foreach ($installResultPhotos as $photoIndex => $photoUrl): ?>
-                                        <a href="<?= h($photoUrl) ?>" target="_blank" rel="noopener">
-                                            <img src="<?= h($photoUrl) ?>" alt="รูปงานติดตั้งที่ <?= h((string) ($photoIndex + 1)) ?>">
+                                <div class="proof-gallery installation-result-gallery">
+                                    <?php foreach (array_slice($installResultPhotos, 0, 3) as $photoIndex => $photoUrl): ?>
+                                        <a class="installation-result-image-link" href="<?= h($photoUrl) ?>" target="_blank" rel="noopener">
+                                            <img class="installation-result-image" src="<?= h($photoUrl) ?>" alt="รูปงานติดตั้งที่ <?= h((string) ($photoIndex + 1)) ?>">
                                         </a>
                                     <?php endforeach; ?>
                                 </div>
+                                <?php if (count($installResultPhotos) > 3): ?>
+                                    <button class="installation-result-more" type="button" data-installation-result-open>
+                                        ดูภาพทั้งหมด <?= h((string) count($installResultPhotos)) ?> รูป
+                                    </button>
+                                <?php endif; ?>
                             <?php else: ?>
-                                <p class="product-table__empty">ไม่พบรูปงานติดตั้ง</p>
+                                <div class="installation-result-empty">
+                                    <strong>ยังไม่มีรูปผลการติดตั้ง</strong>
+                                    <span>ไม่พบไฟล์รูปที่บันทึกไว้สำหรับงานนี้</span>
+                                </div>
                             <?php endif; ?>
                             <?php if ($installResultNote !== ''): ?>
                                 <div class="installation-result-note">
@@ -1632,6 +1663,21 @@ endif;
                         </div>
                     </div>
                 </section>
+                <?php if (count($installResultPhotos) > 3): ?>
+                    <dialog class="installation-result-modal" data-installation-result-modal aria-labelledby="installation-result-modal-title">
+                        <div class="installation-result-modal-header">
+                            <h2 id="installation-result-modal-title">รูปงานติดตั้งทั้งหมด</h2>
+                            <button class="installation-result-modal-close" type="button" data-installation-result-close aria-label="ปิดรูปภาพ">×</button>
+                        </div>
+                        <div class="installation-result-modal-grid">
+                            <?php foreach ($installResultPhotos as $photoIndex => $photoUrl): ?>
+                                <a href="<?= h($photoUrl) ?>" target="_blank" rel="noopener">
+                                    <img src="<?= h($photoUrl) ?>" alt="รูปงานติดตั้งที่ <?= h((string) ($photoIndex + 1)) ?>">
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </dialog>
+                <?php endif; ?>
             <?php endif; ?>
 
         </div>
@@ -1716,8 +1762,8 @@ endif;
                             <?= technician_detail_icon_svg(($hasReceivedProducts || $hasInstallResult) ? 'check' : 'truck', 18) ?>
                             <div>
                                 <?php if ($hasInstallResult): ?>
-                                    <strong>ช่างบันทึกผลการติดตั้งเรียบร้อยแล้ว</strong>
-                                    <span>กำลังรอหัวหน้างานตรวจสอบและอนุมัติ</span>
+                                    <strong>รอหัวหน้าช่างยืนยัน</strong>
+                                    <span>ช่างบันทึกผลการติดตั้งแล้ว และกำลังรอหัวหน้าช่างยืนยันงาน</span>
                                 <?php else: ?>
                                     <strong><?= $hasReceivedProducts ? 'รับสินค้าแล้ว' : 'ยังไม่ได้รับสินค้าจากคลัง' ?></strong>
                                     <span><?= $hasReceivedProducts ? 'สามารถดูใบติดตั้งและดำเนินงานตามขั้นตอนถัดไป' : 'กรุณายืนยันรับสินค้าก่อนวันติดตั้ง' ?></span>
@@ -1764,10 +1810,6 @@ endif;
                             <span>ใบติดตั้ง</span>
                         </a>
 
-                        <a class="action-panel__link action-panel__phone" href="tel:<?= h(preg_replace('/\D+/', '', (string) ($job['customer_phone'] ?? ''))) ?>">
-                            <?= technician_detail_icon_svg('phone', 16) ?>
-                            <span>โทรหาลูกค้า</span>
-                        </a>
                     </div>
                 <?php endif; ?>
             </section>

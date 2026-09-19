@@ -903,16 +903,9 @@ body.app-body .content {
   font-weight: 800;
 }
 
-.admin-topbar-clean {
-}
-
 /* =========================================================
    Admin dashboard reference refresh
    ========================================================= */
-
-body.app-body.role-3 .admin-topbar-clean {
-    display: none !important;
-}
 
 body.app-body.role-3 .content {
     min-height: calc(100vh - 64px);
@@ -948,7 +941,7 @@ body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-top::after {
 body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-top h1 {
     margin: 0 0 6px;
     color: #0f172a;
-    font-size: 28px !important;
+    font-size: 20px !important;
     font-weight: 800;
     line-height: 1.2;
 }

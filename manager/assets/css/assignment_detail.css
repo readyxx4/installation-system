@@ -1,0 +1,1319 @@
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-card {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    border: 1px solid #dbe3ee;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, .06);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5ecf6;
+    background: #fff;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-heading {
+    min-width: 0;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-heading h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-heading p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-height: 28px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-body {
+    padding: 24px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-content {
+    display: grid;
+    gap: 12px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-label {
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-image-link {
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid #dbe3ee;
+    border-radius: 12px;
+    background: #f8fafc;
+    cursor: zoom-in;
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-image-link:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, .12);
+    transform: translateY(-1px);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-empty {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 32px 20px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #64748b;
+    text-align: center;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-empty strong {
+    color: #334155;
+    font-size: 14px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-empty span {
+    font-size: 12.5px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    min-height: 38px;
+    padding: 8px 14px;
+    border: 1px solid #bfdbfe;
+    border-radius: 9px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .18s ease, border-color .18s ease;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-more:hover {
+    border-color: #93c5fd;
+    background: #dbeafe;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal[open] {
+    position: fixed;
+    inset: 32px 0;
+    width: min(1100px, 92vw);
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    height: max-content;
+    max-height: calc(100vh - 64px);
+    padding: 0;
+    margin: auto;
+    z-index: 1000;
+    border: 1px solid rgba(148, 163, 184, .35);
+    border-radius: 18px;
+    background: rgba(245, 245, 245, .72);
+    color: #111827;
+    box-shadow: 0 20px 60px rgba(31, 31, 31, .24);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow: hidden;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal::backdrop {
+    background: rgba(31, 31, 31, .28);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 64px;
+    padding: 16px 20px;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(148, 163, 184, .35);
+    background: rgba(255, 255, 255, .68);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-header h2 {
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+    color: #111827;
+    font-size: 18px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-close {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    border: 1px solid rgba(148, 163, 184, .35);
+    border-radius: 9px;
+    background: rgba(31, 31, 31, .08);
+    color: #111827;
+    font-size: 22px;
+    line-height: 1;
+    margin: 0;
+    align-self: center;
+    cursor: pointer;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-close:hover {
+    border-color: rgba(31, 31, 31, .55);
+    background: rgba(31, 31, 31, .16);
+    color: #111827;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-stage {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    height: min(520px, calc(100vh - 220px));
+    max-height: calc(100vh - 220px);
+    padding: 24px 80px;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: rgba(230, 230, 230, .42);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-image {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: min(100%, calc(100vh - 260px));
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-nav {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid rgba(148, 163, 184, .35);
+    border-radius: 999px;
+    background: rgba(31, 31, 31, .62);
+    color: #f8fafc;
+    font: inherit;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition: background-color .18s ease, border-color .18s ease;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-nav:hover {
+    border-color: rgba(31, 31, 31, .55);
+    background: rgba(31, 31, 31, .78);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-nav[hidden] {
+    display: none;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-nav.is-prev {
+    left: 18px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-nav.is-next {
+    right: 18px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-grid {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px 16px;
+    border-top: 1px solid rgba(148, 163, 184, .35);
+    background: rgba(255, 255, 255, .50);
+    overflow-x: auto;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-thumb {
+    display: block;
+    width: 64px;
+    height: 56px;
+    flex: 0 0 64px;
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .72);
+    cursor: pointer;
+    opacity: .72;
+    transition: border-color .18s ease, opacity .18s ease, transform .18s ease;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-thumb:hover,
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-thumb.is-active {
+    border-color: #60a5fa;
+    opacity: 1;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-thumb.is-active {
+    transform: translateY(-1px);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-summary-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-summary-actions form {
+    margin: 0;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-confirm-btn {
+    font: inherit;
+    min-height: 42px;
+    border: 1px solid #16a34a;
+    background: #16a34a;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-confirm-btn:hover {
+    border-color: #15803d;
+    background: #15803d;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-confirm-btn:focus-visible {
+    outline: 3px solid rgba(22, 163, 74, .28);
+    outline-offset: 2px;
+}
+
+/* Manager detail follows the two-column detail pattern used by Technician. */
+body.app-body.role-1:has(.manager-assignment-detail-page) {
+    background: #f1f5f9;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .content {
+    height: calc(100vh - 68px) !important;
+    min-height: 0 !important;
+    background: #f1f5f9 !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .main {
+    background: #f1f5f9 !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .shell-topbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 18px !important;
+    height: 68px !important;
+    min-height: 68px !important;
+    padding: 0 32px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    background: #fff !important;
+    overflow: visible !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04) !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .shell-topbar-title {
+    min-width: 0 !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .shell-topbar-title h1 {
+    margin: 0 !important;
+    color: #0f172a !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .shell-topbar-title p {
+    margin: 2px 0 0 !important;
+    color: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .shell-topbar-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+    flex: 0 0 auto !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .shell-topbar-pill,
+body.app-body.role-1:has(.manager-assignment-detail-page) .shell-topbar-user {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-height: 38px !important;
+    padding: 0 4px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #334155 !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .shell-topbar-avatar {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 999px !important;
+    background: var(--role-primary, #2563eb) !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .shell-topbar-user-copy {
+    display: grid !important;
+    gap: 1px !important;
+    line-height: 1.1 !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .shell-topbar-user-copy strong {
+    color: #0f172a !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .shell-topbar-user-copy small {
+    color: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .content {
+    padding: 28px 32px !important;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page {
+    width: 100%;
+    max-width: 1240px;
+    min-width: 0;
+    margin: 0 auto;
+    align-items: start;
+    gap: 18px;
+    padding: 12px 32px 60px;
+    box-sizing: border-box;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-assignment-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 20px;
+    align-items: start;
+    grid-column: 1 / -1;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-assignment-detail-main,
+body.app-body.role-1 .manager-assignment-detail-page .manager-assignment-detail-side {
+    min-width: 0;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .manager-assignment-detail-main {
+    display: grid;
+    gap: 18px;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .manager-detail-header {
+    grid-column: 1 / -1;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page > .flash {
+    grid-column: 1 / -1;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-assignment-detail-main {
+    grid-column: 1;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-assignment-detail-side {
+    grid-column: 2;
+    display: block;
+    margin-top: 110px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-summary-card,
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-process-card {
+    height: 100%;
+    border-color: #dbe3ee;
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-summary-card {
+    display: grid;
+    gap: 16px;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .sale-detail-customer-box,
+body.app-body.role-1:has(.manager-assignment-detail-page) .product-table {
+    grid-column: 1;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-customer-box,
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-work-box {
+    border: 1px solid #dbe3ee;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-customer-box {
+    min-height: 132px;
+    box-sizing: border-box;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header {
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header .sale-detail-summary-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    width: calc(100% + 360px);
+}
+
+body.app-body.role-1:has(.manager-assignment-detail-page) .manager-detail-header .sale-detail-summary-head {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-slip-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .detail-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-decoration: none;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .detail-back-link:hover {
+    color: #2563eb;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .detail-back-link .ref-icon {
+    flex: 0 0 16px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-status {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header .sale-detail-summary-actions {
+    align-self: center;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header .sale-detail-setup-code {
+    margin: 0;
+    color: #0f172a;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header .sale-detail-setup-code strong {
+    font-weight: 700;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-content-subtitle {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 13.5px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-content-subtitle strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 30px;
+    padding: 6px 13px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.35;
+    white-space: nowrap;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status > strong {
+    font-size: inherit;
+    font-weight: 500;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.waiting {
+    color: #a16207;
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.created {
+    color: #2563eb;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.assigned {
+    color: #6d28d9;
+    background: #f5f3ff;
+    border-color: #c4b5fd;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.accepted {
+    color: #0369a1;
+    background: #e0f2fe;
+    border-color: #7dd3fc;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.ready {
+    color: #0f766e;
+    background: #ccfbf1;
+    border-color: #5eead4;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.working {
+    color: #6d28d9;
+    background: #f5f3ff;
+    border-color: #ddd6fe;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.review {
+    color: #c2410c;
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.done {
+    color: #059669;
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.pickup {
+    color: #4338ca;
+    background: #eef2ff;
+    border-color: #c7d2fe;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.unassigned {
+    color: #475569;
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.cancelled,
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.rejected {
+    color: #b91c1c;
+    background: #fff1f2;
+    border-color: #fecdd3;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions .sale-detail-status.overdue {
+    color: #ea580c;
+    background: #fff7ed;
+    border-color: #fdba74;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-summary-head {
+    margin: 0;
+    padding: 20px 22px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-work-box {
+    padding: 24px 28px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-customer-box {
+    display: block;
+    padding: 0;
+    background: #fff;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__header {
+    padding: 16px 28px;
+    border-bottom: 1px solid #e5ecf6;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__body {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px 28px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__eyebrow {
+    display: block;
+    margin-bottom: 2px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__id {
+    display: grid;
+    gap: 4px;
+    min-width: 140px;
+    text-align: right;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__id span {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__id strong {
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__avatar {
+    width: 60px;
+    height: 60px;
+    flex-basis: 60px;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__avatar svg {
+    width: 24px;
+    height: 24px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__content h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-top: 10px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__meta > span,
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__address > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__meta > span {
+    white-space: nowrap;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__meta .ref-icon-muted,
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__address .ref-icon-muted {
+    flex: 0 0 16px;
+    color: #64748b;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__address {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 8px;
+    color: #5b6b86;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__address > span {
+    flex: 0 0 auto;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__address > span > span {
+    min-width: 0;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .customer-info__address > span > .ref-icon-muted {
+    flex: 0 0 16px;
+    color: #64748b;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-work-meta span,
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-note span {
+    color: #64748b;
+    font-weight: 500;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-work-meta strong,
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-note strong {
+    color: #0f172a;
+    font-weight: 600;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-section-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-section-heading h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-section-heading p {
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-summary-head,
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-process-head {
+    color: #0f172a;
+    margin: -20px -20px 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5ecf6;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-process-head h2 {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-process-head p {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-process-row span {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-process-row strong {
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-process-card {
+    padding: 20px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-process-row {
+    grid-template-columns: 1fr;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-process-row > div + div {
+    border-top: 0;
+    border-left: 0;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-process-row {
+    gap: 0;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-process-row > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-process-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 14px 0 0;
+    border-top: 1px solid #e5ecf6;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-process-total span {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-process-total strong {
+    color: #2563eb;
+    font-family: "Inter", "Noto Sans Thai", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-action-stack {
+    display: grid;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-action-stack form,
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-action-stack .sale-detail-slip-btn {
+    width: 100%;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-detail-action-stack .sale-detail-slip-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5ecf6;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__header p {
+    margin: 3px 0 0;
+    color: #64748b;
+    font-size: 12.5px;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+    padding: 20px;
+    border: 1px solid #dbe3ee;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__table {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+    overflow: visible;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__head {
+    display: table-header-group;
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__row {
+    display: table-row;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__head .product-table__row {
+    background: #f8fafc;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__row > * {
+    display: table-cell;
+    box-sizing: border-box;
+    vertical-align: middle;
+    padding: 16px 14px;
+    min-width: 0;
+    border-bottom: 1px solid #e5ecf6;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__body {
+    display: table-row-group;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__row > *:nth-child(1) { width: 56%; }
+body.app-body.role-1 .manager-assignment-detail-page .product-table__row > *:nth-child(2) { width: 12%; }
+body.app-body.role-1 .manager-assignment-detail-page .product-table__row > *:nth-child(3) { width: 18%; }
+body.app-body.role-1 .manager-assignment-detail-page .product-table__row > *:nth-child(4) { width: 14%; }
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__head span:nth-child(2),
+body.app-body.role-1 .manager-assignment-detail-page .product-table__head span:nth-child(3),
+body.app-body.role-1 .manager-assignment-detail-page .product-table__head span:nth-child(4),
+body.app-body.role-1 .manager-assignment-detail-page .product-table__body .product-table__row > *:nth-child(2),
+body.app-body.role-1 .manager-assignment-detail-page .product-table__money {
+    text-align: right;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__item strong,
+body.app-body.role-1 .manager-assignment-detail-page .product-table__row > span,
+body.app-body.role-1 .manager-assignment-detail-page .product-table__money {
+    color: #334155;
+    font-weight: 500;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__money {
+    font-family: "Inter", "Noto Sans Thai", sans-serif;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__qty {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__total {
+    position: static;
+    float: none;
+    width: 100%;
+    box-sizing: border-box;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 24px;
+    border-top: 1px solid #e5ecf6;
+    background: #f8fafc;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__total > span {
+    display: block;
+    margin-bottom: 4px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .product-table__total > strong {
+    flex: 0 0 auto;
+    color: #2563eb;
+    font-family: "Inter", "Noto Sans Thai", sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    padding-left: 16px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-work-meta {
+    margin-bottom: 14px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .sale-detail-work-bottom {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5ecf6;
+}
+
+@media (max-width: 768px) {
+    body.app-body.role-1 .manager-assignment-detail-page {
+        width: min(100%, calc(100% - 24px));
+        grid-template-columns: 1fr;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .manager-assignment-detail-main,
+    body.app-body.role-1 .manager-assignment-detail-page .manager-assignment-detail-side,
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-card {
+        grid-column: 1;
+        margin-top: 0;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 18px;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header .sale-detail-summary-head {
+        grid-template-columns: 1fr;
+        align-items: flex-start;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-status {
+        justify-content: flex-start;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .customer-info__meta {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .customer-info__body {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .customer-info__id {
+        grid-column: 2;
+        text-align: left;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header {
+        align-items: flex-start;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .manager-detail-header-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .product-table__row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px 12px;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .product-table__head {
+        display: none;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .product-table__total {
+        flex-direction: column;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .product-table__total > strong {
+        margin-left: 0;
+        align-self: flex-end;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-body {
+        padding: 18px;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal[open] {
+        inset: 24px 0;
+        width: 94vw;
+        height: max-content;
+        max-height: calc(100dvh - 48px);
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-header {
+        min-height: 64px;
+        padding: 16px 14px;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-stage {
+        height: min(420px, calc(100dvh - 220px));
+        max-height: calc(100dvh - 220px);
+        padding: 16px 54px;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-image {
+        max-height: min(100%, calc(100dvh - 260px));
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-nav {
+        width: 36px;
+        height: 36px;
+        font-size: 28px;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-nav.is-prev {
+        left: 10px;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-nav.is-next {
+        right: 10px;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-grid {
+        gap: 8px;
+        padding: 14px;
+    }
+
+    body.app-body.role-1 .manager-assignment-detail-page .installation-result-modal-thumb {
+        width: 56px;
+        height: 50px;
+        flex-basis: 56px;
+    }
+}

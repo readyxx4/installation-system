@@ -102,7 +102,7 @@ if ($search !== '') {
     ");
 }
 
-layout_header('จัดการข้อมูลลูกค้า', 'customers');
+layout_header('จัดการข้อมูลลูกค้า', 'customers', 'จัดการข้อมูลลูกค้าสำหรับการสร้างใบงานติดตั้ง');
 ?>
 
 <link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/admin_lists.css')) ?>?v=<?= h(asset_version('admin/assets/css/admin_lists.css')) ?>">
@@ -110,7 +110,7 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
 <?= flash_message() ?>
 
 <div class="panel admin-list-page admin-customers-page">
-  <div class="panel-title">รายการข้อมูลลูกค้าทั้งหมด</div>
+  <div class="panel-title">รายการลูกค้า</div>
 
   <form class="toolbar customer-toolbar" method="GET" action="<?= h(app_system_url('admin/customers.php')) ?>">
     <input type="text" name="q" placeholder="ค้นหารหัสลูกค้า ชื่อ-นามสกุล เบอร์โทร อีเมล หรือที่อยู่" value="<?= h($search) ?>">
@@ -158,22 +158,8 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
             <td><?= h($row['user_name'] ?: '-') ?></td>
             <td><?= h($row['user_phone']) ?></td>
             <td><?= h($row['user_email']) ?></td>
-            <td class="address-cell admin-address-cell">
-              <?php
-                $address = (string) ($row['user_address'] ?? '');
-                $is_long = mb_strlen($address, 'UTF-8') > 35;
-                $short_address = $is_long
-                  ? mb_substr($address, 0, 35, 'UTF-8') . '...'
-                  : $address;
-              ?>
-
-              <?php if ($is_long): ?>
-                <span class="address-short"><?= h($short_address) ?></span>
-                <span class="address-full admin-address-full" style="display:none;"><?= nl2br(h($address)) ?></span>
-                <button type="button" class="text-more-btn" data-toggle-address>ดูเพิ่มเติม</button>
-              <?php else: ?>
-                <?= h($address) ?>
-              <?php endif; ?>
+            <td class="customer-address-cell">
+              <?= nl2br(h((string) ($row['user_address'] ?? ''))) ?>
             </td>
             <td class="customer-action-cell">
               <?php $can_delete_customer = !customer_has_related_work($conn, $row['customer_id']); ?>
@@ -222,7 +208,6 @@ layout_header('จัดการข้อมูลลูกค้า', 'custome
 </div>
 
 <script src="<?= h(app_asset_url('admin/assets/js/confirm_delete.js')) ?>?v=<?= h(asset_version('admin/assets/js/confirm_delete.js')) ?>"></script>
-<script src="<?= h(app_asset_url('admin/assets/js/toggle_address.js')) ?>?v=<?= h(asset_version('admin/assets/js/toggle_address.js')) ?>"></script>
 
 <?php layout_footer(); ?>
 

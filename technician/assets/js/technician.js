@@ -129,4 +129,36 @@
       focusedAssignmentRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
+
+  const openAssignmentDetail = (row) => {
+    const detailUrl = row?.dataset.detailUrl || '';
+    if (detailUrl) {
+      window.location.href = detailUrl;
+    }
+  };
+
+  const detailRowSelector = '.accept-job-row[data-detail-url], .my-job-row[data-detail-url]';
+
+  document.addEventListener('click', (event) => {
+    const row = event.target.closest(detailRowSelector);
+    if (!row || event.target.closest('a, button, form, input, select, textarea, label, .accept-job-actions-cell, .my-job-actions-cell')) {
+      return;
+    }
+
+    openAssignmentDetail(row);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+
+    const row = event.target.closest(detailRowSelector);
+    if (!row || event.target !== row) {
+      return;
+    }
+
+    event.preventDefault();
+    openAssignmentDetail(row);
+  });
 })();

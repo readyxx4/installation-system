@@ -84,7 +84,7 @@ if ($search !== '') {
     ");
 }
 
-layout_header('จัดการข้อมูลช่างติดตั้ง', 'technicians');
+layout_header('จัดการข้อมูลช่างติดตั้ง', 'technicians', 'จัดการข้อมูลและความพร้อมของช่างติดตั้ง');
 ?>
 
 <link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/admin_lists.css')) ?>?v=<?= h(asset_version('admin/assets/css/admin_lists.css')) ?>">
@@ -92,7 +92,7 @@ layout_header('จัดการข้อมูลช่างติดตั�
 <?= flash_message() ?>
 
 <div class="panel admin-list-page admin-technicians-page">
-  <div class="panel-title">รายการข้อมูลช่างทั้งหมด</div>
+  <div class="panel-title">รายการช่างติดตั้ง</div>
 
   <form class="toolbar technician-toolbar" method="GET" action="<?= h(app_system_url('admin/technicians.php')) ?>">
     <input type="text" name="q" placeholder="ค้นหารหัส ชื่อ-นามสกุล เบอร์โทร หรืออีเมล" value="<?= h($search) ?>">

@@ -195,7 +195,7 @@ if (!function_exists('admin_form_icon_svg')) {
   }
 }
 
-layout_header('จัดการข้อมูลระบบ', 'system');
+layout_header('จัดการข้อมูลระบบ', 'system', 'ตรวจสอบข้อมูลและรายละเอียดของระบบ');
 ?>
 <link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/system.css')) ?>?v=<?= h(asset_version('admin/assets/css/system.css')) ?>">
 

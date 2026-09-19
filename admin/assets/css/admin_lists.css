@@ -48,7 +48,7 @@ body.app-body.role-3 .admin-list-page > .panel-title {
     color: #0f172a;
     background: transparent;
     border: 0;
-    font-size: 28px;
+    font-size: 18px;
     font-weight: 800;
     line-height: 1.2;
 }
@@ -176,6 +176,32 @@ body.app-body.role-3 .admin-list-page .data-table tbody tr:last-child td {
 
 body.app-body.role-3 .admin-list-page .data-table td:last-child {
     white-space: nowrap;
+}
+
+body.app-body.role-3 .admin-customers-page .admin-customers-table .customer-address-cell {
+    width: 30%;
+    max-width: none !important;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.65;
+    vertical-align: top;
+}
+
+body.app-body.role-3 .admin-product-types-page .product-type-table th:nth-child(3),
+body.app-body.role-3 .admin-product-types-page .product-type-table td:nth-child(3),
+body.app-body.role-3 .admin-product-types-page .product-type-detail-cell {
+    width: 42%;
+    max-width: none !important;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.5;
+    vertical-align: top;
 }
 
 body.app-body.role-3 .admin-list-page .data-table td:last-child .btn,

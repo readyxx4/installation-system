@@ -99,6 +99,20 @@ function icon_svg(string $name): string
 
 function setup_status_name($status): string
 {
+    $status = (string) $status;
+    if ($status === '0') {
+        return 'สร้างใบงานแล้ว';
+    }
+    if ($status === '4') {
+        return 'เสร็จสิ้น';
+    }
+    if ($status === '5') {
+        return 'ยกเลิกแล้ว';
+    }
+    if (in_array($status, ['1', '2', '3'], true)) {
+        return 'อยู่ระหว่างดำเนินการ';
+    }
+
     return match ((string) $status) {
         '0' => 'สร้างใบงานแล้ว',
         '1' => 'มอบหมายงานแล้ว',
@@ -275,7 +289,7 @@ function render_sale_setup_rows(array $rows, string $empty_message): void
 {
     if (count($rows) === 0): ?>
         <tr>
-            <td colspan="9" class="cs-empty-cell"><?= h($empty_message) ?></td>
+            <td colspan="6" class="cs-empty-cell"><?= h($empty_message) ?></td>
         </tr>
         <?php return;
     endif;
@@ -340,16 +354,16 @@ function render_sale_setup_rows(array $rows, string $empty_message): void
 
             <!-- จัดการ -->
             <td class="setup-col-actions">
-                <div class="cs-row-actions">
+                <div class="ui-action-group">
 
                     <a href="<?= h(
                         app_system_url(
                             'sale/setup_slip.php?id=' .
                             urlencode((string) $row['setup_id'])
                         )
-                    ) ?>" class="btn btn-small">
-                        <?= icon_svg('file') ?>
-                        ดู
+                    ) ?>" class="ui-action-btn ui-action-btn--view">
+                        <span class="ui-action-btn__icon"><?= icon_svg('file') ?></span>
+                        <span class="ui-action-btn__text">ดู</span>
                     </a>
 
                     <a href="<?= h(
@@ -357,19 +371,19 @@ function render_sale_setup_rows(array $rows, string $empty_message): void
                             'sale/edit_setup.php?id=' .
                             urlencode((string) $row['setup_id'])
                         )
-                    ) ?>" class="btn btn-small btn-edit">
-                        <?= icon_svg('edit') ?>
-                        แก้ไข
+                    ) ?>" class="ui-action-btn ui-action-btn--edit">
+                        <span class="ui-action-btn__icon"><?= icon_svg('edit') ?></span>
+                        <span class="ui-action-btn__text">แก้ไข</span>
                     </a>
 
                     <button
                         type="button"
-                        class="btn btn-small btn-delete"
+                        class="ui-action-btn ui-action-btn--danger"
                         data-open-cancel-modal
                         data-setup-id="<?= h($row['setup_id']) ?>"
                     >
-                        <?= icon_svg('trash') ?>
-                        ยกเลิก
+                        <span class="ui-action-btn__icon"><?= icon_svg('trash') ?></span>
+                        <span class="ui-action-btn__text">ยกเลิก</span>
                     </button>
 
                 </div>
@@ -378,7 +392,7 @@ function render_sale_setup_rows(array $rows, string $empty_message): void
     <?php endforeach;
 }
 
-layout_header('รายการงานติดตั้ง', 'setups');
+layout_header('รายการงานติดตั้ง', 'setups', 'ใบงานที่รอดำเนินการ');
 ?>
 
 <link rel="stylesheet"
@@ -386,14 +400,7 @@ layout_header('รายการงานติดตั้ง', 'setups');
 
 <?= flash_message() ?>
 
-<section class="cs-job-status-panel cs-setups-page-panel">
-    <div class="cs-job-status-head">
-        <div>
-            <h2>รายการใบงานติดตั้ง</h2>
-            <p class="cs-page-subtitle">ใบงานที่รอดำเนินการ</p>
-        </div>
-    </div>
-
+<section class="cs-job-status-panel cs-setups-page-panel cs-setup-list-page-panel">
     <form class="toolbar setup-toolbar cs-list-toolbar cs-sale-admin-toolbar" action="javascript:void(0)">
         <input id="setupSearchInput" type="search" data-setup-search placeholder="ค้นหารหัสใบงาน ลูกค้า สินค้า หรือช่าง"
             autocomplete="off">

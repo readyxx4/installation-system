@@ -5,25 +5,6 @@ body.app-body.role-technician .technician-assignments-page .technician-focused-a
   outline-offset: -2px !important;
 }
 
-body.app-body.role-technician .technician-assignments-page .badge.warning {
-  background: #fff7ed !important;
-  border: 1px solid #fed7aa !important;
-  color: #c2410c !important;
-}
-
-body.app-body.role-technician .technician-assignments-page .accept-urgent-badge {
-  min-height: 24px !important;
-  padding: 4px 10px !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-}
-
-body.app-body.role-technician .technician-assignments-page .accept-urgent-badge .dot {
-  width: 7px !important;
-  height: 7px !important;
-  background: #ea580c !important;
-}
-
 body.app-body.role-technician .technician-assignments-page .btn-success {
   border: 1px solid #059669 !important;
   background: #059669 !important;
@@ -34,4 +15,194 @@ body.app-body.role-technician .technician-assignments-page .btn-danger-ghost {
   border: 1px solid #fecaca !important;
   background: #fff1f2 !important;
   color: #dc2626 !important;
+}
+
+/* Clean assignment table for accept_job.php only. */
+body.app-body.role-technician .technician-assignments-page .accept-job-table-wrap {
+  display: block !important;
+  width: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  padding: 0 !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .04) !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  color: #334155;
+  font-size: 13px;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table th {
+  height: 48px;
+  padding: 0 10px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: left;
+  white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table td {
+  min-height: 68px;
+  padding: 10px 10px;
+  border-bottom: 1px solid #eef2f7;
+  background: #ffffff;
+  vertical-align: middle;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table tbody tr.accept-job-row:hover td {
+  background: #f8fbff;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table tbody tr.accept-job-row {
+  cursor: pointer;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table tbody tr.accept-job-row:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: -2px;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table th:nth-child(1),
+body.app-body.role-technician .technician-assignments-page .accept-job-table td:nth-child(1) {
+  width: 12%;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table th:nth-child(2),
+body.app-body.role-technician .technician-assignments-page .accept-job-table td:nth-child(2) {
+  width: 20%;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table th:nth-child(3),
+body.app-body.role-technician .technician-assignments-page .accept-job-table td:nth-child(3) {
+  width: 10%;
+  text-align: center;
+  vertical-align: middle;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table td:nth-child(3) .qty-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table th:nth-child(4),
+body.app-body.role-technician .technician-assignments-page .accept-job-table td:nth-child(4) {
+  width: 14%;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table th:nth-child(5),
+body.app-body.role-technician .technician-assignments-page .accept-job-table td:nth-child(5) {
+  width: 15%;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table th:last-child {
+  width: 250px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-table td:last-child {
+  width: 180px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-id,
+body.app-body.role-technician .technician-assignments-page .accept-job-customer,
+body.app-body.role-technician .technician-assignments-page .accept-job-assigned-date,
+body.app-body.role-technician .technician-assignments-page .accept-job-install-date,
+body.app-body.role-technician .technician-assignments-page .accept-job-install-time {
+  color: #1e293b;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-id,
+body.app-body.role-technician .technician-assignments-page .accept-job-customer,
+body.app-body.role-technician .technician-assignments-page .accept-job-assigned-date,
+body.app-body.role-technician .technician-assignments-page .accept-job-install-date,
+body.app-body.role-technician .technician-assignments-page .accept-job-install-time {
+  white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-id {
+  display: table-cell;
+  font-weight: 700;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-customer strong,
+body.app-body.role-technician .technician-assignments-page .accept-job-assigned-date strong,
+body.app-body.role-technician .technician-assignments-page .accept-job-install-date strong {
+  display: block;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-customer small,
+body.app-body.role-technician .technician-assignments-page .accept-job-assigned-date small,
+body.app-body.role-technician .technician-assignments-page .accept-job-install-date small {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-actions-cell .job-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-actions-cell .cs-inline-action-form {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-actions-cell .btn {
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  flex: 0 0 auto !important;
+  padding: 6px 9px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-actions-cell .btn svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+}
+
+body.app-body.role-technician .technician-assignments-page .accept-job-empty {
+  min-height: 180px;
+  padding: 28px 16px;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  body.app-body.role-technician .technician-assignments-page .accept-job-table-wrap {
+    border-radius: 14px !important;
+  }
 }

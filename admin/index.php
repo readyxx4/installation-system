@@ -372,7 +372,7 @@ $status_overview = [
 $status_count_values = array_map('intval', array_column($status_overview, 'count'));
 $status_max_count = max([1, ...$status_count_values]);
 
-layout_header('หน้าหลักผู้ดูแลระบบ', 'dashboard');
+layout_header('หน้าหลัก', 'dashboard', 'ภาพรวมข้อมูลและสถานะการทำงานของระบบ');
 ?>
 
 <link
@@ -384,14 +384,10 @@ layout_header('หน้าหลักผู้ดูแลระบบ', 'dash
 
     <div class="admin-dashboard-top">
         <div>
-            <h1>ภาพรวมผู้ดูแลระบบ</h1>
+            <h1>สรุปภาพรวม</h1>
         </div>
 
         <div class="admin-dashboard-actions">
-            <div class="admin-date-pill">
-                <i class="fa-regular fa-calendar"></i>
-                <?= h(date('d/m/Y')) ?>
-            </div>
             <div class="admin-date-pill admin-update-pill">
                 <i class="fa-regular fa-clock"></i>
                 อัปเดตล่าสุด <?= h($dashboard_updated_at) ?>

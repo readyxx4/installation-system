@@ -853,6 +853,25 @@ body.app-body.role-2 .content {
   scrollbar-width: thin;
 }
 
+body.app-body.role-2:has(.sale-create-page)
+.product-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  max-height: 100%;
+  padding-right: 6px;
+  padding-bottom: 0;
+  overflow-y: auto;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+body.app-body.role-2:has(.sale-create-page)
+.product-list-item {
+  width: 100%;
+  max-width: none;
+}
+
 .product-list-item {
   display: grid;
 
@@ -1158,44 +1177,61 @@ body.app-body.role-2
    ========================================================= */
 
 body.app-body.role-2
-.sales-dashboard-page
+.sales-dashboard-page.sale-create-page
 .setup-work-page.setup-create-page
 .setup-main-panel {
   display: flex;
   flex-direction: column;
 
-  border-color: #dbe8f7;
-  border-radius: 13px;
+  border-color: #dbeafe;
+  border-radius: 16px;
 
   box-shadow:
-    0 12px 30px rgba(15, 42, 77, 0.06);
+    0 10px 28px rgba(15, 23, 42, 0.06);
 }
 
 body.app-body.role-2
-.sales-dashboard-page
+.sales-dashboard-page.sale-create-page
 .setup-work-page.setup-create-page
 .setup-tabs {
   flex: 0 0 auto;
 
-  background: #f3f7fc;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
 }
 
 body.app-body.role-2
-.sales-dashboard-page
+.sales-dashboard-page.sale-create-page
 .setup-work-page.setup-create-page
 .setup-tab {
   min-height: 42px;
 
-  color: #52667f;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #64748b;
 
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
 }
 
 body.app-body.role-2
-.sales-dashboard-page
+.sales-dashboard-page.sale-create-page
 .setup-work-page.setup-create-page
 .setup-tab.active {
-  color: var(--setup-primary-dark);
+  border-bottom-color: #3b82f6;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+body.app-body.role-2
+.sales-dashboard-page.sale-create-page
+.setup-work-page.setup-create-page
+.setup-tab:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: -2px;
+  border-radius: 8px;
 }
 
 body.app-body.role-2
@@ -1246,12 +1282,13 @@ body.app-body.role-2
 }
 
 body.app-body.role-2
-.sales-dashboard-page
+.sales-dashboard-page.sale-create-page
 .setup-work-page.setup-create-page
 .setup-section-heading h2 {
   margin: 0;
 
   font-size: 15px;
+  font-weight: 700;
 }
 
 body.app-body.role-2
@@ -1361,15 +1398,28 @@ body.app-body.role-2
 }
 
 body.app-body.role-2
-.sales-dashboard-page
+.sales-dashboard-page.sale-create-page
 .setup-work-page.setup-create-page
 .customer-result-item.selected {
-  border-color: #1565c0;
+  border-color: #93c5fd;
 
-  background: #edf6ff;
+  background: #eff6ff;
 
   box-shadow:
-    0 0 0 2px rgba(21, 101, 192, 0.14);
+    0 0 0 2px rgba(147, 197, 253, 0.22);
+}
+
+body.app-body.role-2:has(.sale-create-page)
+.product-list-item.selected {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.22);
+}
+
+body.app-body.role-2:has(.sale-create-page)
+.product-list-item.selected .product-list-icon {
+  background: #2563eb;
+  color: #ffffff;
 }
 
 body.app-body.role-2
@@ -1469,7 +1519,7 @@ body.app-body.role-2
    ========================================================= */
 
 body.app-body.role-2
-.sales-dashboard-page
+.sales-dashboard-page.sale-create-page
 .setup-work-page.setup-create-page
 .summary-card {
   display: flex;
@@ -1477,11 +1527,12 @@ body.app-body.role-2
 
   padding: 14px 16px;
 
-  border-color: #dbe8f7;
-  border-radius: 13px;
+  border-color: #dbeafe;
+  border-radius: 16px;
+  background: #ffffff;
 
   box-shadow:
-    0 12px 30px rgba(15, 42, 77, 0.06);
+    0 10px 28px rgba(15, 23, 42, 0.06);
 }
 
 
@@ -1499,18 +1550,19 @@ body.app-body.role-2
 }
 
 body.app-body.role-2
-.sales-dashboard-page
+.sales-dashboard-page.sale-create-page
 .setup-work-page.setup-create-page
 .summary-title-row h2 {
   margin: 0;
 
   font-size: 18px;
+  font-weight: 700;
 
   line-height: 1.2;
 }
 
 body.app-body.role-2
-.sales-dashboard-page
+.sales-dashboard-page.sale-create-page
 .setup-work-page.setup-create-page
 .summary-title-row p {
   margin: 2px 0 0;
@@ -1518,6 +1570,7 @@ body.app-body.role-2
   color: #64748b;
 
   font-size: 10.5px;
+  font-weight: 400;
 }
 
 body.app-body.role-2
@@ -1617,7 +1670,7 @@ body.app-body.role-2
 }
 
 body.app-body.role-2
-.sales-dashboard-page
+.sales-dashboard-page.sale-create-page
 .setup-work-page.setup-create-page
 .summary-customer-name strong {
   display: block;
@@ -1625,7 +1678,7 @@ body.app-body.role-2
   color: #172033;
 
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
 
   line-height: 1.2;
 }
@@ -1883,7 +1936,7 @@ body.app-body.role-2
    ========================================================= */
 
 body.app-body.role-2
-.sales-dashboard-page
+.sales-dashboard-page.sale-create-page
 .setup-work-page.setup-create-page
 .summary-total-row {
   flex: 0 0 auto;
@@ -1902,12 +1955,12 @@ body.app-body.role-2
   border-top:
     1px
     solid
-    #e6dccb;
+    #e2e8f0;
 
   border-bottom:
     1px
     solid
-    #e6dccb;
+    #e2e8f0;
 }
 
 body.app-body.role-2

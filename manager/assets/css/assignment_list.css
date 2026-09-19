@@ -1286,3 +1286,232 @@ body.app-body.role-1 .assignment-detail-table td {
   justify-content: space-between !important;
   gap: 18px !important;
 }
+
+/* Assignment list page: compact Technician-style surface. */
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  padding: 0 32px !important;
+  margin: 0 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  background: #fff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .04) !important;
+  overflow: visible !important;
+}
+
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar-title h1 {
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+}
+
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar-title p {
+  margin: 2px 0 0 !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+}
+
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 14px !important;
+  flex: 0 0 auto !important;
+}
+
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar-pill,
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar-user {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 38px !important;
+  padding: 0 4px !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar-avatar {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  flex: 0 0 28px !important;
+  border-radius: 999px !important;
+  background: #2563eb !important;
+  color: #fff !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar-user-copy {
+  display: grid !important;
+  gap: 1px !important;
+  min-width: 0 !important;
+  line-height: 1.2 !important;
+}
+
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar-user-copy strong,
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar-user-copy small {
+  display: block !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar-user-copy strong {
+  color: #0f172a !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-1:has(.assignment-list-page) .shell-topbar-user-copy small {
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+}
+
+body.app-body.role-1:has(.assignment-list-page) .content {
+  background: #f6f8fb !important;
+}
+
+body.app-body.role-1 .assignment-list-page {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 32px 24px;
+  background: transparent !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-from-setup-card {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-toolbar-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-search-field {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-search-field input[type="text"] {
+  width: 100% !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-search-field input[type="text"]::placeholder {
+  color: #94a3b8 !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-toolbar-buttons {
+  display: flex !important;
+  gap: 8px !important;
+  flex: 0 0 auto !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-search-btn,
+body.app-body.role-1 .assignment-list-page .assignment-reset-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 8px 14px !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-search-btn {
+  color: #fff !important;
+  background: #2563eb !important;
+  border: 1px solid #2563eb !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-reset-btn {
+  color: #475569 !important;
+  background: #fff !important;
+  border: 1px solid #dbe3ef !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-table-wrap {
+  width: 100% !important;
+  overflow-x: auto !important;
+  border: 1px solid #dbeafe !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .04) !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-detail-table {
+  width: 100% !important;
+  min-width: 900px;
+  background: #fff !important;
+  font-size: 13px !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-detail-table th {
+  height: 48px !important;
+  padding: 0 10px !important;
+  background: #f8fafc !important;
+  color: #475569 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-detail-table td {
+  min-height: 68px !important;
+  padding: 10px !important;
+  color: #334155 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  vertical-align: middle !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-detail-table td strong {
+  font-weight: 600 !important;
+}
+
+body.app-body.role-1 .assignment-list-page .assignment-icon-btn {
+  font-weight: 600 !important;
+}
+
+@media (max-width: 720px) {
+  body.app-body.role-1 .assignment-list-page .assignment-toolbar-card {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+}

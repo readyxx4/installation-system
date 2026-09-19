@@ -67,12 +67,53 @@ function manager_home_is_overdue(array $row): bool
 
 function manager_home_status_text(array $row): string
 {
-    if (manager_home_is_overdue($row)) {
-        return 'เกินกำหนด';
+    $setupStatus = (string) ($row['setup_status'] ?? '');
+    $assignStatus = (string) ($row['assign_status'] ?? '');
+    $hasReceive = (string) ($row['has_receive'] ?? '0') === '1';
+    $hasInstallResult = (string) ($row['has_install_result'] ?? '0') === '1';
+
+    if ($setupStatus === '5' || $assignStatus === '4') {
+        return 'ยกเลิกแล้ว';
+    }
+
+    if ($assignStatus === '3') {
+        return 'ช่างปฏิเสธงาน';
+    }
+
+    if ($setupStatus === '4' || $assignStatus === '5') {
+        return 'เสร็จสิ้น';
+    }
+
+    if ($hasInstallResult && $setupStatus === '3') {
+        return 'รอหัวหน้าช่างยืนยัน';
+    }
+
+    if ($setupStatus === '3') {
+        return 'กำลังติดตั้ง';
+    }
+
+    if ($hasReceive) {
+        return 'ยืนยันรับสินค้าแล้ว';
+    }
+
+    if ($setupStatus === '2' && $assignStatus === '2' && !$hasReceive) {
+        return 'ช่างกำลังไปรับสินค้า';
+    }
+
+    if ($setupStatus === '2') {
+        return 'ช่างรับงานแล้ว';
+    }
+
+    if ($assignStatus === '1') {
+        return 'รอช่างรับงาน';
     }
 
     if (empty($row['assign_id'])) {
         return 'ยังไม่ได้มอบหมาย';
+    }
+
+    if (manager_home_is_overdue($row)) {
+        return 'เกินกำหนด';
     }
 
     return match ((string) ($row['assign_status'] ?? '')) {
@@ -141,6 +182,14 @@ $dashboard_rows = safe_rows($conn, "
     SELECT
         s.setup_id,
         s.setup_status,
+        CASE WHEN EXISTS (
+            SELECT 1 FROM product_receive pr
+            WHERE pr.assign_id = a.assign_id AND pr.receive_status = 1
+        ) THEN 1 ELSE 0 END AS has_receive,
+        CASE WHEN EXISTS (
+            SELECT 1 FROM installation_result ir
+            WHERE ir.setup_id = s.setup_id
+        ) THEN 1 ELSE 0 END AS has_install_result,
         s.created_at,
         c.customer_name AS user_name,
         p.pro_name,
@@ -539,7 +588,7 @@ layout_header('หน้าหลักหัวหน้าช่าง', 'dash
                         <div class="manager-assign-copy">
                             <div class="manager-inline-head">
                                 <strong><?= h((string) $job['setup_id']) ?></strong>
-                                <span class="manager-badge orange">รอมอบหมาย</span>
+                                <span class="manager-badge unassigned">รอมอบหมาย</span>
                             </div>
                             <span><?= h((string) ($job['user_name'] ?: '-')) ?></span>
                             <small>
@@ -603,7 +652,7 @@ layout_header('หน้าหลักหัวหน้าช่าง', 'dash
                         <div class="manager-task-copy">
                             <div class="manager-inline-head">
                                 <strong><?= h((string) $job['setup_id']) ?></strong>
-                                <span class="manager-badge orange">เกินกำหนด</span>
+                                <span class="manager-badge overdue">เกินกำหนด</span>
                             </div>
                             <span>
                                 <?= h((string) ($job['user_name'] ?: '-')) ?>

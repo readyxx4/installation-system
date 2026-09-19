@@ -26,6 +26,132 @@ body.app-body.role-2,
   color: var(--sales-ink);
 }
 
+/* Sale create page shell: use the shared header and neutral workspace surface. */
+body.app-body.role-2:has(.sale-create-page) .main,
+body.app-body.role-2:has(.sale-create-page) .content {
+  background: #f1f5f9 !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .shell-topbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  padding: 0 32px !important;
+  margin: 0 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .04) !important;
+  overflow: visible !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-title {
+  min-width: 0 !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-title h1 {
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-title p {
+  margin: 2px 0 0 !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 1.3 !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 14px !important;
+  flex: 0 0 auto !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-pill,
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-user {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 38px !important;
+  padding: 0 4px !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-user-copy {
+  display: grid !important;
+  gap: 1px !important;
+  min-width: 0 !important;
+  line-height: 1.2 !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-user-copy strong,
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-user-copy small {
+  display: block !important;
+  white-space: nowrap !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-avatar {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  flex: 0 0 28px !important;
+  border-radius: 999px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-user-copy strong {
+  color: #0f172a !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .shell-topbar-user-copy small {
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .content {
+  height: calc(100vh - 68px) !important;
+  min-height: 0 !important;
+  max-height: calc(100vh - 68px) !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  padding: 24px 32px 32px !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .sales-dashboard-page {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+body.app-body.role-2:has(.sale-create-page) .setup-work-page,
+body.app-body.role-2:has(.sale-create-page) .setup-work-page form,
+body.app-body.role-2:has(.sale-create-page) .setup-split-layout,
+body.app-body.role-2:has(.sale-create-page) .setup-main-panel,
+body.app-body.role-2:has(.sale-create-page) .setup-summary-sidebar,
+body.app-body.role-2:has(.sale-create-page) .summary-card {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
 .sales-dashboard-page .admin-dashboard-top {
   position: relative;
   overflow: hidden;
@@ -330,9 +456,48 @@ body.app-body.role-2,
   .sales-dashboard-work-grid {
     grid-template-columns: 1fr;
   }
+
+  body.app-body.role-2:has(.sale-create-page) .content {
+    height: auto !important;
+    min-height: calc(100vh - 68px) !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+  }
+
+  body.app-body.role-2:has(.sale-create-page) .sales-dashboard-page,
+  body.app-body.role-2:has(.sale-create-page) .setup-work-page,
+  body.app-body.role-2:has(.sale-create-page) .setup-work-page form,
+  body.app-body.role-2:has(.sale-create-page) .setup-split-layout,
+  body.app-body.role-2:has(.sale-create-page) .setup-main-panel,
+  body.app-body.role-2:has(.sale-create-page) .setup-summary-sidebar,
+  body.app-body.role-2:has(.sale-create-page) .summary-card {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  body.app-body.role-2:has(.sale-create-page) .product-grid {
+    flex: 0 1 auto;
+    max-height: clamp(220px, calc(100vh - 430px), 520px);
+  }
 }
 
 @media (max-width: 760px) {
+  body.app-body.role-2:has(.sale-create-page) .shell-topbar {
+    height: auto !important;
+    min-height: 68px !important;
+    padding: 16px 20px !important;
+    flex-wrap: wrap !important;
+  }
+
+  body.app-body.role-2:has(.sale-create-page) .shell-topbar-actions {
+    margin-left: auto !important;
+  }
+
+  body.app-body.role-2:has(.sale-create-page) .content {
+    padding: 20px !important;
+  }
+
   .sales-dashboard-page .admin-dashboard-top {
     align-items: flex-start;
     flex-direction: column;

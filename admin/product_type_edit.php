@@ -103,7 +103,7 @@ if (!function_exists('admin_form_icon_svg')) {
   }
 }
 
-layout_header('แก้ไขประเภทสินค้า', 'product_types');
+layout_header('แก้ไขประเภทสินค้า', 'product_types', 'แก้ไขประเภทสินค้าในระบบ');
 ?>
 <?= flash_message() ?>
 <div class="staff-form-page">

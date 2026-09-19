@@ -663,6 +663,282 @@ body.app-body.role-technician .technician-detail-page .action-panel__preview img
     object-fit: cover;
 }
 
+body.app-body.role-technician .technician-detail-page .installation-result-card {
+    overflow: hidden;
+    border: 1px solid #dbe3ee;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, .06);
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5ecf6;
+    background: #fff;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-heading {
+    min-width: 0;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-heading h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-heading p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-height: 28px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-body {
+    padding: 24px;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-content {
+    gap: 12px;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-label {
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-image-link {
+    aspect-ratio: 4 / 3;
+    border-color: #dbe3ee;
+    border-radius: 12px;
+    background: #f8fafc;
+    cursor: zoom-in;
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-image-link:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, .12);
+    transform: translateY(-1px);
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-image {
+    object-fit: cover;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-empty {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 32px 20px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #64748b;
+    text-align: center;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-empty strong {
+    color: #334155;
+    font-size: 14px;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-empty span {
+    font-size: 12.5px;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-note {
+    display: grid;
+    gap: 6px;
+    padding: 14px 16px;
+    border: 1px solid #e5ecf6;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-note strong {
+    color: #475569;
+    font-size: 12px;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-note p {
+    margin: 0;
+    color: #334155;
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    min-height: 38px;
+    padding: 8px 14px;
+    border: 1px solid #bfdbfe;
+    border-radius: 9px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .18s ease, border-color .18s ease;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-more:hover {
+    border-color: #93c5fd;
+    background: #dbeafe;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal {
+    width: min(1040px, calc(100% - 32px));
+    max-width: 1040px;
+    max-height: min(88dvh, 900px);
+    padding: 0;
+    border: 1px solid #dbe3ee;
+    border-radius: 16px;
+    background: #fff;
+    color: #0f172a;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, .2);
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal::backdrop {
+    background: rgba(15, 23, 42, .56);
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5ecf6;
+    background: #fff;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.35;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-close {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    border: 1px solid #dbe3ee;
+    border-radius: 9px;
+    background: #fff;
+    color: #475569;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-close:hover {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-grid a {
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid #dbe3ee;
+    border-radius: 12px;
+    background: #f8fafc;
+    cursor: zoom-in;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-grid img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    body.app-body.role-technician .technician-detail-page .installation-result-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 18px;
+    }
+
+    body.app-body.role-technician .technician-detail-page .installation-result-body {
+        padding: 18px;
+    }
+
+    body.app-body.role-technician .technician-detail-page .installation-result-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    body.app-body.role-technician .technician-detail-page .installation-result-modal {
+        width: calc(100% - 24px);
+        max-height: 90dvh;
+    }
+
+    body.app-body.role-technician .technician-detail-page .installation-result-modal-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        padding: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    body.app-body.role-technician .technician-detail-page .installation-result-gallery {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    body.app-body.role-technician .technician-detail-page .installation-result-modal-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 body.app-body.role-technician .technician-detail-page .action-panel {
     position: sticky;
     top: 18px;
@@ -946,16 +1222,6 @@ body.app-body.role-technician .technician-detail-page .action-panel__link {
     border: 1px solid #d5dde8;
     background: #fff;
     color: #334155;
-}
-
-body.app-body.role-technician .technician-detail-page .action-panel__phone {
-    border-color: transparent;
-    color: #2563eb;
-}
-
-body.app-body.role-technician .technician-detail-page .action-panel__phone:hover {
-    background: #eff6ff;
-    border-color: #bfdbfe;
 }
 
 body.app-body.role-technician .technician-detail-page.receive-confirm-page {

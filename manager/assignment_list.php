@@ -214,12 +214,12 @@ function setup_status_name($status): string
 function setup_status_badge($status): string
 {
     return match ((string) $status) {
-        '0' => 'orange',
-        '1' => 'blue',
-        '2' => 'cyan',
-        '3' => 'purple',
-        '4' => 'green',
-        default => 'red',
+        '0' => 'unassigned',
+        '1' => 'assigned',
+        '2' => 'accepted',
+        '3' => 'working',
+        '4' => 'done',
+        default => 'waiting',
     };
 }
 
@@ -275,12 +275,49 @@ function assignment_is_overdue(array $row): bool
 
 function display_assignment_status(array $row): string
 {
-    if (assignment_is_overdue($row)) {
-        return 'เกินกำหนด';
+    $setupStatus = (string) ($row['setup_status'] ?? '');
+    $assignStatus = (string) ($row['assign_status'] ?? '');
+    $hasReceive = (string) ($row['has_receive'] ?? '0') === '1';
+    $hasInstallResult = (string) ($row['has_install_result'] ?? '0') === '1';
+
+    if ($setupStatus === '5' || $assignStatus === '4') {
+        return 'ยกเลิกแล้ว';
     }
 
-    if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
-        return 'ยกเลิกแล้ว';
+    if ($assignStatus === '3') {
+        return 'ช่างปฏิเสธงาน';
+    }
+
+    if ($setupStatus === '4' || $assignStatus === '5') {
+        return 'เสร็จสิ้น';
+    }
+
+    if ($hasInstallResult && $setupStatus === '3') {
+        return 'รอหัวหน้าช่างยืนยัน';
+    }
+
+    if ($setupStatus === '3') {
+        return 'กำลังติดตั้ง';
+    }
+
+    if ($hasReceive) {
+        return 'ยืนยันรับสินค้าแล้ว';
+    }
+
+    if ($setupStatus === '2' && $assignStatus === '2' && !$hasReceive) {
+        return 'ช่างกำลังไปรับสินค้า';
+    }
+
+    if ($setupStatus === '2') {
+        return 'ช่างรับงานแล้ว';
+    }
+
+    if ($assignStatus === '1') {
+        return 'รอช่างรับงาน';
+    }
+
+    if (assignment_is_overdue($row)) {
+        return 'เกินกำหนด';
     }
 
     $status_name = setup_status_name($row['setup_status']);
@@ -310,15 +347,56 @@ function assignment_has_unavailable_active_tech(array $row): bool
 
 function display_assignment_badge(array $row): string
 {
+    $setupStatus = (string) ($row['setup_status'] ?? '');
+    $assignStatus = (string) ($row['assign_status'] ?? '');
+    $hasReceive = (string) ($row['has_receive'] ?? '0') === '1';
+    $hasInstallResult = (string) ($row['has_install_result'] ?? '0') === '1';
+
+    if ($setupStatus === '5' || $assignStatus === '4') {
+        return 'cancelled';
+    }
+
+    if ($assignStatus === '3') {
+        return 'rejected';
+    }
+
+    if ($setupStatus === '4' || $assignStatus === '5') {
+        return 'done';
+    }
+
+    if ($hasInstallResult && $setupStatus === '3') {
+        return 'review';
+    }
+
+    if ($setupStatus === '3') {
+        return 'working';
+    }
+
+    if ($hasReceive) {
+        return 'ready';
+    }
+
+    if ($setupStatus === '2' && $assignStatus === '2' && !$hasReceive) {
+        return 'pickup';
+    }
+
+    if ($setupStatus === '2') {
+        return 'accepted';
+    }
+
+    if ($assignStatus === '1') {
+        return 'waiting';
+    }
+
+    if ($setupStatus === '0') {
+        return 'unassigned';
+    }
+
     if (assignment_is_overdue($row)) {
-        return 'red';
+        return 'overdue';
     }
 
-    if (!empty($row['assign_id']) && (string) ($row['assign_status'] ?? '') === '4') {
-        return 'slate';
-    }
-
-    return setup_status_badge($row['setup_status']);
+    return setup_status_badge($setupStatus);
 }
 
 function assign_status_name($status): string
@@ -371,7 +449,7 @@ function money_text($value): string
 
 $latest_assignment_join = "\n    LEFT JOIN assignment a\n        ON a.setup_id = s.setup_id\n       AND a.assign_id = (\n            SELECT a2.assign_id\n            FROM assignment a2\n            WHERE a2.setup_id = s.setup_id\n            ORDER BY a2.assign_date DESC, a2.assign_id DESC\n            LIMIT 1\n       )\n";
 
-$base_sql = "\n    SELECT\n        s.setup_id,\n        s.customer_id AS user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n\n        c.customer_name AS user_name,\n        c.customer_phone AS user_phone,\n        c.customer_email AS user_email,\n        c.customer_address AS user_address,\n\n        p.pro_name,\n        p.pro_price_install,\n\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n        {$assign_install_date_select},\n        {$assign_install_time_select},\n\n        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n\n        m.user_name AS manager_name,\n\n        COUNT(idt.detail_id) AS item_count,\n        COALESCE(SUM(COALESCE(idt.install_qty, 1) * COALESCE(p2.pro_price_install, 0)), 0) AS install_total\n\n    FROM setup s\n    LEFT JOIN customers c ON s.customer_id = c.customer_id\n    LEFT JOIN product p ON s.pro_id = p.pro_id\n    {$latest_assignment_join}\n    LEFT JOIN technicians t ON a.tech_id = t.tech_id\n    LEFT JOIN `user` m ON a.assign_by = m.user_id\n    LEFT JOIN install_detail idt ON s.setup_id = idt.setup_id\n    LEFT JOIN product p2 ON idt.pro_id = p2.pro_id\n";
+$base_sql = "\n    SELECT\n        s.setup_id,\n        s.customer_id AS user_id,\n        s.pro_id,\n        s.setup_date,\n        s.setup_location,\n        s.setup_address,\n        s.setup_note,\n        s.setup_status,\n        s.created_at,\n\n        c.customer_name AS user_name,\n        c.customer_phone AS user_phone,\n        c.customer_email AS user_email,\n        c.customer_address AS user_address,\n\n        p.pro_name,\n        p.pro_price_install,\n\n        a.assign_id,\n        a.assign_date,\n        a.assign_status,\n        {$assign_install_date_select},\n        {$assign_install_time_select},\n\n        t.tech_id,\n        t.tech_name,\n        t.tech_fullname,\n        t.tech_phone,\n        t.tech_email,\n        t.tech_status,\n\n        m.user_name AS manager_name,\n\n        COUNT(idt.detail_id) AS item_count,\n        COALESCE(SUM(COALESCE(idt.install_qty, 1) * COALESCE(p2.pro_price_install, 0)), 0) AS install_total,\n        MAX(CASE WHEN pr.receive_id IS NOT NULL THEN 1 ELSE 0 END) AS has_receive,\n        MAX(CASE WHEN ir.result_id IS NOT NULL THEN 1 ELSE 0 END) AS has_install_result\n\n    FROM setup s\n    LEFT JOIN customers c ON s.customer_id = c.customer_id\n    LEFT JOIN product p ON s.pro_id = p.pro_id\n    {$latest_assignment_join}\n    LEFT JOIN technicians t ON a.tech_id = t.tech_id\n    LEFT JOIN `user` m ON a.assign_by = m.user_id\n    LEFT JOIN install_detail idt ON s.setup_id = idt.setup_id\n    LEFT JOIN product p2 ON idt.pro_id = p2.pro_id\n    LEFT JOIN product_receive pr ON pr.assign_id = a.assign_id AND pr.receive_status = 1\n    LEFT JOIN installation_result ir ON ir.setup_id = s.setup_id\n";
 
 $install_date_group_sql = $has_install_date ? "        a.assign_install_date,\n" : "";
 $install_time_group_sql = $has_install_time ? "        a.assign_install_time,\n" : "";
@@ -480,27 +558,11 @@ $visible_setups = array_values(array_filter($setups, function ($row) {
 
 $setups_json = json_encode($visible_setups, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-layout_header('รายการมอบหมายงาน', 'assignment_list');
+layout_header('รายการมอบหมายงาน', 'assignment_list', 'ตรวจสอบใบงานที่รอการมอบหมาย และดำเนินการมอบหมายช่างติดตั้ง');
 ?>
 
-<div class="manager-list-page manager-list-detail-page assignment-from-setup-page assignment-list-no-tophead">
+<div class="manager-list-page manager-list-detail-page assignment-from-setup-page assignment-list-no-tophead assignment-list-page">
     <?= flash_message() ?>
-
-    <div class="assignment-sale-header">
-        <div class="admin-dashboard-top">
-            <div>
-                <h1>รายการมอบหมายงาน</h1>
-                <p>ตรวจสอบใบงานที่รอการมอบหมาย และดำเนินการมอบหมายช่างติดตั้ง</p>
-            </div>
-
-            <div class="admin-dashboard-actions">
-                <div class="admin-date-pill">
-                    <i class="fa-regular fa-calendar"></i>
-                    <?= h(date('d/m/Y')) ?>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <section class="manager-panel manager-list-panel assignment-from-setup-card">
         <form class="assignment-search-form assignment-toolbar-card" method="GET" action="<?= h(app_system_url('manager/assignment_list.php')) ?>">

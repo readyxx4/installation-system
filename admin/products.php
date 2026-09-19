@@ -99,7 +99,7 @@ if ($search !== '') {
     ");
 }
 
-layout_header('จัดการสินค้า', 'products');
+layout_header('จัดการสินค้า', 'products', 'จัดการข้อมูลสินค้าและประเภทสินค้า');
 ?>
 
 <link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/admin_lists.css')) ?>?v=<?= h(asset_version('admin/assets/css/admin_lists.css')) ?>">
@@ -107,7 +107,7 @@ layout_header('จัดการสินค้า', 'products');
 <?= flash_message() ?>
 
 <div class="panel admin-list-page admin-products-page">
-  <div class="panel-title">รายการข้อมูลสินค้าทั้งหมด</div>
+  <div class="panel-title">รายการสินค้า</div>
 
   <form class="toolbar product-toolbar" method="GET" action="<?= h(app_system_url('admin/products.php')) ?>">
     <input

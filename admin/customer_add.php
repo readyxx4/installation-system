@@ -281,7 +281,7 @@ if (table_exists($conn, 'provinces')) {
   }
 }
 
-layout_header('เพิ่มข้อมูลลูกค้า', 'users');
+layout_header('เพิ่มข้อมูลลูกค้า', 'users', 'เพิ่มข้อมูลลูกค้าใหม่ในระบบ');
 ?>
 
 <?= flash_message() ?>

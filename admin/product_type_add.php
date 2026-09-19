@@ -127,7 +127,7 @@ if (!function_exists('admin_form_icon_svg')) {
   }
 }
 
-layout_header('เพิ่มประเภทสินค้า', 'product_types');
+layout_header('เพิ่มประเภทสินค้า', 'product_types', 'เพิ่มประเภทสินค้าที่ใช้ในระบบ');
 ?>
 <?= flash_message() ?>
 <div class="staff-form-page">

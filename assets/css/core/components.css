@@ -79,7 +79,8 @@
 .setup-submit-btn,
 .product-detail-button,
 .customer-detail-button,
-.btn-detail {
+.btn-detail,
+.ui-action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -135,10 +136,128 @@
 .product-detail-button:disabled,
 .customer-detail-button:disabled,
 .btn-detail:disabled,
+.ui-action-btn:disabled,
 .btn.is-disabled,
 .disabled-link {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+/* Reusable action buttons for table and card actions. */
+.ui-action-group {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: nowrap;
+  width: 100%;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.ui-action-btn {
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  font: inherit;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  appearance: none;
+}
+
+.ui-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.1);
+}
+
+.ui-action-btn:active {
+  transform: translateY(0);
+}
+
+.ui-action-btn:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.25);
+  outline-offset: 2px;
+}
+
+.ui-action-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.ui-action-btn__icon svg {
+  display: block;
+  width: 13px;
+  height: 13px;
+  color: currentColor;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.ui-action-btn__text {
+  display: inline-block;
+  line-height: 1;
+}
+
+.ui-action-btn--view {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.ui-action-btn--view:hover {
+  border-color: #93c5fd;
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.ui-action-btn--edit {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+}
+
+.ui-action-btn--edit:hover {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.ui-action-btn--danger {
+  border-color: #fecdd3;
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+.ui-action-btn--danger:hover {
+  border-color: #fda4af;
+  background: #ffe4e6;
+  color: #991b1b;
+}
+
+.ui-action-btn--primary {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.ui-action-btn--primary:hover {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: #ffffff;
 }
 
 .badge,

@@ -24,6 +24,10 @@ function safe_count(mysqli $conn, string $sql, string $tech_id): int
 
 function assign_status_name($status): string
 {
+    if ((string) $status === '5') {
+        return 'งานเสร็จสิ้นแล้ว';
+    }
+
     return match ((string) $status) {
         '0' => 'ยังไม่มอบหมาย',
         '1' => 'มอบหมายแล้ว',

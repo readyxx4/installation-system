@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $default_tech_id = make_tech_id($conn);
 
-layout_header('เพิ่มข้อมูลช่าง', 'technicians');
+layout_header('เพิ่มข้อมูลช่าง', 'technicians', 'เพิ่มข้อมูลช่างติดตั้งในระบบ');
 ?>
 
 <?= flash_message() ?>

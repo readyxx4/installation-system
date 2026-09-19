@@ -175,6 +175,8 @@ $stmt = $conn->prepare("
         c.customer_email AS user_email,
         c.customer_address AS user_address,
 
+        seller.user_name AS seller_name,
+
         p.pro_id AS main_pro_id,
         p.pro_name AS main_pro_name,
         p.pro_price_install AS main_pro_price_install,
@@ -193,6 +195,7 @@ $stmt = $conn->prepare("
         t.tech_email
     FROM setup s
     LEFT JOIN customers c ON s.customer_id = c.customer_id
+    LEFT JOIN `user` seller ON seller.user_id = s.sale_id
     LEFT JOIN product p ON s.pro_id = p.pro_id
     LEFT JOIN product_type pt ON p.protype_id = pt.protype_id
     LEFT JOIN assignment a ON s.setup_id = a.setup_id AND a.assign_status IN (1, 2, 5)
@@ -286,6 +289,24 @@ $slip_company_phone = '043-272-136';
 $slip_company_tax_id = '0405551001144';
 
 $display_install_date = !empty($setup['assign_install_date']) ? $setup['assign_install_date'] : ($setup['setup_date'] ?? null);
+
+$slip_creator_name = trim((string) ($setup['seller_name'] ?? ''));
+$slip_creator_name = $slip_creator_name !== '' ? $slip_creator_name : '-';
+
+$assignment_status = (string) ($setup['assign_status'] ?? '');
+$assignment_technician_id = trim((string) ($setup['tech_id'] ?? ''));
+$has_active_assignment = !empty($setup['assign_id'])
+    && $assignment_technician_id !== ''
+    && in_array($assignment_status, ['1', '2', '5'], true);
+
+$slip_technician_name = trim((string) ($setup['tech_fullname'] ?? ''));
+if ($slip_technician_name === '') {
+    $slip_technician_name = trim((string) ($setup['tech_name'] ?? ''));
+}
+$slip_technician_name = $slip_technician_name !== '' ? $slip_technician_name : '-';
+
+$slip_customer_name = trim((string) ($setup['user_name'] ?? ''));
+$slip_customer_name = $slip_customer_name !== '' ? $slip_customer_name : '-';
 
 $slip_back_url = $from_manager
     ? app_system_url('manager/assignment_list.php')
@@ -428,24 +449,26 @@ layout_header('ใบติดตั้ง', 'setups');
         </section>
 
         <footer class="install-slip-footer">
-            <div class="install-slip-signature">
-                <p></p>
-                <strong>ผู้จัดทำใบงาน</strong>
-                <small>พนักงานขาย</small>
-                <span>วันที่ ____ / ____ / ______</span>
-            </div>
-
-            <div class="install-slip-signature">
-                <p></p>
-                <strong>ช่างผู้ติดตั้ง</strong>
-                <small>ผู้ดำเนินงานติดตั้ง</small>
-                <span>วันที่ ____ / ____ / ______</span>
+            <div class="install-slip-signature"<?= $has_active_assignment ? '' : ' aria-hidden="true"' ?>>
+                <?php if ($has_active_assignment): ?>
+                    <p></p>
+                    <strong>ช่างผู้ติดตั้ง</strong>
+                    <small><?= h($slip_technician_name) ?> · ผู้ดำเนินงานติดตั้ง</small>
+                    <span>วันที่ ____ / ____ / ______</span>
+                <?php endif; ?>
             </div>
 
             <div class="install-slip-signature">
                 <p></p>
                 <strong>ลูกค้า / ผู้รับงาน</strong>
-                <small>ผู้ตรวจรับงานติดตั้ง</small>
+                <small><?= h($slip_customer_name) ?> · ผู้ตรวจรับงานติดตั้ง</small>
+                <span>วันที่ ____ / ____ / ______</span>
+            </div>
+
+            <div class="install-slip-signature">
+                <p></p>
+                <strong><?= h($slip_creator_name) ?></strong>
+                <small>พนักงานขาย · ผู้จัดทำใบงาน</small>
                 <span>วันที่ ____ / ____ / ______</span>
             </div>
         </footer>

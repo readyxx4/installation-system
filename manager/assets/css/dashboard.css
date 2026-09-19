@@ -211,13 +211,21 @@ body.app-body.role-1 .app-main {
 }
 
 .manager-badge.blue {
-    color: var(--mgr-blue);
-    background: var(--mgr-blue-light);
+    color: #2563eb;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
 }
 
-.manager-badge.orange {
-    color: var(--mgr-orange-text);
-    background: var(--mgr-orange-bg);
+.manager-badge.unassigned {
+    color: #475569;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+}
+
+.manager-badge.overdue {
+    color: #ea580c;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
 }
 
 .manager-inline-head {
@@ -1316,10 +1324,11 @@ body.app-body.role-1 .manager-tech-card .manager-tech-chip strong {
    - แถบหน้ารายการเป็นฟ้า/น้ำเงินทั้งหมด
    ========================================================= */
 
-/* งานที่ยังไม่ได้มอบหมาย = ส้ม */
-.manager-badge.orange {
-    color: #C4711A !important;
-    background: #FDEBDA !important;
+/* เกินกำหนด ใช้สีส้มแดงมาตรฐานของ Manager */
+.manager-badge.overdue {
+    color: #ea580c !important;
+    background: #fff7ed !important;
+    border-color: #fdba74 !important;
 }
 
 .manager-btn.assign-warning {

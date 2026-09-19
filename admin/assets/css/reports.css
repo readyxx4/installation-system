@@ -1,0 +1,2851 @@
+/* Admin report surface: a focused report canvas, separate from Dashboard. */
+
+body.app-body.role-3:has(.admin-report-page) .content {
+    min-height: calc(100vh - 64px);
+    height: calc(100vh - 64px) !important;
+    padding: 0 !important;
+    background:
+        radial-gradient(circle at 3% 0%, rgba(124, 58, 237, .09), transparent 28%),
+        radial-gradient(circle at 98% 2%, rgba(14, 165, 233, .1), transparent 30%),
+        #f7f9fc !important;
+}
+
+.admin-report-page {
+    --report-ink: #172033;
+    --report-muted: #64748b;
+    --report-border: #e5eaf1;
+    --report-surface: #ffffff;
+    width: 100%;
+    max-width: 1280px;
+    min-height: calc(100vh - 64px);
+    margin: 0 auto;
+    padding: 36px 48px 56px;
+    box-sizing: border-box;
+    color: var(--report-ink);
+    isolation: isolate;
+}
+
+.report-header {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 18px;
+    padding: 26px 28px;
+    border: 1px solid rgba(139, 92, 246, .14);
+    border-radius: 24px;
+    background: linear-gradient(135deg, #ffffff 0%, #faf7ff 54%, #f0f7ff 100%);
+    box-shadow: 0 16px 38px rgba(79, 70, 229, .08);
+}
+
+.report-header::after {
+    position: absolute;
+    right: -60px;
+    bottom: -95px;
+    width: 220px;
+    height: 220px;
+    border: 1px solid rgba(99, 102, 241, .16);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .36);
+    content: "";
+    pointer-events: none;
+}
+
+.report-header-copy {
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.report-header-actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+}
+
+.report-print-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #ffffff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 10px 22px rgba(79, 70, 229, .22);
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+.report-print-btn:hover {
+    filter: saturate(1.08);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 26px rgba(79, 70, 229, .28);
+}
+
+.report-print-btn:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .24);
+    outline-offset: 3px;
+}
+
+.report-header h1 {
+    margin: 0 0 6px;
+    color: var(--report-ink);
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.12;
+}
+
+.report-header p {
+    max-width: 720px;
+    margin: 0;
+    color: var(--report-muted);
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.report-table-period {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid rgba(96, 165, 250, .25);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .8);
+    color: #315b9b;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.report-table-period i {
+    color: #2563eb;
+}
+
+.report-category-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    width: fit-content;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 14px;
+    padding: 6px;
+    overflow-x: auto;
+    white-space: nowrap;
+    border: 1px solid rgba(226, 232, 240, .9);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .82);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, .06);
+    scrollbar-width: thin;
+}
+
+.report-category-link {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 18px;
+    border-radius: 999px;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform .18s ease, color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.report-category-link:hover {
+    background: #f1f5ff;
+    color: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.report-category-link.is-active {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #ffffff;
+    box-shadow: 0 12px 24px rgba(79, 70, 229, .24);
+    transform: translateY(-1px);
+}
+
+.report-category-link:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .2);
+    outline-offset: 2px;
+}
+
+.report-metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.report-overview-metric-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.report-overview-metric-grid .report-metric-card {
+    gap: 11px;
+    min-height: 96px;
+    padding: 14px;
+}
+
+.report-overview-metric-grid .report-metric-copy strong {
+    font-size: clamp(24px, 2.1vw, 32px);
+}
+
+.report-overview-metric-grid .report-metric-card:has(.report-metric-icon.tone-blue) .report-metric-copy strong {
+    color: #2563eb;
+}
+
+.report-overview-metric-grid .report-metric-card:has(.report-metric-icon.tone-green) .report-metric-copy strong {
+    color: #16a34a;
+}
+
+.report-overview-metric-grid .report-metric-card:has(.report-metric-icon.tone-amber) .report-metric-copy strong {
+    color: #d97706;
+}
+
+.report-overview-metric-grid .report-metric-card:has(.report-metric-icon.tone-violet) .report-metric-copy strong {
+    color: #7c3aed;
+}
+
+.report-overview-metric-grid .report-metric-card:has(.report-metric-icon.tone-cyan) .report-metric-copy strong {
+    color: #0891b2;
+}
+
+.report-metric-card {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+    min-height: 112px;
+    padding: 17px;
+    border: 1px solid var(--report-border);
+    border-radius: 20px;
+    background: var(--report-surface);
+    box-shadow: 0 14px 32px rgba(30, 55, 90, .06);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+/* Shared Reports card surface and Overview interaction. */
+.report-metric-card::before,
+.report-panel::before,
+.report-placeholder::before,
+.report-overview-summary-item::before {
+    position: absolute;
+    top: 0;
+    right: 18px;
+    left: 18px;
+    height: 3px;
+    border-radius: 0 0 999px 999px;
+    background: linear-gradient(90deg, #93c5fd, #2563eb);
+    content: "";
+    opacity: 0;
+    pointer-events: none;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: opacity .2s ease, transform .2s ease;
+}
+
+.report-metric-card:hover::before,
+.report-panel:hover::before,
+.report-placeholder:hover::before,
+.report-overview-summary-item:hover::before {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+.report-metric-card::after {
+    position: absolute;
+    right: -24px;
+    bottom: -34px;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, .72), rgba(255, 255, 255, 0));
+    content: "";
+    pointer-events: none;
+}
+
+.report-metric-card:has(.report-metric-icon.tone-blue)::before {
+    background: linear-gradient(90deg, #93c5fd, #2563eb);
+}
+
+.report-metric-card:has(.report-metric-icon.tone-cyan)::before {
+    background: linear-gradient(90deg, #67e8f9, #0891b2);
+}
+
+.report-metric-card:has(.report-metric-icon.tone-violet)::before {
+    background: linear-gradient(90deg, #c4b5fd, #7c3aed);
+}
+
+.report-metric-card:has(.report-metric-icon.tone-green)::before {
+    background: linear-gradient(90deg, #86efac, #16a34a);
+}
+
+.report-metric-card:has(.report-metric-icon.tone-amber)::before {
+    background: linear-gradient(90deg, #fde68a, #d97706);
+}
+
+.report-metric-card:has(.report-metric-icon.tone-red)::before {
+    background: linear-gradient(90deg, #fda4af, #dc2626);
+}
+
+.report-metric-card:hover,
+.report-panel:hover,
+.report-placeholder:hover,
+.report-overview-summary-item:hover {
+    transform: translateY(-3px);
+    border-color: rgba(147, 197, 253, .65);
+    box-shadow: 0 18px 38px rgba(30, 55, 90, .1);
+}
+
+.report-metric-card:has(.report-metric-icon.tone-blue):hover {
+    border-color: rgba(147, 197, 253, .65);
+}
+
+.report-metric-card:has(.report-metric-icon.tone-cyan):hover {
+    border-color: rgba(103, 232, 249, .65);
+}
+
+.report-metric-card:has(.report-metric-icon.tone-violet):hover {
+    border-color: rgba(196, 181, 253, .65);
+}
+
+.report-metric-card:has(.report-metric-icon.tone-green):hover {
+    border-color: rgba(134, 239, 172, .65);
+}
+
+.report-metric-card:has(.report-metric-icon.tone-amber):hover {
+    border-color: rgba(253, 230, 138, .65);
+}
+
+.report-metric-card:has(.report-metric-icon.tone-red):hover {
+    border-color: rgba(253, 164, 175, .65);
+}
+
+.report-metric-icon,
+.report-placeholder-icon {
+    display: inline-flex;
+    flex: 0 0 42px;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    font-size: 17px;
+    box-shadow: 0 8px 15px rgba(30, 55, 90, .08);
+}
+
+.report-metric-copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.report-metric-copy > span {
+    overflow: hidden;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.report-metric-copy strong {
+    overflow: hidden;
+    color: var(--report-ink);
+    font-size: clamp(21px, 2.1vw, 29px);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.05;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.report-metric-copy small {
+    overflow: hidden;
+    color: #64748b;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.report-visual-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(320px, .85fr);
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.report-dual-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.installation-trend-panel,
+.installation-status-panel,
+.installation-detail-panel {
+    margin-bottom: 18px;
+}
+
+.installation-report-head {
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.installation-year-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.installation-year-control select {
+    min-height: 36px;
+    padding: 0 30px 0 11px;
+    border: 1px solid #dbe4ee;
+    border-radius: 10px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    cursor: pointer;
+}
+
+.installation-year-control select:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .16);
+    outline-offset: 1px;
+    border-color: #93c5fd;
+}
+
+.installation-trend-legend {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px 22px;
+    margin: 0 0 4px 28px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.installation-trend-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.installation-trend-swatch {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+}
+
+.installation-trend-swatch--created {
+    background: #3b82f6;
+}
+
+.installation-trend-swatch--completed {
+    background: #10b981;
+}
+
+.installation-trend-chart-wrap {
+    overflow-x: auto;
+    margin-top: 2px;
+}
+
+.installation-trend-chart {
+    display: block;
+    width: 100%;
+    min-width: 680px;
+    height: 250px;
+}
+
+.installation-trend-gridline {
+    stroke: #e8eef7;
+    stroke-width: 1;
+}
+
+.installation-trend-axis-label,
+.installation-trend-month-label {
+    fill: #94a3b8;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.installation-trend-line {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+}
+
+.installation-trend-line--created {
+    stroke: #3b82f6;
+}
+
+.installation-trend-line--completed {
+    stroke: #10b981;
+}
+
+.installation-trend-point {
+    stroke-width: 2;
+    cursor: pointer;
+    transition: r .16s ease, stroke-width .16s ease;
+}
+
+.installation-trend-point:hover,
+.installation-trend-point:focus-visible {
+    r: 6;
+    stroke-width: 3;
+    outline: none;
+}
+
+.installation-trend-point--created {
+    fill: #fff;
+    stroke: #3b82f6;
+}
+
+.installation-trend-point--completed {
+    fill: #fff;
+    stroke: #10b981;
+}
+
+.installation-status-bars {
+    display: grid;
+    gap: 13px;
+}
+
+.installation-status-row {
+    display: grid;
+    gap: 7px;
+}
+
+.installation-status-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.installation-status-label span {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+}
+
+.installation-status-label i {
+    display: inline-flex;
+    flex: 0 0 24px;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    font-size: 11px;
+}
+
+.installation-status-label strong {
+    color: #1e293b;
+    white-space: nowrap;
+}
+
+.installation-status-track {
+    width: 100%;
+    height: 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #eef2ff;
+}
+
+.installation-status-fill {
+    display: block;
+    height: 100%;
+    min-width: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #818cf8, #6366f1);
+    transition: width .2s ease;
+}
+
+.installation-status-row:has(.installation-status-label i.tone-amber) .installation-status-fill {
+    background: linear-gradient(90deg, #fcd34d, #d97706);
+}
+
+.installation-status-row:has(.installation-status-label i.tone-blue) .installation-status-fill {
+    background: linear-gradient(90deg, #93c5fd, #2563eb);
+}
+
+.installation-status-row:has(.installation-status-label i.tone-cyan) .installation-status-fill {
+    background: linear-gradient(90deg, #67e8f9, #0891b2);
+}
+
+.installation-status-row:has(.installation-status-label i.tone-yellow) .installation-status-fill {
+    background: linear-gradient(90deg, #60a5fa, #1d4ed8);
+}
+
+.installation-status-row:has(.installation-status-label i.tone-violet) .installation-status-fill {
+    background: linear-gradient(90deg, #c4b5fd, #7c3aed);
+}
+
+.installation-status-row:has(.installation-status-label i.tone-orange) .installation-status-fill {
+    background: linear-gradient(90deg, #fdba74, #ea580c);
+}
+
+.installation-status-row:has(.installation-status-label i.tone-green) .installation-status-fill {
+    background: linear-gradient(90deg, #86efac, #16a34a);
+}
+
+.installation-status-row:has(.installation-status-label i.tone-red) .installation-status-fill {
+    background: linear-gradient(90deg, #fda4af, #dc2626);
+}
+
+.installation-status-row.is-zero .installation-status-fill {
+    width: 0 !important;
+}
+
+.installation-detail-table {
+    min-width: 980px;
+}
+
+.personnel-section {
+    margin-bottom: 24px;
+}
+
+.personnel-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    margin: 4px 0 14px;
+}
+
+.personnel-section-header h2 {
+    margin: 0 0 4px;
+    color: var(--report-ink);
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+.personnel-section-header p {
+    margin: 0;
+    color: var(--report-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.personnel-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.personnel-kpi-card {
+    min-height: 88px;
+    padding: 13px;
+}
+
+.personnel-kpi-card .report-metric-copy strong {
+    font-size: clamp(23px, 2vw, 30px);
+}
+
+.personnel-chart-panel,
+.personnel-table-panel {
+    margin-bottom: 16px;
+}
+
+/* Phase 4: installation-fee report visuals. Keep this scope isolated from the other tabs. */
+.revenue-report .report-metric-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.revenue-area-panel {
+    margin-bottom: 18px;
+}
+
+.revenue-area-panel::before {
+    background: linear-gradient(90deg, #a5b4fc, #6366f1);
+}
+
+.revenue-area-panel:hover {
+    border-color: rgba(99, 102, 241, .52);
+}
+
+.revenue-area-header {
+    align-items: center;
+}
+
+.revenue-year-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.revenue-year-control select {
+    min-height: 36px;
+    padding: 0 30px 0 11px;
+    border: 1px solid #dbe4ee;
+    border-radius: 10px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    cursor: pointer;
+}
+
+.revenue-year-control select:focus-visible {
+    outline: 3px solid rgba(79, 70, 229, .16);
+    outline-offset: 1px;
+    border-color: #a5b4fc;
+}
+
+.revenue-area-legend {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: -2px 0 4px 28px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.revenue-area-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.revenue-area-swatch {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #6366f1;
+}
+
+.revenue-area-chart-wrap {
+    overflow-x: auto;
+    margin-top: 2px;
+}
+
+.revenue-area-chart {
+    display: block;
+    width: 100%;
+    min-width: 680px;
+    height: 260px;
+}
+
+.revenue-area-gridline {
+    stroke: #e8eef7;
+    stroke-width: 1;
+}
+
+.revenue-area-axis-label,
+.revenue-area-month-label {
+    fill: #94a3b8;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.revenue-area-fill {
+    fill: rgba(99, 102, 241, .14);
+}
+
+.revenue-area-line {
+    fill: none;
+    stroke: #6366f1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+}
+
+.revenue-area-point {
+    fill: #fff;
+    stroke: #6366f1;
+    stroke-width: 2;
+}
+
+.revenue-report-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(420px, .95fr);
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.revenue-status-panel,
+.revenue-monthly-panel {
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+.revenue-status-bars {
+    display: grid;
+    gap: 13px;
+}
+
+.revenue-status-row {
+    display: grid;
+    gap: 7px;
+}
+
+.revenue-status-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.revenue-status-label span {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+}
+
+.revenue-status-label i {
+    display: inline-flex;
+    flex: 0 0 24px;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: #eef2ff;
+    color: #6366f1;
+    font-size: 11px;
+}
+
+.revenue-status-label strong {
+    color: #1e293b;
+    white-space: nowrap;
+}
+
+.revenue-status-track {
+    width: 100%;
+    height: 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #eef2ff;
+}
+
+.revenue-status-fill {
+    display: block;
+    height: 100%;
+    min-width: 0;
+    border-radius: inherit;
+    background: #6366f1;
+    transition: width .2s ease;
+}
+
+.revenue-status-row.is-zero .revenue-status-track {
+    background: transparent;
+}
+
+.revenue-status-row.is-zero .revenue-status-fill {
+    width: 0;
+}
+
+.revenue-monthly-panel .report-table-wrap {
+    overflow-x: auto;
+}
+
+.revenue-monthly-table {
+    min-width: 470px;
+}
+
+.revenue-monthly-table th,
+.revenue-monthly-table td {
+    white-space: nowrap;
+}
+
+.personnel-chart-panel h3,
+.personnel-table-panel h3 {
+    margin: 3px 0 4px;
+    color: var(--report-ink);
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.personnel-chart-panel p,
+.personnel-table-panel p {
+    margin: 0;
+    color: var(--report-muted);
+    font-size: 12px;
+}
+
+.personnel-chart-legend {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px 14px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.personnel-chart-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.personnel-series-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.personnel-series-dot--created,
+.personnel-series-dot--assigned,
+.personnel-series-bar--created,
+.personnel-series-bar--assigned {
+    background: #3b82f6;
+}
+
+.personnel-series-dot--done,
+.personnel-series-bar--done {
+    background: #10b981;
+}
+
+.personnel-series-dot--cancelled,
+.personnel-series-dot--rejected,
+.personnel-series-bar--cancelled,
+.personnel-series-bar--rejected {
+    background: #ef4444;
+}
+
+.personnel-grouped-bars {
+    display: grid;
+    gap: 16px;
+}
+
+.personnel-chart-row {
+    display: grid;
+    grid-template-columns: minmax(140px, 190px) minmax(0, 1fr);
+    align-items: start;
+    gap: 18px;
+}
+
+.personnel-chart-name {
+    min-width: 0;
+    padding-top: 2px;
+    overflow: hidden;
+    color: #334155;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.personnel-chart-series {
+    display: grid;
+    gap: 7px;
+}
+
+.personnel-series-row {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) 34px;
+    align-items: center;
+    gap: 9px;
+}
+
+.personnel-series-label {
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: right;
+}
+
+.personnel-series-track {
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #f1f5f9;
+}
+
+.personnel-series-bar {
+    display: block;
+    height: 100%;
+    min-width: 0;
+    border-radius: inherit;
+    transition: width .2s ease;
+}
+
+.personnel-series-row strong {
+    color: #475569;
+    font-size: 11px;
+    text-align: right;
+}
+
+.personnel-table {
+    min-width: 700px;
+}
+
+.report-insight-card {
+    min-width: 0;
+}
+
+.report-insight-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.report-insight-header h2 {
+    margin: 0 0 4px;
+    color: var(--report-ink);
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1.25;
+}
+
+.report-insight-header p {
+    margin: 0;
+    color: var(--report-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.completed-install-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.completed-install-header {
+    margin-bottom: 14px;
+}
+
+.completed-install-controls {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: flex-end;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.completed-period-tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    padding: 4px;
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    background: #f8fafc;
+    scrollbar-width: thin;
+}
+
+.completed-reset-btn {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 30px;
+    padding: 0 10px;
+    border: 1px solid #dbe4ee;
+    border-radius: 999px;
+    background: #fff;
+    color: #64748b;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.completed-reset-btn:hover {
+    border-color: #bae6fd;
+    background: #f0f9ff;
+    color: #0284c7;
+    transform: translateY(-1px);
+}
+
+.completed-reset-btn:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .2);
+    outline-offset: 2px;
+}
+
+.completed-reset-btn i {
+    font-size: 11px;
+}
+
+.completed-period-tab {
+    appearance: none;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 999px;
+    margin: 0;
+    background: transparent;
+    color: #64748b;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .18s ease, box-shadow .18s ease, color .18s ease, transform .18s ease;
+}
+
+.completed-period-tab:hover {
+    background: #eff6ff;
+    color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.completed-period-tab.is-active {
+    background: linear-gradient(135deg, #34d399, #38bdf8);
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(14, 165, 233, .18);
+}
+
+.completed-period-tab:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .2);
+    outline-offset: 2px;
+}
+
+.completed-date-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.completed-date-control[hidden] {
+    display: none;
+}
+
+.completed-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 12px;
+}
+
+.completed-period-control {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+}
+
+.completed-range-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.completed-range-control[hidden] {
+    display: none;
+}
+
+.completed-range-input {
+    width: 142px;
+    min-width: 142px;
+    min-height: 40px;
+    padding: 7px 10px;
+    border: 1px solid #dbe4ee;
+    border-radius: 10px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    font-weight: 600;
+}
+
+.completed-range-input:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .16);
+    outline-offset: 1px;
+    border-color: #93c5fd;
+}
+
+.completed-date-picker {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.completed-date-picker input[type="text"] {
+    width: 132px;
+    min-width: 132px;
+    min-height: 40px;
+    padding: 7px 34px 7px 10px;
+    border: 1px solid #dbe4ee;
+    border-radius: 10px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    font-weight: 600;
+}
+
+.completed-date-trigger {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition: background .18s ease, color .18s ease;
+}
+
+.completed-date-trigger:hover {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.completed-date-trigger:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .16);
+    outline-offset: 1px;
+}
+
+.completed-date-trigger i {
+    font-size: 14px;
+}
+
+.completed-date-picker .completed-date-native {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.completed-date-picker input[type="text"]::placeholder {
+    color: #94a3b8;
+}
+
+.completed-date-picker input[type="text"]:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .16);
+    outline-offset: 1px;
+    border-color: #93c5fd;
+}
+
+.completed-install-summary {
+    margin: 0;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.completed-install-chart {
+    min-height: 188px;
+}
+
+.completed-install-bars {
+    display: grid;
+    grid-template-columns: repeat(var(--completed-bar-count), minmax(34px, 1fr));
+    align-items: end;
+    gap: 9px;
+    min-height: 188px;
+    padding: 10px 2px 0;
+}
+
+.completed-install-bar-item {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    min-width: 0;
+    gap: 8px;
+}
+
+.completed-install-bar-stage {
+    width: 100%;
+    height: 142px;
+}
+
+.completed-install-bar-track {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px 10px 5px 5px;
+    background: #f1f5f9;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, .05);
+}
+
+.completed-install-bar-item.is-zero .completed-install-bar-track {
+    background: transparent;
+    box-shadow: none;
+}
+
+.completed-install-bar-item.is-zero .completed-install-bar-fill {
+    height: 0;
+}
+
+.completed-install-bar-fill {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: var(--completed-bar-height, 0%);
+    flex: 0 0 auto;
+    max-height: 100%;
+    min-height: 0;
+    border-radius: 10px 10px 5px 5px;
+    background: linear-gradient(180deg, #7dd3fc, #0ea5e9);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45);
+    transition: height .22s ease;
+}
+
+.completed-install-bar-value {
+    position: absolute;
+    top: -21px;
+    left: 50%;
+    color: #334155;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    transform: translateX(-50%);
+}
+
+.completed-install-bar-label {
+    overflow: hidden;
+    max-width: 100%;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.installation-summary-donut-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 0;
+}
+
+.installation-report-body {
+    display: grid;
+    grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+    align-items: center;
+    gap: 28px;
+}
+
+.installation-donut-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+}
+
+.installation-summary-donut {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 178px;
+    height: 178px;
+    border-radius: 50%;
+    background: #edf2f7;
+    box-shadow: 0 16px 30px rgba(79, 70, 229, .14);
+}
+
+.installation-summary-donut::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 124px;
+    height: 124px;
+    border-radius: 50%;
+    background: #fff;
+    content: "";
+    transform: translate(-50%, -50%);
+}
+
+.installation-summary-donut-center {
+    position: absolute;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.installation-summary-donut-center strong {
+    color: var(--report-ink);
+    font-size: 31px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.installation-summary-donut-center span {
+    color: var(--report-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.installation-summary-count-label {
+    position: absolute;
+    z-index: 2;
+    top: calc(50% + var(--label-y));
+    left: calc(50% + var(--label-x));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 2px;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    pointer-events: none;
+    text-shadow: none;
+    transform: translate(-50%, -50%);
+}
+
+.installation-summary-legend {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    min-width: 0;
+    padding: 0;
+}
+
+.installation-summary-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    line-height: 1.3;
+}
+
+.installation-summary-dot {
+    flex: 0 0 9px;
+    width: 9px;
+    height: 9px;
+    margin-top: 4px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(148, 163, 184, .12);
+}
+
+/* Status dot colors mirror Manager assignment-history badges. */
+.installation-summary-dot.tone-amber { background: #94a3b8; }
+.installation-summary-dot.tone-blue { background: #a78bfa; }
+.installation-summary-dot.tone-cyan { background: #38bdf8; }
+.installation-summary-dot.tone-yellow { background: #60a5fa; }
+.installation-summary-dot.tone-violet { background: #818cf8; }
+.installation-summary-dot.tone-orange { background: #fb923c; }
+.installation-summary-dot.tone-green { background: #34d399; }
+.installation-summary-dot.tone-rose { background: #f87171; }
+.installation-summary-dot.tone-red { background: #f87171; }
+
+.installation-summary-legend-label {
+    overflow: hidden;
+    color: #334155;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+}
+
+.report-panel,
+.report-placeholder,
+.report-overview-summary-item {
+    position: relative;
+    min-width: 0;
+    border: 1px solid var(--report-border);
+    border-radius: 20px;
+    background: var(--report-surface);
+    box-shadow: 0 14px 32px rgba(30, 55, 90, .06);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.report-panel {
+    padding: 21px;
+}
+
+.report-panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.report-panel-head h2,
+.report-placeholder h2 {
+    margin: 0 0 4px;
+    color: var(--report-ink);
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1.25;
+}
+
+.report-panel-head p,
+.report-placeholder p {
+    margin: 0;
+    color: var(--report-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.report-panel-total {
+    flex: 0 0 auto;
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.report-bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+}
+
+.report-bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.report-bar-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.report-bar-label span,
+.report-status-label {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    gap: 8px;
+}
+
+.report-bar-label i,
+.report-status-label i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    font-size: 11px;
+}
+
+.report-bar-label strong {
+    color: #1e293b;
+    font-size: 12px;
+}
+
+.report-bar-track,
+.report-share-track {
+    display: block;
+    overflow: hidden;
+    height: 9px;
+    border-radius: 999px;
+    background: #edf2f8;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, .04);
+}
+
+.report-bar-track > span,
+.report-share-track > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    transition: width .25s ease;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .36);
+}
+
+.report-overview-summary-panel {
+    margin-bottom: 18px;
+}
+
+.report-overview-summary-panel .report-panel-head {
+    margin-bottom: 14px;
+}
+
+.report-overview-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.report-overview-summary-item {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 5px;
+    padding: 13px 14px;
+}
+
+.report-overview-summary-item span {
+    overflow: hidden;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.report-overview-summary-item strong {
+    overflow: hidden;
+    color: #1e293b;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.report-table-panel {
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.report-summary-panel {
+    align-self: start;
+}
+
+.report-summary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.report-summary-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 11px 12px;
+    border: 1px solid #edf1f5;
+    border-radius: 12px;
+    background: #fbfdff;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.report-summary-line strong {
+    color: #1e293b;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.report-data-panel {
+    margin-bottom: 18px;
+}
+
+.report-wide-table {
+    min-width: 900px;
+}
+
+.report-empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 94px;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.report-empty-state i {
+    color: #93c5fd;
+}
+
+.report-muted-cell {
+    color: #94a3b8;
+    text-align: center;
+}
+
+.report-table-footnote {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 16px 21px 0;
+    color: #94a3b8;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.report-table-footnote i {
+    color: #93c5fd;
+}
+
+.report-table-wrap {
+    overflow-x: auto;
+    margin: 0 -21px -21px;
+}
+
+.report-table {
+    width: 100%;
+    min-width: 650px;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: #475569;
+    font-size: 13px;
+}
+
+.report-table th {
+    padding: 12px 21px;
+    border-top: 1px solid #edf1f5;
+    border-bottom: 1px solid #e9eef4;
+    background: linear-gradient(180deg, #fbfdff, #f6f9fc);
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.report-table td {
+    padding: 14px 21px;
+    border-bottom: 1px solid #f0f3f7;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.report-table tbody tr {
+    transition: background .18s ease;
+}
+
+.report-table tbody tr:hover {
+    background: #fbfdff;
+}
+
+.report-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.report-status-label {
+    color: #334155;
+    font-weight: 700;
+}
+
+.report-share-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 140px;
+}
+
+.report-share-track {
+    flex: 1 1 auto;
+    height: 6px;
+}
+
+.report-share-cell strong {
+    flex: 0 0 38px;
+    color: #64748b;
+    font-size: 12px;
+    text-align: right;
+}
+
+.report-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 28px;
+}
+
+.report-placeholder-icon {
+    flex-basis: 52px;
+    width: 52px;
+    height: 52px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 19px;
+}
+
+.report-placeholder > div:nth-child(2) {
+    min-width: 0;
+    margin-right: auto;
+}
+
+.tone-blue { color: #2563eb; }
+.tone-cyan { color: #0891b2; }
+.tone-violet { color: #7c3aed; }
+.tone-green { color: #16a34a; }
+.tone-amber { color: #d97706; }
+.tone-yellow { color: #2563eb; }
+.tone-orange { color: #ea580c; }
+.tone-red { color: #dc2626; }
+
+.report-bar-label i.tone-blue,
+.report-status-label i.tone-blue { color: #7c3aed; background: #f5f3ff; }
+.report-bar-label i.tone-cyan,
+.report-status-label i.tone-cyan { color: #0284c7; background: #e0f2fe; }
+.report-bar-label i.tone-violet,
+.report-status-label i.tone-violet { color: #4f46e5; background: #eef2ff; }
+.report-bar-label i.tone-green,
+.report-status-label i.tone-green { color: #059669; background: #ecfdf5; }
+.report-bar-label i.tone-amber,
+.report-status-label i.tone-amber { color: #64748b; background: #f1f5f9; }
+.report-bar-label i.tone-yellow,
+.report-status-label i.tone-yellow { color: #2563eb; background: #eff6ff; }
+.report-bar-label i.tone-orange,
+.report-status-label i.tone-orange { color: #ea580c; background: #fff7ed; }
+.report-bar-label i.tone-red,
+.report-status-label i.tone-red { color: #dc2626; background: #fff1f2; }
+
+.report-metric-icon.tone-blue { background: #eff6ff; }
+.report-metric-icon.tone-cyan { background: #ecfeff; }
+.report-metric-icon.tone-violet { background: #f5f3ff; }
+.report-metric-icon.tone-green { background: #ecfdf5; }
+.report-metric-icon.tone-amber { background: #fffbeb; }
+.report-metric-icon.tone-red { background: #fef2f2; }
+
+.report-bar-track > span.tone-blue,
+.report-share-track > span.tone-blue { background: linear-gradient(90deg, #ddd6fe, #a78bfa); }
+.report-bar-track > span.tone-cyan,
+.report-share-track > span.tone-cyan { background: linear-gradient(90deg, #bae6fd, #38bdf8); }
+.report-bar-track > span.tone-violet,
+.report-share-track > span.tone-violet { background: linear-gradient(90deg, #c7d2fe, #818cf8); }
+.report-bar-track > span.tone-green,
+.report-share-track > span.tone-green { background: linear-gradient(90deg, #a7f3d0, #34d399); }
+.report-bar-track > span.tone-amber,
+.report-share-track > span.tone-amber { background: linear-gradient(90deg, #e2e8f0, #94a3b8); }
+.report-bar-track > span.tone-red,
+.report-share-track > span.tone-red { background: linear-gradient(90deg, #fecdd3, #f87171); }
+
+@media (max-width: 1100px) {
+    .admin-report-page {
+        padding-right: 24px;
+        padding-left: 24px;
+    }
+
+    .report-metric-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 860px) {
+    .report-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .report-visual-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-dual-chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-insight-header {
+        flex-direction: column;
+    }
+
+    .completed-install-controls {
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .completed-period-tabs {
+        max-width: 100%;
+    }
+
+    .installation-report-head {
+        align-items: flex-start;
+    }
+
+    .installation-year-control {
+        align-self: flex-start;
+    }
+
+    .personnel-section-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .personnel-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .personnel-chart-legend {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 680px) {
+    .admin-report-page {
+        padding: 22px 16px 32px;
+    }
+
+    .report-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .report-metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .report-metric-card {
+        gap: 10px;
+        min-height: 96px;
+        padding: 13px;
+    }
+
+    .report-metric-icon {
+        flex-basis: 36px;
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        font-size: 14px;
+    }
+
+    .report-metric-copy strong {
+        font-size: 20px;
+    }
+
+    .report-overview-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .installation-summary-donut {
+        width: 156px;
+        height: 156px;
+    }
+
+    .installation-summary-donut::after {
+        width: 110px;
+        height: 110px;
+    }
+
+    .installation-report-body {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .installation-summary-legend {
+        grid-template-columns: 1fr;
+    }
+
+    .completed-install-controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .completed-period-tabs {
+        justify-content: flex-start;
+    }
+
+    .completed-date-control {
+        justify-content: space-between;
+    }
+
+    .completed-summary-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .completed-period-control {
+        align-items: stretch;
+        justify-content: flex-start;
+        flex-direction: column;
+    }
+
+    .completed-date-control,
+    .completed-range-control {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .completed-range-input {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .completed-install-bars {
+        gap: 7px;
+        overflow-x: auto;
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+
+    .completed-install-chart[data-period="month"] .completed-install-bars {
+        min-width: 520px;
+    }
+
+    .installation-trend-chart {
+        min-width: 680px;
+    }
+
+    .installation-trend-legend {
+        margin-left: 0;
+    }
+
+    .installation-year-control {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .installation-year-control select {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .personnel-section {
+        margin-bottom: 18px;
+    }
+
+    .personnel-kpi-grid {
+        gap: 10px;
+    }
+
+    .personnel-chart-row {
+        grid-template-columns: 1fr;
+        gap: 7px;
+    }
+
+    .personnel-chart-name {
+        padding-top: 0;
+    }
+
+    .report-placeholder {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        padding: 20px;
+    }
+
+}
+
+@media (max-width: 430px) {
+    .report-metric-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-overview-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-panel {
+        padding: 17px;
+    }
+
+    .report-table-wrap {
+        margin-right: -17px;
+        margin-left: -17px;
+    }
+
+    .report-table th,
+    .report-table td {
+        padding-right: 17px;
+        padding-left: 17px;
+    }
+
+    .installation-summary-legend {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1100px) {
+    .revenue-report-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 680px) {
+    .revenue-report .report-metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .revenue-area-header {
+        align-items: flex-start;
+    }
+
+    .revenue-year-control {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .revenue-year-control select {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .revenue-area-legend {
+        margin-left: 0;
+    }
+
+    .revenue-area-chart {
+        min-width: 620px;
+        height: 220px;
+    }
+}
+
+@media (max-width: 430px) {
+    .revenue-report .report-metric-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .revenue-status-label {
+        font-size: 11px;
+    }
+}
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 6mm;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) {
+        overflow: visible !important;
+        background: #ffffff !important;
+        font-size: 10.5px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .app-shell,
+    body.app-body.role-3:has(.admin-report-page) .main,
+    body.app-body.role-3:has(.admin-report-page) .content {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .app-shell {
+        display: block !important;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .app-sidebar,
+    body.app-body.role-3:has(.admin-report-page) .admin-topbar-clean,
+    body.app-body.role-3:has(.admin-report-page) .report-category-nav,
+    body.app-body.role-3:has(.admin-report-page) .report-header-actions,
+    body.app-body.role-3:has(.admin-report-page) .report-print-btn,
+    body.app-body.role-3:has(.admin-report-page) .completed-install-controls,
+    body.app-body.role-3:has(.admin-report-page) .completed-period-control,
+    body.app-body.role-3:has(.admin-report-page) .completed-period-tabs,
+    body.app-body.role-3:has(.admin-report-page) .completed-reset-btn {
+        display: none !important;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .content {
+        padding: 0 !important;
+        background: #ffffff !important;
+    }
+
+    .admin-report-page {
+        width: 100%;
+        max-width: none;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    .report-header {
+        margin-bottom: 10px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        border-color: #e5e7eb;
+        background: #ffffff;
+        box-shadow: none;
+    }
+
+    .report-header h1 {
+        margin: 0 0 4px;
+        font-size: 19px;
+    }
+
+    .report-header p {
+        font-size: 11px;
+    }
+
+    .report-header::after {
+        display: none;
+    }
+
+    .report-metric-grid,
+    .report-overview-metric-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .admin-report-page:has(.installation-trend-panel) .report-metric-grid {
+        gap: 8px;
+    }
+
+    .report-overview-metric-grid .report-metric-card,
+    .report-metric-card {
+        min-height: 78px;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 12px;
+    }
+
+    .report-metric-card::before,
+    .report-metric-card::after {
+        display: none;
+    }
+
+    .report-overview-metric-grid .report-metric-icon,
+    .report-metric-icon {
+        flex-basis: 32px;
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        box-shadow: none;
+        font-size: 13px;
+    }
+
+    .report-metric-copy {
+        gap: 3px;
+    }
+
+    .report-metric-copy > span {
+        font-size: 9px;
+    }
+
+    .report-metric-copy strong,
+    .report-overview-metric-grid .report-metric-copy strong {
+        font-size: 19px;
+    }
+
+    .report-metric-copy small {
+        display: none;
+    }
+
+    .report-dual-chart-grid,
+    .report-visual-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .report-panel {
+        padding: 12px;
+        border-radius: 14px;
+    }
+
+    .report-insight-header,
+    .report-panel-head {
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .report-insight-header h2,
+    .report-panel-head h2,
+    .report-placeholder h2 {
+        margin: 0 0 4px;
+        font-size: 14px;
+    }
+
+    .report-insight-header p,
+    .report-panel-head p,
+    .report-placeholder p {
+        font-size: 10px;
+    }
+
+    .installation-report-body {
+        grid-template-columns: minmax(132px, 160px) minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .installation-summary-donut {
+        width: 132px;
+        height: 132px;
+        box-shadow: none;
+    }
+
+    .installation-summary-donut::after {
+        width: 92px;
+        height: 92px;
+    }
+
+    .installation-summary-donut-center {
+        gap: 4px;
+    }
+
+    .installation-summary-donut-center strong {
+        font-size: 25px;
+    }
+
+    .installation-summary-donut-center span,
+    .installation-summary-legend-label {
+        font-size: 9px;
+    }
+
+    .installation-summary-count-label {
+        min-width: 14px;
+        height: 14px;
+        font-size: 10px;
+    }
+
+    .installation-summary-legend {
+        gap: 6px;
+    }
+
+    .installation-summary-legend-item {
+        gap: 6px;
+    }
+
+    .installation-summary-dot {
+        flex-basis: 7px;
+        width: 7px;
+        height: 7px;
+        margin-top: 2px;
+        box-shadow: none;
+    }
+
+    .completed-install-header {
+        margin-bottom: 8px;
+    }
+
+    .completed-summary-row {
+        justify-content: flex-start;
+        margin-bottom: 7px;
+    }
+
+    .completed-install-summary {
+        font-size: 10px;
+    }
+
+    .completed-install-chart {
+        min-height: 142px;
+    }
+
+    .completed-install-bars {
+        overflow: visible;
+        min-width: 0;
+        min-height: 142px;
+        gap: 7px;
+        padding: 7px 0 0;
+    }
+
+    .completed-install-chart[data-period="month"] .completed-install-bars {
+        min-width: 0;
+    }
+
+    .completed-install-bar-stage {
+        height: 108px;
+    }
+
+    .completed-install-bar-track,
+    .completed-install-bar-fill {
+        border-radius: 6px 6px 3px 3px;
+        box-shadow: none;
+    }
+
+    .completed-install-bar-value {
+        top: -15px;
+        font-size: 9px;
+    }
+
+    .completed-install-bar-label {
+        font-size: 9px;
+    }
+
+    .installation-trend-panel,
+    .installation-status-panel,
+    .installation-detail-panel {
+        margin-bottom: 8px;
+    }
+
+    .installation-year-control {
+        display: none;
+    }
+
+    .installation-trend-chart-wrap {
+        overflow: visible;
+    }
+
+    .installation-trend-chart {
+        min-width: 0;
+        height: 170px;
+    }
+
+    .installation-trend-axis-label,
+    .installation-trend-month-label {
+        font-size: 8px;
+    }
+
+    .installation-trend-legend {
+        margin-bottom: 0;
+        font-size: 9px;
+    }
+
+    .installation-status-bars {
+        gap: 7px;
+    }
+
+    .installation-status-label {
+        font-size: 9px;
+    }
+
+    .installation-status-label i {
+        flex-basis: 17px;
+        width: 17px;
+        height: 17px;
+        border-radius: 5px;
+        font-size: 8px;
+    }
+
+    .installation-status-track {
+        height: 8px;
+    }
+
+    .installation-detail-table {
+        min-width: 900px;
+    }
+
+    .personnel-section {
+        margin-bottom: 8px;
+    }
+
+    .personnel-section-header {
+        margin-bottom: 8px;
+    }
+
+    .personnel-section-header h2 {
+        font-size: 14px;
+    }
+
+    .personnel-section-header p,
+    .personnel-chart-panel p,
+    .personnel-table-panel p {
+        font-size: 10px;
+    }
+
+    .personnel-kpi-grid {
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .personnel-kpi-card {
+        min-height: 70px;
+        gap: 7px;
+        padding: 9px;
+    }
+
+    .personnel-kpi-card .report-metric-icon {
+        flex-basis: 28px;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        font-size: 11px;
+    }
+
+    .personnel-kpi-card .report-metric-copy > span {
+        font-size: 8px;
+    }
+
+    .personnel-kpi-card .report-metric-copy strong {
+        font-size: 16px;
+    }
+
+    .personnel-chart-panel,
+    .personnel-table-panel {
+        margin-bottom: 8px;
+    }
+
+    .personnel-chart-panel h3,
+    .personnel-table-panel h3 {
+        font-size: 12px;
+    }
+
+    .personnel-chart-legend {
+        gap: 5px 10px;
+        font-size: 8px;
+    }
+
+    .personnel-series-dot {
+        width: 6px;
+        height: 6px;
+    }
+
+    .personnel-grouped-bars {
+        gap: 8px;
+    }
+
+    .personnel-chart-row {
+        gap: 4px;
+    }
+
+    .personnel-chart-name {
+        font-size: 10px;
+    }
+
+    .personnel-chart-series {
+        gap: 4px;
+    }
+
+    .personnel-series-row {
+        grid-template-columns: 42px minmax(0, 1fr) 24px;
+        gap: 5px;
+    }
+
+    .personnel-series-label,
+    .personnel-series-row strong {
+        font-size: 8px;
+    }
+
+    .personnel-series-track {
+        height: 7px;
+    }
+
+    .personnel-table {
+        min-width: 0;
+        table-layout: fixed;
+        font-size: 8px;
+    }
+
+    .personnel-table th,
+    .personnel-table td {
+        padding: 5px 4px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .report-overview-summary-panel {
+        margin-bottom: 0;
+    }
+
+    .report-overview-summary-panel .report-panel-head {
+        margin-bottom: 8px;
+    }
+
+    .report-overview-summary-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .report-overview-summary-item {
+        gap: 4px;
+        padding: 9px 10px;
+    }
+
+    .report-overview-summary-item span {
+        font-size: 9px;
+    }
+
+    .report-overview-summary-item strong {
+        font-size: 14px;
+    }
+
+    .report-bar-chart,
+    .report-summary-list {
+        gap: 10px;
+    }
+
+    .report-bar-row {
+        gap: 4px;
+    }
+
+    .report-bar-label,
+    .report-bar-label strong,
+    .report-summary-line {
+        font-size: 10px;
+    }
+
+    .report-bar-label i,
+    .report-status-label i {
+        width: 17px;
+        height: 17px;
+        border-radius: 5px;
+        font-size: 8px;
+    }
+
+    .report-table-panel {
+        padding: 10px;
+    }
+
+    .report-table th,
+    .report-table td {
+        padding: 7px 8px;
+        font-size: 10px;
+    }
+
+    .installation-detail-table {
+        min-width: 0;
+        table-layout: fixed;
+        font-size: 8px;
+    }
+
+    .installation-detail-table th,
+    .installation-detail-table td {
+        padding: 5px 4px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .report-panel,
+    .report-metric-card,
+    .report-overview-summary-item {
+        box-shadow: none;
+    }
+
+    .report-metric-card,
+    .report-overview-summary-item,
+    .report-overview-summary-panel {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .report-header,
+    .report-metric-grid,
+    .report-dual-chart-grid,
+    .report-visual-grid,
+    .report-panel {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .report-table-panel {
+        break-inside: auto;
+        page-break-inside: auto;
+    }
+
+    .report-table tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+
+@media print {
+    .revenue-report .report-metric-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .revenue-report .report-metric-card {
+        min-height: 78px;
+        padding: 10px;
+    }
+
+    .revenue-report .report-metric-card .report-metric-copy > span {
+        font-size: 9px;
+    }
+
+    .revenue-report .report-metric-card .report-metric-copy strong {
+        font-size: 17px;
+    }
+
+    .revenue-area-panel {
+        margin-bottom: 10px;
+    }
+
+    .revenue-year-control {
+        display: none;
+    }
+
+    .revenue-area-legend {
+        margin-left: 0;
+        font-size: 9px;
+    }
+
+    .revenue-area-chart-wrap {
+        overflow: visible;
+    }
+
+    .revenue-area-chart {
+        min-width: 0;
+        height: 180px;
+    }
+
+    .revenue-area-axis-label,
+    .revenue-area-month-label {
+        font-size: 8px;
+    }
+
+    .revenue-report-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 0;
+    }
+
+    .revenue-status-panel,
+    .revenue-monthly-panel {
+        margin-bottom: 0;
+    }
+
+    .revenue-status-bars {
+        gap: 7px;
+    }
+
+    .revenue-status-row {
+        gap: 4px;
+    }
+
+    .revenue-status-label {
+        font-size: 9px;
+    }
+
+    .revenue-status-label i {
+        flex-basis: 17px;
+        width: 17px;
+        height: 17px;
+        border-radius: 5px;
+        font-size: 8px;
+    }
+
+    .revenue-status-track {
+        height: 8px;
+    }
+
+    .revenue-monthly-table {
+        min-width: 0;
+        table-layout: fixed;
+        font-size: 8px;
+    }
+
+    .revenue-monthly-table th,
+    .revenue-monthly-table td {
+        padding: 5px 4px;
+        font-size: 8px;
+        white-space: normal;
+        word-break: break-word;
+    }
+}
+
+/* Admin Reports: keep only the top metric cards interactive. */
+body.app-body.role-3:has(.admin-report-page) .report-panel,
+body.app-body.role-3:has(.admin-report-page) .report-overview-summary-item {
+    border-color: #cbd5e1;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(30, 55, 90, .05);
+    transition: none;
+}
+
+body.app-body.role-3:has(.admin-report-page) .report-panel:hover,
+body.app-body.role-3:has(.admin-report-page) .report-overview-summary-item:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 22px rgba(30, 55, 90, .05);
+    transform: none;
+}
+
+body.app-body.role-3:has(.admin-report-page) .report-panel::before,
+body.app-body.role-3:has(.admin-report-page) .report-panel:hover::before,
+body.app-body.role-3:has(.admin-report-page) .report-overview-summary-item::before,
+body.app-body.role-3:has(.admin-report-page) .report-overview-summary-item:hover::before {
+    opacity: 0;
+    transform: scaleX(0);
+    transition: none;
+}
+
+body.app-body.role-3:has(.admin-report-page) .report-header {
+    border-color: #cbd5e1;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(30, 55, 90, .05);
+    transition: none;
+}
+
+@media print {
+    body.app-body.role-3:has(.admin-report-page) .report-header,
+    body.app-body.role-3:has(.admin-report-page) .report-panel,
+    body.app-body.role-3:has(.admin-report-page) .report-overview-summary-item,
+    body.app-body.role-3:has(.admin-report-page) .report-metric-card {
+        border: 1px solid #cbd5e1 !important;
+        background: #fff !important;
+        box-shadow: none !important;
+        transform: none !important;
+        transition: none !important;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-header:hover,
+    body.app-body.role-3:has(.admin-report-page) .report-panel:hover,
+    body.app-body.role-3:has(.admin-report-page) .report-overview-summary-item:hover,
+    body.app-body.role-3:has(.admin-report-page) .report-metric-card:hover {
+        border-color: #cbd5e1 !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-header::after,
+    body.app-body.role-3:has(.admin-report-page) .report-panel::before,
+    body.app-body.role-3:has(.admin-report-page) .report-panel:hover::before,
+    body.app-body.role-3:has(.admin-report-page) .report-overview-summary-item::before,
+    body.app-body.role-3:has(.admin-report-page) .report-overview-summary-item:hover::before,
+    body.app-body.role-3:has(.admin-report-page) .report-metric-card::before,
+    body.app-body.role-3:has(.admin-report-page) .report-metric-card::after {
+        display: none !important;
+    }
+}
+ .admin-report-page .is-loading {
+    opacity: .62;
+    pointer-events: none;
+    transition: opacity .18s ease;
+}
+
+.admin-report-async-error {
+    margin: 8px 0 0;
+    color: #b91c1c;
+    font-size: 11px;
+    line-height: 1.4;
+    text-align: right;
+}

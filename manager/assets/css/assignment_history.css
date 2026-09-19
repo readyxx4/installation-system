@@ -13,6 +13,325 @@ body.app-body.role-1
     white-space: nowrap !important;
 }
 
+/* Match the compact Technician list rhythm on this page only. */
+body.app-body.role-1 .assignment-history-page {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0 32px 24px;
+    background: transparent !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .content {
+    background: #f6f8fb !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 18px !important;
+    height: 68px !important;
+    min-height: 68px !important;
+    padding: 0 32px !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    background: #fff !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04) !important;
+    overflow: visible !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-title {
+    min-width: 0 !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-title h1 {
+    margin: 0 !important;
+    color: #0f172a !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-title p {
+    margin: 2px 0 0 !important;
+    color: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 14px !important;
+    flex: 0 0 auto !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-pill,
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-user {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-height: 38px !important;
+    padding: 0 4px !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-user-copy {
+    display: grid !important;
+    gap: 1px !important;
+    min-width: 0 !important;
+    line-height: 1.2 !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-user-copy strong,
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-user-copy small {
+    display: block !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-avatar {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    flex: 0 0 28px !important;
+    border-radius: 999px !important;
+    background: #2563eb !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-user-copy strong {
+    color: #0f172a !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+body.app-body.role-1:has(.assignment-history-page) .shell-topbar-user-copy small {
+    color: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-from-setup-card {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-list-head-action {
+    padding: 12px 0 20px !important;
+    background: transparent !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-list-head-action h2 {
+    margin: 0 !important;
+    font-size: 22px !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-list-head-action p {
+    margin: 6px 0 0 !important;
+    color: #64748b !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    line-height: 1.45 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-toolbar-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 0 10px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-search-field {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-toolbar-buttons {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex: 0 0 auto !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-search-field input,
+body.app-body.role-1 .assignment-history-page .assignment-search-field input[type="text"] {
+    width: 100% !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 8px 12px 8px 36px !important;
+    border: 1px solid #dbeafe !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+    color: #334155 !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-search-field input::placeholder {
+    color: #94a3b8 !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-toolbar-card .btn-search,
+body.app-body.role-1 .assignment-history-page .assignment-toolbar-card .btn-reset {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 8px 14px !important;
+    border-radius: 10px !important;
+    white-space: nowrap !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-toolbar-card .btn-search {
+    color: #fff !important;
+    background: #2563eb !important;
+    border: 1px solid #2563eb !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-toolbar-card .btn-reset {
+    color: #475569 !important;
+    background: #fff !important;
+    border: 1px solid #dbe3ef !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-status-tabs {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin: 0 0 12px !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-status-tab {
+    min-height: 38px !important;
+    padding: 7px 12px !important;
+    border: 1px solid #dbeafe !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    color: #64748b !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-status-tab.active {
+    border-color: #2563eb !important;
+    background: #2563eb !important;
+    color: #fff !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-table-wrap {
+    width: 100% !important;
+    overflow-x: auto !important;
+    border: 1px solid #dbeafe !important;
+    border-radius: 14px !important;
+    background: #fff !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .04) !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-history-compact-table {
+    min-width: 920px;
+    background: #fff !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-history-compact-table th,
+body.app-body.role-1 .assignment-history-page .assignment-history-compact-table td {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-history-compact-table th {
+    height: 48px !important;
+    background: #f8fafc !important;
+    color: #475569 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-history-compact-table td {
+    min-height: 68px !important;
+    background: #fff !important;
+    color: #334155 !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    vertical-align: middle !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-history-compact-table tbody tr:hover td {
+    background: #f8fbff !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-history-compact-table .assignment-icon-btn {
+    min-height: 38px !important;
+    height: 38px !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-history-compact-table .assignment-install-date,
+body.app-body.role-1 .assignment-history-page .assignment-history-compact-table .assignment-install-time {
+    white-space: nowrap !important;
+}
+
+@media (max-width: 720px) {
+    body.app-body.role-1 .assignment-history-page .assignment-toolbar-card {
+        align-items: stretch !important;
+        flex-direction: column !important;
+    }
+
+    body.app-body.role-1 .assignment-history-page .assignment-toolbar-buttons {
+        justify-content: flex-end !important;
+    }
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-status-tab b,
+body.app-body.role-1 .assignment-history-page .assignment-status-tab .status-count-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 20px !important;
+    height: 20px !important;
+    padding: 0 6px !important;
+    border-radius: 999px !important;
+    background: #dbeafe !important;
+    color: #2563eb !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .assignment-status-tab.active b,
+body.app-body.role-1 .assignment-history-page .assignment-status-tab.active .status-count-badge {
+    background: #bfdbfe !important;
+    color: #1d4ed8 !important;
+}
+
 body.app-body.role-1
 .assignment-history-page
 .assignment-history-compact-table
@@ -56,11 +375,105 @@ body.app-body.role-1 .assignment-history-page .assignment-detail-table td:last-c
     text-align: center !important;
 }
 
+body.app-body.role-1 .assignment-history-page .assignment-history-compact-table .assignment-status-cell .badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    box-sizing: border-box !important;
+    min-width: 116px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 4px 10px !important;
+    border-radius: 999px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+}
+
 /* Ã Â¸Â¢Ã Â¸ÂÃ Â¹â‚¬Ã Â¸Â¥Ã Â¸Â´Ã Â¸ÂÃ Â¹ÂÃ Â¸Â¥Ã Â¹â€°Ã Â¸Â§Ã Â¹â‚¬Ã Â¸â€ºÃ Â¹â€¡Ã Â¸â„¢Ã Â¸ÂªÃ Â¸ÂµÃ Â¹â‚¬Ã Â¸â€”Ã Â¸Â²Ã Â¹ÂÃ Â¸Å¡Ã Â¸Å¡Ã Â¸ÂªÃ Â¸â€“Ã Â¸Â²Ã Â¸â„¢Ã Â¸Â°Ã Â¸ÂªÃ Â¸Â´Ã Â¹â€°Ã Â¸â„¢Ã Â¸ÂªÃ Â¸Â¸Ã Â¸â€ */
-body.app-body.role-1 .assignment-history-page .badge.slate {
+body.app-body.role-1 .assignment-history-page .assignment-history-compact-table .assignment-status-cell .badge::before {
+    content: "";
+    display: inline-block !important;
+    width: 5px !important;
+    height: 5px !important;
+    flex: 0 0 5px !important;
+    border-radius: 999px !important;
+    background: currentColor !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.created {
+    color: #2563eb !important;
+    background: #eff6ff !important;
+    border: 1px solid #bfdbfe !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.unassigned {
     color: #475569 !important;
     background: #f8fafc !important;
     border: 1px solid #cbd5e1 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.assigned {
+    color: #6d28d9 !important;
+    background: #f5f3ff !important;
+    border: 1px solid #c4b5fd !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.waiting {
+    color: #a16207 !important;
+    background: #fffbeb !important;
+    border: 1px solid #fde68a !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.accepted {
+    color: #0369a1 !important;
+    background: #e0f2fe !important;
+    border: 1px solid #7dd3fc !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.pickup {
+    color: #4338ca !important;
+    background: #eef2ff !important;
+    border: 1px solid #c7d2fe !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.ready {
+    color: #1d4ed8 !important;
+    background: #eff6ff !important;
+    border: 1px solid #93c5fd !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.working {
+    color: #6d28d9 !important;
+    background: #f5f3ff !important;
+    border: 1px solid #ddd6fe !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.review {
+    color: #c2410c !important;
+    background: #fff7ed !important;
+    border: 1px solid #fed7aa !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.done {
+    color: #059669 !important;
+    background: #ecfdf5 !important;
+    border: 1px solid #a7f3d0 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.cancelled,
+body.app-body.role-1 .assignment-history-page .badge.rejected {
+    color: #b91c1c !important;
+    background: #fff1f2 !important;
+    border: 1px solid #fecdd3 !important;
+}
+
+body.app-body.role-1 .assignment-history-page .badge.overdue {
+    color: #ea580c !important;
+    background: #fff7ed !important;
+    border: 1px solid #fdba74 !important;
 }
 
 /* Ã Â¸Ë†Ã Â¸Â­Ã Â¹ÂÃ Â¸â€žÃ Â¸Å¡: Ã Â¸â€žÃ Â¸â€¡Ã Â¸â€ºÃ Â¸Â¸Ã Â¹Ë†Ã Â¸Â¡Ã Â¸â€”Ã Â¸Â±Ã Â¹â€°Ã Â¸â€¡Ã Â¸ÂªÃ Â¸Â­Ã Â¸â€¡Ã Â¹Æ’Ã Â¸Â«Ã Â¹â€°Ã Â¸â€šÃ Â¸â„¢Ã Â¸Â²Ã Â¸â€Ã Â¹â‚¬Ã Â¸â€”Ã Â¹Ë†Ã Â¸Â²Ã Â¸ÂÃ Â¸Â±Ã Â¸â„¢ */

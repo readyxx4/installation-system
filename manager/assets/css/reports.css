@@ -1,0 +1,807 @@
+/* Manager Reports extends the existing Admin Reports component language. */
+
+.manager-report-page .is-loading {
+    opacity: .62;
+    pointer-events: none;
+    transition: opacity .18s ease;
+}
+
+.manager-report-async-error {
+    margin: 8px 0 0;
+    color: #b91c1c;
+    font-size: 11px;
+    line-height: 1.4;
+    text-align: right;
+}
+
+body.app-body.role-1:has(.manager-report-page) .shell-topbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 18px !important;
+    height: 68px !important;
+    min-height: 68px !important;
+    padding: 0 32px !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    background: #fff !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04) !important;
+    overflow: visible !important;
+}
+
+body.app-body.role-1:has(.manager-report-page) .shell-topbar-title h1 {
+    margin: 0 !important;
+    color: #0f172a !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+}
+
+body.app-body.role-1:has(.manager-report-page) .shell-topbar-title p {
+    margin: 2px 0 0 !important;
+    color: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+body.app-body.role-1:has(.manager-report-page) .shell-topbar-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 14px !important;
+    flex: 0 0 auto !important;
+}
+
+body.app-body.role-1:has(.manager-report-page) .shell-topbar-pill,
+body.app-body.role-1:has(.manager-report-page) .shell-topbar-user {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-height: 38px !important;
+    padding: 0 4px !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1:has(.manager-report-page) .shell-topbar-avatar {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    flex: 0 0 28px !important;
+    border-radius: 999px !important;
+    background: #2563eb !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+body.app-body.role-1:has(.manager-report-page) .shell-topbar-user-copy {
+    display: grid !important;
+    gap: 1px !important;
+    min-width: 0 !important;
+    line-height: 1.2 !important;
+}
+
+body.app-body.role-1:has(.manager-report-page) .shell-topbar-user-copy strong,
+body.app-body.role-1:has(.manager-report-page) .shell-topbar-user-copy small {
+    display: block !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1:has(.manager-report-page) .shell-topbar-user-copy strong {
+    color: #0f172a !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+body.app-body.role-1:has(.manager-report-page) .shell-topbar-user-copy small {
+    color: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+body.app-body.role-1:has(.manager-report-page) .content {
+    min-height: calc(100vh - 68px) !important;
+    height: calc(100vh - 68px) !important;
+    padding: 0 !important;
+    background: #f7f9fc !important;
+}
+
+.manager-report-page {
+    width: 100%;
+    max-width: 1280px;
+    min-height: calc(100vh - 68px);
+    margin: 0 auto;
+    padding: 30px 40px 52px;
+    box-sizing: border-box;
+    color: #172033;
+    isolation: isolate;
+}
+
+.manager-report-metric-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    margin-bottom: 16px;
+}
+
+.manager-report-metric-grid .report-metric-card {
+    min-height: 104px;
+    padding: 15px;
+}
+
+.manager-report-metric-grid .report-metric-copy strong {
+    font-size: clamp(23px, 2vw, 30px);
+}
+
+/* Summary cards stay interactive; larger report sections stay static. */
+body.app-body.role-1:has(.manager-report-page) .manager-report-summary-card {
+    cursor: default;
+}
+
+body.app-body.role-1:has(.manager-report-page) .report-panel {
+    border-color: #cbd5e1;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(30, 55, 90, .05);
+    transition: none;
+}
+
+body.app-body.role-1:has(.manager-report-page) .report-panel:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 22px rgba(30, 55, 90, .05);
+    transform: none;
+}
+
+body.app-body.role-1:has(.manager-report-page) .report-panel::before,
+body.app-body.role-1:has(.manager-report-page) .report-panel:hover::before {
+    opacity: 0;
+    transform: scaleX(0);
+    transition: none;
+}
+
+.manager-report-filter {
+    margin-bottom: 16px;
+    padding: 18px 20px;
+}
+
+.manager-report-filter-head {
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.manager-report-filter-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 230px) auto;
+    align-items: end;
+    gap: 12px;
+}
+
+.manager-report-field {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.manager-report-field input,
+.manager-report-field select {
+    width: 100%;
+    min-height: 38px;
+    padding: 0 11px;
+    border: 1px solid #dbe4ee;
+    border-radius: 10px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    font-weight: 500;
+    box-sizing: border-box;
+}
+
+.manager-report-field input:focus,
+.manager-report-field select:focus,
+.manager-period-picker input:focus {
+    outline: 3px solid rgba(37, 99, 235, .15);
+    outline-offset: 1px;
+    border-color: #93c5fd;
+}
+
+.manager-report-filter-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.manager-report-submit,
+.manager-report-reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.manager-report-submit {
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 8px 16px rgba(37, 99, 235, .16);
+}
+
+.manager-report-reset {
+    border: 1px solid #dbe4ee;
+    background: #fff;
+    color: #64748b;
+}
+
+.manager-report-submit:hover,
+.manager-report-reset:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(30, 55, 90, .1);
+}
+
+.manager-report-submit:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.manager-report-visual-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.manager-report-visual-grid > .report-panel {
+    min-width: 0;
+}
+
+.manager-report-table-panel {
+    margin-bottom: 0;
+}
+
+.manager-technician-filter-panel {
+    margin-bottom: 16px;
+    padding: 18px 20px;
+}
+
+.manager-technician-filter-head {
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 0;
+}
+
+.manager-technician-period-form {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.manager-technician-period-tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.manager-technician-period-tab {
+    min-height: 30px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #64748b;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.manager-technician-period-tab:hover {
+    color: #1e3a8a;
+}
+
+.manager-technician-period-tab.is-active {
+    background: #fff;
+    color: #1d4ed8;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, .08);
+}
+
+.manager-technician-period-picker {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+}
+
+.manager-technician-period-picker input {
+    width: 142px;
+    min-width: 142px;
+    min-height: 34px;
+    padding: 0 9px;
+    border: 1px solid #dbe4ee;
+    border-radius: 9px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.manager-technician-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.manager-technician-chart-card {
+    min-width: 0;
+    min-height: 0;
+    padding: 18px 20px;
+}
+
+.manager-technician-chart-head {
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+.manager-technician-chart-head .report-panel-total {
+    flex: 0 0 auto;
+}
+
+.manager-technician-bars {
+    display: grid;
+    gap: 14px;
+}
+
+.manager-technician-bar-row {
+    display: grid;
+    gap: 7px;
+    min-width: 0;
+}
+
+.manager-technician-bar-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+    color: #334155;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.manager-technician-bar-label span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-weight: 700;
+}
+
+.manager-technician-bar-label strong {
+    flex: 0 0 auto;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.manager-technician-bar-track {
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #eef2f7;
+}
+
+.manager-technician-bar-track span {
+    display: block;
+    height: 100%;
+    min-width: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #60a5fa, #2563eb);
+}
+
+.manager-technician-chart-card:nth-child(2) .manager-technician-bar-track span {
+    background: linear-gradient(90deg, #86efac, #16a34a);
+}
+
+.manager-technician-bar-row.is-zero .manager-technician-bar-label {
+    color: #94a3b8;
+}
+
+.manager-technician-bar-row.is-zero .manager-technician-bar-label strong {
+    color: #94a3b8;
+}
+
+.manager-technician-empty-state {
+    min-height: 136px;
+}
+
+.manager-weekly-trend-panel {
+    margin-bottom: 16px;
+    padding: 18px 20px 20px;
+}
+
+.manager-weekly-trend-head {
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.manager-weekly-trend-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.manager-weekly-trend-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid #dbe4ee;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    font-size: 22px;
+    line-height: 1;
+    text-decoration: none;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.manager-weekly-trend-arrow:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    transform: translateY(-1px);
+}
+
+.manager-weekly-trend-chart-wrap {
+    width: 100%;
+    overflow: hidden;
+}
+
+.manager-weekly-trend-chart {
+    display: block;
+    width: 100%;
+    min-width: 520px;
+    height: auto;
+    overflow: visible;
+}
+
+.manager-weekly-trend-grid-line {
+    stroke: #e8eef5;
+    stroke-width: 1;
+}
+
+.manager-weekly-trend-y-label,
+.manager-weekly-trend-x-label {
+    fill: #94a3b8;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.manager-weekly-trend-line {
+    fill: none;
+    stroke: #2563eb;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+}
+
+.manager-weekly-trend-point {
+    fill: #fff;
+    stroke: #2563eb;
+    stroke-width: 3;
+    cursor: pointer;
+    transition: r .18s ease, fill .18s ease;
+}
+
+.manager-weekly-trend-point:hover,
+.manager-weekly-trend-point:focus-visible {
+    fill: #dbeafe;
+    outline: none;
+}
+
+.manager-report-table {
+    min-width: 760px;
+}
+
+.manager-report-table td:nth-child(1) {
+    color: #1e3a8a;
+    font-weight: 700;
+}
+
+.manager-report-table td:nth-child(2),
+.manager-report-table td:nth-child(3) {
+    max-width: 190px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.manager-report-visual-grid .completed-install-controls {
+    align-items: center;
+    gap: 8px;
+}
+
+.manager-period-picker {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.manager-period-picker .completed-range-input {
+    width: 142px;
+    min-width: 142px;
+    min-height: 34px;
+    padding: 0 9px;
+    border: 1px solid #dbe4ee;
+    border-radius: 9px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.manager-report-visual-grid .completed-install-card {
+    align-self: start;
+    min-height: 0;
+    padding: 18px 20px;
+}
+
+.manager-report-visual-grid .completed-install-card .completed-install-header {
+    margin-bottom: 10px;
+}
+
+.manager-report-visual-grid .completed-install-card .completed-summary-row {
+    justify-content: flex-start;
+    margin-bottom: 8px;
+}
+
+@media (max-width: 1180px) {
+    .manager-report-metric-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .manager-report-visual-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    body.app-body.role-1:has(.manager-report-page) .shell-topbar {
+        height: auto !important;
+        min-height: 68px !important;
+        padding: 12px 18px !important;
+    }
+
+    body.app-body.role-1:has(.manager-report-page) .shell-topbar-actions {
+        gap: 8px !important;
+    }
+
+    body.app-body.role-1:has(.manager-report-page) .content {
+        height: calc(100vh - 68px) !important;
+    }
+
+    .manager-report-page {
+        padding: 20px 16px 36px;
+    }
+
+    .manager-report-filter-form {
+        grid-template-columns: 1fr;
+    }
+
+    .manager-report-filter-actions {
+        justify-content: flex-start;
+    }
+
+    .manager-report-filter .report-panel-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .completed-install-header,
+    .completed-summary-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .manager-technician-filter-head,
+    .manager-weekly-trend-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .manager-technician-period-form {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .manager-technician-period-tabs {
+        flex: 1 1 auto;
+    }
+
+    .manager-technician-period-tab {
+        flex: 1 1 0;
+    }
+
+    .manager-weekly-trend-controls {
+        align-self: stretch;
+        justify-content: flex-start;
+    }
+
+    .manager-technician-chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .manager-report-visual-grid .completed-install-controls {
+        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .manager-report-visual-grid .completed-period-tabs {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto;
+    }
+
+    .manager-report-visual-grid .completed-period-tab {
+        flex: 1 1 0;
+    }
+}
+
+@media (max-width: 520px) {
+    .manager-report-metric-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .manager-report-metric-grid .report-metric-card {
+        min-height: 82px;
+    }
+
+    .manager-report-visual-grid .completed-install-controls {
+        align-items: stretch;
+    }
+
+    .manager-report-visual-grid .completed-period-tabs,
+    .manager-report-visual-grid .manager-period-picker {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+
+    .manager-report-visual-grid .manager-period-picker .completed-range-input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .manager-technician-filter-panel,
+    .manager-technician-chart-card,
+    .manager-weekly-trend-panel {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    .manager-technician-period-form {
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+
+    .manager-technician-period-tabs,
+    .manager-technician-period-picker {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+
+    .manager-technician-period-picker input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .manager-weekly-trend-chart {
+        min-width: 460px;
+    }
+}
+
+@media print {
+    body.app-body.role-1:has(.manager-report-page) {
+        background: #fff !important;
+    }
+
+    body.app-body.role-1:has(.manager-report-page) .app-shell {
+        display: block !important;
+    }
+
+    body.app-body.role-1:has(.manager-report-page) .app-sidebar,
+    body.app-body.role-1:has(.manager-report-page) .shell-topbar,
+    body.app-body.role-1:has(.manager-report-page) .manager-report-filter,
+    body.app-body.role-1:has(.manager-report-page) .manager-technician-filter-panel,
+    body.app-body.role-1:has(.manager-report-page) .completed-install-controls,
+    body.app-body.role-1:has(.manager-report-page) .manager-technician-period-form,
+    body.app-body.role-1:has(.manager-report-page) .manager-weekly-trend-controls,
+    body.app-body.role-1:has(.manager-report-page) .report-header-actions,
+    body.app-body.role-1:has(.manager-report-page) .report-print-btn {
+        display: none !important;
+    }
+
+    body.app-body.role-1:has(.manager-report-page) .content {
+        height: auto !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        background: #fff !important;
+    }
+
+    .manager-report-page {
+        max-width: none;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    .manager-report-page .report-header {
+        margin-bottom: 16px;
+        border-color: #e5e7eb;
+        background: #fff;
+        box-shadow: none;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    body.app-body.role-1:has(.manager-report-page) .report-panel,
+    body.app-body.role-1:has(.manager-report-page) .manager-report-summary-card {
+        border: 1px solid #cbd5e1 !important;
+        background: #fff !important;
+        box-shadow: none !important;
+        transform: none !important;
+        transition: none !important;
+    }
+
+    body.app-body.role-1:has(.manager-report-page) .report-panel:hover,
+    body.app-body.role-1:has(.manager-report-page) .manager-report-summary-card:hover {
+        border-color: #cbd5e1 !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    body.app-body.role-1:has(.manager-report-page) .report-panel::before,
+    body.app-body.role-1:has(.manager-report-page) .report-panel:hover::before,
+    body.app-body.role-1:has(.manager-report-page) .manager-report-summary-card::before,
+    body.app-body.role-1:has(.manager-report-page) .manager-report-summary-card:hover::before {
+        display: none !important;
+    }
+
+    .manager-report-page .report-metric-grid,
+    .manager-report-page .report-panel,
+    .manager-report-page .manager-technician-chart-grid,
+    .manager-report-page .manager-report-visual-grid {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .manager-report-page .report-table-panel {
+        break-inside: auto;
+        page-break-inside: auto;
+    }
+}

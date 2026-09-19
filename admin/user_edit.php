@@ -280,7 +280,7 @@ if (preg_match(
   $selected_zip_code = trim($address_matches[5]);
 }
 
-layout_header('แก้ไขข้อมูลพนักงาน', 'users');
+layout_header('แก้ไขข้อมูลพนักงาน', 'users', 'แก้ไขข้อมูลและสิทธิ์พนักงานในระบบ');
 ?>
 
 <?= flash_message() ?>

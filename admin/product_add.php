@@ -168,7 +168,7 @@ if (!function_exists('admin_form_icon_svg')) {
   }
 }
 
-layout_header('เพิ่มสินค้า', 'products');
+layout_header('เพิ่มสินค้า', 'products', 'เพิ่มข้อมูลสินค้าและประเภทสินค้า');
 ?>
 <?= flash_message() ?>
 <div class="staff-form-page">

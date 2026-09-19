@@ -42,7 +42,7 @@ body.app-body.role-3 .admin-users-page .admin-user-list-pane {
 body.app-body.role-3 .admin-users-page .admin-users-page-head h1 {
     margin: 0 0 6px;
     color: #0f172a;
-    font-size: 28px;
+    font-size: 18px;
     font-weight: 800;
     line-height: 1.2;
 }
@@ -187,17 +187,17 @@ body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(1) {
 
 body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(2),
 body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(2) {
-    width: 17%;
+    width: 20%;
 }
 
 body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(3),
 body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(3) {
-    width: 14%;
+    width: 13%;
 }
 
 body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(4),
 body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(4) {
-    width: 20%;
+    width: 22%;
 }
 
 body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(5),
@@ -207,13 +207,47 @@ body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(5) {
 
 body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(6),
 body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(6) {
-    width: 18%;
+    width: 180px;
+    text-align: center;
 }
 
-body.app-body.role-3 .admin-users-page .admin-users-table th:nth-child(7),
-body.app-body.role-3 .admin-users-page .admin-users-table td:nth-child(7) {
-    width: 150px;
-    text-align: center;
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table {
+    min-width: 0 !important;
+}
+
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table th:nth-child(1),
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table td:nth-child(1) {
+    width: 13%;
+}
+
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table th:nth-child(2),
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table td:nth-child(2) {
+    width: 17%;
+}
+
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table th:nth-child(3),
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table td:nth-child(3) {
+    width: 12%;
+}
+
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table th:nth-child(4),
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table td:nth-child(4) {
+    width: 20%;
+}
+
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table th:nth-child(5),
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table td:nth-child(5) {
+    width: 14%;
+}
+
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table th:nth-child(6),
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table td:nth-child(6) {
+    width: 180px;
+}
+
+body.app-body.role-3 .admin-users-page.has-detail .admin-users-table td:last-child {
+    padding-right: 4px;
+    padding-left: 4px;
 }
 
 body.app-body.role-3 .admin-users-page .user-row-name-trigger {
@@ -230,45 +264,44 @@ body.app-body.role-3 .admin-users-page .user-row-name-trigger {
     white-space: nowrap;
 }
 
-body.app-body.role-3 .admin-users-page .admin-address-cell {
-    max-width: none !important;
-    overflow: hidden;
-    color: #64748b !important;
-    line-height: 1.45;
-    text-overflow: ellipsis;
-}
-
-body.app-body.role-3 .admin-users-page .text-more-btn {
-    display: inline-flex;
-    margin-left: 4px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: #2563eb;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
 body.app-body.role-3 .admin-users-page .admin-users-table td:last-child {
+    padding-right: 10px;
+    padding-left: 10px;
     white-space: nowrap;
 }
 
+body.app-body.role-3 .admin-users-page .admin-users-table .user-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+    max-width: 100%;
+}
+
 body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-edit,
-body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-delete {
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-delete,
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-account {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     width: auto !important;
     min-width: 0 !important;
-    height: 32px !important;
-    min-height: 32px !important;
-    margin: 0 2px;
+    height: 30px !important;
+    min-height: 30px !important;
+    margin: 0;
     padding: 0 9px !important;
-    gap: 5px !important;
-    border-radius: 9px !important;
-    font-size: 12px !important;
+    gap: 4px !important;
+    border-radius: 8px !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
     line-height: 1 !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-delete-icon {
+    width: 30px !important;
+    min-width: 30px !important;
+    padding: 0 !important;
 }
 
 body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-edit {
@@ -279,8 +312,82 @@ body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-edi
 
 body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-delete {
     border: 1px solid #fecaca !important;
-    background: #fff1f2 !important;
-    color: #dc2626 !important;
+    background: #fef2f2 !important;
+    color: #ef4444 !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-edit,
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-delete,
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-account {
+    transition: background-color .18s ease,
+        border-color .18s ease,
+        color .18s ease,
+        box-shadow .18s ease,
+        transform .18s ease;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-edit:hover,
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-delete:hover,
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-account:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, .08);
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-edit:hover {
+    border-color: #93c5fd !important;
+    background: #dbeafe !important;
+    color: #1d4ed8 !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-suspend {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    border: 1px solid #fed7aa !important;
+    background: #fff7ed !important;
+    color: #d97706 !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-suspend:hover {
+    border-color: #fdba74 !important;
+    background: #ffedd5 !important;
+    color: #b45309 !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-restore {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    border: 1px solid #bbf7d0 !important;
+    background: #f0fdf4 !important;
+    color: #16a34a !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-restore:hover {
+    border-color: #86efac !important;
+    background: #dcfce7 !important;
+    color: #15803d !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-delete:hover {
+    border-color: #fda4af !important;
+    background: #ffe4e6 !important;
+    color: #be123c !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-edit:active,
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-delete:active,
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-account:active {
+    transform: translateY(0);
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .btn-account.disabled-link {
+    cursor: not-allowed;
+    opacity: .62;
+    transform: none;
+    box-shadow: none;
 }
 
 body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .action-icon {
@@ -292,6 +399,27 @@ body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .action-
     stroke: currentColor !important;
 }
 
+body.app-body.role-3 .admin-users-page .admin-users-table td:last-child .user-actions .action-icon {
+    position: static !important;
+    inset: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
+    flex: 0 0 14px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: currentColor !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+    transform: none !important;
+}
+
 body.app-body.role-3 .admin-users-page .badge {
     display: inline-flex;
     align-items: center;
@@ -301,6 +429,12 @@ body.app-body.role-3 .admin-users-page .badge {
     font-size: 11px;
     font-weight: 800;
     white-space: nowrap;
+}
+
+body.app-body.role-3 .admin-users-page .role-cell .badge {
+    display: flex;
+    width: max-content;
+    max-width: 100%;
 }
 
 body.app-body.role-3 .admin-users-page .badge.red {
@@ -322,6 +456,28 @@ body.app-body.role-3 .admin-users-page .empty-state {
     height: 180px;
     color: #64748b;
     text-align: center;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table .user-detail-row td {
+    transition: background-color .16s ease, border-color .16s ease, color .16s ease;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table .user-detail-row.is-suspended td {
+    background: #f8fafc !important;
+    border-bottom-color: #e2e8f0 !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table .user-detail-row.is-suspended td:not(:last-child) {
+    color: #64748b !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table .user-detail-row.is-suspended .user-row-name-trigger {
+    color: #64748b !important;
+}
+
+body.app-body.role-3 .admin-users-page .admin-users-table .user-detail-row.is-suspended:hover td {
+    background: #f1f5f9 !important;
+    border-bottom-color: #cbd5e1 !important;
 }
 
 body.app-body.role-3 .admin-users-page .admin-user-detail-panel {
@@ -352,7 +508,7 @@ body.app-body.role-3 .admin-users-page .admin-user-detail-panel {
     }
 
     body.app-body.role-3 .admin-users-page .admin-users-page-head h1 {
-        font-size: 24px;
+        font-size: 18px;
     }
 
     body.app-body.role-3 .admin-users-page .user-toolbar {

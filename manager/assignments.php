@@ -656,22 +656,6 @@ layout_header('มอบหมายงานช่าง', 'assignments');
         </section>
     <?php endif; ?>
 
-    <div class="assignment-sale-header manager-assignment-page-header">
-        <div class="admin-dashboard-top">
-            <div>
-                <h1><?= $current_assignment ? 'แก้ไขการมอบหมายงาน' : 'มอบหมายงานช่าง' ?></h1>
-                <p><?= $is_canceled_assignment ? 'งานนี้ถูกยกเลิกแล้ว ดูประวัติได้อย่างเดียว' : ($is_read_only ? 'งานเสร็จสิ้นแล้ว ดูรายละเอียดได้อย่างเดียว' : ($current_assignment ? 'ตรวจสอบและปรับข้อมูลการมอบหมายงาน' : 'ตรวจสอบข้อมูลใบงาน แล้วเลือกช่าง วัน และเวลาติดตั้ง')) ?></p>
-            </div>
-
-            <div class="admin-dashboard-actions">
-                <div class="admin-date-pill">
-                    <i class="fa-regular fa-calendar"></i>
-                    <?= h(date('d/m/Y')) ?>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <?= flash_message() ?>
 
     <?php $page_status = trim($_GET['status'] ?? ''); ?>
@@ -699,6 +683,31 @@ layout_header('มอบหมายงานช่าง', 'assignments');
         </div>
     <?php endif; ?>
 
+    <header class="manager-assignment-content-header">
+        <div class="manager-assignment-content-heading">
+            <a class="manager-assignment-back-link" href="<?= h(app_system_url('manager/assignment_list.php')) ?>">
+                <?= manager_icon_svg('back') ?>
+                <span>กลับไปยังหน้าก่อนหน้า</span>
+            </a>
+
+            <h1>สรุปงานมอบหมาย</h1>
+            <p class="manager-work-code">
+                รหัสใบงาน <strong><?= h($selected_setup['setup_id']) ?></strong>
+                · ตรวจสอบรายละเอียดใบงานและสถานะการมอบหมาย
+            </p>
+        </div>
+
+        <div class="manager-assignment-content-actions">
+            <a
+                class="manager-soft-link"
+                href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($selected_setup['setup_id']) . '&from=manager')) ?>"
+            >
+                <?= manager_icon_svg('eye') ?>
+                ดูใบติดตั้ง
+            </a>
+        </div>
+    </header>
+
     <form method="POST" action="<?= h(app_system_url('manager/assignments.php')) ?>" onsubmit="return beforeAssignSubmit()">
         <input type="hidden" id="setup_id" name="setup_id" value="<?= h($selected_setup['setup_id']) ?>" required>
         <input type="hidden" id="tech_id" name="tech_id" value="<?= h($current_tech_id) ?>" required>
@@ -707,24 +716,10 @@ layout_header('มอบหมายงานช่าง', 'assignments');
         <input type="hidden" id="confirm_tech_change" name="confirm_tech_change" value="0">
 
         <div class="manager-assignment-step-one">
+        <div class="manager-assignment-left-column">
         <section class="manager-assign-panel manager-selected-setup-panel always-show">
-            <div class="manager-work-summary-head">
-                <div>
-                    <h2>สรุปใบงาน</h2>
-                    <p class="manager-work-code">
-                        รหัสใบงาน
-                        <strong><?= h($selected_setup['setup_id']) ?></strong>
-                    </p>
-                    <p class="manager-work-subtitle">ตรวจสอบรายละเอียดใบงานก่อนดำเนินการมอบหมาย</p>
-                </div>
-
-                <a
-                    class="manager-soft-link"
-                    href="<?= h(app_system_url('sale/setup_slip.php?id=' . urlencode($selected_setup['setup_id']) . '&from=manager')) ?>"
-                >
-                    <?= manager_icon_svg('eye') ?>
-                    ดูใบติดตั้ง
-                </a>
+            <div class="manager-panel-head">
+                <h2>ข้อมูลลูกค้า</h2>
             </div>
 
             <div class="manager-work-customer">
@@ -733,93 +728,36 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                 </div>
 
                 <div class="manager-work-customer-main">
-                    <span>ลูกค้า</span>
                     <strong><?= h($selected_setup['customer_display']) ?></strong>
 
                     <div class="manager-work-contact-list">
                         <div>
-                            <span>เบอร์โทร</span>
-                            <strong><?= h($selected_setup['user_phone'] ?: '--') ?></strong>
+                            <span>
+                                <svg class="ref-icon ref-icon-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16"></path><path d="M4 15h16"></path><path d="M10 3 8 21"></path><path d="M16 3 14 21"></path></svg>
+                                <?= h($selected_setup['user_id'] ?: '--') ?>
+                            </span>
                         </div>
 
                         <div>
-                            <span>อีเมล</span>
-                            <strong><?= h($selected_setup['user_email'] ?: '--') ?></strong>
+                            <span>
+                                <svg class="ref-icon ref-icon-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.32 1.77.59 2.61a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.47-1.16a2 2 0 0 1 2.11-.45c.84.27 1.71.47 2.61.59A2 2 0 0 1 22 16.92z"></path></svg>
+                                <?= h($selected_setup['user_phone'] ?: '--') ?>
+                            </span>
                         </div>
 
                         <div>
-                            <span>ที่อยู่ลูกค้า</span>
-                            <strong><?= h($selected_setup['user_address'] ?: '--') ?></strong>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="manager-work-customer-id">
-                    <span>รหัสลูกค้า</span>
-                    <strong><?= h($selected_setup['user_id'] ?: '--') ?></strong>
-                </div>
-            </div>
-
-            <div class="manager-work-detail-box">
-                <div class="manager-work-meta">
-                    <div>
-                        <span>วันที่สร้างใบงาน</span>
-                        <strong><?= h(date('d/m/Y H:i', strtotime($selected_setup['created_at']))) ?></strong>
-                    </div>
-
-                    <div>
-                        <span>จำนวนสินค้า</span>
-                        <strong><?= h((string) ((int) ($selected_setup['item_count'] ?? 0))) ?> รายการ</strong>
-                    </div>
-
-                    <div class="wide">
-                        <span>ที่อยู่ติดตั้ง</span>
-                        <strong><?= h($selected_setup['setup_address_display']) ?></strong>
-                    </div>
-                </div>
-
-                <div class="manager-work-product-table">
-                    <div class="manager-work-product-head">
-                        <span>สินค้า</span>
-                        <span>จำนวน</span>
-                        <span>ค่าติดตั้ง/หน่วย</span>
-                        <span>รวม</span>
-                    </div>
-
-                    <?php foreach ($product_items as $product_item): ?>
-                        <div class="manager-work-product-row">
-                            <strong><?= h($product_item['pro_name'] ?? '--') ?></strong>
-
                             <span>
-                                <?= h((string) ($product_item['install_qty'] ?? 0)) ?> ชิ้น
+                                <svg class="ref-icon ref-icon-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg>
+                                <?= h($selected_setup['user_email'] ?: '--') ?>
                             </span>
-
-                            <span>
-                                <?= h(number_format((float) ($product_item['install_price'] ?? 0), 2)) ?> บาท
-                            </span>
-
-                            <strong>
-                                <?= h(number_format((float) ($product_item['install_total'] ?? 0), 2)) ?> บาท
-                            </strong>
                         </div>
-                    <?php endforeach; ?>
-                </div>
 
-                <div class="manager-work-bottom">
-                    <div>
-                        <span>หมายเหตุ</span>
-                        <strong>
-                            <?= h(
-                                trim((string) ($selected_setup['setup_note'] ?? '')) !== ''
-                                    ? $selected_setup['setup_note']
-                                    : '--'
-                            ) ?>
-                        </strong>
-                    </div>
-
-                    <div class="manager-work-total">
-                        <span>รวมค่าติดตั้ง</span>
-                        <strong><?= h($selected_setup['install_total_display']) ?></strong>
+                        <div>
+                            <span>
+                                <svg class="ref-icon ref-icon-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <span><?= h($selected_setup['user_address'] ?: '--') ?></span>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -840,6 +778,48 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                 </div>
             <?php endif; ?>
         </section>
+
+        <section class="manager-assign-panel manager-product-panel">
+            <div class="manager-panel-head">
+                <div>
+                    <h2>รายการสินค้า</h2>
+                    <p><?= h((string) ((int) ($selected_setup['item_count'] ?? 0))) ?> รายการ</p>
+                </div>
+            </div>
+
+            <div class="manager-work-product-table">
+                <div class="manager-work-product-head">
+                    <span>สินค้า</span>
+                    <span>จำนวน</span>
+                    <span>ค่าติดตั้ง/หน่วย</span>
+                    <span>รวม</span>
+                </div>
+
+                <?php foreach ($product_items as $product_item): ?>
+                    <div class="manager-work-product-row">
+                        <strong><?= h($product_item['pro_name'] ?? '--') ?></strong>
+
+                        <span>
+                            <?= h((string) ($product_item['install_qty'] ?? 0)) ?> ชิ้น
+                        </span>
+
+                        <span>
+                            <?= h(number_format((float) ($product_item['install_price'] ?? 0), 2)) ?> บาท
+                        </span>
+
+                        <strong>
+                            <?= h(number_format((float) ($product_item['install_total'] ?? 0), 2)) ?> บาท
+                        </strong>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <footer class="manager-work-bottom">
+                <span>ยอดรวมค่าติดตั้ง</span>
+                <strong><?= h($selected_setup['install_total_display']) ?></strong>
+            </footer>
+        </section>
+        </div>
 
         <?php if (!$is_canceled_assignment): ?>
         <section class="manager-assign-panel manager-tech-panel show" id="techPanel">
@@ -870,9 +850,9 @@ layout_header('มอบหมายงานช่าง', 'assignments');
 
             <div class="manager-tech-list" id="techList"></div>
         </section>
-        </div>
 
-        <section class="manager-assign-panel manager-schedule-panel manager-step-panel" id="schedulePanel">
+        <section class="manager-schedule-panel manager-step-panel" id="schedulePanel">
+            <div class="manager-calendar-card">
             <div class="manager-panel-head">
                 <div>
                     <h2>เลือกวันติดตั้ง</h2>
@@ -897,24 +877,27 @@ layout_header('มอบหมายงานช่าง', 'assignments');
                 </table>
             </div>
 
-            <div class="manager-calendar-toolbar">
-                <button type="button" data-calendar-month="-1">‹</button>
-                <strong id="calendarMonthText">-</strong>
-                <button type="button" data-calendar-month="1">›</button>
-                <span class="calendar-legend available">ว่าง</span>
-                <span class="calendar-legend partial">มีคิว</span>
-                <span class="calendar-legend busy">คิวเต็ม</span>
-                <span class="calendar-legend holiday">วันหยุด</span>
-            </div>
+            <div class="manager-calendar-column">
+                <div class="manager-calendar-toolbar">
+                    <button type="button" data-calendar-month="-1">‹</button>
+                    <strong id="calendarMonthText">-</strong>
+                    <button type="button" data-calendar-month="1">›</button>
+                    <span class="calendar-legend available">ว่าง</span>
+                    <span class="calendar-legend partial">มีคิว</span>
+                    <span class="calendar-legend busy">คิวเต็ม</span>
+                    <span class="calendar-legend holiday">วันหยุด</span>
+                </div>
 
-            <div class="manager-calendar" id="installCalendar"></div>
-            <div class="manager-selected-date" id="selectedDateBox">ยังไม่ได้เลือกวันที่ติดตั้ง</div>
+                <div class="manager-calendar" id="installCalendar"></div>
+                <div class="manager-selected-date" id="selectedDateBox">ยังไม่ได้เลือกวันที่ติดตั้ง</div>
+            </div>
+            </div>
 
             <div class="manager-time-panel" id="timePanel">
                 <div class="manager-time-panel-head">
                     <div>
                         <h3>เลือกช่วงเวลาติดตั้ง</h3>
-                        <!-- <p>เลือกช่วงเวลาว่างได้ 1 ช่วง</p> -->
+                        <p>เลือกช่วงเวลาที่ต้องการให้ช่างเข้าติดตั้ง</p>
                     </div>
                     <span class="manager-soft-badge" id="selectedTimeText">ยังไม่ได้เลือกเวลา</span>
                 </div>
@@ -949,6 +932,8 @@ layout_header('มอบหมายงานช่าง', 'assignments');
             </div>
         </section>
         <?php endif; ?>
+
+        </div>
 
         <div class="manager-form-actions sticky-actions">
             <a class="manager-action-btn" href="<?= h(app_system_url('manager/assignment_list.php')) ?>">

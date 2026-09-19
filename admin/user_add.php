@@ -301,7 +301,7 @@ if (table_exists($conn, 'provinces')) {
   }
 }
 
-layout_header('เพิ่มข้อมูลพนักงาน', 'users');
+layout_header('เพิ่มข้อมูลพนักงาน', 'users', 'เพิ่มข้อมูลและสิทธิ์พนักงานในระบบ');
 ?>
 
 <?= flash_message() ?>

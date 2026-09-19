@@ -64,7 +64,8 @@ try {
           u.user_id,
           u.user_name,
           u.user_email,
-          u.user_role
+          u.user_role,
+          u.user_status
         FROM `user` u
         WHERE u.user_email = ?
           AND u.user_password = ?
@@ -82,6 +83,10 @@ try {
     }
 
     $user = $result->fetch_assoc();
+
+    if ((int) ($user['user_status'] ?? 0) !== 1) {
+        redirect_to(app_public_url('login.html?error=suspended'));
+    }
 
     $_SESSION['logged_in'] = true;
     $_SESSION['login_type'] = 'user';

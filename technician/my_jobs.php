@@ -10,10 +10,40 @@ $allowed_warning_filters = ['near', 'urgent', 'today', 'overdue'];
 if (!in_array($warning_filter, $allowed_warning_filters, true)) {
     $warning_filter = '';
 }
+$status_filter = trim((string) ($_GET['status'] ?? 'all'));
+$allowed_status_filters = ['all', 'awaiting_receive', 'ready', 'installing', 'awaiting_review', 'done', 'history'];
+if (!in_array($status_filter, $allowed_status_filters, true)) {
+    $status_filter = 'all';
+}
 
 if ($tech_id === '') {
     redirect_to(app_public_url('login.html?error=login'));
 }
+
+$page_titles = [
+    'all' => 'งานของฉัน',
+    'awaiting_receive' => 'รอรับสินค้า',
+    'ready' => 'พร้อมติดตั้ง',
+    'installing' => 'กำลังติดตั้ง',
+    'awaiting_review' => 'รอหัวหน้าช่างยืนยัน',
+    'done' => 'งานเสร็จสิ้น',
+    'history' => 'ประวัติงาน',
+];
+$page_subtitles = [
+    'all' => 'รายการงานติดตั้งทั้งหมดของฉัน',
+    'awaiting_receive' => 'งานที่รับงานแล้ว และรอยืนยันรับสินค้า',
+    'ready' => 'งานที่รับสินค้าแล้ว และพร้อมเริ่มติดตั้ง',
+    'installing' => 'งานที่เริ่มติดตั้งแล้ว และรอบันทึกผลการติดตั้ง',
+    'awaiting_review' => 'งานที่บันทึกผลแล้ว และรอหัวหน้าช่างยืนยัน',
+    'done' => 'งานที่ยืนยันเสร็จสิ้นแล้ว',
+    'history' => 'งานที่เสร็จสิ้น ปฏิเสธ หรือถูกยกเลิกแล้ว',
+];
+$page_title = $page_titles[$status_filter] ?? $page_titles['all'];
+$page_subtitle = $page_subtitles[$status_filter] ?? $page_subtitles['all'];
+$menu_status_filters = ['awaiting_receive', 'ready', 'installing', 'history'];
+$technician_active_menu = in_array($status_filter, $menu_status_filters, true)
+    ? 'my_jobs_' . $status_filter
+    : 'my_jobs';
 
 function assign_status_name($status): string
 {
@@ -60,7 +90,11 @@ function technician_my_jobs_ui_status(array $row): array
     $receive_status = (string) ($row['receive_status'] ?? '');
 
     if ($assign_status === '5' || $setup_status === '4') {
-        return ['key' => 'done', 'label' => 'เสร็จแล้ว', 'class' => 'success'];
+        return ['key' => 'done', 'label' => 'งานเสร็จสิ้นแล้ว', 'class' => 'success'];
+    }
+
+    if ($setup_status === '3' && (string) ($row['has_install_result'] ?? '0') === '1') {
+        return ['key' => 'awaiting_review', 'label' => 'รอหัวหน้าช่างยืนยัน', 'class' => 'waiting'];
     }
 
     if ($setup_status === '3') {
@@ -90,6 +124,11 @@ $stmt_jobs = $conn->prepare("
         s.setup_address,
         s.setup_location,
         s.setup_status,
+        EXISTS (
+            SELECT 1
+            FROM installation_result ir
+            WHERE ir.setup_id = s.setup_id
+        ) AS has_install_result,
 
         c.customer_name,
         c.customer_phone,
@@ -113,7 +152,7 @@ $stmt_jobs = $conn->prepare("
         GROUP BY d.setup_id
     ) ds ON s.setup_id = ds.setup_id
     WHERE a.tech_id = ?
-      AND a.assign_status IN (2, 5)
+      AND (a.assign_status IN (2, 3, 4, 5) OR s.setup_status = 4)
     ORDER BY a.assign_date DESC, a.assign_id DESC
 ");
 
@@ -125,7 +164,10 @@ $status_counts = [
     'all' => 0,
     'awaiting_receive' => 0,
     'ready' => 0,
+    'installing' => 0,
+    'awaiting_review' => 0,
     'done' => 0,
+    'history' => 0,
 ];
 
 while ($job_row = $jobs_result->fetch_assoc()) {
@@ -145,15 +187,35 @@ while ($job_row = $jobs_result->fetch_assoc()) {
     $job_row['ui_status_label'] = $ui_status['label'];
     $job_row['ui_status_class'] = $ui_status['class'];
 
-    $status_counts['all'] += 1;
+    $is_history_job = in_array((string) ($job_row['assign_status'] ?? ''), ['3', '4', '5'], true)
+        || (string) ($job_row['setup_status'] ?? '') === '4';
+
+    if (!$is_history_job) {
+        $status_counts['all'] += 1;
+    }
     if (isset($status_counts[$ui_status['key']])) {
         $status_counts[$ui_status['key']] += 1;
+    }
+    if ($is_history_job) {
+        $status_counts['history'] += 1;
+    }
+
+    if ($status_filter === 'history' && !$is_history_job) {
+        continue;
+    }
+
+    if ($status_filter === 'all' && $is_history_job) {
+        continue;
+    }
+
+    if ($status_filter !== 'all' && $status_filter !== 'history' && $ui_status['key'] !== $status_filter) {
+        continue;
     }
 
     $job_rows[] = $job_row;
 }
 
-layout_header('งานของฉัน', 'my_jobs', 'รายการงานติดตั้งที่รับงานแล้ว สำหรับตรวจสอบและดำเนินการขั้นตอนถัดไป');
+layout_header($page_title, $technician_active_menu, $page_subtitle);
 ?>
 
 <link
@@ -180,11 +242,6 @@ layout_header('งานของฉัน', 'my_jobs', 'รายการง�
 <?= flash_message() ?>
 
 <section class="page technician-assignments-page technician-my-jobs-page">
-  <div class="page-header">
-    <h2>งานของฉัน</h2>
-    <p>รายการงานติดตั้งที่รับงานแล้ว สำหรับตรวจสอบและดำเนินการขั้นตอนถัดไป</p>
-  </div>
-
   <form class="search-bar" action="javascript:void(0)">
     <div class="input-wrap">
       <span class="lead"><?= technician_my_jobs_icon_svg('search', 18, 'ref-icon-search') ?></span>
@@ -211,21 +268,29 @@ layout_header('งานของฉัน', 'my_jobs', 'รายการง�
 
   <div class="mb-16 flex items-center justify-between technician-filter-row">
     <div class="chip-group" aria-label="ตัวกรองสถานะงานของฉัน">
-      <button type="button" class="chip active" data-history-filter="all">
-        ทั้งหมด <span class="chip-count"><?= h((string) $status_counts['all']) ?></span>
-      </button>
-
-      <button type="button" class="chip" data-history-filter="awaiting_receive">
-        รอรับสินค้า <span class="chip-count"><?= h((string) $status_counts['awaiting_receive']) ?></span>
-      </button>
-
-      <button type="button" class="chip" data-history-filter="ready">
-        พร้อมติดตั้ง <span class="chip-count"><?= h((string) $status_counts['ready']) ?></span>
-      </button>
-
-      <button type="button" class="chip" data-history-filter="done">
-        เสร็จแล้ว <span class="chip-count"><?= h((string) $status_counts['done']) ?></span>
-      </button>
+      <?php
+      $status_tabs = [
+          'all' => 'ทั้งหมด',
+          'awaiting_receive' => 'รอรับสินค้า',
+          'ready' => 'พร้อมติดตั้ง',
+          'installing' => 'กำลังติดตั้ง',
+          'awaiting_review' => 'รอหัวหน้าช่างยืนยัน',
+          'done' => 'งานเสร็จสิ้น',
+          'history' => 'ประวัติงาน',
+      ];
+      foreach ($status_tabs as $tab_key => $tab_label):
+          $tab_url = app_system_url('technician/my_jobs.php?status=' . urlencode($tab_key));
+      ?>
+        <a
+          class="chip <?= $status_filter === $tab_key ? 'active' : '' ?>"
+          href="<?= h($tab_url) ?>"
+          style="text-decoration: none;"
+          data-history-filter="<?= h($tab_key) ?>"
+          aria-current="<?= $status_filter === $tab_key ? 'page' : 'false' ?>"
+        >
+          <?= h($tab_label) ?> <span class="chip-count"><?= h((string) ($status_counts[$tab_key] ?? 0)) ?></span>
+        </a>
+      <?php endforeach; ?>
     </div>
 
     <div class="text-xs text-muted flex items-center gap-4 technician-sort-note">
@@ -234,130 +299,125 @@ layout_header('งานของฉัน', 'my_jobs', 'รายการง�
     </div>
   </div>
 
-  <div class="job-list" data-technician-job-list>
-    <?php if (count($job_rows) === 0): ?>
-      <div class="card">
-        <div class="empty">
-          <div class="empty-icon"><?= technician_my_jobs_icon_svg('clipboard-check', 30) ?></div>
-          <h3>ยังไม่มีงานที่รับแล้ว</h3>
-          <p>รายการงานติดตั้งที่รับงานแล้วจะแสดงที่นี่</p>
-        </div>
-      </div>
-    <?php endif; ?>
+  <div class="job-list my-jobs-table-wrap" data-technician-job-list>
+    <table class="my-jobs-table">
+      <thead>
+        <tr>
+          <th>รหัสงาน</th>
+          <th>ลูกค้า</th>
+          <th>สินค้า</th>
+          <th>สถานะงาน</th>
+          <th>วันที่ติดตั้ง</th>
+          <th>เวลาติดตั้ง</th>
+          <th>จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if (count($job_rows) === 0): ?>
+          <tr>
+            <td colspan="7">
+              <div class="empty my-jobs-empty">
+                <div class="empty-icon"><?= technician_my_jobs_icon_svg('clipboard-check', 30) ?></div>
+                <h3><?= $status_filter === 'all' ? 'ยังไม่มีงานของฉัน' : 'ไม่พบงานในสถานะนี้' ?></h3>
+                <p><?= $status_filter === 'all' ? 'รายการงานติดตั้งที่รับงานแล้วจะแสดงที่นี่' : 'ลองเลือกสถานะอื่นเพื่อดูรายการงาน' ?></p>
+              </div>
+            </td>
+          </tr>
+        <?php endif; ?>
 
-    <?php if (count($job_rows) > 0): ?>
-      <div class="card" data-history-search-empty style="display: none;">
-        <div class="empty">
-          <div class="empty-icon"><?= technician_my_jobs_icon_svg('search', 30) ?></div>
-          <h3>ไม่พบงานที่ตรงกับการค้นหา</h3>
-          <p>ลองปรับคำค้นหาหรือเปลี่ยนหมวดหมู่</p>
-        </div>
-      </div>
-    <?php endif; ?>
+        <?php if (count($job_rows) > 0): ?>
+          <tr data-history-search-empty style="display: none;">
+            <td colspan="7">
+              <div class="empty my-jobs-empty">
+                <div class="empty-icon"><?= technician_my_jobs_icon_svg('search', 30) ?></div>
+                <h3>ไม่พบงานที่ตรงกับการค้นหา</h3>
+                <p>ลองปรับคำค้นหาหรือเปลี่ยนหมวดหมู่</p>
+              </div>
+            </td>
+          </tr>
+        <?php endif; ?>
 
-    <?php foreach ($job_rows as $row): ?>
-      <?php
-        $install_address = $row['setup_address'] ?: ($row['customer_address'] ?: ($row['setup_location'] ?? '-'));
-        $assign_date_text = !empty($row['assign_date'])
-          ? date('d/m/Y H:i', strtotime($row['assign_date']))
-          : '-';
+        <?php foreach ($job_rows as $row): ?>
+          <?php
+            $install_address = $row['setup_address'] ?: ($row['customer_address'] ?: ($row['setup_location'] ?? '-'));
+            $assign_date_text = !empty($row['assign_date'])
+              ? date('d/m/Y H:i', strtotime($row['assign_date']))
+              : '-';
 
-        $install_date_text = !empty($row['assign_install_date'])
-          ? date('d/m/Y', strtotime($row['assign_install_date']))
-          : '-';
+            $install_date_text = !empty($row['assign_install_date'])
+              ? date('d/m/Y', strtotime($row['assign_install_date']))
+              : '-';
 
-        $install_time_text = !empty($row['assign_install_time'])
-          ? date('H:i', strtotime($row['assign_install_time'])) . ' น.'
-          : '-';
+            $install_time_text = !empty($row['assign_install_time'])
+              ? date('H:i', strtotime($row['assign_install_time'])) . ' น.'
+              : '-';
 
-        $install_datetime_text = trim($install_date_text . ' ' . $install_time_text);
-        $customer_name = trim((string) ($row['customer_name'] ?? '-'));
-        $customer_initial = function_exists('mb_substr') ? mb_substr($customer_name, 0, 1, 'UTF-8') : substr($customer_name, 0, 1);
-        $product_count = max(0, (int) ($row['item_count'] ?? 0));
-      ?>
+            $install_datetime_text = trim($install_date_text . ' ' . $install_time_text);
+            $customer_name = trim((string) ($row['customer_name'] ?? '-'));
+            $product_count = max(0, (int) ($row['item_count'] ?? 0));
+            $detail_url = app_system_url('technician/job_detail.php?id=' . urlencode((string) ($row['assign_id'] ?? '')));
+          ?>
 
-      <article
-        class="job-card"
-        data-technician-history-card
-        data-history-status="<?= h($row['ui_status_key'] ?? 'accepted') ?>"
-        data-history-search-text="<?= h(strtolower(
-            (string) ($row['assign_id'] ?? '') . ' ' .
-            (string) ($row['setup_id'] ?? '') . ' ' .
-            (string) ($row['customer_name'] ?? '') . ' ' .
-            (string) ($row['customer_phone'] ?? '') . ' ' .
-            $assign_date_text . ' ' .
-            $install_datetime_text . ' ' .
-            $install_address
-        )) ?>"
-      >
-        <div class="job-card-head">
-          <div class="flex items-center gap-12">
-            <div class="job-id">
-              <?= technician_my_jobs_icon_svg('hash', 13) ?>
+          <tr
+            class="my-job-row"
+            data-detail-url="<?= h($detail_url) ?>"
+            tabindex="0"
+            aria-label="Open job details"
+            data-history-item
+            data-technician-history-card
+            data-history-status="<?= h($row['ui_status_key'] ?? 'accepted') ?>"
+            data-history-search-text="<?= h(strtolower(
+                (string) ($row['assign_id'] ?? '') . ' ' .
+                (string) ($row['setup_id'] ?? '') . ' ' .
+                (string) ($row['customer_name'] ?? '') . ' ' .
+                (string) ($row['customer_phone'] ?? '') . ' ' .
+                $assign_date_text . ' ' .
+                $install_datetime_text . ' ' .
+                $install_address
+            )) ?>"
+          >
+            <td class="my-job-id">
               <strong><?= h($row['assign_id'] ?? '-') ?></strong>
-            </div>
+            </td>
 
-            <span class="badge <?= h($row['ui_status_class'] ?? 'blue') ?>">
-              <span class="dot"></span>
-              <?= h($row['ui_status_label'] ?? assign_status_name($row['assign_status'] ?? '')) ?>
-            </span>
-          </div>
+            <td class="my-job-customer">
+              <strong><?= h($customer_name) ?></strong>
+            </td>
 
-          <div class="text-xs text-muted flex items-center gap-4">
-            <?= technician_my_jobs_icon_svg('clock', 12, 'ref-icon-muted') ?>
-            มอบหมาย <?= h($assign_date_text) ?>
-          </div>
-        </div>
-
-        <div class="job-body">
-          <div class="job-field">
-            <div class="job-field-label"><?= technician_my_jobs_icon_svg('user', 12, 'ref-icon-muted') ?> ลูกค้า</div>
-            <div class="job-field-value">
-              <div class="customer-avatar"><?= h($customer_initial !== '' ? $customer_initial : '-') ?></div>
-              <div>
-                <div><?= h($customer_name) ?></div>
-                <div class="job-field-sub"><?= h($row['customer_phone'] ?? '-') ?></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="job-field">
-            <div class="job-field-label"><?= technician_my_jobs_icon_svg('calendar', 12, 'ref-icon-muted') ?> วันติดตั้ง</div>
-            <div class="job-field-value">
-              <?= h($install_date_text) ?>
-              <span class="job-field-sub inline-sub">· <?= h($install_time_text) ?></span>
-            </div>
-            <div class="job-field-sub address-sub">
-              <?= technician_my_jobs_icon_svg('map-pin', 12, 'ref-icon-muted') ?>
-              <?= h($install_address) ?>
-            </div>
-          </div>
-
-          <div class="job-field">
-            <div class="job-field-label"><?= technician_my_jobs_icon_svg('package', 12, 'ref-icon-muted') ?> รายการสินค้า</div>
-            <div class="job-field-value product-summary-line">
+            <td class="my-job-products">
               <span class="qty-pill"><?= h((string) $product_count) ?> รายการ</span>
-              <div class="job-total">
-                <span class="job-total-label">ยอดรวม</span>
-                <span class="job-total-value">฿<?= h(number_format((float) ($row['install_total'] ?? 0), 2)) ?><span class="unit">บาท</span></span>
-              </div>
-            </div>
-          </div>
-        </div>
+            </td>
 
-        <div class="job-card-foot">
-          <div class="job-actions">
-            <a
-              class="btn btn-outline"
-              href="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode((string) ($row['assign_id'] ?? '')))) ?>"
-            >
-              <?= technician_my_jobs_icon_svg('eye', 14) ?>
-              <span>รายละเอียด</span>
-            </a>
-          </div>
-        </div>
-      </article>
-    <?php endforeach; ?>
+            <td class="my-job-status">
+              <span class="badge <?= h($row['ui_status_class'] ?? 'blue') ?>">
+                <span class="dot"></span>
+                <?= h($row['ui_status_label'] ?? assign_status_name($row['assign_status'] ?? '')) ?>
+              </span>
+            </td>
+
+            <td class="my-job-install-date">
+              <strong><?= h($install_date_text) ?></strong>
+            </td>
+
+            <td class="my-job-install-time" style="white-space: nowrap;">
+              <strong><?= h($install_time_text) ?></strong>
+            </td>
+
+            <td class="my-job-actions-cell">
+              <div class="job-actions">
+                <a
+                  class="btn btn-outline"
+                  href="<?= h($detail_url) ?>"
+                >
+                  <?= technician_my_jobs_icon_svg('eye', 14) ?>
+                  <span>รายละเอียด</span>
+                </a>
+              </div>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
   </div>
 </section>
 

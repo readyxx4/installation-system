@@ -272,6 +272,11 @@ function flash_message(): string
     'updated' => ['success', 'แก้ไขข้อมูลสำเร็จ', 'ระบบได้อัปเดตข้อมูลเรียบร้อยแล้ว'],
     'accept_updated' => ['success', 'รับงานสำเร็จ', 'ระบบบันทึกการรับงานเรียบร้อยแล้ว'],
     'deleted' => ['success', 'ลบข้อมูลสำเร็จ', 'ระบบได้ลบข้อมูลเรียบร้อยแล้ว'],
+    'user_suspended' => ['success', 'ระงับบัญชีแล้ว', 'บัญชีนี้จะไม่สามารถเข้าสู่ระบบได้ แต่ข้อมูลและประวัติงานยังคงอยู่'],
+    'user_restored' => ['success', 'คืนสถานะบัญชีแล้ว', 'บัญชีนี้สามารถเข้าสู่ระบบได้ตามปกติ'],
+    'user_self_protected' => ['warning', 'ไม่สามารถดำเนินการได้', 'ไม่สามารถระงับหรือลบบัญชีที่กำลังใช้งานอยู่ได้'],
+    'user_last_admin' => ['warning', 'ไม่สามารถดำเนินการได้', 'ต้องมีผู้ดูแลระบบที่ใช้งานได้อย่างน้อย 1 บัญชีเสมอ'],
+    'user_historical' => ['error', 'ไม่สามารถลบบัญชีได้', 'บัญชีนี้มีประวัติการใช้งานในระบบ กรุณาใช้การระงับบัญชีแทน'],
 
     'error' => ['error', 'เกิดข้อผิดพลาด', 'กรุณาตรวจสอบข้อมูลอีกครั้ง แล้วลองใหม่'],
     'duplicate' => ['warning', 'ข้อมูลซ้ำในระบบ', 'ข้อมูลนี้มีอยู่ในระบบแล้ว กรุณาตรวจสอบอีกครั้ง'],
@@ -361,6 +366,9 @@ function technician_shell_icon_svg(string $name, int $size = 20): string
     'home' => '<path d="M3 12l9-9 9 9"></path><path d="M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"></path>',
     'clipboard-check' => '<rect x="8" y="3" width="8" height="4" rx="1"></rect><path d="M8 5H6a2 2 0 00-2 2v13a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path><path d="M9 14l2 2 4-4"></path>',
     'briefcase' => '<rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"></path><path d="M2 13h20"></path>',
+    'package' => '<path d="M16.5 9.4L7.5 4.2M21 16V8a2 2 0 00-1-1.7l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.7l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path><path d="M3.3 7L12 12l8.7-5M12 22V12"></path>',
+    'tool' => '<path d="M14.7 6.3a4.5 4.5 0 0 0-5.9 5.9L3.5 17.5a2.1 2.1 0 0 0 3 3l5.3-5.3a4.5 4.5 0 0 0 5.9-5.9l-2.9 2.1-2.7-2.7 2.1-2.9Z"></path>',
+    'history' => '<path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 5v5h5M12 7v5l3 2"></path>',
     'calendar' => '<rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path>',
     'logout' => '<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"></path>',
   ];
@@ -398,6 +406,8 @@ function sale_manager_shell_icon_svg(string $name, int $size = 20): string
     'document-list' => '<path d="M6 3h8l4 4v14H6z"></path><path d="M14 3v5h5M9 12h6M9 16h6M9 8h1"></path>',
     'history' => '<path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 5v5h5M12 7v5l3 2"></path>',
     'clipboard-list' => '<rect x="5" y="4" width="14" height="17" rx="2"></rect><path d="M9 4V3h6v1M9 9h6M9 13h6M9 17h4"></path>',
+    'clipboard-check' => '<rect x="5" y="4" width="14" height="17" rx="2"></rect><path d="M9 4V3h6v1M9 12l2 2 4-4M9 17h6"></path>',
+    'chart' => '<path d="M5 20V10M12 20V4M19 20v-7"></path><path d="M3 20h18"></path>',
   ];
 
   if (!isset($paths[$name])) {
@@ -593,10 +603,34 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
           );
 
           nav_item(
+            'ยืนยันผลการติดตั้ง',
+            sale_manager_shell_icon_svg('clipboard-check', 20),
+            app_system_url('manager/installation_confirmations.php'),
+            'installation_confirmations',
+            $active
+          );
+
+          nav_item(
             'รายการมอบหมายงาน',
             sale_manager_shell_icon_svg('history', 20),
             app_system_url('manager/assignment_history.php'),
             'assignment_history',
+            $active
+          );
+
+          nav_item(
+            'ประวัติงาน',
+            sale_manager_shell_icon_svg('history', 20),
+            app_system_url('manager/assignment_history.php?view=archive'),
+            'assignment_archive',
+            $active
+          );
+
+          nav_item(
+            'รายงาน',
+            sale_manager_shell_icon_svg('chart', 20),
+            app_system_url('manager/reports.php'),
+            'manager_reports',
             $active
           );
           ?>
@@ -638,16 +672,7 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
           );
           ?>
 
-          <!--
           <?php
-          nav_item(
-            'บันทึกการจ่ายสินค้า',
-            '<i class="fa-solid fa-boxes-stacked"></i>',
-            app_system_url('sale/payment.php'),
-            'payment',
-            $active
-          );
-
           nav_item(
             'รายงาน',
             '<i class="fa-solid fa-chart-column"></i>',
@@ -656,7 +681,6 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
             $active
           );
           ?>
-          -->
 
 
         <!-- ====================================== -->
@@ -711,6 +735,14 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
           );
 
           nav_item(
+            'รายงาน',
+            '<i class="fa-solid fa-chart-column" aria-hidden="true"></i>',
+            app_system_url('admin/reports.php'),
+            'reports',
+            $active
+          );
+
+          nav_item(
             'ข้อมูลระบบ',
             admin_shell_icon_svg('system', 20),
             app_system_url('admin/system.php'),
@@ -740,10 +772,50 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
           );
 
           nav_item(
+            'รอรับสินค้า',
+            technician_shell_icon_svg('package', 20),
+            app_system_url('technician/my_jobs.php?status=awaiting_receive'),
+            'my_jobs_awaiting_receive',
+            $active
+          );
+
+          nav_item(
+            'พร้อมติดตั้ง',
+            technician_shell_icon_svg('calendar', 20),
+            app_system_url('technician/my_jobs.php?status=ready'),
+            'my_jobs_ready',
+            $active
+          );
+
+          nav_item(
+            'กำลังติดตั้ง',
+            technician_shell_icon_svg('tool', 20),
+            app_system_url('technician/my_jobs.php?status=installing'),
+            'my_jobs_installing',
+            $active
+          );
+
+          nav_item(
             'งานของฉัน',
             technician_shell_icon_svg('briefcase', 20),
             app_system_url('technician/my_jobs.php'),
             'my_jobs',
+            $active
+          );
+
+          nav_item(
+            'ประวัติงาน',
+            technician_shell_icon_svg('history', 20),
+            app_system_url('technician/my_jobs.php?status=history'),
+            'my_jobs_history',
+            $active
+          );
+
+          nav_item(
+            'รายงาน',
+            '<i class="fa-solid fa-chart-column" aria-hidden="true"></i>',
+            app_system_url('technician/report.php'),
+            'technician_report',
             $active
           );
           ?>

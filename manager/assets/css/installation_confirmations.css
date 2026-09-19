@@ -1,0 +1,325 @@
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 18px !important;
+    height: 68px !important;
+    min-height: 68px !important;
+    padding: 0 32px !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    background: #fff !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04) !important;
+    overflow: visible !important;
+}
+
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-title {
+    min-width: 0 !important;
+}
+
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-title h1 {
+    margin: 0 !important;
+    color: #0f172a !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+}
+
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-title p {
+    margin: 2px 0 0 !important;
+    color: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 14px !important;
+    flex: 0 0 auto !important;
+}
+
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-pill,
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-user {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-height: 38px !important;
+    padding: 0 4px !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-user-copy {
+    display: grid !important;
+    gap: 1px !important;
+    min-width: 0 !important;
+    line-height: 1.2 !important;
+}
+
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-user-copy strong,
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-user-copy small {
+    display: block !important;
+    white-space: nowrap !important;
+}
+
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-avatar {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    flex: 0 0 28px !important;
+    border-radius: 999px !important;
+    background: #2563eb !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-user-copy strong {
+    color: #0f172a !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+body.app-body.role-1:has(.manager-confirmations-page) .shell-topbar-user-copy small {
+    color: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+body.app-body.role-1:has(.manager-confirmations-page) .content {
+    height: calc(100vh - 68px) !important;
+    min-height: 0 !important;
+    background: #f1f5f9 !important;
+}
+
+body.app-body.role-1 .manager-confirmations-page {
+    width: min(1240px, 100%);
+    margin: 0 auto;
+    padding: 4px 32px 60px;
+    color: #0f172a;
+}
+
+body.app-body.role-1 .manager-confirmations-panel {
+    border: 1px solid #dbe3ee;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
+    overflow: hidden;
+}
+
+body.app-body.role-1 .manager-confirmations-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+body.app-body.role-1 .manager-confirmations-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+body.app-body.role-1 .manager-confirmations-search-icon {
+    position: absolute;
+    left: 12px;
+    width: 16px;
+    height: 16px;
+    stroke: #64748b;
+    stroke-width: 1.8;
+    pointer-events: none;
+}
+
+body.app-body.role-1 .manager-confirmations-search input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px 0 36px;
+    border: 1px solid #dbe3ee;
+    border-radius: 9px;
+    background: #fff;
+    color: #1e293b;
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+}
+
+body.app-body.role-1 .manager-confirmations-search input:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, .12);
+}
+
+body.app-body.role-1 .manager-confirmations-search input::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+}
+
+body.app-body.role-1 .manager-confirmations-search-button,
+body.app-body.role-1 .manager-confirmations-reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+body.app-body.role-1 .manager-confirmations-search-button {
+    gap: 6px;
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #fff;
+    cursor: pointer;
+}
+
+body.app-body.role-1 .manager-confirmations-search-button-icon {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+}
+
+body.app-body.role-1 .manager-confirmations-reset {
+    gap: 6px;
+    border: 1px solid #dbe3ee;
+    background: #fff;
+    color: #475569;
+}
+
+body.app-body.role-1 .manager-confirmations-reset-icon {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+}
+
+body.app-body.role-1 .manager-confirmations-table-wrap {
+    overflow-x: auto;
+    border-top: 1px solid #e5ecf6;
+}
+
+body.app-body.role-1 .manager-confirmations-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 13px;
+}
+
+body.app-body.role-1 .manager-confirmations-table th,
+body.app-body.role-1 .manager-confirmations-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #edf2f7;
+    text-align: left;
+    vertical-align: middle;
+}
+
+body.app-body.role-1 .manager-confirmations-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+body.app-body.role-1 .manager-confirmations-table td {
+    color: #334155;
+}
+
+body.app-body.role-1 .manager-confirmations-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+body.app-body.role-1 .manager-confirmations-table tbody tr.manager-confirmations-row {
+    cursor: pointer;
+}
+
+body.app-body.role-1 .manager-confirmations-table tbody tr.manager-confirmations-row:hover td,
+body.app-body.role-1 .manager-confirmations-table tbody tr.manager-confirmations-row:focus-visible td {
+    background: #f8fbff;
+}
+
+body.app-body.role-1 .manager-confirmations-table td:first-child {
+    color: #0f172a;
+}
+
+body.app-body.role-1 .manager-confirmations-table td:first-child strong {
+    display: block;
+}
+
+body.app-body.role-1 .manager-confirmations-table td:first-child strong {
+    font-weight: 700;
+}
+
+body.app-body.role-1 .manager-confirmation-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 28px;
+    padding: 0 10px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: #fff;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+body.app-body.role-1 .manager-confirmation-status.review {
+    border-color: #fed7aa;
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+body.app-body.role-1 .manager-confirmation-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+body.app-body.role-1 .manager-confirmations-table th.manager-confirmations-status-heading,
+body.app-body.role-1 .manager-confirmations-table td.manager-confirmations-status-cell {
+    text-align: center;
+}
+
+body.app-body.role-1 .manager-confirmations-status-cell .manager-confirmations-search-button {
+    min-height: 36px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-inline: auto;
+}
+
+body.app-body.role-1 .manager-confirmations-empty {
+    padding: 44px 20px !important;
+    color: #64748b !important;
+    text-align: center !important;
+}
+
+@media (max-width: 720px) {
+    body.app-body.role-1 .manager-confirmations-page {
+        padding: 10px 16px 40px;
+    }
+
+    body.app-body.role-1 .manager-confirmations-toolbar {
+        align-items: stretch;
+        flex-wrap: wrap;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    body.app-body.role-1 .manager-confirmations-search {
+        flex-basis: 100%;
+    }
+}

@@ -146,7 +146,7 @@ if (!function_exists('admin_form_icon_svg')) {
   }
 }
 
-layout_header('แก้ไขสินค้า', 'products');
+layout_header('แก้ไขสินค้า', 'products', 'แก้ไขข้อมูลสินค้าในระบบ');
 ?>
 <?= flash_message() ?>
 <div class="staff-form-page">

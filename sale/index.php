@@ -85,7 +85,7 @@ if ($productResult) {
 
 $setupId = make_setup_id($conn);
 
-layout_header('สร้างใบงานติดตั้ง', 'create_setup');
+layout_header('สร้างใบงานติดตั้ง', 'create_setup', 'เลือกข้อมูลลูกค้า สินค้า และรายละเอียดการติดตั้งก่อนบันทึกใบงาน');
 ?>
 
 <link rel="stylesheet"
@@ -96,21 +96,7 @@ layout_header('สร้างใบงานติดตั้ง', 'create_set
 
 <?= flash_message() ?>
 
-<div class="admin-dashboard-v2 sales-dashboard-page">
-  <div class="admin-dashboard-top">
-    <div>
-      <h1>สร้างใบงานติดตั้ง</h1>
-      <p>เลือกข้อมูลลูกค้า สินค้า และรายละเอียดการติดตั้งก่อนบันทึกใบงาน</p>
-    </div>
-
-    <div class="admin-dashboard-actions">
-      <div class="admin-date-pill">
-        <i class="fa-regular fa-calendar"></i>
-        <?= h(date('d/m/Y')) ?>
-      </div>
-    </div>
-  </div>
-
+<div class="admin-dashboard-v2 sales-dashboard-page sale-create-page">
   <div class="setup-page setup-work-page setup-create-page">
     <?php require __DIR__ . '/partials/create_setup_form.php'; ?>
   </div>

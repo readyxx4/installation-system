@@ -66,7 +66,7 @@ if ($search !== '') {
     ");
 }
 
-layout_header('จัดการประเภทสินค้า', 'product_types');
+layout_header('จัดการประเภทสินค้า', 'product_types', 'จัดการประเภทสินค้าที่ใช้ในระบบ');
 ?>
 
 <link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/admin_lists.css')) ?>?v=<?= h(asset_version('admin/assets/css/admin_lists.css')) ?>">
@@ -74,7 +74,7 @@ layout_header('จัดการประเภทสินค้า', 'product
 <?= flash_message() ?>
 
 <div class="panel admin-list-page admin-product-types-page">
-  <div class="panel-title">รายการข้อมูลประเภทสินค้าทั้งหมด</div>
+  <div class="panel-title">รายการประเภทสินค้า</div>
 
   <form class="toolbar product-type-toolbar" method="GET" action="<?= h(app_system_url('admin/product_types.php')) ?>">
     <input
@@ -132,32 +132,8 @@ layout_header('จัดการประเภทสินค้า', 'product
           <tr>
             <td><?= h($row['protype_id']) ?></td>
             <td><?= h($row['protype_name']) ?></td>
-            <td class="address-cell product-type-detail-cell">
-              <?php
-                $detail = (string) $row['protype_detail'];
-                $is_long = mb_strlen($detail, 'UTF-8') > 25;
-
-                $short_detail = mb_strlen($detail, 'UTF-8') > 25
-                  ? mb_substr($detail, 0, 25, 'UTF-8') . '...'
-                  : $detail;
-
-              ?>
-
-              <?php if ($is_long): ?>
-                <span class="address-short">
-                  <?= h($short_detail) ?>
-                </span>
-
-                <span class="address-full product-type-detail-full" style="display:none;">
-                  <?= nl2br(h($detail)) ?>
-                </span>
-
-                <button type="button" class="text-more-btn" data-toggle-address>
-                  ดูเพิ่มเติม
-                </button>
-              <?php else: ?>
-                <?= h($detail) ?>
-              <?php endif; ?>
+            <td class="product-type-detail-cell">
+              <?= nl2br(h((string) $row['protype_detail'])) ?>
             </td>
 
             <td>
@@ -215,7 +191,6 @@ layout_header('จัดการประเภทสินค้า', 'product
 
 <link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/table_actions.css')) ?>?v=<?= h(asset_version('admin/assets/css/table_actions.css')) ?>">
 
-<script src="<?= h(app_asset_url('admin/assets/js/toggle_address.js')) ?>?v=<?= h(asset_version('admin/assets/js/toggle_address.js')) ?>"></script>
 <script src="<?= h(app_asset_url('admin/assets/js/confirm_delete.js')) ?>?v=<?= h(asset_version('admin/assets/js/confirm_delete.js')) ?>"></script>
 
 <?php

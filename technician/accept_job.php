@@ -243,6 +243,7 @@ $stmt_jobs = $conn->prepare("
         a.assign_date,
         a.assign_install_date,
         a.assign_install_time,
+        a.assign_install_end_time,
         a.assign_status,
 
         s.setup_id,
@@ -295,7 +296,7 @@ while ($job_row = $jobs_result->fetch_assoc()) {
     $job_rows[] = $job_row;
 }
 
-layout_header('ยืนยันการรับงาน', 'accept_job', 'ตรวจสอบงานที่ได้รับมอบหมาย แล้วเลือกรับหรือปฏิเสธ');
+layout_header('ยืนยันการรับงาน', 'accept_job');
 ?>
 
 <link
@@ -322,10 +323,7 @@ layout_header('ยืนยันการรับงาน', 'accept_job', '�
 <?= flash_message() ?>
 
 <section class="page technician-assignments-page">
-  <div class="page-header">
-    <h1>ยืนยันการรับงานติดตั้ง</h1>
-    <p>ตรวจสอบงานที่ได้รับมอบหมายจากหัวหน้างานล่วงหน้า แล้วเลือกรับงานหรือปฏิเสธงาน</p>
-  </div>
+
 
   <form class="search-bar" action="javascript:void(0)">
     <div class="input-wrap">
@@ -371,33 +369,50 @@ layout_header('ยืนยันการรับงาน', 'accept_job', '�
     </div>
   </div>
 
-  <div class="job-list" data-technician-job-list>
-    <?php if (count($job_rows) === 0): ?>
-      <div class="card">
-        <div class="empty">
-          <div class="empty-icon"><?= technician_accept_icon_svg('clipboard-check', 30) ?></div>
-          <h3>ไม่พบงานที่ตรงกัน</h3>
-          <p>ยังไม่มีงานที่รอยืนยันการรับงาน</p>
-        </div>
-      </div>
-    <?php endif; ?>
+  <div class="job-list accept-job-table-wrap" data-technician-job-list>
+    <table class="accept-job-table">
+      <thead>
+        <tr>
+          <th>รหัสงาน</th>
+          <th>ลูกค้า</th>
+          <th>สินค้า</th>
+          <th>วันที่มอบหมาย</th>
+          <th style="width: 14%; padding-right: 4px;">วันที่ติดตั้ง</th>
+          <th style="width: 20%; padding-left: 0;">เวลาติดตั้ง</th>
+          <th>จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if (count($job_rows) === 0): ?>
+          <tr>
+            <td colspan="7">
+              <div class="empty accept-job-empty">
+                <div class="empty-icon"><?= technician_accept_icon_svg('clipboard-check', 30) ?></div>
+                <h3>ไม่พบงานที่ตรงกัน</h3>
+                <p>ยังไม่มีงานที่รอยืนยันการรับงาน</p>
+              </div>
+            </td>
+          </tr>
+        <?php endif; ?>
 
-    <?php if (count($job_rows) > 0): ?>
-      <div class="card" data-history-search-empty style="display: none;">
-        <div class="empty">
-          <div class="empty-icon"><?= technician_accept_icon_svg('search', 30) ?></div>
-          <h3>ไม่พบงานที่ตรงกัน</h3>
-          <p>ลองปรับคำค้นหาหรือเปลี่ยนหมวดหมู่</p>
-        </div>
-      </div>
-    <?php endif; ?>
+        <?php if (count($job_rows) > 0): ?>
+          <tr data-history-search-empty style="display: none;">
+            <td colspan="7">
+              <div class="empty accept-job-empty">
+                <div class="empty-icon"><?= technician_accept_icon_svg('search', 30) ?></div>
+                <h3>ไม่พบงานที่ตรงกัน</h3>
+                <p>ลองปรับคำค้นหาหรือเปลี่ยนหมวดหมู่</p>
+              </div>
+            </td>
+          </tr>
+        <?php endif; ?>
 
-    <?php foreach ($job_rows as $row): ?>
+        <?php foreach ($job_rows as $row): ?>
       <?php
         $is_focused_row = $focus_assign_id !== '' && hash_equals((string) ($row['assign_id'] ?? ''), $focus_assign_id);
         $install_address = $row['setup_address'] ?: ($row['customer_address'] ?: ($row['setup_location'] ?? '-'));
         $assign_date_text = !empty($row['assign_date'])
-          ? date('d/m/Y H:i', strtotime($row['assign_date']))
+          ? date('d/m/Y', strtotime($row['assign_date']))
           : '-';
 
         $install_date_text = !empty($row['assign_install_date'])
@@ -408,16 +423,25 @@ layout_header('ยืนยันการรับงาน', 'accept_job', '�
           ? date('H:i', strtotime($row['assign_install_time'])) . ' น.'
           : '-';
 
-        $install_datetime_text = trim($install_date_text . ' ' . $install_time_text);
+        $install_end_time_text = !empty($row['assign_install_end_time'])
+          ? date('H:i', strtotime($row['assign_install_end_time'])) . ' น.'
+          : '';
+
+        $install_time_range_text = $install_end_time_text !== ''
+          ? date('H:i', strtotime($row['assign_install_time'])) . ' - ' . $install_end_time_text
+          : $install_time_text;
+
+        $install_datetime_text = trim($install_date_text . ' ' . $install_time_range_text);
         $customer_name = trim((string) ($row['customer_name'] ?? '-'));
-        $customer_initial = function_exists('mb_substr') ? mb_substr($customer_name, 0, 1, 'UTF-8') : substr($customer_name, 0, 1);
         $product_count = max(0, (int) ($row['item_count'] ?? 0));
-        $job_warning_badge = (bool) ($row['is_accept_urgent'] ?? false);
       ?>
 
-      <article
-        class="job-card <?= $is_focused_row ? 'technician-focused-assignment-row' : '' ?>"
+      <tr
+        class="accept-job-row <?= $is_focused_row ? 'technician-focused-assignment-row' : '' ?>"
         <?= $is_focused_row ? 'data-technician-focus-row="true"' : '' ?>
+        data-detail-url="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode((string) ($row['assign_id'] ?? '')))) ?>"
+        tabindex="0"
+        aria-label="Open job details"
         data-history-item
         data-technician-history-card
         data-history-status="<?= !empty($row['is_accept_urgent']) ? 'urgent' : 'assigned' ?>"
@@ -428,75 +452,38 @@ layout_header('ยืนยันการรับงาน', 'accept_job', '�
             (string) ($row['customer_phone'] ?? '') . ' ' .
             (string) ($row['assign_install_date'] ?? '') . ' ' .
             (string) ($row['assign_install_time'] ?? '') . ' ' .
+            (string) ($row['assign_install_end_time'] ?? '') . ' ' .
             $assign_date_text . ' ' .
             $install_datetime_text . ' ' .
             $install_address
         )) ?>"
       >
-        <div class="job-card-head">
-          <div class="flex items-center gap-12">
-            <div class="job-id">
-              <?= technician_accept_icon_svg('hash', 13) ?>
-              <strong><?= h($row['assign_id'] ?? '-') ?></strong>
-            </div>
+        <td class="accept-job-id">
+          <strong><?= h($row['assign_id'] ?? '-') ?></strong>
+        </td>
 
-            <?php if ($job_warning_badge): ?>
-              <span class="badge warning accept-urgent-badge"><span class="dot"></span>งานด่วน</span>
-            <?php endif; ?>
-          </div>
+        <td class="accept-job-customer">
+          <strong><?= h($customer_name) ?></strong>
+        </td>
 
-          <div class="text-xs text-muted flex items-center gap-4">
-            <?= technician_accept_icon_svg('clock', 12, 'ref-icon-muted') ?>
-            มอบหมาย <?= h($assign_date_text) ?>
-          </div>
-        </div>
+        <td>
+          <span class="qty-pill"><?= h((string) $product_count) ?> รายการ</span>
+        </td>
 
-        <div class="job-body">
-          <div class="job-field">
-            <div class="job-field-label"><?= technician_accept_icon_svg('user', 12, 'ref-icon-muted') ?> ลูกค้า</div>
-            <div class="job-field-value">
-              <div class="customer-avatar"><?= h($customer_initial !== '' ? $customer_initial : '-') ?></div>
-              <div>
-                <div><?= h($customer_name) ?></div>
-                <div class="job-field-sub"><?= h($row['customer_phone'] ?? '-') ?></div>
-              </div>
-            </div>
-          </div>
+        <td class="accept-job-assigned-date">
+          <strong><?= h($assign_date_text) ?></strong>
+        </td>
 
-          <div class="job-field">
-            <div class="job-field-label"><?= technician_accept_icon_svg('calendar', 12, 'ref-icon-muted') ?> วันติดตั้ง</div>
-            <div class="job-field-value">
-              <?= h($install_date_text) ?>
-              <span class="job-field-sub inline-sub">· <?= h($install_time_text) ?></span>
-            </div>
-            <div class="job-field-sub address-sub">
-              <?= technician_accept_icon_svg('map-pin', 12, 'ref-icon-muted') ?>
-              <?= h($install_address) ?>
-            </div>
-          </div>
+        <td class="accept-job-install-date" style="width: 14%; padding-right: 4px;">
+          <strong><?= h($install_date_text) ?></strong>
+        </td>
 
-          <div class="job-field">
-            <div class="job-field-label"><?= technician_accept_icon_svg('package', 12, 'ref-icon-muted') ?> รายการสินค้า</div>
-            <div class="job-field-value product-summary-line">
-              <span class="qty-pill"><?= h((string) $product_count) ?> รายการ</span>
-              <div class="job-total">
-                <span class="job-total-label">ยอดรวม</span>
-                <span class="job-total-value">฿<?= h(number_format((float) ($row['install_total'] ?? 0), 2)) ?><span class="unit">บาท</span></span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <td class="accept-job-install-time" style="width: 20%; white-space: nowrap; padding-left: 0;">
+          <strong><?= h($install_time_range_text) ?></strong>
+        </td>
 
-        <div class="job-card-foot">
+        <td class="accept-job-actions-cell">
           <div class="job-actions">
-            <a
-              class="btn btn-outline"
-              href="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode((string) ($row['assign_id'] ?? '')))) ?>"
-            >
-              <?= technician_accept_icon_svg('eye', 14) ?>
-              <span>รายละเอียด</span>
-            </a>
-
             <form class="cs-inline-action-form" method="POST" action="<?= h(app_system_url('technician/accept_job.php')) ?>">
               <input type="hidden" name="assign_id" value="<?= h($row['assign_id']) ?>">
               <input type="hidden" name="action" value="accept">
@@ -525,9 +512,11 @@ layout_header('ยืนยันการรับงาน', 'accept_job', '�
               </button>
             </form>
           </div>
-        </div>
-      </article>
-    <?php endforeach; ?>
+        </td>
+      </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
   </div>
 </section>
 <script

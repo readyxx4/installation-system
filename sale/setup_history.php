@@ -125,7 +125,7 @@ try {
     $history_setup_rows = [];
 }
 
-layout_header('ประวัติใบงาน', 'setup_history');
+layout_header('ประวัติใบงาน', 'setup_history', 'ตรวจสอบใบงานที่เสร็จสิ้นหรือยกเลิกแล้ว');
 ?>
 
 <link
@@ -135,14 +135,7 @@ layout_header('ประวัติใบงาน', 'setup_history');
 
 <?= flash_message() ?>
 
-<section class="cs-job-status-panel cs-setups-page-panel">
-    <div class="cs-job-status-head">
-        <div>
-            <h2>ประวัติใบงาน</h2>
-            <p class="cs-page-subtitle">ใบงานที่หัวหน้าช่างมอบหมายแล้ว แสดงไว้สำหรับตรวจสอบย้อนหลัง</p>
-        </div>
-    </div>
-
+<section class="cs-job-status-panel cs-setups-page-panel cs-setup-history-page-panel">
     <form class="toolbar setup-toolbar cs-sale-admin-toolbar cs-history-search-toolbar" action="javascript:void(0)">
         <input
             id="historySearchInput"
