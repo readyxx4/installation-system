@@ -307,7 +307,7 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
 <?= flash_message() ?>
 <link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/staff_forms.css')) ?>?v=<?= h(asset_version('admin/assets/css/staff_forms.css')) ?>">
 
-<div class="staff-form-page">
+<div class="staff-form-page admin-user-add-page">
   <div class="staff-page-back-row">
     <a class="staff-back-link" href="<?= h(app_system_url('admin/users.php')) ?>">
       <?= icon_svg('back') ?> กลับรายการพนักงาน
@@ -327,12 +327,13 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
     <div class="staff-create-head staff-create-head-clean">
       <div>
         <h2>ข้อมูลพนักงานใหม่</h2>
+        <p>กรอกข้อมูลสำหรับสร้างบัญชีพนักงาน</p>
       </div>
     </div>
 
     <div class="staff-form-grid">
       <div class="staff-field readonly-field">
-        <label for="user_id">รหัสพนักงาน *</label>
+        <label for="user_id">รหัสพนักงาน <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('id') ?>
           <input
@@ -348,7 +349,7 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
       </div>
 
       <div class="staff-field">
-        <label for="user_role">สิทธิ์การใช้งาน *</label>
+        <label for="user_role">สิทธิ์การใช้งาน <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap select-wrap">
           <?= icon_svg('role') ?>
           <select id="user_role" name="user_role" required>
@@ -361,7 +362,7 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
       </div>
 
       <div class="staff-field staff-field-full">
-        <label for="user_name">ชื่อ-นามสกุล *</label>
+        <label for="user_name">ชื่อ-นามสกุล <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('user') ?>
           <input
@@ -376,7 +377,7 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
       </div>
 
       <div class="staff-field">
-        <label for="user_phone">เบอร์โทรศัพท์ *</label>
+        <label for="user_phone">เบอร์โทรศัพท์ <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('phone') ?>
           <input
@@ -393,7 +394,7 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
       </div>
 
       <div class="staff-field">
-        <label for="user_email">อีเมล *</label>
+        <label for="user_email">อีเมล <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('mail') ?>
           <input
@@ -424,12 +425,12 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
       <div class="staff-field staff-field-full staff-address-section">
         <div class="staff-address-title">
           <?= icon_svg('map') ?>
-          <label>ข้อมูลที่อยู่ *</label>
+          <label>ข้อมูลที่อยู่ <span class="required-mark" aria-hidden="true">*</span></label>
         </div>
 
         <div class="staff-address-grid">
           <div class="staff-field staff-address-detail">
-            <label for="address_detail">บ้านเลขที่ / หมู่ / ถนน *</label>
+            <label for="address_detail">บ้านเลขที่ / หมู่ / ถนน <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="staff-input-wrap">
               <?= icon_svg('map') ?>
               <input
@@ -444,7 +445,7 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
           </div>
 
           <div class="staff-field">
-            <label for="province_id">จังหวัด *</label>
+            <label for="province_id">จังหวัด <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="staff-input-wrap address-select-wrap">
               <?= icon_svg('map') ?>
               <select
@@ -464,7 +465,7 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
           </div>
 
           <div class="staff-field">
-            <label for="district_id">อำเภอ *</label>
+            <label for="district_id">อำเภอ <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="staff-input-wrap address-select-wrap">
               <?= icon_svg('map') ?>
               <select
@@ -480,7 +481,7 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
           </div>
 
           <div class="staff-field">
-            <label for="sub_district_id">ตำบล *</label>
+            <label for="sub_district_id">ตำบล <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="staff-input-wrap address-select-wrap">
               <?= icon_svg('map') ?>
               <select
@@ -496,7 +497,7 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
           </div>
 
           <div class="staff-field">
-            <label for="zip_code">รหัสไปรษณีย์ *</label>
+            <label for="zip_code">รหัสไปรษณีย์ <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="staff-input-wrap readonly-field">
               <?= icon_svg('id') ?>
               <input
@@ -520,7 +521,7 @@ layout_header('เพิ่มข้อมูลพนักงาน', 'users',
       </a>
 
       <button class="staff-save-btn" type="submit">
-        <?= icon_svg('save') ?> เพิ่มข้อมูลพนักงาน
+        <?= icon_svg('save') ?> บันทึกพนักงาน
       </button>
     </div>
   </form>

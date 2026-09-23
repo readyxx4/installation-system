@@ -311,18 +311,40 @@ body.app-body.role-technician .technician-assignments-page .badge .dot {
 
 body.app-body.role-technician .technician-assignments-page .badge.blue {
   background: #eff6ff !important;
-  color: #2563eb !important;
+  color: #3b82f6 !important;
 }
 
 body.app-body.role-technician .technician-assignments-page .badge.green,
 body.app-body.role-technician .technician-assignments-page .badge.success {
   background: #ecfdf5 !important;
-  color: #059669 !important;
+  color: #10b981 !important;
 }
 
-body.app-body.role-technician .technician-assignments-page .badge.info {
+body.app-body.role-technician .technician-assignments-page .badge.cyan {
+  background: #ecfeff !important;
+  color: #0891b2 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .badge.indigo {
   background: #eef2ff !important;
-  color: #4f46e5 !important;
+  color: #6366f1 !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .badge.purple {
+  background: #f3e8ff !important;
+  color: #7c3aed !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .badge.pink {
+  border: 1px solid #fecdd3 !important;
+  background: #fff1f2 !important;
+  color: #f43f5e !important;
+}
+
+body.app-body.role-technician .technician-assignments-page .badge.red {
+  border: 1px solid #fecaca !important;
+  background: #fef2f2 !important;
+  color: #ef4444 !important;
 }
 
 body.app-body.role-technician .technician-assignments-page .job-body {

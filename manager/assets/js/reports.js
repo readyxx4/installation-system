@@ -1,177 +1,26 @@
 (function () {
   'use strict';
 
-  const payload = window.managerCompletedReport || {};
-  const chart = document.querySelector('[data-manager-completed-chart]');
-  const summary = document.querySelector('[data-manager-completed-summary]');
-  const tabs = Array.from(document.querySelectorAll('[data-manager-period]'));
-  const periodInput = document.querySelector('[data-manager-period-input]');
-
-  if (!chart || !summary || tabs.length === 0) return;
-
-  const labels = {
-    day: ['เช้า', 'บ่าย', 'เย็น'],
-    week: ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'],
-    month: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
-  };
-
-  let activePeriod = ['day', 'week', 'month'].includes(payload.initialPeriod)
-    ? payload.initialPeriod
-    : 'day';
-
-  const periodValues = {
-    day: payload.initialDay || '',
-    week: payload.initialWeek || '',
-    month: payload.initialMonth || '',
-  };
-
-  const periodInputConfig = {
-    day: { type: 'date', label: 'เลือกวันที่' },
-    week: { type: 'week', label: 'เลือกสัปดาห์' },
-    month: { type: 'month', label: 'เลือกเดือน' },
-  };
-
-  const numberFormat = (value) => (Number(value) || 0).toLocaleString('en-US');
-
-  const formatDate = (isoDate) => {
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(isoDate || ''));
-    return match ? `${match[3]}/${match[2]}/${match[1]}` : '-';
-  };
-
-  const weekToIsoDate = (weekValue) => {
-    const match = /^(\d{4})-W(\d{2})$/.exec(String(weekValue || ''));
-    if (!match) return '';
-
-    const year = Number(match[1]);
-    const week = Number(match[2]);
-    const januaryFourth = new Date(Date.UTC(year, 0, 4));
-    const isoDay = januaryFourth.getUTCDay() || 7;
-    januaryFourth.setUTCDate(januaryFourth.getUTCDate() - isoDay + 1 + ((week - 1) * 7));
-
-    return `${januaryFourth.getUTCFullYear()}-${String(januaryFourth.getUTCMonth() + 1).padStart(2, '0')}-${String(januaryFourth.getUTCDate()).padStart(2, '0')}`;
-  };
-
-  const syncPeriodInput = () => {
-    if (!periodInput) return;
-
-    const config = periodInputConfig[activePeriod];
-    periodInput.type = config.type;
-    periodInput.value = periodValues[activePeriod];
-    periodInput.setAttribute('aria-label', config.label);
-  };
-
-  const rememberPeriodInput = () => {
-    if (periodInput && periodInput.value) {
-      periodValues[activePeriod] = periodInput.value;
-    }
-  };
-
-  const renderBars = (barLabels, values) => {
-    chart.replaceChildren();
-    chart.dataset.period = activePeriod;
-
-    const safeValues = Array.isArray(values)
-      ? values.map((value) => Math.max(0, Number(value) || 0))
-      : [];
-    const maxValue = safeValues.reduce((max, value) => Math.max(max, value), 0);
-    const bars = document.createElement('div');
-    bars.className = 'completed-install-bars';
-    bars.style.setProperty('--completed-bar-count', String(barLabels.length));
-
-    barLabels.forEach((labelText, index) => {
-      const value = safeValues[index] || 0;
-      const item = document.createElement('div');
-      item.className = 'completed-install-bar-item';
-      item.classList.toggle('is-zero', value === 0);
-
-      const stage = document.createElement('div');
-      stage.className = 'completed-install-bar-stage';
-      const track = document.createElement('div');
-      track.className = 'completed-install-bar-track';
-      const fill = document.createElement('span');
-      fill.className = 'completed-install-bar-fill';
-      const height = maxValue > 0 ? (value / maxValue) * 100 : 0;
-      fill.style.setProperty('--completed-bar-height', `${value > 0 ? Math.max(8, height) : 0}%`);
-
-      if (value > 0) {
-        const valueElement = document.createElement('strong');
-        valueElement.className = 'completed-install-bar-value';
-        valueElement.textContent = numberFormat(value);
-        fill.appendChild(valueElement);
+  const updatePrintDate = () => {
+    document.querySelectorAll('[data-manager-report-print-date]').forEach((node) => {
+      const timezone = node.dataset.timezone || undefined;
+      try {
+        const printedDate = new Intl.DateTimeFormat('en-GB', {
+          timeZone: timezone,
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }).format(new Date());
+        node.textContent = `วันที่พิมพ์: ${printedDate}`;
+      } catch (error) {
+        node.textContent = `วันที่พิมพ์: ${new Date().toLocaleDateString('en-GB')}`;
       }
-
-      track.appendChild(fill);
-      stage.appendChild(track);
-      const label = document.createElement('span');
-      label.className = 'completed-install-bar-label';
-      label.textContent = labelText;
-      item.append(stage, label);
-      bars.appendChild(item);
     });
-
-    chart.appendChild(bars);
-    return safeValues.reduce((total, value) => total + value, 0);
   };
 
-  const render = () => {
-    syncPeriodInput();
+  updatePrintDate();
+  window.addEventListener('beforeprint', updatePrintDate);
 
-    const dayData = payload.day || {};
-    const weekData = payload.week || {};
-    const monthData = payload.month || {};
-    let values = [];
-    let summaryText = '';
-
-    if (activePeriod === 'day') {
-      const selectedDay = periodValues.day || payload.initialDay;
-      values = (dayData.dates && dayData.dates[selectedDay]) || [0, 0, 0];
-      summaryText = `วันที่ ${formatDate(selectedDay)} เสร็จแล้ว ${numberFormat(values.reduce((total, value) => total + (Number(value) || 0), 0))} งาน`;
-    } else if (activePeriod === 'week') {
-      const selectedWeek = periodValues.week || payload.initialWeek;
-      const weekStart = weekToIsoDate(selectedWeek);
-      values = (weekData.weeks && weekData.weeks[weekStart]) || Array(7).fill(0);
-      summaryText = `สัปดาห์เริ่ม ${formatDate(weekStart)} เสร็จแล้ว ${numberFormat(values.reduce((total, value) => total + (Number(value) || 0), 0))} งาน`;
-    } else {
-      const selectedMonth = periodValues.month || payload.initialMonth;
-      const monthMatch = /^(\d{4})-(\d{2})$/.exec(selectedMonth || '');
-      const year = monthMatch ? monthMatch[1] : '';
-      const valuesByYear = monthData.years && monthData.years[year];
-      values = Array.isArray(valuesByYear) ? valuesByYear : Array(12).fill(0);
-      summaryText = `เดือน ${monthMatch ? monthMatch[2] : '--'}/${year || '----'} เสร็จแล้ว ${numberFormat(values.reduce((total, value) => total + (Number(value) || 0), 0))} งาน`;
-    }
-
-    tabs.forEach((tab) => {
-      const isActive = tab.dataset.managerPeriod === activePeriod;
-      tab.classList.toggle('is-active', isActive);
-      tab.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-    });
-
-    summary.textContent = summaryText;
-    renderBars(labels[activePeriod], values);
-    const url = new URL(window.location.href);
-    url.searchParams.set('period', activePeriod);
-    url.searchParams.set('chart_' + activePeriod, periodValues[activePeriod] || '');
-    url.searchParams.delete('ajax');
-    url.searchParams.delete('section');
-    window.history.replaceState({}, '', url);
-  };
-
-  tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      rememberPeriodInput();
-      activePeriod = tab.dataset.managerPeriod || 'day';
-      render();
-    });
-  });
-
-  if (periodInput) {
-    periodInput.addEventListener('change', () => {
-      rememberPeriodInput();
-      render();
-    });
-  }
-
-  render();
 })();
 
 (function () {

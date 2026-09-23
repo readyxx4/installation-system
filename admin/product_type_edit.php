@@ -106,17 +106,18 @@ if (!function_exists('admin_form_icon_svg')) {
 layout_header('แก้ไขประเภทสินค้า', 'product_types', 'แก้ไขประเภทสินค้าในระบบ');
 ?>
 <?= flash_message() ?>
+<link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/staff_forms.css')) ?>?v=<?= h(asset_version('admin/assets/css/staff_forms.css')) ?>">
 <div class="staff-form-page">
   <div class="staff-page-back-row"><a class="staff-back-link" href="<?= h(app_system_url('admin/product_types.php')) ?>"><?= admin_form_icon_svg('back') ?> กลับรายการประเภทสินค้า</a></div>
   <form class="staff-create-card" method="POST" action="<?= h(app_system_url('admin/product_type_edit.php')) ?>" autocomplete="off">
     <input type="hidden" name="protype_id" value="<?= h($product_type['protype_id']) ?>">
-    <div class="staff-create-head staff-create-head-clean"><div><h2>แก้ไขประเภทสินค้า</h2></div></div>
+    <div class="staff-create-head staff-create-head-clean"><div><h2>แก้ไขประเภทสินค้า</h2><p>ปรับปรุงข้อมูลประเภทสินค้า</p></div></div>
     <div class="staff-form-grid">
-      <div class="staff-field readonly-field"><label for="protype_id_show">รหัสประเภทสินค้า *</label><div class="staff-input-wrap"><?= admin_form_icon_svg('id') ?><input type="text" id="protype_id_show" value="<?= h($product_type['protype_id']) ?>" readonly></div></div>
-      <div class="staff-field"><label for="protype_name">ชื่อประเภทสินค้า *</label><div class="staff-input-wrap"><?= admin_form_icon_svg('box') ?><input type="text" id="protype_name" name="protype_name" maxlength="50" value="<?= h($product_type['protype_name']) ?>" required></div></div>
-      <div class="staff-field staff-field-full"><label for="protype_detail">รายละเอียดประเภทสินค้า *</label><div class="staff-textarea-wrap"><?= admin_form_icon_svg('text') ?><textarea id="protype_detail" name="protype_detail" maxlength="255" required><?= h($product_type['protype_detail']) ?></textarea></div></div>
+      <div class="staff-field readonly-field"><label for="protype_id_show">รหัสประเภทสินค้า <span class="required-mark" aria-hidden="true">*</span></label><div class="staff-input-wrap"><?= admin_form_icon_svg('id') ?><input type="text" id="protype_id_show" value="<?= h($product_type['protype_id']) ?>" readonly></div></div>
+      <div class="staff-field"><label for="protype_name">ชื่อประเภทสินค้า <span class="required-mark" aria-hidden="true">*</span></label><div class="staff-input-wrap"><?= admin_form_icon_svg('box') ?><input type="text" id="protype_name" name="protype_name" maxlength="50" value="<?= h($product_type['protype_name']) ?>" required></div></div>
+      <div class="staff-field staff-field-full"><label for="protype_detail">รายละเอียดประเภทสินค้า <span class="required-mark" aria-hidden="true">*</span></label><div class="staff-textarea-wrap"><?= admin_form_icon_svg('text') ?><textarea id="protype_detail" name="protype_detail" maxlength="255" required><?= h($product_type['protype_detail']) ?></textarea></div></div>
     </div>
-    <div class="staff-form-actions"><a class="staff-cancel-btn" href="<?= h(app_system_url('admin/product_types.php')) ?>">ยกเลิก</a><button class="staff-save-btn" type="submit"><?= admin_form_icon_svg('save') ?> บันทึกข้อมูล</button></div>
+    <div class="staff-form-actions"><a class="staff-cancel-btn" href="<?= h(app_system_url('admin/product_types.php')) ?>">ยกเลิก</a><button class="staff-save-btn" type="submit"><?= admin_form_icon_svg('save') ?> บันทึกการแก้ไข</button></div>
   </form>
 </div>
 <?php layout_footer(); ?>

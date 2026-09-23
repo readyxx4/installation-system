@@ -63,11 +63,12 @@ function technician_assignment_status_text($status): string
 function technician_assignment_status_class($status): string
 {
     return match ((string) $status) {
-        '1' => 'waiting',
-        '2' => 'progress',
-        '5' => 'done',
-        '3', '4' => 'cancelled',
-        default => 'waiting',
+        '1' => 'purple',
+        '2' => 'cyan',
+        '5' => 'green',
+        '3' => 'pink',
+        '4' => 'red',
+        default => 'purple',
     };
 }
 
@@ -108,18 +109,18 @@ function technician_detail_ui_status(array $job, ?array $productReceive): array
     }
 
     if ($setupStatus === '3') {
-        return ['label' => 'กำลังติดตั้ง', 'class' => 'info'];
+        return ['label' => 'กำลังติดตั้ง', 'class' => 'indigo'];
     }
 
     if ($assignStatus === '2' && $receiveStatus === '1' && $setupStatus === '2') {
-        return ['label' => 'พร้อมติดตั้ง', 'class' => 'green'];
+        return ['label' => 'พร้อมติดตั้ง', 'class' => 'blue'];
     }
 
     if ($assignStatus === '2' && $receiveStatus !== '1') {
-        return ['label' => 'รอรับสินค้า', 'class' => 'blue'];
+        return ['label' => 'รอรับสินค้า', 'class' => 'cyan'];
     }
 
-    return ['label' => technician_assignment_status_text($assignStatus), 'class' => 'blue'];
+    return ['label' => technician_assignment_status_text($assignStatus), 'class' => technician_assignment_status_class($assignStatus)];
 }
 function make_receive_id(mysqli $conn): string
 {
@@ -1319,7 +1320,7 @@ body.app-body.role-technician .technician-detail-page.install-complete-page #ins
                 <p>ตรวจสอบรายการสินค้าและอัปโหลดหลักฐานก่อนยืนยันรับสินค้าจากคลัง</p>
             </div>
             <div class="detail-badges" aria-label="สถานะงาน">
-                <span class="badge blue detail-status-badge">รอรับสินค้า</span>
+                <span class="badge cyan detail-status-badge">รอรับสินค้า</span>
             </div>
         </div>
     </div>
@@ -1501,7 +1502,7 @@ endif;
 
             <div class="detail-badges" aria-label="สถานะงาน">
                 <?php if ($isPreAcceptJob): ?>
-                    <span class="badge waiting detail-status-badge">รอยืนยันรับงาน</span>
+                    <span class="badge purple detail-status-badge">รอยืนยันรับงาน</span>
                     <?php if ($showUrgentHeaderBadge): ?>
                         <span class="badge warning detail-urgent-badge"><span class="dot"></span>งานด่วน</span>
                     <?php endif; ?>

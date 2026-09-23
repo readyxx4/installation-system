@@ -2,193 +2,172 @@
   'use strict';
 
   const page = document.querySelector('.technician-report-page');
-  if (!page) return;
+  const form = page?.querySelector('[data-technician-report-filter-form]');
+  if (!page || !form) return;
 
-  const controllers = Object.create(null);
-  const sequences = Object.create(null);
-  const formatNumber = (value) => Number(value || 0).toLocaleString('en-US');
-
-  const setUrl = (params) => {
-    const url = new URL(window.location.href);
-    Object.entries(params).forEach(([key, value]) => {
-      if (value === '' || value == null) url.searchParams.delete(key);
-      else url.searchParams.set(key, value);
+  const updatePrintDate = () => {
+    page.querySelectorAll('[data-technician-report-print-date]').forEach((node) => {
+      const timezone = node.dataset.timezone || undefined;
+      try {
+        const printedDate = new Intl.DateTimeFormat('en-GB', {
+          timeZone: timezone,
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }).format(new Date());
+        node.textContent = `วันที่พิมพ์: ${printedDate}`;
+      } catch (error) {
+        node.textContent = `วันที่พิมพ์: ${new Date().toLocaleDateString('en-GB')}`;
+      }
     });
-    url.searchParams.delete('ajax');
-    url.searchParams.delete('section');
+  };
+
+  updatePrintDate();
+  window.addEventListener('beforeprint', updatePrintDate);
+
+  const formatNumber = (value) => Number(value || 0).toLocaleString('en-US');
+  const periodSelect = form.querySelector('[data-technician-table-period]');
+  const dateRange = form.querySelector('[data-technician-table-date-range]');
+  const dateFrom = form.querySelector('[data-technician-table-date-from]');
+  const dateTo = form.querySelector('[data-technician-table-date-to]');
+  let controller = null;
+
+  const setUrl = () => {
+    const url = new URL(window.location.href);
+    ['q', 'status', 'table_period', 'table_date_from', 'table_date_to'].forEach((key) => {
+      const value = form.elements[key]?.value || '';
+      if (value && !(key === 'table_period' && value === 'all')) url.searchParams.set(key, value);
+      else url.searchParams.delete(key);
+    });
+    ['assigned_period', 'assigned_value', 'completed_period', 'completed_value', 'trend_week', 'ajax', 'section']
+      .forEach((key) => url.searchParams.delete(key));
     window.history.replaceState({}, '', url);
   };
 
-  const panelFor = (section) => section === 'trend'
-    ? page.querySelector('.technician-report-trend-card')
-    : page.querySelectorAll('.technician-report-chart-card')[section === 'assigned' ? 0 : 1];
-
-  const setBusy = (panel, busy) => {
-    if (!panel) return;
-    panel.classList.toggle('is-loading', busy);
-    panel.setAttribute('aria-busy', busy ? 'true' : 'false');
-    if (!busy) panel.querySelector('.technician-report-async-error')?.remove();
+  const syncDateRange = () => {
+    if (!dateRange || !periodSelect) return;
+    dateRange.hidden = periodSelect.value !== 'custom';
+    if (periodSelect.value !== 'custom') {
+      if (dateFrom) dateFrom.value = '';
+      if (dateTo) dateTo.value = '';
+    }
   };
 
-  const showError = (panel) => {
-    if (!panel) return;
-    panel.querySelector('.technician-report-async-error')?.remove();
+  const setBusy = (busy) => {
+    page.classList.toggle('is-filter-loading', busy);
+    page.querySelectorAll('.technician-report-summary-card, .technician-report-table-card')
+      .forEach((panel) => panel.setAttribute('aria-busy', busy ? 'true' : 'false'));
+  };
+
+  const showError = () => {
+    page.querySelector('.technician-report-async-error')?.remove();
     const message = document.createElement('p');
     message.className = 'technician-report-async-error';
-    message.textContent = 'ไม่สามารถโหลดข้อมูลส่วนนี้ได้ กรุณาลองใหม่อีกครั้ง';
-    panel.appendChild(message);
+    message.textContent = 'ไม่สามารถโหลดข้อมูลตามตัวกรองได้ กรุณาลองใหม่อีกครั้ง';
+    form.insertAdjacentElement('afterend', message);
   };
 
-  const request = async (section, params) => {
-    const panel = panelFor(section);
-    const seq = (sequences[section] || 0) + 1;
-    sequences[section] = seq;
-    controllers[section]?.abort();
-    const controller = new AbortController();
-    controllers[section] = controller;
-    setBusy(panel, true);
+  const request = async () => {
+    controller?.abort();
+    controller = new AbortController();
     const url = new URL(window.location.href);
-    Object.entries(params || {}).forEach(([key, value]) => url.searchParams.set(key, value));
+    new FormData(form).forEach((value, key) => {
+      if (value !== '') url.searchParams.set(key, value);
+      else url.searchParams.delete(key);
+    });
     url.searchParams.set('ajax', '1');
-    url.searchParams.set('section', section);
+    url.searchParams.set('section', 'global');
+    setBusy(true);
     try {
       const response = await fetch(url, { headers: { Accept: 'application/json' }, signal: controller.signal });
       if (!response.ok) throw new Error('request-failed');
       const payload = await response.json();
-      if (!payload.success || sequences[section] !== seq) throw new Error('invalid-response');
+      if (!payload.success || payload.section !== 'global') throw new Error('invalid-response');
       return payload;
     } finally {
-      if (controllers[section] === controller) {
-        delete controllers[section];
-        setBusy(panel, false);
-      }
+      setBusy(false);
+      controller = null;
     }
   };
 
-  const renderBars = (card, payload) => {
-    const chart = card.querySelector('.technician-report-bar-chart');
-    const wrap = card.querySelector('.technician-report-bar-chart-wrap');
-    const summary = card.querySelector('.technician-report-chart-summary strong');
-    const range = card.querySelector('.technician-report-chart-summary span');
-    if (!chart || !wrap) return;
-    const values = Array.isArray(payload.values) ? payload.values.map((value) => Number(value) || 0) : [];
-    const labels = Array.isArray(payload.labels) ? payload.labels : [];
-    const max = Math.max(1, ...values);
-    chart.replaceChildren();
-    chart.style.setProperty('--technician-bar-count', String(labels.length));
-    chart.classList.toggle('is-empty', Number(payload.total || 0) === 0);
-    wrap.classList.toggle('is-empty', Number(payload.total || 0) === 0);
-    values.forEach((value, index) => {
-      const item = document.createElement('div');
-      item.className = 'technician-report-bar-item' + (value === 0 ? ' is-zero' : '');
-      const stage = document.createElement('div');
-      stage.className = 'technician-report-bar-stage';
-      const fill = document.createElement('div');
-      fill.className = 'technician-report-bar-fill';
-      fill.style.height = value > 0 ? Math.max(8, (value / max) * 100) + '%' : '0%';
-      if (value > 0) {
-        const strong = document.createElement('strong');
-        strong.textContent = formatNumber(value);
-        fill.appendChild(strong);
-      }
-      stage.appendChild(fill);
-      const label = document.createElement('span');
-      label.textContent = labels[index] || '';
-      item.append(stage, label);
-      chart.appendChild(item);
+  const renderSummary = (metrics) => {
+    page.querySelectorAll('[data-technician-summary-card]').forEach((card) => {
+      const value = card.querySelector('strong');
+      if (value) value.textContent = formatNumber(metrics?.[card.dataset.technicianSummaryCard] || 0);
     });
-    let empty = wrap.querySelector('.technician-report-chart-empty');
-    if (!empty) {
-      empty = document.createElement('p');
-      empty.className = 'technician-report-chart-empty';
-      empty.textContent = 'ยังไม่มีข้อมูลในช่วงเวลานี้';
-      wrap.appendChild(empty);
-    }
-    empty.hidden = Number(payload.total || 0) !== 0;
-    if (summary) summary.textContent = formatNumber(payload.total) + ' งาน';
-    if (range) range.textContent = payload.range_label || '';
   };
 
-  page.querySelectorAll('[data-technician-period-form]').forEach((form) => {
-    const field = form.querySelector('[data-technician-period-field]');
-    const input = form.querySelector('[data-technician-period-input]');
-    const options = Array.from(form.querySelectorAll('[data-technician-period-option]'));
-    if (!field || !input || options.length === 0) return;
-    const section = field.name.replace('_period', '');
-    let active = field.value === 'month' ? 'month' : 'week';
-    const values = { week: input.dataset.weekValue || '', month: input.dataset.monthValue || '' };
-    const sync = () => {
-      field.value = active;
-      input.type = active === 'month' ? 'month' : 'week';
-      input.value = values[active] || '';
-      options.forEach((option) => {
-        const selected = option.dataset.technicianPeriodOption === active;
-        option.classList.toggle('is-active', selected);
-        option.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  const renderJobRows = (selector, rows, emptyText) => {
+    const body = page.querySelector(selector);
+    if (!body) return;
+    body.replaceChildren();
+    if (!Array.isArray(rows) || rows.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 6;
+      td.innerHTML = `<div class="technician-report-empty-state technician-report-empty-state-compact"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><span>${emptyText}</span></div>`;
+      tr.appendChild(td);
+      body.appendChild(tr);
+      return;
+    }
+    rows.forEach((item) => {
+      const tr = document.createElement('tr');
+      [item.setup_id, item.customer_name, item.product_text, item.install_date, item.install_time].forEach((value, index) => {
+        const td = document.createElement('td');
+        if (index === 0) {
+          const strong = document.createElement('strong');
+          strong.className = 'technician-report-job-id';
+          strong.textContent = value || '--';
+          td.appendChild(strong);
+        } else {
+          td.textContent = value || '--';
+        }
+        tr.appendChild(td);
       });
-    };
-    const load = () => {
-      if (input.value) values[active] = input.value;
-      sync();
-      request(section, { [section + '_period']: active, [section + '_value']: values[active] || '' })
-        .then((payload) => {
-          renderBars(form.closest('.technician-report-chart-card'), payload);
-          setUrl({ [section + '_period']: payload.period, [section + '_value']: payload.value });
-        })
-        .catch((error) => {
-          if (error.name !== 'AbortError') showError(panelFor(section));
-        });
-    };
-    options.forEach((option) => option.addEventListener('click', () => {
-      const next = option.dataset.technicianPeriodOption === 'month' ? 'month' : 'week';
-      if (next !== active) { active = next; load(); }
-    }));
-    input.addEventListener('change', load);
-    form.addEventListener('submit', (event) => { event.preventDefault(); load(); });
-    sync();
+      const statusCell = document.createElement('td');
+      const badge = document.createElement('span');
+      badge.className = `badge technician-report-status-badge ${item.status_class || 'is-assigned'}`;
+      badge.textContent = item.status_label || 'สถานะไม่ระบุ';
+      statusCell.appendChild(badge);
+      tr.appendChild(statusCell);
+      body.appendChild(tr);
+    });
+  };
+
+  const applyPayload = (payload) => {
+    renderSummary(payload.metrics || {});
+    renderJobRows('[data-technician-all-body]', payload.all_rows || [], 'ไม่มีงานที่ได้รับมอบหมาย');
+    const allCount = page.querySelector('[data-technician-all-count]');
+    if (allCount) allCount.textContent = `${formatNumber(payload.all_total)} รายการ`;
+  };
+
+  const load = () => {
+    page.querySelector('.technician-report-async-error')?.remove();
+    request()
+      .then((payload) => {
+        applyPayload(payload);
+        setUrl();
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') showError();
+      });
+  };
+
+  periodSelect?.addEventListener('change', syncDateRange);
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    load();
+  });
+  form.querySelector('[data-technician-report-filter-reset]')?.addEventListener('click', () => {
+    form.reset();
+    if (form.elements.q) form.elements.q.value = '';
+    if (form.elements.status) form.elements.status.value = '';
+    if (periodSelect) periodSelect.value = 'all';
+    if (dateFrom) dateFrom.value = '';
+    if (dateTo) dateTo.value = '';
+    syncDateRange();
+    load();
   });
 
-  const trend = page.querySelector('.technician-report-trend-card');
-  if (trend) {
-    const renderTrend = (payload) => {
-      const svg = trend.querySelector('.technician-report-line-chart');
-      if (!svg) return;
-      const values = (payload.values || []).map((value) => Number(value) || 0);
-      const max = Math.max(1, ...values);
-      const width = 820, height = 280, left = 52, right = 24, top = 24, bottom = 48;
-      const plotWidth = width - left - right, plotHeight = height - top - bottom;
-      const xs = values.map((_, index) => left + plotWidth * (index / 6));
-      const ys = values.map((value) => top + plotHeight - (value / max) * plotHeight);
-      const line = svg.querySelector('.technician-report-line');
-      if (line) line.setAttribute('points', xs.map((x, i) => x.toFixed(2) + ',' + ys[i].toFixed(2)).join(' '));
-      svg.querySelectorAll('.technician-report-grid-line').forEach((element, index) => {
-        const ratio = index === 0 ? 0 : index === 1 ? .5 : 1;
-        const y = top + plotHeight - plotHeight * ratio;
-        element.setAttribute('y1', y); element.setAttribute('y2', y);
-      });
-      svg.querySelectorAll('.technician-report-y-label').forEach((element, index) => {
-        const ratio = index === 0 ? 0 : index === 1 ? .5 : 1;
-        element.setAttribute('y', top + plotHeight - plotHeight * ratio + 4);
-        element.textContent = formatNumber(Math.round(max * ratio));
-      });
-      svg.querySelectorAll('.technician-report-point').forEach((element, index) => {
-        element.setAttribute('cx', xs[index]); element.setAttribute('cy', ys[index]);
-        const title = element.querySelector('title');
-        if (title) title.textContent = (payload.labels || [])[index] + ': ' + formatNumber(values[index]) + ' งาน';
-      });
-      const range = trend.querySelector('.technician-report-week-controls span');
-      if (range) range.textContent = (payload.start || '') + ' - ' + (payload.end || '');
-      const previous = trend.querySelector('[data-technician-trend-arrow="previous"]');
-      const next = trend.querySelector('[data-technician-trend-arrow="next"]');
-      if (previous) previous.dataset.week = payload.previous_week || '';
-      if (next) next.dataset.week = payload.next_week || '';
-    };
-    const loadTrend = (week) => request('trend', { trend_week: week })
-      .then((payload) => { renderTrend(payload); setUrl({ trend_week: payload.week }); })
-      .catch((error) => { if (error.name !== 'AbortError') showError(trend); });
-    trend.querySelectorAll('[data-technician-trend-arrow]').forEach((arrow) => arrow.addEventListener('click', (event) => {
-      event.preventDefault();
-      if (arrow.dataset.week) loadTrend(arrow.dataset.week);
-    }));
-  }
-})();
+  syncDateRange();
+}());

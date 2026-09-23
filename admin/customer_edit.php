@@ -294,12 +294,13 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users', '�
     <div class="staff-create-head staff-create-head-clean">
       <div>
         <h2>แก้ไขข้อมูลลูกค้า</h2>
+        <p>ปรับปรุงข้อมูลและที่อยู่ลูกค้า</p>
       </div>
     </div>
 
     <div class="staff-form-grid">
       <div class="staff-field readonly-field">
-        <label for="user_id_show">รหัสผู้ใช้ *</label>
+        <label for="user_id_show">รหัสผู้ใช้ <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= admin_form_icon_svg('id') ?>
           <input type="text" id="user_id_show" value="<?= h($user['customer_id']) ?>" readonly>
@@ -308,7 +309,7 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users', '�
 
 
       <div class="staff-field staff-field-full">
-        <label for="user_name">ชื่อ-นามสกุล *</label>
+        <label for="user_name">ชื่อ-นามสกุล <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= admin_form_icon_svg('user') ?>
           <input
@@ -324,7 +325,7 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users', '�
       </div>
 
       <div class="staff-field">
-        <label for="user_phone">เบอร์โทรศัพท์ *</label>
+        <label for="user_phone">เบอร์โทรศัพท์ <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= admin_form_icon_svg('phone') ?>
           <input
@@ -341,7 +342,7 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users', '�
       </div>
 
       <div class="staff-field">
-        <label for="user_email">อีเมล *</label>
+        <label for="user_email">อีเมล <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= admin_form_icon_svg('mail') ?>
           <input
@@ -362,12 +363,12 @@ layout_header('แก้ไขข้อมูลลูกค้า', 'users', '�
       <div class="staff-field staff-field-full staff-address-section">
         <div class="staff-address-title">
           <?= admin_form_icon_svg('map') ?>
-          <label>ข้อมูลที่อยู่ *</label>
+          <label>ข้อมูลที่อยู่ <span class="required-mark" aria-hidden="true">*</span></label>
         </div>
 
         <div class="staff-address-grid">
           <div class="staff-field staff-address-detail">
-            <label for="address_detail">บ้านเลขที่ / หมู่ / ถนน *</label>
+            <label for="address_detail">บ้านเลขที่ / หมู่ / ถนน <span class="required-mark" aria-hidden="true">*</span></label>
             <div class="staff-input-wrap">
               <?= admin_form_icon_svg('map') ?>
               <input

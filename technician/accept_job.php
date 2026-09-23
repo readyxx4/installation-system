@@ -27,13 +27,13 @@ function assign_status_name($status): string
 function assign_status_badge($status): string
 {
     return match ((string) $status) {
-        '0' => 'orange',
-        '1' => 'blue',
-        '2' => 'green',
-        '3' => 'red',
+        '0' => 'purple',
+        '1' => 'purple',
+        '2' => 'cyan',
+        '3' => 'pink',
         '4' => 'red',
         '5' => 'green',
-        default => 'red',
+        default => 'purple',
     };
 }
 

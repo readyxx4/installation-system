@@ -149,6 +149,7 @@ if (!function_exists('admin_form_icon_svg')) {
 layout_header('แก้ไขสินค้า', 'products', 'แก้ไขข้อมูลสินค้าในระบบ');
 ?>
 <?= flash_message() ?>
+<link rel="stylesheet" href="<?= h(app_asset_url('admin/assets/css/staff_forms.css')) ?>?v=<?= h(asset_version('admin/assets/css/staff_forms.css')) ?>">
 <div class="staff-form-page">
   <div class="staff-page-back-row"><a class="staff-back-link"
       href="<?= h(app_system_url('admin/products.php')) ?>"><?= admin_form_icon_svg('back') ?> กลับรายการสินค้า</a>
@@ -159,30 +160,31 @@ layout_header('แก้ไขสินค้า', 'products', 'แก้ไข�
     <div class="staff-create-head staff-create-head-clean">
       <div>
         <h2>แก้ไขข้อมูลสินค้า</h2>
+        <p>ปรับปรุงข้อมูลสินค้าและราคา</p>
       </div>
     </div>
     <div class="staff-form-grid">
-      <div class="staff-field readonly-field"><label for="pro_id_show">รหัสสินค้า *</label>
+      <div class="staff-field readonly-field"><label for="pro_id_show">รหัสสินค้า <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap"><?= admin_form_icon_svg('id') ?><input type="text" id="pro_id_show"
             value="<?= h($product['pro_id']) ?>" readonly></div>
       </div>
-      <div class="staff-field"><label for="protype_id">ประเภทสินค้า *</label>
+      <div class="staff-field"><label for="protype_id">ประเภทสินค้า <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap select-wrap"><?= admin_form_icon_svg('box') ?><select id="protype_id"
             name="protype_id" required>
             <option value="" disabled>เลือกประเภทสินค้า</option><?php while ($type = $product_types->fetch_assoc()): ?>
               <option value="<?= h($type['protype_id']) ?>" <?= $product['protype_id'] === $type['protype_id'] ? 'selected' : '' ?>><?= h($type['protype_name']) ?></option><?php endwhile; ?>
           </select></div>
       </div>
-      <div class="staff-field staff-field-full"><label for="pro_name">ชื่อสินค้า *</label>
+      <div class="staff-field staff-field-full"><label for="pro_name">ชื่อสินค้า <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap"><?= admin_form_icon_svg('box') ?><input type="text" id="pro_name" name="pro_name"
             maxlength="50" value="<?= h($product['pro_name']) ?>" required></div>
       </div>
-      <div class="staff-field"><label for="pro_price">ราคาสินค้า *</label>
+      <div class="staff-field"><label for="pro_price">ราคาสินค้า <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap"><?= admin_form_icon_svg('money') ?><input type="number" id="pro_price"
             name="pro_price" min="0" step="0.01"
             value="<?= h(number_format((float) $product['pro_price'], 2, '.', '')) ?>" required></div>
       </div>
-      <div class="staff-field"><label for="pro_price_install">ราคาค่าติดตั้ง *</label>
+      <div class="staff-field"><label for="pro_price_install">ราคาค่าติดตั้ง <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap"><?= admin_form_icon_svg('money') ?><input type="number" id="pro_price_install"
             name="pro_price_install" min="0" step="0.01"
             value="<?= h(number_format((float) $product['pro_price_install'], 2, '.', '')) ?>" required></div>
@@ -190,7 +192,7 @@ layout_header('แก้ไขสินค้า', 'products', 'แก้ไข�
     </div>
     <div class="staff-form-actions"><a class="staff-cancel-btn"
         href="<?= h(app_system_url('admin/products.php')) ?>">ยกเลิก</a><button class="staff-save-btn"
-        type="submit"><?= admin_form_icon_svg('save') ?> บันทึกข้อมูล</button></div>
+        type="submit"><?= admin_form_icon_svg('save') ?> บันทึกการแก้ไข</button></div>
   </form>
 </div>
 <?php layout_footer(); ?>

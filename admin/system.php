@@ -31,7 +31,10 @@ function get_system_table(mysqli $conn): string
         CREATE TABLE `system` (
             `system_name` VARCHAR(255) NOT NULL,
             `system_logo` VARCHAR(255),
-            `system_desc` VARCHAR(255) NOT NULL
+            `system_desc` VARCHAR(255) NOT NULL,
+            `company_address` VARCHAR(500) NOT NULL,
+            `company_registration_no` VARCHAR(50) NOT NULL DEFAULT '',
+            `tax_id` CHAR(13) NOT NULL
         )
     ");
 
@@ -56,7 +59,7 @@ function system_logo_url(string $logo): string
 $table = get_system_table($conn);
 
 $result = $conn->query("
-    SELECT system_name, system_logo, system_desc
+    SELECT system_name, system_logo, system_desc, company_address, company_registration_no, tax_id
     FROM `$table`
     LIMIT 1
 ");
@@ -65,22 +68,28 @@ if ($result->num_rows > 0) {
   $system = $result->fetch_assoc();
 } else {
   $system = [
-    'system_name' => 'ห้างโอวเปงฮง จำกัด',
+    'system_name' => '',
     'system_logo' => '',
     'system_desc' => 'Installation System',
+    'company_address' => '',
+    'company_registration_no' => '',
+    'tax_id' => '',
   ];
 
   $stmt = $conn->prepare("
         INSERT INTO `$table`
-        (system_name, system_logo, system_desc)
-        VALUES (?, ?, ?)
+        (system_name, system_logo, system_desc, company_address, company_registration_no, tax_id)
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
 
   $stmt->bind_param(
-    'sss',
+    'ssssss',
     $system['system_name'],
     $system['system_logo'],
-    $system['system_desc']
+    $system['system_desc'],
+    $system['company_address'],
+    $system['company_registration_no'],
+    $system['tax_id']
   );
 
   $stmt->execute();
@@ -89,12 +98,15 @@ if ($result->num_rows > 0) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $system_name = trim($_POST['system_name'] ?? '');
   $system_desc = trim($_POST['system_desc'] ?? '');
+  $company_address = trim($_POST['company_address'] ?? '');
+  $company_registration_no = trim((string) ($_POST['company_registration_no'] ?? ''));
+  $tax_id = trim((string) ($_POST['tax_id'] ?? ''));
   $old_logo = trim($_POST['old_logo'] ?? '');
   $remove_logo = $_POST['remove_logo'] ?? '';
 
   $system_logo = $old_logo;
 
-  if ($system_name === '' || $system_desc === '') {
+  if ($system_name === '' || $system_desc === '' || $company_address === '' || !preg_match('/^\d{13}$/', $tax_id)) {
     redirect_to(app_system_url('admin/system.php?status=error'));
   }
 
@@ -153,15 +165,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             UPDATE `$table`
             SET system_name = ?,
                 system_logo = ?,
-                system_desc = ?
+                system_desc = ?,
+                company_address = ?,
+                company_registration_no = ?,
+                tax_id = ?
             LIMIT 1
         ");
 
     $stmt->bind_param(
-      'sss',
+      'ssssss',
       $system_name,
       $system_logo,
-      $system_desc
+      $system_desc,
+      $company_address,
+      $company_registration_no,
+      $tax_id
     );
 
     $stmt->execute();
@@ -204,12 +222,49 @@ layout_header('จัดการข้อมูลระบบ', 'system', 'ต
   <div class="staff-page-back-row"><a class="staff-back-link" href="<?= h(app_system_url('admin/index.php')) ?>"><?= admin_form_icon_svg('back') ?> กลับหน้าหลัก</a></div>
   <form class="staff-create-card" method="POST" action="<?= h(app_system_url('admin/system.php')) ?>" enctype="multipart/form-data" autocomplete="off">
     <input type="hidden" name="old_logo" value="<?= h($system['system_logo']) ?>">
-    <div class="staff-create-head staff-create-head-clean"><div><h2>แก้ไขข้อมูลระบบ</h2></div></div>
-    <div class="staff-form-grid">
-      <div class="staff-field"><label for="system_name">ชื่อระบบ *</label><div class="staff-input-wrap"><?= admin_form_icon_svg('text') ?><input type="text" id="system_name" name="system_name" maxlength="255" value="<?= h($system['system_name']) ?>" required></div></div>
-      <div class="staff-field"><label for="system_logo">รูปภาพ / โลโก้ระบบ</label><div class="staff-input-wrap file-input-wrap"><?= admin_form_icon_svg('image') ?><input type="file" id="system_logo" name="system_logo" accept="image/*"></div></div>
-      <div class="staff-field staff-field-full"><label for="system_desc">รายละเอียดระบบ *</label><div class="staff-textarea-wrap"><?= admin_form_icon_svg('text') ?><textarea id="system_desc" name="system_desc" maxlength="255" required><?= h($system['system_desc']) ?></textarea></div></div>
-      <div class="staff-field staff-field-full"><div class="system-logo-preview"><p id="logoPreviewTitle"><?= !empty($system['system_logo']) ? 'รูปภาพปัจจุบัน' : 'ตัวอย่างรูปภาพ' ?></p><div class="system-logo-image-box"><img id="systemLogoPreview" src="<?= !empty($system['system_logo']) ? h(system_logo_url($system['system_logo'])) : '' ?>" alt="โลโก้ระบบ" style="<?= empty($system['system_logo']) ? 'display:none;' : '' ?>"><?php if (!empty($system['system_logo'])): ?><button type="button" class="logo-remove-x" title="ลบรูปภาพ">×</button><?php endif; ?></div><span id="systemLogoFileName"><?= !empty($system['system_logo']) ? h($system['system_logo']) : 'ยังไม่มีรูปภาพ' ?></span><input type="hidden" id="remove_logo" name="remove_logo" value="0"></div></div>
+    <div class="staff-create-head staff-create-head-clean"><div><h2>แก้ไขข้อมูลระบบ</h2><p>ปรับปรุงชื่อระบบและการแสดงผลส่วนกลาง</p></div></div>
+    <div class="system-form-layout">
+      <div class="system-logo-column">
+        <section class="system-logo-section" aria-labelledby="system-logo-title">
+          <div class="system-logo-section-head">
+            <div>
+              <h3 id="system-logo-title">โลโก้ระบบ</h3>
+            </div>
+          </div>
+          <div class="system-logo-editor">
+            <div class="system-logo-preview-panel">
+              <span id="logoPreviewTitle" class="system-logo-preview-title"><?= !empty($system['system_logo']) ? 'รูปภาพปัจจุบัน' : 'ตัวอย่างรูปภาพ' ?></span>
+              <div class="system-logo-image-box">
+                <img id="systemLogoPreview" src="<?= !empty($system['system_logo']) ? h(system_logo_url($system['system_logo'])) : '' ?>" alt="โลโก้ระบบ" style="<?= empty($system['system_logo']) ? 'display:none;' : '' ?>">
+                <?php if (!empty($system['system_logo'])): ?>
+                  <button type="button" class="logo-remove-x" title="ลบรูปภาพ">×</button>
+                <?php endif; ?>
+              </div>
+            </div>
+            <div class="system-logo-upload-panel">
+              <label class="system-logo-upload-title" for="system_logo">เปลี่ยนโลโก้</label>
+              <div class="system-logo-file-control">
+                <label class="system-logo-file-trigger" for="system_logo">
+                  <?= admin_form_icon_svg('image') ?>
+                  <span>เลือกรูปภาพ</span>
+                </label>
+                <input type="file" id="system_logo" name="system_logo" accept="image/*">
+                <span id="systemLogoFileName" class="system-logo-file-name" hidden aria-hidden="true"></span>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="remove_logo" name="remove_logo" value="0">
+        </section>
+      </div>
+      <div class="system-details-column">
+        <div class="system-details-grid">
+          <div class="staff-field system-field-full"><label for="system_name">ชื่อระบบ <span class="required-mark" aria-hidden="true">*</span></label><div class="staff-input-wrap"><?= admin_form_icon_svg('text') ?><input type="text" id="system_name" name="system_name" maxlength="255" value="<?= h($system['system_name']) ?>" required></div></div>
+          <div class="staff-field system-field-full"><label for="system_desc">รายละเอียดระบบ <span class="required-mark" aria-hidden="true">*</span></label><div class="staff-textarea-wrap"><?= admin_form_icon_svg('text') ?><textarea id="system_desc" name="system_desc" maxlength="255" required><?= h($system['system_desc']) ?></textarea></div></div>
+          <div class="staff-field system-field-full"><label for="company_address">ที่อยู่บริษัท <span class="required-mark" aria-hidden="true">*</span></label><div class="staff-textarea-wrap"><?= admin_form_icon_svg('map') ?><textarea id="company_address" name="company_address" maxlength="500" required><?= h($system['company_address']) ?></textarea></div></div>
+          <div class="staff-field"><label for="company_registration_no">เลขทะเบียนนิติบุคคล</label><div class="staff-input-wrap"><?= admin_form_icon_svg('id') ?><input type="text" id="company_registration_no" name="company_registration_no" inputmode="numeric" maxlength="50" value="<?= h($system['company_registration_no']) ?>"></div></div>
+          <div class="staff-field"><label for="tax_id">เลขประจำตัวผู้เสียภาษี <span class="required-mark" aria-hidden="true">*</span></label><div class="staff-input-wrap"><?= admin_form_icon_svg('id') ?><input type="text" id="tax_id" name="tax_id" inputmode="numeric" pattern="\d{13}" maxlength="13" value="<?= h($system['tax_id']) ?>" required></div></div>
+        </div>
+      </div>
     </div>
     <div class="staff-form-actions"><a class="staff-cancel-btn" href="<?= h(app_system_url('admin/index.php')) ?>">ยกเลิก</a><button class="staff-save-btn" type="submit"><?= admin_form_icon_svg('save') ?> บันทึกข้อมูล</button></div>
   </form>

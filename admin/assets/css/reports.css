@@ -21,6 +21,8 @@ body.app-body.role-3:has(.admin-report-page) .content {
     margin: 0 auto;
     padding: 36px 48px 56px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     color: var(--report-ink);
     isolation: isolate;
 }
@@ -1451,10 +1453,10 @@ body.app-body.role-3:has(.admin-report-page) .content {
     justify-content: center;
     min-width: 18px;
     height: 18px;
-    padding: 0 2px;
     color: #0f172a;
     font-size: 13px;
     font-weight: 700;
+    font-family: inherit;
     line-height: 1;
     pointer-events: none;
     text-shadow: none;
@@ -2676,6 +2678,213 @@ body.app-body.role-3:has(.admin-report-page) .content {
     }
 }
 
+/* Table filters share the Reports control language and stay scoped to this page. */
+.admin-report-page .report-filter-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: -4px 0 18px;
+}
+
+.admin-report-page .report-installation-filter-bar {
+    margin: 0 0 18px;
+}
+
+/* Keep the page rhythm identical on every report tab: hero, filters, tabs, then content. */
+.admin-report-page > .report-header {
+    order: -3;
+}
+
+.admin-report-page > .report-filter-bar {
+    order: -2;
+    margin: 0 0 18px;
+}
+
+.admin-report-page > .report-category-nav {
+    order: -1;
+}
+
+.admin-report-page .report-filter-search,
+.admin-report-page .report-filter-select {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    min-height: 40px;
+    border: 1px solid #dbe3ee;
+    border-radius: 11px;
+    background: #fff;
+    color: #475569;
+    transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+
+.admin-report-page .report-filter-search {
+    flex: 1 1 320px;
+}
+
+.admin-report-page .report-filter-search > i {
+    flex: 0 0 auto;
+    margin-left: 13px;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.admin-report-page .report-filter-search input,
+.admin-report-page .report-filter-select select {
+    width: 100%;
+    min-width: 0;
+    height: 38px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #334155;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.admin-report-page .report-filter-search input {
+    padding: 0 13px 0 9px;
+}
+
+.admin-report-page .report-filter-search input::placeholder {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.admin-report-page .report-filter-select {
+    flex: 0 1 230px;
+    gap: 8px;
+    padding: 0 11px;
+}
+
+.admin-report-page .report-filter-select > span:not(.sr-only) {
+    flex: 0 0 auto;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.admin-report-page .report-filter-select select {
+    padding: 0 20px 0 0;
+    cursor: pointer;
+}
+
+.admin-report-page .report-filter-search:focus-within,
+.admin-report-page .report-filter-select:focus-within {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+}
+
+.admin-report-page .report-filter-submit,
+.admin-report-page .report-filter-reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: 11px;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, border-color .18s ease, color .18s ease;
+}
+
+.admin-report-page .report-filter-submit {
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(37, 99, 235, .16);
+}
+
+.admin-report-page .report-filter-submit:hover {
+    background: #1d4ed8;
+    box-shadow: 0 9px 18px rgba(37, 99, 235, .22);
+    transform: translateY(-1px);
+}
+
+.admin-report-page .report-filter-reset {
+    border: 1px solid #dbe3ee;
+    background: #fff;
+    color: #64748b;
+}
+
+.admin-report-page .report-filter-reset:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    transform: translateY(-1px);
+}
+
+.admin-report-page .report-filter-submit:active,
+.admin-report-page .report-filter-reset:active {
+    transform: translateY(0);
+}
+
+.admin-report-page .report-filter-submit:focus-visible,
+.admin-report-page .report-filter-reset:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .18);
+    outline-offset: 2px;
+}
+
+.admin-report-page .report-filter-bar--year {
+    justify-content: flex-end;
+    margin-top: -4px;
+}
+
+.admin-report-page .report-filter-bar--year .report-filter-select {
+    flex: 0 1 160px;
+}
+
+.admin-report-page .report-filter-message {
+    flex: 1 0 100%;
+    margin: 0;
+    color: #b91c1c;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.admin-report-page .is-filter-loading .report-table-wrap {
+    opacity: .58;
+    transition: opacity .18s ease;
+}
+
+.admin-report-page .report-installation-summary-grid.is-filter-loading {
+    opacity: .58;
+    transition: opacity .18s ease;
+}
+
+.admin-report-page .report-personnel-summary-grid.is-filter-loading,
+.admin-report-page .report-revenue-summary-grid.is-filter-loading {
+    opacity: .58;
+    transition: opacity .18s ease;
+}
+
+@media (max-width: 700px) {
+    .admin-report-page .report-filter-search,
+    .admin-report-page .report-filter-select,
+    .admin-report-page .report-filter-submit,
+    .admin-report-page .report-filter-reset {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+
+    .admin-report-page .report-filter-bar--year {
+        justify-content: stretch;
+    }
+}
+
+@media print {
+    .admin-report-page .report-filter-bar {
+        display: none;
+    }
+}
+
 @media print {
     .revenue-report .report-metric-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2848,4 +3057,652 @@ body.app-body.role-3:has(.admin-report-page) .report-header {
     font-size: 11px;
     line-height: 1.4;
     text-align: right;
+}
+
+/* Admin Reports status palette: one tone per workflow state. */
+.admin-report-page {
+    --status-amber: #D97706;
+    --status-blue: #2563EB;
+    --status-cyan: #0891B2;
+    --status-indigo: #4F46E5;
+    --status-violet: #7C3AED;
+    --status-orange: #EA580C;
+    --status-green: #16A34A;
+    --status-brown: #9A3412;
+    --status-red: #DC2626;
+    --status-crimson: #BE123C;
+    --status-amber-soft: #FFFBEB;
+    --status-blue-soft: #EFF6FF;
+    --status-cyan-soft: #ECFEFF;
+    --status-indigo-soft: #EEF2FF;
+    --status-violet-soft: #F5F3FF;
+    --status-orange-soft: #FFF7ED;
+    --status-green-soft: #ECFDF5;
+    --status-brown-soft: #FFF7ED;
+    --status-red-soft: #FEF2F2;
+    --status-crimson-soft: #FFF1F2;
+}
+
+body.app-body.role-3:has(.admin-report-page) .installation-status-label i,
+body.app-body.role-3:has(.admin-report-page) .revenue-status-label i,
+body.app-body.role-3:has(.admin-report-page) .report-status-label i,
+body.app-body.role-3:has(.admin-report-page) .report-bar-label i {
+    color: var(--status-color, #64748B);
+    background: var(--status-soft, #F8FAFC);
+}
+
+body.app-body.role-3:has(.admin-report-page) .installation-status-label i.tone-amber,
+body.app-body.role-3:has(.admin-report-page) .revenue-status-label i.tone-amber,
+body.app-body.role-3:has(.admin-report-page) .report-status-label i.tone-amber,
+body.app-body.role-3:has(.admin-report-page) .report-bar-label i.tone-amber { --status-color: var(--status-amber); --status-soft: var(--status-amber-soft); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-label i.tone-blue,
+body.app-body.role-3:has(.admin-report-page) .revenue-status-label i.tone-blue,
+body.app-body.role-3:has(.admin-report-page) .report-status-label i.tone-blue,
+body.app-body.role-3:has(.admin-report-page) .report-bar-label i.tone-blue { --status-color: var(--status-blue); --status-soft: var(--status-blue-soft); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-label i.tone-cyan,
+body.app-body.role-3:has(.admin-report-page) .revenue-status-label i.tone-cyan,
+body.app-body.role-3:has(.admin-report-page) .report-status-label i.tone-cyan,
+body.app-body.role-3:has(.admin-report-page) .report-bar-label i.tone-cyan { --status-color: var(--status-cyan); --status-soft: var(--status-cyan-soft); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-label i.tone-indigo,
+body.app-body.role-3:has(.admin-report-page) .revenue-status-label i.tone-indigo,
+body.app-body.role-3:has(.admin-report-page) .report-status-label i.tone-indigo,
+body.app-body.role-3:has(.admin-report-page) .report-bar-label i.tone-indigo { --status-color: var(--status-indigo); --status-soft: var(--status-indigo-soft); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-label i.tone-violet,
+body.app-body.role-3:has(.admin-report-page) .revenue-status-label i.tone-violet,
+body.app-body.role-3:has(.admin-report-page) .report-status-label i.tone-violet,
+body.app-body.role-3:has(.admin-report-page) .report-bar-label i.tone-violet { --status-color: var(--status-violet); --status-soft: var(--status-violet-soft); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-label i.tone-orange,
+body.app-body.role-3:has(.admin-report-page) .revenue-status-label i.tone-orange,
+body.app-body.role-3:has(.admin-report-page) .report-status-label i.tone-orange,
+body.app-body.role-3:has(.admin-report-page) .report-bar-label i.tone-orange { --status-color: var(--status-orange); --status-soft: var(--status-orange-soft); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-label i.tone-green,
+body.app-body.role-3:has(.admin-report-page) .revenue-status-label i.tone-green,
+body.app-body.role-3:has(.admin-report-page) .report-status-label i.tone-green,
+body.app-body.role-3:has(.admin-report-page) .report-bar-label i.tone-green { --status-color: var(--status-green); --status-soft: var(--status-green-soft); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-label i.tone-brown,
+body.app-body.role-3:has(.admin-report-page) .revenue-status-label i.tone-brown,
+body.app-body.role-3:has(.admin-report-page) .report-status-label i.tone-brown,
+body.app-body.role-3:has(.admin-report-page) .report-bar-label i.tone-brown { --status-color: var(--status-brown); --status-soft: var(--status-brown-soft); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-label i.tone-red,
+body.app-body.role-3:has(.admin-report-page) .revenue-status-label i.tone-red,
+body.app-body.role-3:has(.admin-report-page) .report-status-label i.tone-red,
+body.app-body.role-3:has(.admin-report-page) .report-bar-label i.tone-red { --status-color: var(--status-red); --status-soft: var(--status-red-soft); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-label i.tone-crimson,
+body.app-body.role-3:has(.admin-report-page) .revenue-status-label i.tone-crimson,
+body.app-body.role-3:has(.admin-report-page) .report-status-label i.tone-crimson,
+body.app-body.role-3:has(.admin-report-page) .report-bar-label i.tone-crimson { --status-color: var(--status-crimson); --status-soft: var(--status-crimson-soft); }
+
+body.app-body.role-3:has(.admin-report-page) .installation-status-fill.tone-amber,
+body.app-body.role-3:has(.admin-report-page) .report-bar-track > span.tone-amber { background: linear-gradient(90deg, #FDE68A, var(--status-amber)); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-fill.tone-blue,
+body.app-body.role-3:has(.admin-report-page) .report-bar-track > span.tone-blue { background: linear-gradient(90deg, #93C5FD, var(--status-blue)); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-fill.tone-cyan,
+body.app-body.role-3:has(.admin-report-page) .report-bar-track > span.tone-cyan { background: linear-gradient(90deg, #67E8F9, var(--status-cyan)); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-fill.tone-indigo,
+body.app-body.role-3:has(.admin-report-page) .report-bar-track > span.tone-indigo { background: linear-gradient(90deg, #A5B4FC, var(--status-indigo)); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-fill.tone-violet,
+body.app-body.role-3:has(.admin-report-page) .report-bar-track > span.tone-violet { background: linear-gradient(90deg, #C4B5FD, var(--status-violet)); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-fill.tone-orange,
+body.app-body.role-3:has(.admin-report-page) .report-bar-track > span.tone-orange { background: linear-gradient(90deg, #FDBA74, var(--status-orange)); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-fill.tone-green,
+body.app-body.role-3:has(.admin-report-page) .report-bar-track > span.tone-green { background: linear-gradient(90deg, #86EFAC, var(--status-green)); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-fill.tone-brown,
+body.app-body.role-3:has(.admin-report-page) .report-bar-track > span.tone-brown { background: linear-gradient(90deg, #FDBA74, var(--status-brown)); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-fill.tone-red,
+body.app-body.role-3:has(.admin-report-page) .report-bar-track > span.tone-red { background: linear-gradient(90deg, #FDA4AF, var(--status-red)); }
+body.app-body.role-3:has(.admin-report-page) .installation-status-fill.tone-crimson,
+body.app-body.role-3:has(.admin-report-page) .report-bar-track > span.tone-crimson { background: linear-gradient(90deg, #FDA4AF, var(--status-crimson)); }
+
+body.app-body.role-3:has(.admin-report-page) .revenue-status-fill.tone-amber { background: linear-gradient(90deg, #FDE68A, var(--status-amber)); }
+body.app-body.role-3:has(.admin-report-page) .revenue-status-fill.tone-blue { background: linear-gradient(90deg, #93C5FD, var(--status-blue)); }
+body.app-body.role-3:has(.admin-report-page) .revenue-status-fill.tone-cyan { background: linear-gradient(90deg, #67E8F9, var(--status-cyan)); }
+body.app-body.role-3:has(.admin-report-page) .revenue-status-fill.tone-indigo { background: linear-gradient(90deg, #A5B4FC, var(--status-indigo)); }
+body.app-body.role-3:has(.admin-report-page) .revenue-status-fill.tone-violet { background: linear-gradient(90deg, #C4B5FD, var(--status-violet)); }
+body.app-body.role-3:has(.admin-report-page) .revenue-status-fill.tone-orange { background: linear-gradient(90deg, #FDBA74, var(--status-orange)); }
+body.app-body.role-3:has(.admin-report-page) .revenue-status-fill.tone-green { background: linear-gradient(90deg, #86EFAC, var(--status-green)); }
+body.app-body.role-3:has(.admin-report-page) .revenue-status-fill.tone-brown { background: linear-gradient(90deg, #FDBA74, var(--status-brown)); }
+body.app-body.role-3:has(.admin-report-page) .revenue-status-fill.tone-red { background: linear-gradient(90deg, #FDA4AF, var(--status-red)); }
+body.app-body.role-3:has(.admin-report-page) .revenue-status-fill.tone-crimson { background: linear-gradient(90deg, #FDA4AF, var(--status-crimson)); }
+
+body.app-body.role-3:has(.admin-report-page) .installation-summary-dot.tone-amber { background: var(--status-amber); }
+body.app-body.role-3:has(.admin-report-page) .installation-summary-dot.tone-blue { background: var(--status-blue); }
+body.app-body.role-3:has(.admin-report-page) .installation-summary-dot.tone-cyan { background: var(--status-cyan); }
+body.app-body.role-3:has(.admin-report-page) .installation-summary-dot.tone-indigo { background: var(--status-indigo); }
+body.app-body.role-3:has(.admin-report-page) .installation-summary-dot.tone-violet { background: var(--status-violet); }
+body.app-body.role-3:has(.admin-report-page) .installation-summary-dot.tone-orange { background: var(--status-orange); }
+body.app-body.role-3:has(.admin-report-page) .installation-summary-dot.tone-green { background: var(--status-green); }
+body.app-body.role-3:has(.admin-report-page) .installation-summary-dot.tone-brown { background: var(--status-brown); }
+body.app-body.role-3:has(.admin-report-page) .installation-summary-dot.tone-red { background: var(--status-red); }
+body.app-body.role-3:has(.admin-report-page) .installation-summary-dot.tone-crimson { background: var(--status-crimson); }
+
+/* Keep only the monthly revenue table compact; other Admin Reports tables are unchanged. */
+.admin-report-page .revenue-monthly-panel .report-table-wrap {
+    overflow-x: hidden;
+}
+
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    font-size: 12.5px;
+}
+
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table th,
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table td {
+    box-sizing: border-box;
+    padding: 9px 10px;
+}
+
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table th {
+    white-space: normal;
+    line-height: 1.25;
+    overflow-wrap: normal;
+}
+
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table th:nth-child(1),
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table td:nth-child(1) {
+    width: 16%;
+    text-align: left;
+}
+
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table th:nth-child(2),
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table td:nth-child(2) {
+    width: 20%;
+    text-align: center;
+}
+
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table th:nth-child(3),
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table td:nth-child(3) {
+    width: 32%;
+    text-align: right;
+}
+
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table th:nth-child(4),
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table td:nth-child(4) {
+    width: 32%;
+    text-align: right;
+}
+
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table td:nth-child(2),
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table td:nth-child(3),
+.admin-report-page .revenue-monthly-panel .revenue-monthly-table td:nth-child(4) {
+    white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+    .admin-report-page .revenue-monthly-panel .revenue-monthly-table {
+        font-size: 11.5px;
+    }
+
+    .admin-report-page .revenue-monthly-panel .revenue-monthly-table th,
+    .admin-report-page .revenue-monthly-panel .revenue-monthly-table td {
+        padding: 7px 6px;
+    }
+}
+
+/* Admin Reports: table-first layout for the four report tabs. */
+.admin-report-page .report-installation-summary-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+/* The review label is intentionally allowed to use two lines; other metric labels retain their compact shared rule. */
+.admin-report-page .report-installation-summary-grid .report-metric-card:has([data-installation-metric="review"]) .report-metric-copy > span {
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    white-space: normal;
+    line-height: 1.35;
+}
+
+/* Keep the received-goods label on one line without changing the metric card's dimensions. */
+.admin-report-page .report-installation-summary-grid .report-metric-card:has([data-installation-metric="in_progress"]) .report-metric-copy:has(.is-installation-received-label) {
+    flex: 1 1 0;
+}
+
+.admin-report-page .report-installation-summary-grid .report-metric-copy > .is-installation-received-label {
+    overflow: visible;
+    color: #64748b;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: -.025em;
+    line-height: 1.2;
+    text-overflow: clip;
+    white-space: nowrap;
+}
+
+.admin-report-page .report-revenue-summary-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+/* Revenue metrics keep their full copy inside the existing five-card desktop layout. */
+.admin-report-page .report-revenue-summary-grid .report-metric-card {
+    gap: 9px;
+    min-height: 112px;
+    padding: 13px;
+}
+
+.admin-report-page .report-revenue-summary-grid .report-metric-icon {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+}
+
+.admin-report-page .report-revenue-summary-grid .report-metric-copy {
+    flex: 1 1 0;
+}
+
+.admin-report-page .report-revenue-summary-grid .report-metric-copy > span {
+    display: block;
+    min-height: 2.5em;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    font-size: 10.5px;
+    line-height: 1.25;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.admin-report-page .report-revenue-summary-grid .report-metric-copy strong {
+    overflow: visible;
+    font-size: clamp(16px, 1.4vw, 20px);
+    letter-spacing: -.025em;
+    line-height: 1.1;
+    text-overflow: clip;
+    white-space: nowrap;
+}
+
+.admin-report-page .report-personnel-summary-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.admin-report-page .report-personnel-summary-grid[data-personnel-type="all"],
+.admin-report-page .report-personnel-summary-grid[data-personnel-type="sale"],
+.admin-report-page .report-personnel-summary-grid[data-personnel-type="technician"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-report-page .report-personnel-summary-grid[data-personnel-type="manager"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-report-page .report-table-panel-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.admin-report-page .report-personnel-table-grid {
+    align-items: start;
+}
+
+.admin-report-page .report-personnel-table-grid--single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.admin-report-page .report-personnel-table-grid[data-personnel-type="all"] [data-personnel-table-type="technician"] {
+    grid-column: 1 / -1;
+}
+
+.admin-report-page .report-table-panel {
+    min-width: 0;
+    transform: none;
+}
+
+.admin-report-page .report-table-panel:hover {
+    transform: none;
+    border-color: var(--report-border);
+    box-shadow: 0 14px 32px rgba(30, 55, 90, .06);
+}
+
+.admin-report-page .report-table-panel::before,
+.admin-report-page .report-table-panel:hover::before {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.admin-report-page .report-table-panel .report-table-wrap {
+    overflow-x: auto;
+}
+
+.admin-report-page .report-table-panel .report-table {
+    width: 100%;
+    min-width: 0;
+}
+
+.admin-report-page .report-table-panel .report-table th,
+.admin-report-page .report-table-panel .report-table td {
+    padding: 11px 14px;
+}
+
+.admin-report-page .report-table-panel .report-table th {
+    white-space: normal;
+    line-height: 1.35;
+}
+
+.admin-report-page .report-table-panel .report-table td {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+}
+
+.admin-report-page .report-table-panel .report-table strong,
+.admin-report-page .report-table-panel .report-money-cell,
+.admin-report-page .report-table-panel .report-number-cell {
+    white-space: nowrap;
+}
+
+.admin-report-page .report-latest-table {
+    table-layout: fixed;
+}
+
+.admin-report-page .report-latest-table th:nth-child(1),
+.admin-report-page .report-latest-table td:nth-child(1) { width: 13%; }
+.admin-report-page .report-latest-table th:nth-child(2),
+.admin-report-page .report-latest-table td:nth-child(2) { width: 21%; }
+.admin-report-page .report-latest-table th:nth-child(3),
+.admin-report-page .report-latest-table td:nth-child(3) { width: 16%; }
+.admin-report-page .report-latest-table th:nth-child(4),
+.admin-report-page .report-latest-table td:nth-child(4) { width: 18%; }
+.admin-report-page .report-latest-table th:nth-child(5),
+.admin-report-page .report-latest-table td:nth-child(5) { width: 14%; }
+.admin-report-page .report-latest-table th:nth-child(6),
+.admin-report-page .report-latest-table td:nth-child(6) { width: 18%; }
+
+.admin-report-page .installation-detail-table {
+    table-layout: fixed;
+}
+
+.admin-report-page .installation-detail-table th:nth-child(1),
+.admin-report-page .installation-detail-table td:nth-child(1) { width: 13%; }
+.admin-report-page .installation-detail-table th:nth-child(2),
+.admin-report-page .installation-detail-table td:nth-child(2) { width: 17%; }
+.admin-report-page .installation-detail-table th:nth-child(3),
+.admin-report-page .installation-detail-table td:nth-child(3) { width: 15%; }
+.admin-report-page .installation-detail-table th:nth-child(4),
+.admin-report-page .installation-detail-table td:nth-child(4) { width: 16%; }
+.admin-report-page .installation-detail-table th:nth-child(5),
+.admin-report-page .installation-detail-table td:nth-child(5) { width: 12%; }
+.admin-report-page .installation-detail-table th:nth-child(6),
+.admin-report-page .installation-detail-table td:nth-child(6) { width: 12%; }
+.admin-report-page .installation-detail-table th:nth-child(7),
+.admin-report-page .installation-detail-table td:nth-child(7) { width: 15%; }
+
+.admin-report-page .report-status-table,
+.admin-report-page .report-fee-status-table {
+    table-layout: fixed;
+}
+
+.admin-report-page .report-status-table th:first-child,
+.admin-report-page .report-status-table td:first-child { width: 70%; }
+.admin-report-page .report-status-table th:last-child,
+.admin-report-page .report-status-table td:last-child { width: 30%; text-align: right; }
+.admin-report-page .report-fee-status-table th:first-child,
+.admin-report-page .report-fee-status-table td:first-child { width: 48%; }
+.admin-report-page .report-fee-status-table th:nth-child(2),
+.admin-report-page .report-fee-status-table td:nth-child(2) { width: 22%; text-align: right; }
+.admin-report-page .report-fee-status-table th:last-child,
+.admin-report-page .report-fee-status-table td:last-child { width: 30%; text-align: right; }
+
+.admin-report-page .report-number-cell,
+.admin-report-page .report-money-cell {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.admin-report-page .report-readiness-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 0 9px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.admin-report-page .report-readiness-badge.is-ready {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.admin-report-page .report-readiness-badge.is-busy {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.admin-report-page .report-year-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.admin-report-page .report-year-control label {
+    color: var(--report-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.admin-report-page .report-year-control select {
+    min-height: 34px;
+    padding: 0 30px 0 11px;
+    border: 1px solid #dbe3ee;
+    border-radius: 10px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+@media (max-width: 1180px) {
+    .admin-report-page .report-installation-summary-grid,
+    .admin-report-page .report-personnel-summary-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .admin-report-page .report-revenue-summary-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 820px) {
+    .admin-report-page .report-table-panel-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-report-page .report-installation-summary-grid,
+    .admin-report-page .report-revenue-summary-grid,
+    .admin-report-page .report-personnel-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .admin-report-page .report-installation-summary-grid,
+    .admin-report-page .report-revenue-summary-grid,
+    .admin-report-page .report-personnel-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-report-page .report-panel-head {
+        flex-direction: column;
+    }
+
+    .admin-report-page .report-table-panel .report-table th,
+    .admin-report-page .report-table-panel .report-table td {
+        padding: 9px 10px;
+        font-size: 12px;
+    }
+}
+
+@media print {
+    body.app-body.role-3:has(.admin-report-page) .content {
+        height: auto !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .admin-report-page {
+        max-width: none;
+        min-height: 0;
+        padding: 0;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-header {
+        padding: 0 0 16px;
+        border: 0;
+        border-radius: 0;
+        background: #fff;
+        box-shadow: none;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-header-actions,
+    body.app-body.role-3:has(.admin-report-page) .report-category-nav {
+        display: none;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-metric-grid,
+    body.app-body.role-3:has(.admin-report-page) .report-table-panel-grid {
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-panel,
+    body.app-body.role-3:has(.admin-report-page) .report-metric-card {
+        box-shadow: none;
+        transform: none !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-panel::before,
+    body.app-body.role-3:has(.admin-report-page) .report-panel:hover::before,
+    body.app-body.role-3:has(.admin-report-page) .report-metric-card::before,
+    body.app-body.role-3:has(.admin-report-page) .report-metric-card:hover::before {
+        display: none;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-table-wrap {
+        overflow: visible;
+        margin: 0;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-table {
+        min-width: 0;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-table thead {
+        display: table-header-group;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-table tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+
+.admin-report-page .report-print-document-header {
+    display: none;
+}
+
+@media print {
+    body.app-body.role-3:has(.admin-report-page) .admin-report-page > .report-print-document-header {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto;
+        order: -4;
+        align-items: center;
+        gap: 14px 22px;
+        margin: 0 0 12px;
+        padding: 0 0 10px;
+        color: #0f172a;
+        border-bottom: 1px solid #cbd5e1;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .admin-report-page > .report-header,
+    body.app-body.role-3:has(.admin-report-page) .admin-report-page > .report-category-nav,
+    body.app-body.role-3:has(.admin-report-page) .admin-report-page > .report-filter-bar {
+        display: none !important;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-print-brand {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-print-logo {
+        display: block;
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-print-logo-placeholder {
+        display: grid;
+        width: 64px;
+        height: 64px;
+        place-items: center;
+        color: #64748b;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-print-company-copy,
+    body.app-body.role-3:has(.admin-report-page) .report-print-meta {
+        min-width: 0;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-print-company-name,
+    body.app-body.role-3:has(.admin-report-page) .report-print-company-address,
+    body.app-body.role-3:has(.admin-report-page) .report-print-company-tax,
+    body.app-body.role-3:has(.admin-report-page) .report-print-meta h2,
+    body.app-body.role-3:has(.admin-report-page) .report-print-meta p {
+        margin: 0;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-print-company-name {
+        color: #0f172a;
+        font-size: 16px;
+        font-weight: 800;
+        line-height: 1.25;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-print-company-address,
+    body.app-body.role-3:has(.admin-report-page) .report-print-company-tax {
+        max-width: 72ch;
+        margin-top: 3px;
+        color: #475569;
+        font-size: 10px;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-print-meta {
+        align-self: center;
+        text-align: right;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-print-meta h2 {
+        color: #0f172a;
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1.25;
+    }
+
+    body.app-body.role-3:has(.admin-report-page) .report-print-meta p {
+        margin-top: 3px;
+        color: #475569;
+        font-size: 10px;
+        line-height: 1.35;
+    }
 }

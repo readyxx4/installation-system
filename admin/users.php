@@ -274,7 +274,8 @@ if ($search !== '') {
     $users = $stmt->get_result();
 } else {
     $users = $conn->query("
-        SELECT user_id, user_name, user_phone, user_email, user_role, user_status, user_address{$created_select}
+        SELECT user_id, user_name, user_phone
+            , user_email, user_role, user_status, user_address{$created_select}
         FROM `user`
         WHERE user_role IN (1, 2, 3)
         ORDER BY user_id DESC

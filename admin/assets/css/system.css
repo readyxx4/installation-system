@@ -20,6 +20,31 @@ body.app-body.role-3 .admin-system-page .staff-page-back-row {
     margin: 0 0 16px;
 }
 
+body.app-body.role-3 .admin-system-page .staff-back-link {
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 0 13px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    border: 1px solid #dbe3ec !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    color: #475569 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-back-link:hover {
+    border-color: #93c5fd !important;
+    background: #f8fbff !important;
+    color: #1d4ed8 !important;
+    transform: translateY(-1px);
+}
+
 body.app-body.role-3 .admin-system-page .staff-create-card {
     padding: 0 !important;
     border: 1px solid #e5e7eb !important;
@@ -42,6 +67,15 @@ body.app-body.role-3 .admin-system-page .staff-create-head h2 {
     font-weight: 800;
 }
 
+body.app-body.role-3 .admin-system-page .staff-create-head-clean p {
+    display: block !important;
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
 body.app-body.role-3 .admin-system-page .staff-form-grid,
 body.app-body.role-3 .admin-system-page .staff-form-actions {
     padding-left: 22px;
@@ -56,6 +90,365 @@ body.app-body.role-3 .admin-system-page .staff-form-actions {
     padding-bottom: 22px;
 }
 
+body.app-body.role-3 .admin-system-page .staff-form-grid {
+    gap: 18px !important;
+    padding: 24px !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-field label {
+    margin-bottom: 7px !important;
+    color: #334155 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1.35;
+}
+
+body.app-body.role-3 .admin-system-page .required-mark {
+    margin-left: 2px;
+    color: #dc2626;
+    font-weight: 700;
+}
+
+body.app-body.role-3 .admin-system-page .staff-input-wrap input,
+body.app-body.role-3 .admin-system-page .staff-input-wrap select,
+body.app-body.role-3 .admin-system-page .staff-textarea-wrap textarea {
+    border-color: #dbe3ec !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-input-wrap input,
+body.app-body.role-3 .admin-system-page .staff-input-wrap select {
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 13px 0 42px !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-textarea-wrap textarea {
+    min-height: 96px !important;
+    height: auto !important;
+    padding: 11px 13px 11px 42px !important;
+    line-height: 1.55 !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-input-wrap > .form-icon {
+    top: 50% !important;
+    left: 14px !important;
+    width: 17px !important;
+    height: 17px !important;
+    color: #94a3b8 !important;
+    stroke: currentColor !important;
+    transform: translateY(-50%) !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-textarea-wrap > .form-icon {
+    top: 14px !important;
+    transform: none !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-input-wrap input:focus,
+body.app-body.role-3 .admin-system-page .staff-input-wrap select:focus,
+body.app-body.role-3 .admin-system-page .staff-textarea-wrap textarea:focus {
+    border-color: var(--role-primary) !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--role-primary) 14%, transparent) !important;
+    outline: none !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-form-actions {
+    gap: 10px !important;
+    padding: 18px 24px 24px !important;
+    border-top: 1px solid #e5e7eb !important;
+    border-radius: 0 0 16px 16px !important;
+    background: #ffffff !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-cancel-btn,
+body.app-body.role-3 .admin-system-page .staff-save-btn {
+    min-height: 40px !important;
+    height: 40px !important;
+    padding: 0 16px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-cancel-btn {
+    border: 1px solid #dbe3ec !important;
+    background: #ffffff !important;
+    color: #475569 !important;
+    box-shadow: none !important;
+}
+
+body.app-body.role-3 .admin-system-page .staff-save-btn {
+    min-width: 170px !important;
+    border: 1px solid var(--role-primary) !important;
+    background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--role-primary) 20%, transparent) !important;
+}
+
+body.app-body.role-3 .admin-system-page .action-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 16px !important;
+    width: 16px !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: inherit !important;
+    stroke: currentColor !important;
+    fill: none !important;
+}
+
+body.app-body.role-3 .admin-system-page .system-form-layout {
+    display: grid;
+    grid-template-columns: minmax(220px, 30%) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 24px;
+    padding: 24px;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-column,
+body.app-body.role-3 .admin-system-page .system-details-column {
+    min-width: 0;
+}
+
+body.app-body.role-3 .admin-system-page .system-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    height: 100%;
+    align-content: space-between;
+    gap: 18px;
+}
+
+body.app-body.role-3 .admin-system-page .system-field-full {
+    grid-column: 1 / -1;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-section {
+    height: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-section-head {
+    margin-bottom: 14px;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-section-head h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-section-head p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-editor {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-preview-panel {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-preview-title {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-image-box {
+    position: relative;
+    display: grid;
+    width: 124px;
+    height: 124px;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid #dbe4ee;
+    border-radius: 12px;
+    background: #fff;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-image-box img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    object-fit: contain;
+    box-sizing: border-box;
+}
+
+body.app-body.role-3 .admin-system-page .logo-remove-x {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #fecaca;
+    border-radius: 50%;
+    background: #fff;
+    color: #dc2626;
+    font-size: 16px;
+    line-height: 1;
+    z-index: 2;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(15, 23, 42, .1);
+}
+
+body.app-body.role-3 .admin-system-page .logo-remove-x:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-upload-panel {
+    min-width: 0;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-upload-title {
+    display: block;
+    margin-bottom: 8px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-file-control {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-file-trigger {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 14px;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-file-trigger:hover {
+    border-color: #93c5fd;
+    background: #dbeafe;
+    transform: translateY(-1px);
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-file-control:focus-within .system-logo-file-trigger {
+    outline: 3px solid rgba(37, 99, 235, .15);
+    outline-offset: 2px;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-file-trigger > .form-icon {
+    position: static !important;
+    inset: auto !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    width: 17px !important;
+    min-width: 17px !important;
+    height: 17px !important;
+    min-height: 17px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: currentColor !important;
+    stroke: currentColor !important;
+    fill: none !important;
+    transform: none !important;
+    pointer-events: none !important;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-file-control > input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-file-name {
+    min-width: 0;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-editor {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-preview-panel {
+    justify-items: start;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-image-box {
+    width: 146px;
+    height: 146px;
+}
+
+body.app-body.role-3 .admin-system-page .system-logo-file-control {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+}
+
 @media (max-width: 760px) {
     body.app-body.role-3 .admin-system-page {
         padding: 22px 16px 32px;
@@ -65,5 +458,41 @@ body.app-body.role-3 .admin-system-page .staff-form-actions {
     body.app-body.role-3 .admin-system-page .staff-form-actions {
         padding-left: 16px;
         padding-right: 16px;
+    }
+
+    body.app-body.role-3 .admin-system-page .staff-form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+        padding: 18px !important;
+    }
+
+    body.app-body.role-3 .admin-system-page .system-form-layout {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 18px;
+    }
+
+    body.app-body.role-3 .admin-system-page .system-details-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    body.app-body.role-3 .admin-system-page .system-field-full {
+        grid-column: auto;
+    }
+
+    body.app-body.role-3 .admin-system-page .staff-form-actions {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 16px 18px 18px !important;
+    }
+
+    body.app-body.role-3 .admin-system-page .system-logo-preview-panel {
+        justify-items: start;
+    }
+
+    body.app-body.role-3 .admin-system-page .staff-cancel-btn,
+    body.app-body.role-3 .admin-system-page .staff-save-btn {
+        width: 100%;
     }
 }

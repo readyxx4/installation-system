@@ -123,6 +123,10 @@ body.app-body.role-2:has(.sale-report-page) .content {
   isolation: isolate;
 }
 
+.sale-report-page .report-print-document-header {
+  display: none;
+}
+
 .sale-report-hero {
   position: relative;
   overflow: hidden;
@@ -186,7 +190,7 @@ body.app-body.role-2:has(.sale-report-page) .content {
 
 .sale-report-summary-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -257,40 +261,16 @@ body.app-body.role-2:has(.sale-report-page) .content {
   background: linear-gradient(90deg, #93c5fd, #2563eb);
 }
 
-.sale-report-summary-card.tone-amber::before {
-  background: linear-gradient(90deg, #fde68a, #d97706);
-}
-
 .sale-report-summary-card.tone-green::before {
   background: linear-gradient(90deg, #86efac, #16a34a);
-}
-
-.sale-report-summary-card.tone-red::before {
-  background: linear-gradient(90deg, #fda4af, #dc2626);
-}
-
-.sale-report-summary-card.tone-purple::before {
-  background: linear-gradient(90deg, #c4b5fd, #7c3aed);
 }
 
 .sale-report-summary-card.tone-blue:hover {
   border-color: rgba(147, 197, 253, .65);
 }
 
-.sale-report-summary-card.tone-amber:hover {
-  border-color: rgba(253, 230, 138, .65);
-}
-
 .sale-report-summary-card.tone-green:hover {
   border-color: rgba(134, 239, 172, .65);
-}
-
-.sale-report-summary-card.tone-red:hover {
-  border-color: rgba(253, 164, 175, .65);
-}
-
-.sale-report-summary-card.tone-purple:hover {
-  border-color: rgba(196, 181, 253, .65);
 }
 
 .sale-report-summary-icon {
@@ -342,15 +322,6 @@ body.app-body.role-2:has(.sale-report-page) .content {
   background: #eff6ff;
 }
 
-.sale-report-summary-card.tone-amber strong,
-.sale-report-summary-card.tone-amber .sale-report-summary-icon {
-  color: #d97706;
-}
-
-.sale-report-summary-card.tone-amber .sale-report-summary-icon {
-  background: #fff7ed;
-}
-
 .sale-report-summary-card.tone-green strong,
 .sale-report-summary-card.tone-green .sale-report-summary-icon {
   color: #16a34a;
@@ -358,31 +329,6 @@ body.app-body.role-2:has(.sale-report-page) .content {
 
 .sale-report-summary-card.tone-green .sale-report-summary-icon {
   background: #f0fdf4;
-}
-
-.sale-report-summary-card.tone-red strong,
-.sale-report-summary-card.tone-red .sale-report-summary-icon {
-  color: #dc2626;
-}
-
-.sale-report-summary-card.tone-red .sale-report-summary-icon {
-  background: #fef2f2;
-}
-
-.sale-report-summary-card.tone-purple strong,
-.sale-report-summary-card.tone-purple .sale-report-summary-icon {
-  color: #7c3aed;
-}
-
-.sale-report-summary-card.tone-purple .sale-report-summary-icon {
-  background: #f5f3ff;
-}
-
-.sale-report-chart-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 16px;
 }
 
 .sale-report-panel {
@@ -413,62 +359,6 @@ body.app-body.role-2:has(.sale-report-page) .content {
   line-height: 1.5;
 }
 
-.sale-report-period-form {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-
-.sale-report-period-tabs {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  max-width: 100%;
-  padding: 4px;
-  overflow-x: auto;
-  border: 1px solid #e2e8f0;
-  border-radius: 999px;
-  background: #f8fafc;
-  scrollbar-width: thin;
-}
-
-.sale-report-period-tab {
-  appearance: none;
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  min-height: 30px;
-  padding: 0 10px;
-  border: 0;
-  margin: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: #64748b;
-  font: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-  transition: background .18s ease, box-shadow .18s ease, color .18s ease, transform .18s ease;
-}
-
-.sale-report-period-tab:hover {
-  background: #eff6ff;
-  color: #2563eb;
-  transform: translateY(-1px);
-}
-
-.sale-report-period-tab.is-active {
-  background: #fff;
-  color: #1d4ed8;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, .08);
-}
-
-.sale-report-period-tab:focus-visible,
 .sale-report-print-button:focus-visible,
 .sale-report-filter-button:focus-visible,
 .sale-report-clear-filter:focus-visible {
@@ -476,100 +366,11 @@ body.app-body.role-2:has(.sale-report-page) .content {
   outline-offset: 2px;
 }
 
-.sale-report-period-input {
-  width: 142px;
-  min-width: 142px;
-  min-height: 34px;
-  padding: 0 9px;
-  border: 1px solid #dbe4ee;
-  border-radius: 9px;
-  background: #fff;
-  color: #334155;
-  font: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  outline: none;
-  box-sizing: border-box;
-}
-
-.sale-report-period-input:focus,
 .sale-report-table-filter input:focus,
 .sale-report-table-filter select:focus {
   outline: 3px solid rgba(37, 99, 235, .15);
   outline-offset: 1px;
   border-color: #93c5fd;
-}
-
-.sale-report-chart-summary {
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-start;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.sale-report-chart-summary strong {
-  color: #1e293b;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.sale-report-chart-summary span {
-  color: #94a3b8;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.sale-report-chart-wrap {
-  width: 100%;
-  overflow: hidden;
-}
-
-.sale-report-line-chart {
-  display: block;
-  width: 100%;
-  height: 218px;
-  min-width: 0;
-}
-
-.sale-report-chart-grid {
-  stroke: #e8eef7;
-  stroke-width: 1;
-}
-
-.sale-report-chart-line {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 3;
-}
-
-.sale-report-chart-point {
-  fill: #fff;
-  stroke-width: 3;
-  cursor: pointer;
-  transition: r .18s ease, fill .18s ease;
-}
-
-.sale-report-chart-point:hover,
-.sale-report-chart-point:focus-visible {
-  fill: #eff6ff;
-  outline: none;
-}
-
-.sale-report-chart-y-label,
-.sale-report-chart-x-label {
-  fill: #94a3b8;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.sale-report-chart-empty {
-  margin: 0;
-  color: #94a3b8;
-  font-size: 11px;
-  font-weight: 700;
-  text-align: center;
 }
 
 .sale-report-table-panel {
@@ -644,16 +445,16 @@ body.app-body.role-2:has(.sale-report-page) .content {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin: 0 0 18px;
 }
 
 .sale-report-table-filter input,
 .sale-report-table-filter select {
-  min-height: 38px;
-  padding: 0 11px;
+  min-height: 40px;
+  padding: 0 12px;
   border: 1px solid #dbe4ee;
-  border-radius: 10px;
+  border-radius: 11px;
   background: #fff;
   color: #334155;
   font: inherit;
@@ -664,7 +465,7 @@ body.app-body.role-2:has(.sale-report-page) .content {
 
 .sale-report-search-field {
   position: relative;
-  flex: 1 1 260px;
+  flex: 1 1 320px;
   min-width: 220px;
 }
 
@@ -684,13 +485,94 @@ body.app-body.role-2:has(.sale-report-page) .content {
 }
 
 .sale-report-table-filter select {
-  min-width: 190px;
+  min-width: 210px;
+}
+
+.sale-report-period-field select {
+  min-width: 172px;
+}
+
+.sale-report-date-range {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.sale-report-date-range[hidden] {
+  display: none;
+}
+
+.sale-report-date-field {
+  display: grid;
+  gap: 4px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.sale-report-date-field input {
+  width: 146px;
+}
+
+@media (min-width: 1024px) {
+  .sale-report-table-filter {
+    align-items: flex-end;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .sale-report-search-field {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .sale-report-table-filter > label:not(.sale-report-search-field) {
+    flex: 0 1 150px;
+    min-width: 0;
+  }
+
+  .sale-report-table-filter > label:not(.sale-report-search-field) select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .sale-report-date-range {
+    flex: 0 1 240px;
+    min-width: 0;
+    gap: 6px;
+  }
+
+  .sale-report-date-field {
+    min-width: 0;
+    flex: 1 1 0;
+    white-space: nowrap;
+  }
+
+  .sale-report-date-field input {
+    width: 100%;
+    min-width: 0;
+    padding-right: 9px;
+    padding-left: 9px;
+  }
+
+  .sale-report-filter-button,
+  .sale-report-clear-filter {
+    flex: 0 0 auto;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
 }
 
 .sale-report-clear-filter {
   display: inline-flex;
   align-items: center;
-  min-height: 38px;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #dbe4ee;
+  border-radius: 11px;
+  background: #fff;
   color: #64748b;
   font-size: 12px;
   font-weight: 700;
@@ -699,7 +581,23 @@ body.app-body.role-2:has(.sale-report-page) .content {
 }
 
 .sale-report-clear-filter:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
   color: #1d4ed8;
+}
+
+.sale-report-result-count {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .sale-report-table-wrap {
@@ -813,12 +711,6 @@ body.app-body.role-2:has(.sale-report-page) .content {
   }
 }
 
-@media (max-width: 980px) {
-  .sale-report-chart-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 760px) {
   body.app-body.role-2:has(.sale-report-page) .shell-topbar {
     height: auto !important;
@@ -857,19 +749,6 @@ body.app-body.role-2:has(.sale-report-page) .content {
     flex-direction: column;
   }
 
-  .sale-report-period-form {
-    justify-content: flex-start;
-    width: 100%;
-  }
-
-  .sale-report-period-tabs {
-    flex: 1 1 auto;
-  }
-
-  .sale-report-period-tab {
-    flex: 1 1 0;
-  }
-
   body.app-body.role-2:has(.sale-report-page) .shell-topbar-user-copy {
     display: none !important;
   }
@@ -880,21 +759,10 @@ body.app-body.role-2:has(.sale-report-page) .content {
     grid-template-columns: 1fr;
   }
 
-  .sale-report-chart-panel,
   .sale-report-table-panel,
   .sale-report-hero {
     padding-right: 16px;
     padding-left: 16px;
-  }
-
-  .sale-report-period-form,
-  .sale-report-period-tabs,
-  .sale-report-period-input {
-    width: 100%;
-  }
-
-  .sale-report-period-input {
-    min-width: 0;
   }
 
   .sale-report-table-filter {
@@ -904,7 +772,19 @@ body.app-body.role-2:has(.sale-report-page) .content {
 
   .sale-report-search-field,
   .sale-report-table-filter select,
-  .sale-report-filter-button {
+  .sale-report-period-field,
+  .sale-report-date-range,
+  .sale-report-filter-button,
+  .sale-report-clear-filter {
+    width: 100%;
+  }
+
+  .sale-report-date-range {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .sale-report-date-field input {
     width: 100%;
   }
 
@@ -943,9 +823,151 @@ body.app-body.role-2:has(.sale-report-page) .content {
 }
 
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 6mm;
+  }
+
+  html,
+  body,
+  body.app-body,
+  body.app-body.role-2:has(.sale-report-page),
+  body.app-body.role-2:has(.sale-report-page) .app-shell,
+  body.app-body.role-2:has(.sale-report-page) .main,
+  body.app-body.role-2:has(.sale-report-page) .content {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) {
+    background: #fff !important;
+    color: #172033 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .app-shell {
+    display: block !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .main {
+    width: 100% !important;
+    grid-column: auto !important;
+    overflow: visible !important;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .content {
+    width: 100% !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
   .sale-report-page {
-    min-height: 0;
-    padding: 0;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .app-sidebar,
+  body.app-body.role-2:has(.sale-report-page) .shell-topbar,
+  body.app-body.role-2:has(.sale-report-page) .sale-report-hero,
+  body.app-body.role-2:has(.sale-report-page) .sale-report-table-filter,
+  body.app-body.role-2:has(.sale-report-page) .sale-report-print-button,
+  body.app-body.role-2:has(.sale-report-page) .no-print {
+    display: none !important;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .sale-report-page > .report-print-document-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px 22px;
+    margin: 0 0 12px;
+    padding: 0 0 10px;
+    color: #0f172a;
+    border-bottom: 1px solid #cbd5e1;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .report-print-brand {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .report-print-logo {
+    display: block;
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .report-print-logo-placeholder {
+    display: grid;
+    width: 64px;
+    height: 64px;
+    place-items: center;
+    color: #64748b;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .report-print-company-copy,
+  body.app-body.role-2:has(.sale-report-page) .report-print-meta {
+    min-width: 0;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .report-print-company-name,
+  body.app-body.role-2:has(.sale-report-page) .report-print-company-address,
+  body.app-body.role-2:has(.sale-report-page) .report-print-company-tax,
+  body.app-body.role-2:has(.sale-report-page) .report-print-meta h2,
+  body.app-body.role-2:has(.sale-report-page) .report-print-meta p {
+    margin: 0;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .report-print-company-name {
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .report-print-company-address,
+  body.app-body.role-2:has(.sale-report-page) .report-print-company-tax {
+    max-width: 72ch;
+    margin-top: 3px;
+    color: #475569;
+    font-size: 10px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .report-print-meta {
+    align-self: center;
+    text-align: right;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .report-print-meta h2 {
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .report-print-meta p {
+    margin-top: 3px;
+    color: #475569;
+    font-size: 10px;
+    line-height: 1.35;
   }
 
   .sale-report-hero,
@@ -958,19 +980,143 @@ body.app-body.role-2:has(.sale-report-page) .content {
     transition: none !important;
   }
 
-  .sale-report-hero:hover,
-  .sale-report-summary-card:hover,
-  .sale-report-panel:hover {
-    border-color: #cbd5e1 !important;
-    box-shadow: none !important;
-    transform: none !important;
+  .sale-report-hero {
+    min-height: 0 !important;
+    margin-bottom: 10px !important;
+    padding: 14px 16px !important;
+    border-radius: 12px !important;
   }
 
+  .sale-report-hero-actions,
   .sale-report-hero::after,
   .sale-report-summary-card::before,
   .sale-report-summary-card::after,
   .sale-report-panel::before,
   .sale-report-panel:hover::before {
     display: none !important;
+  }
+
+  .sale-report-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin-bottom: 10px !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .sale-report-summary-card {
+    min-height: 0 !important;
+    padding: 10px !important;
+    gap: 8px !important;
+    border-radius: 12px !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .sale-report-panel-head {
+    gap: 10px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .sale-report-panel-head h2 {
+    font-size: 14px !important;
+  }
+
+  .sale-report-panel-head p {
+    font-size: 10px !important;
+  }
+
+  .sale-report-table-panel {
+    padding: 12px 14px 14px !important;
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .sale-report-table-head {
+    margin-bottom: 8px !important;
+  }
+
+  .sale-report-table-filter,
+  .sale-report-print-button,
+  .no-print {
+    display: none !important;
+  }
+
+  .sale-report-table-wrap {
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  .sale-report-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed;
+    font-size: 10px !important;
+  }
+
+  .sale-report-table thead {
+    display: table-header-group;
+  }
+
+  .sale-report-table tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .sale-report-table th {
+    padding: 6px 7px !important;
+    white-space: normal !important;
+    line-height: 1.25 !important;
+  }
+
+  .sale-report-table td {
+    padding: 7px !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    line-height: 1.35 !important;
+  }
+
+  .sale-report-table th:nth-child(1),
+  .sale-report-table td:nth-child(1) {
+    width: 14%;
+    white-space: nowrap !important;
+  }
+
+  .sale-report-table th:nth-child(2),
+  .sale-report-table td:nth-child(2) {
+    width: 20%;
+  }
+
+  .sale-report-table th:nth-child(3),
+  .sale-report-table td:nth-child(3),
+  .sale-report-table th:nth-child(4),
+  .sale-report-table td:nth-child(4) {
+    width: 12%;
+    white-space: nowrap !important;
+  }
+
+  .sale-report-table th:nth-child(5),
+  .sale-report-table td:nth-child(5) {
+    width: 16%;
+  }
+
+  .sale-report-table th:nth-child(6),
+  .sale-report-table td:nth-child(6) {
+    width: 14%;
+  }
+
+  .sale-report-table th:nth-child(7),
+  .sale-report-table td:nth-child(7),
+  .sale-report-money {
+    width: 12%;
+    white-space: nowrap !important;
+  }
+
+  .sale-report-hero:hover,
+  .sale-report-summary-card:hover,
+  .sale-report-panel:hover {
+    border-color: #cbd5e1 !important;
+    box-shadow: none !important;
+    transform: none !important;
   }
 }

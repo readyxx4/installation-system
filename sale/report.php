@@ -82,211 +82,6 @@ function sale_report_scalar(mysqli $conn, string $sql, string $types = '', array
     }
 }
 
-function sale_report_valid_date(string $value): string
-{
-    $value = trim($value);
-    if ($value === '') {
-        return '';
-    }
-
-    $date = DateTimeImmutable::createFromFormat('!Y-m-d', $value);
-    $errors = DateTimeImmutable::getLastErrors();
-    if (!$date || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
-        return '';
-    }
-
-    return $date->format('Y-m-d') === $value ? $value : '';
-}
-
-function sale_report_valid_week(string $value): string
-{
-    $value = trim($value);
-    if (!preg_match('/^\d{4}-W\d{2}$/', $value)) {
-        return '';
-    }
-
-    $week = DateTimeImmutable::createFromFormat('!o-\\WW', $value);
-    $errors = DateTimeImmutable::getLastErrors();
-    if (!$week || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
-        return '';
-    }
-
-    return $week->format('o-\\WW') === $value ? $value : '';
-}
-
-function sale_report_valid_month(string $value): string
-{
-    $value = trim($value);
-    if (!preg_match('/^\d{4}-\d{2}$/', $value)) {
-        return '';
-    }
-
-    $month = DateTimeImmutable::createFromFormat('!Y-m-d', $value . '-01');
-    $errors = DateTimeImmutable::getLastErrors();
-    if (!$month || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
-        return '';
-    }
-
-    return $month->format('Y-m') === $value ? $value : '';
-}
-
-function sale_report_period_value(string $period, string $value, DateTimeImmutable $now): string
-{
-    return match ($period) {
-        'week' => sale_report_valid_week($value) ?: $now->format('o-\\WW'),
-        'month' => sale_report_valid_month($value) ?: $now->format('Y-m'),
-        default => sale_report_valid_date($value) ?: $now->format('Y-m-d'),
-    };
-}
-
-function sale_report_event_datetime($value, DateTimeZone $timezone): ?DateTimeImmutable
-{
-    $value = trim((string) $value);
-    if ($value === '') {
-        return null;
-    }
-
-    foreach (['Y-m-d H:i:s', 'Y-m-d H:i'] as $format) {
-        $date = DateTimeImmutable::createFromFormat($format, $value, $timezone);
-        if ($date instanceof DateTimeImmutable) {
-            return $date;
-        }
-    }
-
-    try {
-        return new DateTimeImmutable($value, $timezone);
-    } catch (Throwable $e) {
-        return null;
-    }
-}
-
-function sale_report_week_start(string $value, DateTimeZone $timezone): DateTimeImmutable
-{
-    $week = DateTimeImmutable::createFromFormat('!o-\\WW', $value, $timezone);
-    if (!$week) {
-        $week = new DateTimeImmutable('monday this week', $timezone);
-    }
-
-    return $week->setTime(0, 0, 0);
-}
-
-function sale_report_build_chart(
-    array $rows,
-    string $period,
-    string $period_value,
-    string $field,
-    DateTimeZone $timezone
-): array {
-    $labels = [];
-    $values = [];
-
-    if ($period === 'week') {
-        $labels = ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'];
-        $values = array_fill(0, 7, 0);
-        $start = sale_report_week_start($period_value, $timezone);
-
-        foreach ($rows as $row) {
-            $event = sale_report_event_datetime($row[$field] ?? null, $timezone);
-            if (!$event) {
-                continue;
-            }
-
-            $offset = (int) $start->diff($event->setTime(0, 0, 0))->format('%r%a');
-            if ($offset >= 0 && $offset < 7) {
-                $values[$offset]++;
-            }
-        }
-
-        $period_label = 'สัปดาห์เริ่ม ' . $start->format('d/m/Y');
-    } elseif ($period === 'month') {
-        $labels = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-        $values = array_fill(0, 12, 0);
-        $month = DateTimeImmutable::createFromFormat('!Y-m-d', $period_value . '-01', $timezone);
-        $year = $month ? $month->format('Y') : date('Y');
-
-        foreach ($rows as $row) {
-            $event = sale_report_event_datetime($row[$field] ?? null, $timezone);
-            if ($event && $event->format('Y') === $year) {
-                $values[(int) $event->format('n') - 1]++;
-            }
-        }
-
-        $period_label = 'ปี ' . $year;
-    } else {
-        $labels = ['เช้า', 'บ่าย', 'เย็น'];
-        $values = array_fill(0, 3, 0);
-        $selected_day = sale_report_valid_date($period_value);
-
-        foreach ($rows as $row) {
-            $event = sale_report_event_datetime($row[$field] ?? null, $timezone);
-            if (!$event || $event->format('Y-m-d') !== $selected_day) {
-                continue;
-            }
-
-            $hour = (int) $event->format('G');
-            $slot = $hour < 12 ? 0 : ($hour < 17 ? 1 : 2);
-            $values[$slot]++;
-        }
-
-        $period_label = 'วันที่ ' . date('d/m/Y', strtotime($selected_day));
-    }
-
-    return [
-        'labels' => $labels,
-        'values' => $values,
-        'total' => array_sum($values),
-        'period_label' => $period_label,
-    ];
-}
-
-function sale_report_chart_svg(array $chart, string $aria_label, string $line_color): string
-{
-    $width = 760;
-    $height = 248;
-    $plot_left = 42;
-    $plot_right = 16;
-    $plot_top = 18;
-    $plot_bottom = 42;
-    $plot_width = $width - $plot_left - $plot_right;
-    $plot_height = $height - $plot_top - $plot_bottom;
-    $values = array_map(static fn ($value): int => max(0, (int) $value), $chart['values']);
-    $max_value = max(1, ...$values);
-    $count = max(1, count($values));
-    $step_x = $count > 1 ? $plot_width / ($count - 1) : $plot_width / 2;
-    $points = [];
-
-    foreach ($values as $index => $value) {
-        $x = $count > 1 ? $plot_left + ($step_x * $index) : $plot_left + ($plot_width / 2);
-        $y = $plot_top + $plot_height - (($value / $max_value) * $plot_height);
-        $points[] = [$x, $y];
-    }
-
-    ob_start();
-    ?>
-    <svg class="sale-report-line-chart" viewBox="0 0 <?= $width ?> <?= $height ?>" role="img" aria-label="<?= h($aria_label) ?>">
-      <?php for ($grid = 0; $grid <= 4; $grid++): ?>
-        <?php
-        $grid_y = $plot_top + (($plot_height / 4) * $grid);
-        $grid_value = (int) round($max_value - (($max_value / 4) * $grid));
-        ?>
-        <line class="sale-report-chart-grid" x1="<?= $plot_left ?>" y1="<?= round($grid_y, 2) ?>" x2="<?= $width - $plot_right ?>" y2="<?= round($grid_y, 2) ?>"></line>
-        <text class="sale-report-chart-y-label" x="<?= $plot_left - 9 ?>" y="<?= round($grid_y + 4, 2) ?>" text-anchor="end"><?= h((string) $grid_value) ?></text>
-      <?php endfor; ?>
-
-      <polyline class="sale-report-chart-line" points="<?php foreach ($points as $point): ?><?= round($point[0], 2) ?>,<?= round($point[1], 2) ?> <?php endforeach; ?>" style="stroke: <?= h($line_color) ?>"></polyline>
-
-      <?php foreach ($points as $index => $point): ?>
-        <circle class="sale-report-chart-point" cx="<?= round($point[0], 2) ?>" cy="<?= round($point[1], 2) ?>" r="4" style="stroke: <?= h($line_color) ?>">
-          <title><?= h((string) ($chart['labels'][$index] ?? 'ช่วงเวลา')) ?>: <?= h((string) $values[$index]) ?> งาน</title>
-        </circle>
-        <text class="sale-report-chart-x-label" x="<?= round($point[0], 2) ?>" y="<?= $height - 14 ?>" text-anchor="middle"><?= h((string) ($chart['labels'][$index] ?? '')) ?></text>
-      <?php endforeach; ?>
-    </svg>
-    <?php
-
-    return (string) ob_get_clean();
-}
-
 function sale_report_status_name($status): string
 {
     return match ((string) $status) {
@@ -319,26 +114,108 @@ function sale_report_format_date($value): string
     return $timestamp ? date('d/m/Y', $timestamp) : '-';
 }
 
-$report_timezone = new DateTimeZone('Asia/Bangkok');
-$report_now = new DateTimeImmutable('now', $report_timezone);
+function sale_report_valid_date(string $value): string
+{
+    $value = trim($value);
+    if ($value === '') {
+        return '';
+    }
 
-$created_period_request = (string) ($_GET['created_period'] ?? $_GET['created_period_current'] ?? 'day');
-$completed_period_request = (string) ($_GET['completed_period'] ?? $_GET['completed_period_current'] ?? 'day');
-$created_period = in_array($created_period_request, ['day', 'week', 'month'], true)
-    ? $created_period_request
-    : 'day';
-$completed_period = in_array($completed_period_request, ['day', 'week', 'month'], true)
-    ? $completed_period_request
-    : 'day';
-$created_value = sale_report_period_value($created_period, (string) ($_GET['created_value'] ?? ''), $report_now);
-$completed_value = sale_report_period_value($completed_period, (string) ($_GET['completed_value'] ?? ''), $report_now);
+    $date = DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+    $errors = DateTimeImmutable::getLastErrors();
+    if (!$date || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
+        return '';
+    }
+
+    return $date->format('Y-m-d') === $value ? $value : '';
+}
+
+$table_search = trim((string) ($_GET['q'] ?? ''));
+$table_search = function_exists('mb_substr') ? mb_substr($table_search, 0, 120) : substr($table_search, 0, 120);
+$table_status = trim((string) ($_GET['status'] ?? ''));
+if (!in_array($table_status, ['', 'created', 'progress', 'done', 'cancelled'], true)) {
+    $table_status = '';
+}
+$created_period = trim((string) ($_GET['created_period'] ?? 'all'));
+if (!in_array($created_period, ['all', 'today', 'month', 'year', 'custom'], true)) {
+    $created_period = 'all';
+}
+$created_date_from = sale_report_valid_date((string) ($_GET['created_date_from'] ?? ''));
+$created_date_to = sale_report_valid_date((string) ($_GET['created_date_to'] ?? ''));
+
+$sale_filter_where = 'WHERE s.sale_id = ?';
+$sale_filter_types = 's';
+$sale_filter_params = [$current_sale_id];
+if ($table_search !== '') {
+    $sale_filter_where .= ' AND (s.setup_id LIKE ? OR c.customer_name LIKE ?)';
+    $sale_filter_types .= 'ss';
+    $sale_search_like = '%' . $table_search . '%';
+    $sale_filter_params[] = $sale_search_like;
+    $sale_filter_params[] = $sale_search_like;
+}
+
+switch ($table_status) {
+    case 'created':
+        $sale_filter_where .= ' AND s.setup_status = 0';
+        break;
+    case 'progress':
+        $sale_filter_where .= ' AND s.setup_status IN (1, 2, 3)';
+        break;
+    case 'done':
+        $sale_filter_where .= ' AND s.setup_status = 4';
+        break;
+    case 'cancelled':
+        $sale_filter_where .= ' AND s.setup_status = 5';
+        break;
+}
+
+$created_now = new DateTimeImmutable('now');
+switch ($created_period) {
+    case 'today':
+        $today_start = $created_now->setTime(0, 0, 0);
+        $sale_filter_where .= ' AND s.created_at >= ? AND s.created_at < ?';
+        $sale_filter_types .= 'ss';
+        $sale_filter_params[] = $today_start->format('Y-m-d H:i:s');
+        $sale_filter_params[] = $today_start->modify('+1 day')->format('Y-m-d H:i:s');
+        break;
+    case 'month':
+        $month_start = $created_now->modify('first day of this month')->setTime(0, 0, 0);
+        $sale_filter_where .= ' AND s.created_at >= ? AND s.created_at < ?';
+        $sale_filter_types .= 'ss';
+        $sale_filter_params[] = $month_start->format('Y-m-d H:i:s');
+        $sale_filter_params[] = $month_start->modify('+1 month')->format('Y-m-d H:i:s');
+        break;
+    case 'year':
+        $year_start = $created_now->setDate((int) $created_now->format('Y'), 1, 1)->setTime(0, 0, 0);
+        $sale_filter_where .= ' AND s.created_at >= ? AND s.created_at < ?';
+        $sale_filter_types .= 'ss';
+        $sale_filter_params[] = $year_start->format('Y-m-d H:i:s');
+        $sale_filter_params[] = $year_start->modify('+1 year')->format('Y-m-d H:i:s');
+        break;
+    case 'custom':
+        if ($created_date_from !== '') {
+            $sale_filter_where .= ' AND s.created_at >= ?';
+            $sale_filter_types .= 's';
+            $sale_filter_params[] = $created_date_from . ' 00:00:00';
+        }
+        if ($created_date_to !== '') {
+            $sale_filter_where .= ' AND s.created_at <= ?';
+            $sale_filter_types .= 's';
+            $sale_filter_params[] = $created_date_to . ' 23:59:59';
+        }
+        break;
+}
 
 $status_counts = array_fill_keys(['0', '1', '2', '3', '4', '5'], 0);
 $status_rows = sale_report_rows(
     $conn,
-    'SELECT s.setup_status, COUNT(*) AS total FROM setup s WHERE s.sale_id = ? GROUP BY s.setup_status',
-    's',
-    [$current_sale_id]
+    "SELECT s.setup_status, COUNT(*) AS total
+     FROM setup s
+     LEFT JOIN customers c ON c.customer_id = s.customer_id
+     {$sale_filter_where}
+     GROUP BY s.setup_status",
+    $sale_filter_types,
+    $sale_filter_params
 );
 foreach ($status_rows as $status_row) {
     $status_key = (string) ($status_row['setup_status'] ?? '');
@@ -349,41 +226,23 @@ foreach ($status_rows as $status_row) {
 
 $total_setups = (int) sale_report_scalar(
     $conn,
-    'SELECT COUNT(*) AS total FROM setup s WHERE s.sale_id = ?',
-    's',
-    [$current_sale_id]
+    "SELECT COUNT(*) AS total
+     FROM setup s
+     LEFT JOIN customers c ON c.customer_id = s.customer_id
+     {$sale_filter_where}",
+    $sale_filter_types,
+    $sale_filter_params
 );
 $total_install_price = sale_report_scalar(
     $conn,
     'SELECT COALESCE(SUM(d.install_total), 0) AS total
      FROM setup s
+     LEFT JOIN customers c ON c.customer_id = s.customer_id
      LEFT JOIN install_detail d ON d.setup_id = s.setup_id
-     WHERE s.sale_id = ?',
-    's',
-    [$current_sale_id]
+     ' . $sale_filter_where,
+    $sale_filter_types,
+    $sale_filter_params
 );
-
-$created_event_rows = sale_report_rows(
-    $conn,
-    'SELECT s.created_at FROM setup s WHERE s.sale_id = ? AND s.created_at IS NOT NULL ORDER BY s.created_at ASC, s.setup_id ASC',
-    's',
-    [$current_sale_id]
-);
-$completed_event_rows = sale_report_rows(
-    $conn,
-    'SELECT s.completed_at FROM setup s WHERE s.sale_id = ? AND s.setup_status = 4 AND s.completed_at IS NOT NULL ORDER BY s.completed_at ASC, s.setup_id ASC',
-    's',
-    [$current_sale_id]
-);
-
-$created_chart = sale_report_build_chart($created_event_rows, $created_period, $created_value, 'created_at', $report_timezone);
-$completed_chart = sale_report_build_chart($completed_event_rows, $completed_period, $completed_value, 'completed_at', $report_timezone);
-
-$table_search = trim((string) ($_GET['q'] ?? ''));
-$table_status = trim((string) ($_GET['status'] ?? ''));
-if (!in_array($table_status, ['', 'created', 'progress', 'done', 'cancelled'], true)) {
-    $table_status = '';
-}
 
 $latest_assignment_join = '
     LEFT JOIN assignment a
@@ -415,75 +274,49 @@ $table_sql = "
         FROM install_detail d
         GROUP BY d.setup_id
     ) detail_summary ON detail_summary.setup_id = s.setup_id
-    WHERE s.sale_id = ?
+    {$sale_filter_where}
 ";
-$table_types = 's';
-$table_params = [$current_sale_id];
-
-if ($table_search !== '') {
-    $table_sql .= ' AND (s.setup_id LIKE ? OR c.customer_name LIKE ?)';
-    $table_types .= 'ss';
-    $search_like = '%' . $table_search . '%';
-    $table_params[] = $search_like;
-    $table_params[] = $search_like;
-}
-
-switch ($table_status) {
-    case 'created':
-        $table_sql .= ' AND s.setup_status = 0';
-        break;
-    case 'progress':
-        $table_sql .= ' AND s.setup_status IN (1, 2, 3)';
-        break;
-    case 'done':
-        $table_sql .= ' AND s.setup_status = 4';
-        break;
-    case 'cancelled':
-        $table_sql .= ' AND s.setup_status = 5';
-        break;
-}
-
 $table_sql .= ' ORDER BY s.created_at DESC, s.setup_id DESC LIMIT 10';
-$recent_setups = sale_report_rows($conn, $table_sql, $table_types, $table_params);
+$recent_setups = sale_report_rows($conn, $table_sql, $sale_filter_types, $sale_filter_params);
 
 $ajax_section = trim((string) ($_GET['section'] ?? ''));
-if ((string) ($_GET['ajax'] ?? '') === '1' && in_array($ajax_section, ['created', 'completed', 'table'], true)) {
+if ((string) ($_GET['ajax'] ?? '') === '1' && $ajax_section === 'table') {
     header('Content-Type: application/json; charset=utf-8');
-
-    if ($ajax_section === 'table') {
-        $rows = array_map(static function (array $row): array {
-            return [
-                'setup_id' => (string) ($row['setup_id'] ?? '-'),
-                'customer_name' => trim((string) ($row['customer_name'] ?? '')) ?: '-',
-                'created_display' => sale_report_format_date($row['created_at'] ?? null),
-                'install_display' => sale_report_format_date($row['assign_install_date'] ?? null),
-                'technician_name' => trim((string) ($row['technician_name'] ?? '')) ?: '-',
-                'status_label' => sale_report_status_name($row['setup_status'] ?? null),
-                'status_tone' => sale_report_status_tone($row['setup_status'] ?? null),
-                'install_display_money' => number_format((float) ($row['install_total'] ?? 0), 2) . ' บาท',
-            ];
-        }, $recent_setups);
-        echo json_encode(['success' => true, 'section' => 'table', 'rows' => $rows], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
-    }
-
-    $chart = $ajax_section === 'created' ? $created_chart : $completed_chart;
+    $rows = array_map(static function (array $row): array {
+        return [
+            'setup_id' => (string) ($row['setup_id'] ?? '-'),
+            'customer_name' => trim((string) ($row['customer_name'] ?? '')) ?: '-',
+            'created_display' => sale_report_format_date($row['created_at'] ?? null),
+            'install_display' => sale_report_format_date($row['assign_install_date'] ?? null),
+            'technician_name' => trim((string) ($row['technician_name'] ?? '')) ?: '-',
+            'status_label' => sale_report_status_name($row['setup_status'] ?? null),
+            'status_tone' => sale_report_status_tone($row['setup_status'] ?? null),
+            'install_display_money' => number_format((float) ($row['install_total'] ?? 0), 2) . ' บาท',
+        ];
+    }, $recent_setups);
     echo json_encode([
         'success' => true,
-        'section' => $ajax_section,
-        'period' => $ajax_section === 'created' ? $created_period : $completed_period,
-        'value' => $ajax_section === 'created' ? $created_value : $completed_value,
-        'labels' => array_values($chart['labels']),
-        'values' => array_values(array_map('intval', $chart['values'])),
-        'total' => (int) $chart['total'],
-        'period_label' => (string) $chart['period_label'],
-        'chart_html' => sale_report_chart_svg($chart, 'แนวโน้มรายงาน', $ajax_section === 'created' ? '#2563eb' : '#16a34a'),
+        'section' => 'table',
+        'count' => $total_setups,
+        'metrics' => [
+            'total' => $total_setups,
+            'created' => $status_counts['0'],
+            'progress' => $status_counts['1'] + $status_counts['2'] + $status_counts['3'],
+            'done' => $status_counts['4'],
+            'cancelled' => $status_counts['5'],
+            'install_total' => $total_install_price,
+        ],
+        'rows' => $rows,
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 
-$created_chart_empty = $created_chart['total'] === 0;
-$completed_chart_empty = $completed_chart['total'] === 0;
+$sale_report_system = system_company_data($conn);
+$sale_report_system_logo_url = $sale_report_system['system_logo_url'];
+$sale_report_system_name = $sale_report_system['system_name'];
+$sale_report_company_address = $sale_report_system['company_address'];
+$sale_report_company_tax_id = $sale_report_system['tax_id'];
+$sale_report_print_date = (new DateTimeImmutable('now'))->format('d/m/Y');
 
 layout_header('รายงานงานติดตั้ง', 'report', 'สรุปข้อมูลใบงานติดตั้งที่คุณสร้าง');
 ?>
@@ -492,8 +325,36 @@ layout_header('รายงานงานติดตั้ง', 'report', 'ส
   rel="stylesheet"
   href="<?= h(app_asset_url('sale/assets/css/report.css')) ?>?v=<?= h(asset_version('sale/assets/css/report.css')) ?>"
 >
+<style>
+  .sale-report-page .sale-report-filter-bar {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+</style>
 
 <div class="sale-report-page">
+  <header class="report-print-document-header" aria-label="หัวเอกสารรายงาน">
+    <div class="report-print-brand">
+      <?php if ($sale_report_system_logo_url !== ''): ?>
+        <img class="report-print-logo" src="<?= h($sale_report_system_logo_url) ?>" alt="โลโก้บริษัท">
+      <?php else: ?>
+        <span class="report-print-logo-placeholder" aria-label="ไม่มีโลโก้บริษัท">-</span>
+      <?php endif; ?>
+      <div class="report-print-company-copy">
+        <p class="report-print-company-name"><?= h($sale_report_system_name) ?></p>
+        <p class="report-print-company-address"><?= h($sale_report_company_address) ?></p>
+        <p class="report-print-company-tax">เลขประจำตัวผู้เสียภาษี: <?= h($sale_report_company_tax_id) ?></p>
+      </div>
+    </div>
+    <div class="report-print-meta">
+      <h2>รายงานงานติดตั้ง</h2>
+      <p data-sale-report-print-date data-timezone="<?= h(date_default_timezone_get()) ?>">วันที่พิมพ์: <?= h($sale_report_print_date) ?></p>
+    </div>
+  </header>
+
   <header class="sale-report-hero">
     <div class="sale-report-hero-copy">
       <h1>รายงานงานติดตั้ง</h1>
@@ -508,144 +369,75 @@ layout_header('รายงานงานติดตั้ง', 'report', 'ส
     </div>
   </header>
 
-  <section class="sale-report-summary-grid" aria-label="สรุปใบงานติดตั้งของคุณ">
+  <form class="sale-report-table-filter sale-report-filter-bar no-print" method="get" action="<?= h(app_system_url('sale/report.php')) ?>" data-sale-report-table-form data-sale-report-filter-bar role="search" aria-label="ตัวกรองรายงานงานติดตั้ง">
+    <label class="sale-report-search-field">
+      <span class="sr-only">ค้นหาใบงาน</span>
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <input type="search" name="q" value="<?= h($table_search) ?>" placeholder="ค้นหาใบงาน/ลูกค้า">
+    </label>
+
+    <label>
+      <span class="sr-only">กรองสถานะ</span>
+      <select name="status">
+        <option value="" <?= $table_status === '' ? 'selected' : '' ?>>สถานะทั้งหมด</option>
+        <option value="created" <?= $table_status === 'created' ? 'selected' : '' ?>>สร้างใบงานแล้ว</option>
+        <option value="progress" <?= $table_status === 'progress' ? 'selected' : '' ?>>กำลังดำเนินการ</option>
+        <option value="done" <?= $table_status === 'done' ? 'selected' : '' ?>>เสร็จสิ้น</option>
+        <option value="cancelled" <?= $table_status === 'cancelled' ? 'selected' : '' ?>>ยกเลิกแล้ว</option>
+      </select>
+    </label>
+
+    <label class="sale-report-period-field">
+      <span class="sr-only">ช่วงเวลาสร้างใบงาน</span>
+      <select name="created_period" data-sale-created-period>
+        <option value="all" <?= $created_period === 'all' ? 'selected' : '' ?>>ช่วงเวลาทั้งหมด</option>
+        <option value="today" <?= $created_period === 'today' ? 'selected' : '' ?>>วันนี้</option>
+        <option value="month" <?= $created_period === 'month' ? 'selected' : '' ?>>เดือนนี้</option>
+        <option value="year" <?= $created_period === 'year' ? 'selected' : '' ?>>ปีนี้</option>
+        <option value="custom" <?= $created_period === 'custom' ? 'selected' : '' ?>>กำหนดช่วงวันที่</option>
+      </select>
+    </label>
+
+    <div class="sale-report-date-range" data-sale-date-range<?= $created_period === 'custom' ? '' : ' hidden' ?>>
+      <label class="sale-report-date-field">
+        <span>วันที่เริ่มต้น</span>
+        <input type="date" name="created_date_from" value="<?= h($created_date_from) ?>" data-sale-created-date-from>
+      </label>
+      <label class="sale-report-date-field">
+        <span>วันที่สิ้นสุด</span>
+        <input type="date" name="created_date_to" value="<?= h($created_date_to) ?>" data-sale-created-date-to>
+      </label>
+    </div>
+
+    <button class="sale-report-filter-button" type="submit">กรอง</button>
+    <a class="sale-report-clear-filter" href="<?= h(app_system_url('sale/report.php')) ?>" data-sale-clear-filter<?= $table_search !== '' || $table_status !== '' || $created_period !== 'all' || $created_date_from !== '' || $created_date_to !== '' ? '' : ' hidden' ?>>ล้างตัวกรอง</a>
+  </form>
+
+  <section class="sale-report-summary-grid" data-sale-report-summary aria-label="สรุปใบงานติดตั้งของคุณ">
     <article class="sale-report-summary-card tone-blue">
       <span class="sale-report-summary-icon" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></span>
       <div>
-        <strong><?= h(number_format($total_setups)) ?></strong>
-        <span>ใบงานทั้งหมด</span>
-      </div>
-    </article>
-
-    <article class="sale-report-summary-card tone-amber">
-      <span class="sale-report-summary-icon" aria-hidden="true"><i class="fa-solid fa-file-circle-plus"></i></span>
-      <div>
-        <strong><?= h(number_format($status_counts['0'])) ?></strong>
-        <span>สร้างใบงานแล้ว</span>
+        <span>สร้างใบงานทั้งหมด</span>
+        <strong data-sale-report-metric="total"><?= h(number_format($total_setups)) ?></strong>
       </div>
     </article>
 
     <article class="sale-report-summary-card tone-blue">
       <span class="sale-report-summary-icon" aria-hidden="true"><i class="fa-solid fa-bars-progress"></i></span>
       <div>
-        <strong><?= h(number_format($status_counts['1'] + $status_counts['2'] + $status_counts['3'])) ?></strong>
         <span>กำลังดำเนินการ</span>
+        <strong data-sale-report-metric="progress"><?= h(number_format($status_counts['1'] + $status_counts['2'] + $status_counts['3'])) ?></strong>
       </div>
     </article>
 
     <article class="sale-report-summary-card tone-green">
       <span class="sale-report-summary-icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
       <div>
-        <strong><?= h(number_format($status_counts['4'])) ?></strong>
         <span>เสร็จสิ้น</span>
+        <strong data-sale-report-metric="done"><?= h(number_format($status_counts['4'])) ?></strong>
       </div>
     </article>
 
-    <article class="sale-report-summary-card tone-red">
-      <span class="sale-report-summary-icon" aria-hidden="true"><i class="fa-solid fa-ban"></i></span>
-      <div>
-        <strong><?= h(number_format($status_counts['5'])) ?></strong>
-        <span>ยกเลิกแล้ว</span>
-      </div>
-    </article>
-
-    <article class="sale-report-summary-card tone-purple">
-      <span class="sale-report-summary-icon" aria-hidden="true"><i class="fa-solid fa-baht-sign"></i></span>
-      <div>
-        <strong><?= h(number_format($total_install_price, 2)) ?></strong>
-        <span>รวมค่าติดตั้ง</span>
-      </div>
-    </article>
-  </section>
-
-  <section class="sale-report-chart-grid" aria-label="แนวโน้มใบงานของคุณ">
-    <article class="sale-report-panel sale-report-chart-panel" data-sale-report-chart="created">
-      <div class="sale-report-panel-head">
-        <div>
-          <h2>แนวโน้มการสร้างใบงาน</h2>
-          <p>จำนวนใบงานที่สร้างตามช่วงเวลา</p>
-        </div>
-
-        <form class="sale-report-period-form no-print" method="get" action="<?= h(app_system_url('sale/report.php')) ?>" data-sale-period-form data-sale-report-field="created">
-          <input type="hidden" name="created_period_current" value="<?= h($created_period) ?>" data-sale-period-current>
-          <input type="hidden" name="completed_period" value="<?= h($completed_period) ?>">
-          <input type="hidden" name="completed_value" value="<?= h($completed_value) ?>">
-          <input type="hidden" name="q" value="<?= h($table_search) ?>">
-          <input type="hidden" name="status" value="<?= h($table_status) ?>">
-          <div class="sale-report-period-tabs" role="group" aria-label="ช่วงเวลาแนวโน้มการสร้างใบงาน">
-            <?php foreach (['day' => 'วัน', 'week' => 'สัปดาห์', 'month' => 'เดือน'] as $period_key => $period_label): ?>
-              <button type="button" class="sale-report-period-tab<?= $created_period === $period_key ? ' is-active' : '' ?>" name="created_period" value="<?= h($period_key) ?>" data-sale-period-tab="<?= h($period_key) ?>" aria-pressed="<?= $created_period === $period_key ? 'true' : 'false' ?>"><?= h($period_label) ?></button>
-            <?php endforeach; ?>
-          </div>
-          <input
-            class="sale-report-period-input"
-            name="created_value"
-            type="<?= h($created_period === 'week' ? 'week' : ($created_period === 'month' ? 'month' : 'date')) ?>"
-            value="<?= h($created_value) ?>"
-            data-sale-period-input
-            data-day="<?= h(sale_report_period_value('day', $created_period === 'day' ? $created_value : '', $report_now)) ?>"
-            data-week="<?= h(sale_report_period_value('week', $created_period === 'week' ? $created_value : '', $report_now)) ?>"
-            data-month="<?= h(sale_report_period_value('month', $created_period === 'month' ? $created_value : '', $report_now)) ?>"
-            aria-label="เลือกช่วงเวลา"
-          >
-        </form>
-      </div>
-
-      <div class="sale-report-chart-summary" data-sale-chart-summary="created">
-        <strong><?= h((string) $created_chart['total']) ?> งาน</strong>
-        <span><?= h($created_chart['period_label']) ?></span>
-      </div>
-
-      <div class="sale-report-chart-wrap" data-sale-chart-wrap="created">
-        <?= sale_report_chart_svg($created_chart, 'แนวโน้มจำนวนใบงานที่สร้าง', '#2563eb') ?>
-      </div>
-
-      <p class="sale-report-chart-empty" data-sale-chart-empty="created"<?= $created_chart_empty ? '' : ' hidden' ?>>ยังไม่มีใบงานที่สร้างในช่วงเวลานี้</p>
-    </article>
-
-    <article class="sale-report-panel sale-report-chart-panel" data-sale-report-chart="completed">
-      <div class="sale-report-panel-head">
-        <div>
-          <h2>แนวโน้มงานเสร็จสิ้น</h2>
-          <p>จำนวนงานที่ปิดเสร็จตามช่วงเวลา</p>
-        </div>
-
-        <form class="sale-report-period-form no-print" method="get" action="<?= h(app_system_url('sale/report.php')) ?>" data-sale-period-form data-sale-report-field="completed">
-          <input type="hidden" name="completed_period_current" value="<?= h($completed_period) ?>" data-sale-period-current>
-          <input type="hidden" name="created_period" value="<?= h($created_period) ?>">
-          <input type="hidden" name="created_value" value="<?= h($created_value) ?>">
-          <input type="hidden" name="q" value="<?= h($table_search) ?>">
-          <input type="hidden" name="status" value="<?= h($table_status) ?>">
-          <div class="sale-report-period-tabs" role="group" aria-label="ช่วงเวลางานเสร็จสิ้น">
-            <?php foreach (['day' => 'วัน', 'week' => 'สัปดาห์', 'month' => 'เดือน'] as $period_key => $period_label): ?>
-              <button type="button" class="sale-report-period-tab<?= $completed_period === $period_key ? ' is-active' : '' ?>" name="completed_period" value="<?= h($period_key) ?>" data-sale-period-tab="<?= h($period_key) ?>" aria-pressed="<?= $completed_period === $period_key ? 'true' : 'false' ?>"><?= h($period_label) ?></button>
-            <?php endforeach; ?>
-          </div>
-          <input
-            class="sale-report-period-input"
-            name="completed_value"
-            type="<?= h($completed_period === 'week' ? 'week' : ($completed_period === 'month' ? 'month' : 'date')) ?>"
-            value="<?= h($completed_value) ?>"
-            data-sale-period-input
-            data-day="<?= h(sale_report_period_value('day', $completed_period === 'day' ? $completed_value : '', $report_now)) ?>"
-            data-week="<?= h(sale_report_period_value('week', $completed_period === 'week' ? $completed_value : '', $report_now)) ?>"
-            data-month="<?= h(sale_report_period_value('month', $completed_period === 'month' ? $completed_value : '', $report_now)) ?>"
-            aria-label="เลือกช่วงเวลา"
-          >
-        </form>
-      </div>
-
-      <div class="sale-report-chart-summary" data-sale-chart-summary="completed">
-        <strong><?= h((string) $completed_chart['total']) ?> งาน</strong>
-        <span><?= h($completed_chart['period_label']) ?></span>
-      </div>
-
-      <div class="sale-report-chart-wrap" data-sale-chart-wrap="completed">
-        <?= sale_report_chart_svg($completed_chart, 'แนวโน้มจำนวนงานที่เสร็จสิ้น', '#16a34a') ?>
-      </div>
-
-      <p class="sale-report-chart-empty" data-sale-chart-empty="completed"<?= $completed_chart_empty ? '' : ' hidden' ?>>ยังไม่มีงานที่ปิดเสร็จในช่วงเวลานี้</p>
-    </article>
   </section>
 
   <section class="sale-report-panel sale-report-table-panel" aria-labelledby="sale-report-table-title">
@@ -654,33 +446,8 @@ layout_header('รายงานงานติดตั้ง', 'report', 'ส
         <h2 id="sale-report-table-title">ใบงานติดตั้งล่าสุด</h2>
         <p>แสดงใบงานที่คุณสร้าง เรียงจากใหม่ไปเก่า</p>
       </div>
+      <span class="sale-report-result-count" data-sale-report-result-count aria-live="polite">พบ <?= h(number_format($total_setups)) ?> รายการ</span>
     </div>
-
-    <form class="sale-report-table-filter no-print" method="get" action="<?= h(app_system_url('sale/report.php')) ?>" data-sale-report-table-form>
-      <input type="hidden" name="created_period" value="<?= h($created_period) ?>">
-      <input type="hidden" name="created_value" value="<?= h($created_value) ?>">
-      <input type="hidden" name="completed_period" value="<?= h($completed_period) ?>">
-      <input type="hidden" name="completed_value" value="<?= h($completed_value) ?>">
-      <label class="sale-report-search-field">
-        <span class="sr-only">ค้นหาใบงาน</span>
-        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-        <input type="search" name="q" value="<?= h($table_search) ?>" placeholder="ค้นหารหัสใบงานหรือชื่อลูกค้า">
-      </label>
-
-      <label>
-        <span class="sr-only">กรองสถานะ</span>
-        <select name="status">
-          <option value="" <?= $table_status === '' ? 'selected' : '' ?>>สถานะทั้งหมด</option>
-          <option value="created" <?= $table_status === 'created' ? 'selected' : '' ?>>สร้างใบงานแล้ว</option>
-          <option value="progress" <?= $table_status === 'progress' ? 'selected' : '' ?>>กำลังดำเนินการ</option>
-          <option value="done" <?= $table_status === 'done' ? 'selected' : '' ?>>เสร็จสิ้น</option>
-          <option value="cancelled" <?= $table_status === 'cancelled' ? 'selected' : '' ?>>ยกเลิกแล้ว</option>
-        </select>
-      </label>
-
-      <button class="sale-report-filter-button" type="submit">กรอง</button>
-      <a class="sale-report-clear-filter" href="<?= h(app_system_url('sale/report.php')) ?>" data-sale-clear-filter<?= $table_search !== '' || $table_status !== '' ? '' : ' hidden' ?>>ล้างตัวกรอง</a>
-    </form>
 
     <div class="table-wrap sale-report-table-wrap">
       <table class="data-table sale-report-table">

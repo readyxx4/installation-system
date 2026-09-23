@@ -257,36 +257,11 @@ foreach ($items as $item) {
     $total_amount += (float) ($item['install_total'] ?? 0);
 }
 
-$company_name = '';
-$company_address = '';
-$logo_path = '';
-
-if (slip_table_exists($conn, 'system')) {
-    $system_result = $conn->query("SELECT system_name, system_desc, system_logo FROM system LIMIT 1");
-    if ($system_result && $system_result->num_rows > 0) {
-        $system = $system_result->fetch_assoc();
-        if (!empty($system['system_name'])) {
-            $company_name = $system['system_name'];
-        }
-        if (!empty($system['system_desc'])) {
-            $company_address = $system['system_desc'];
-        }
-        if (!empty($system['system_logo'])) {
-            $logo_path = $system['system_logo'];
-        }
-    }
-}
-
-
-/*
- * ข้อมูลบริษัทสำหรับเอกสารใบติดตั้ง
- * อ้างอิงสำนักงานใหญ่ของ บริษัท ห้างโอวเปงฮง (2009) จำกัด
- */
-$slip_company_name = $company_name !== '' ? $company_name : 'บริษัท ห้างโอวเปงฮง (2009) จำกัด';
-$slip_company_branch = 'สำนักงานใหญ่';
-$slip_company_address = '311-315 หมู่ที่ 2 ถนนราชนิกูล ตำบลในเมือง อำเภอบ้านไผ่ จังหวัดขอนแก่น 40110';
-$slip_company_phone = '043-272-136';
-$slip_company_tax_id = '0405551001144';
+$slip_company = system_company_data($conn);
+$slip_company_name = $slip_company['system_name'];
+$slip_company_address = $slip_company['company_address'];
+$slip_company_tax_id = $slip_company['tax_id'];
+$slip_company_logo_url = $slip_company['system_logo_url'];
 
 $display_install_date = !empty($setup['assign_install_date']) ? $setup['assign_install_date'] : ($setup['setup_date'] ?? null);
 
@@ -333,22 +308,21 @@ layout_header('ใบติดตั้ง', 'setups');
         <header class="install-slip-header">
             <div class="install-slip-company">
                 <div class="install-slip-logo">
-                    <img src="<?= h(app_asset_url($logo_path)) ?>" alt="โอวเปงฮง">
+                    <?php if ($slip_company_logo_url !== ''): ?>
+                        <img src="<?= h($slip_company_logo_url) ?>" alt="<?= h($slip_company_name) ?>">
+                    <?php else: ?>
+                        <span>-</span>
+                    <?php endif; ?>
                 </div>
 
                 <div class="install-slip-company-text">
                     <div class="install-slip-company-title">
                         <strong><?= h($slip_company_name) ?></strong>
-                        <span>(<?= h($slip_company_branch) ?>)</span>
                     </div>
 
                     <p><?= h($slip_company_address) ?></p>
 
-                    <p>
-                        โทร. <?= h($slip_company_phone) ?>
-                        &nbsp;&nbsp;
-                        เลขประจำตัวผู้เสียภาษี <?= h($slip_company_tax_id) ?>
-                    </p>
+                    <p>เลขประจำตัวผู้เสียภาษี: <?= h($slip_company_tax_id) ?></p>
                 </div>
             </div>
 

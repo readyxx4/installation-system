@@ -198,11 +198,180 @@ body.app-body.role-technician:has(.technician-report-page) .content {
   transform: translateY(0);
 }
 
+.technician-report-filter {
+  margin-bottom: 18px;
+}
+
+.technician-report-filter-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.technician-report-search-field {
+  position: relative;
+  flex: 1 1 320px;
+  min-width: 220px;
+}
+
+.technician-report-search-field i {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  color: #94a3b8;
+  font-size: 12px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.technician-report-filter-field {
+  display: block;
+  flex: 0 1 150px;
+  min-width: 0;
+}
+
+.technician-report-search-field input,
+.technician-report-filter-field select,
+.technician-report-date-field input {
+  width: 100%;
+  min-height: 40px;
+  box-sizing: border-box;
+  border: 1px solid #dbe4ee;
+  border-radius: 11px;
+  background: #fff;
+  color: #334155;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.technician-report-search-field input {
+  padding-left: 33px;
+}
+
+.technician-report-filter-field select,
+.technician-report-date-field input {
+  padding: 0 10px;
+}
+
+.technician-report-search-field input:focus,
+.technician-report-filter-field select:focus,
+.technician-report-date-field input:focus {
+  outline: 3px solid rgba(37, 99, 235, .15);
+  outline-offset: 1px;
+  border-color: #93c5fd;
+}
+
+.technician-report-date-range {
+  display: flex;
+  align-items: flex-end;
+  flex: 0 1 220px;
+  min-width: 0;
+  gap: 6px;
+}
+
+.technician-report-date-range[hidden] {
+  display: none;
+}
+
+.technician-report-date-field {
+  display: grid;
+  flex: 1 1 0;
+  min-width: 0;
+  gap: 4px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.technician-report-filter-actions {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.technician-report-filter-submit,
+.technician-report-filter-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 11px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.technician-report-filter-submit {
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 8px 16px rgba(37, 99, 235, .16);
+}
+
+.technician-report-filter-reset {
+  border: 1px solid #dbe4ee;
+  background: #fff;
+  color: #64748b;
+}
+
+.technician-report-filter-submit:hover,
+.technician-report-filter-reset:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(30, 55, 90, .1);
+}
+
+.technician-report-filter-submit:hover {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+}
+
+.technician-report-filter-submit:active,
+.technician-report-filter-reset:active {
+  transform: translateY(0);
+}
+
+.technician-report-page.is-filter-loading .technician-report-summary-card,
+.technician-report-page.is-filter-loading .technician-report-panel {
+  opacity: .62;
+  pointer-events: none;
+  transition: opacity .18s ease;
+}
+
+@media (min-width: 1024px) {
+  .technician-report-filter-form {
+    align-items: flex-end;
+    flex-wrap: nowrap;
+  }
+
+  .technician-report-search-field {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .technician-report-filter-form > .technician-report-filter-field {
+    flex: 0 1 150px;
+  }
+
+  .technician-report-date-range {
+    flex: 0 1 220px;
+  }
+}
+
 .technician-report-summary-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .technician-report-summary-card {
@@ -365,13 +534,6 @@ body.app-body.role-technician:has(.technician-report-page) .content {
   background: #f5f3ff;
 }
 
-.technician-report-chart-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
 .technician-report-panel {
   min-width: 0;
   border: 1px solid var(--technician-report-border);
@@ -394,8 +556,6 @@ body.app-body.role-technician:has(.technician-report-page) .content {
   text-align: right;
 }
 
-.technician-report-chart-card,
-.technician-report-trend-card,
 .technician-report-table-card {
   padding: 18px 20px 20px;
 }
@@ -424,275 +584,67 @@ body.app-body.role-technician:has(.technician-report-page) .content {
   line-height: 1.5;
 }
 
-.technician-report-period-form {
+.technician-report-status-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-
-.technician-report-period-tabs {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 3px;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  background: #f8fafc;
-}
-
-.technician-report-period-tab {
-  min-height: 30px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: #64748b;
-  font: inherit;
+  justify-content: center;
+  min-height: 24px;
+  max-width: 100%;
+  padding: 4px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
-  cursor: pointer;
-  transition: color .18s ease, background .18s ease, box-shadow .18s ease;
-}
-
-.technician-report-period-tab:hover {
-  color: #1e3a8a;
-}
-
-.technician-report-period-tab.is-active {
-  background: #fff;
-  color: #1d4ed8;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, .08);
-}
-
-.technician-report-period-picker {
-  display: inline-flex;
-  align-items: center;
-  margin: 0;
-}
-
-.technician-report-period-picker input {
-  width: 142px;
-  min-width: 142px;
-  min-height: 34px;
-  padding: 0 9px;
-  border: 1px solid #dbe4ee;
-  border-radius: 9px;
-  background: #fff;
-  color: #334155;
-  font: inherit;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.technician-report-period-picker input:focus-visible {
-  outline: 3px solid rgba(37, 99, 235, .15);
-  outline-offset: 1px;
-  border-color: #93c5fd;
-}
-
-.technician-report-chart-summary {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-  color: var(--technician-report-muted);
-  font-size: 11px;
-}
-
-.technician-report-chart-summary strong {
-  color: #2563eb;
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.technician-report-bar-chart-wrap {
-  min-width: 0;
-}
-
-.technician-report-bar-chart {
-  display: grid;
-  grid-template-columns: repeat(var(--technician-bar-count), minmax(0, 1fr));
-  align-items: end;
-  gap: 12px;
-  min-height: 184px;
-}
-
-.technician-report-bar-item {
-  display: grid;
-  grid-template-rows: 156px auto;
-  gap: 7px;
-  min-width: 0;
+  line-height: 1.2;
   text-align: center;
+  white-space: normal;
 }
 
-.technician-report-bar-stage {
-  display: flex;
-  align-items: flex-end;
-  min-width: 0;
-  min-height: 0;
-  padding: 6px;
-  border: 1px solid #eef2f7;
-  border-radius: 12px;
-  background: #f8fafc;
+.technician-report-status-badge.is-assigned {
+  background: #f3e8ff;
+  color: #7c3aed;
 }
 
-.technician-report-bar-fill {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100%;
-  min-height: 0;
-  border-radius: 9px 9px 7px 7px;
-  background: linear-gradient(180deg, #60a5fa, #2563eb);
-  transition: filter .18s ease;
+.technician-report-status-badge.is-awaiting-receive {
+  background: #ecfeff;
+  color: #0891b2;
 }
 
-.technician-report-chart-card:nth-child(2) .technician-report-bar-fill {
-  background: linear-gradient(180deg, #86efac, #16a34a);
-}
-
-.technician-report-bar-item:hover .technician-report-bar-fill {
-  filter: saturate(1.08) brightness(.98);
-}
-
-.technician-report-bar-fill strong {
-  position: absolute;
-  top: 6px;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.technician-report-bar-item > span {
-  overflow: hidden;
-  color: #64748b;
-  font-size: 11px;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.technician-report-bar-item.is-zero .technician-report-bar-stage {
-  background: #fbfdff;
-}
-
-.technician-report-bar-item.is-zero > span {
-  color: #94a3b8;
-}
-
-.technician-report-chart-empty {
-  margin: 0;
-  color: #94a3b8;
-  font-size: 11px;
-  text-align: center;
-}
-
-.technician-report-bar-chart-wrap.is-empty {
-  display: flex;
-  min-height: 90px;
-  flex-direction: column;
-  justify-content: center;
-  gap: 7px;
-}
-
-.technician-report-bar-chart.is-empty {
-  min-height: 0;
-  gap: 6px;
-}
-
-.technician-report-bar-chart.is-empty .technician-report-bar-item {
-  display: block;
-}
-
-.technician-report-bar-chart.is-empty .technician-report-bar-stage {
-  display: none;
-}
-
-.technician-report-trend-card {
-  margin-bottom: 16px;
-}
-
-.technician-report-week-controls {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: #64748b;
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.technician-report-week-controls a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid #dbe4ee;
-  border-radius: 8px;
-  background: #fff;
-  color: #334155;
-  font-size: 22px;
-  line-height: 1;
-  text-decoration: none;
-  transition: transform .18s ease, border-color .18s ease, background .18s ease;
-}
-
-.technician-report-week-controls a:hover {
-  border-color: #93c5fd;
+.technician-report-status-badge.is-ready {
   background: #eff6ff;
-  transform: translateY(-1px);
+  color: #3b82f6;
 }
 
-.technician-report-line-chart-wrap {
-  width: 100%;
-  overflow: hidden;
+.technician-report-status-badge.is-done {
+  background: #ecfdf5;
+  color: #10b981;
 }
 
-.technician-report-line-chart {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  height: 220px;
+.technician-report-status-badge.is-installing {
+  background: #eef2ff;
+  color: #6366f1;
 }
 
-.technician-report-grid-line {
-  stroke: #e8eef5;
-  stroke-width: 1;
+.technician-report-status-badge.is-review {
+  border-color: #fed7aa;
+  background: #fff7ed;
+  color: #f59e0b;
 }
 
-.technician-report-y-label,
-.technician-report-x-label {
-  fill: #94a3b8;
-  font-size: 11px;
-  font-weight: 700;
+.technician-report-status-badge.is-rejected {
+  border-color: #fecdd3;
+  background: #fff1f2;
+  color: #f43f5e;
 }
 
-.technician-report-line {
-  fill: none;
-  stroke: #16a34a;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 3;
+.technician-report-status-badge.is-cancelled {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #ef4444;
 }
 
-.technician-report-point {
-  fill: #fff;
-  stroke: #16a34a;
-  stroke-width: 3;
-  cursor: pointer;
-  transition: r .18s ease, fill .18s ease;
-}
-
-.technician-report-point:hover,
-.technician-report-point:focus-visible {
-  fill: #dcfce7;
-  outline: none;
+.technician-report-empty-state-compact {
+  min-height: 74px;
 }
 
 .technician-report-panel-total {
@@ -771,10 +723,6 @@ body.app-body.role-technician:has(.technician-report-page) .content {
 }
 
 @media (max-width: 860px) {
-  .technician-report-chart-grid {
-    grid-template-columns: 1fr;
-  }
-
   .technician-report-panel-head {
     align-items: flex-start;
   }
@@ -810,10 +758,23 @@ body.app-body.role-technician:has(.technician-report-page) .content {
     flex-direction: column;
   }
 
-  .technician-report-period-form {
-    justify-content: flex-start;
-    width: 100%;
+  .technician-report-filter-form {
+    align-items: stretch;
+    flex-direction: column;
   }
+
+  .technician-report-search-field,
+  .technician-report-filter-form > .technician-report-filter-field,
+  .technician-report-date-range,
+  .technician-report-filter-actions {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .technician-report-filter-actions {
+    justify-content: flex-start;
+  }
+
 }
 
 @media (max-width: 520px) {
@@ -822,49 +783,14 @@ body.app-body.role-technician:has(.technician-report-page) .content {
   }
 
   .technician-report-hero,
-  .technician-report-chart-card,
-  .technician-report-trend-card,
   .technician-report-table-card {
     padding-right: 16px;
     padding-left: 16px;
   }
+}
 
-  .technician-report-period-form {
-    align-items: stretch;
-    flex-wrap: wrap;
-  }
-
-  .technician-report-period-tabs,
-  .technician-report-period-picker {
-    flex: 1 1 100%;
-    width: 100%;
-  }
-
-  .technician-report-period-tab {
-    flex: 1 1 0;
-  }
-
-  .technician-report-period-picker input {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .technician-report-week-controls {
-    align-self: stretch;
-    justify-content: flex-start;
-  }
-
-  .technician-report-bar-chart {
-    gap: 6px;
-  }
-
-  .technician-report-bar-fill strong {
-    font-size: 9px;
-  }
-
-  .technician-report-bar-item > span {
-    font-size: 10px;
-  }
+.technician-report-page .report-print-document-header {
+  display: none;
 }
 
 @media print {
@@ -875,6 +801,17 @@ body.app-body.role-technician:has(.technician-report-page) .content {
 
   body.app-body.role-technician:has(.technician-report-page) {
     background: #fff !important;
+    overflow: visible !important;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .app-shell,
+  body.app-body.role-technician:has(.technician-report-page) .main,
+  body.app-body.role-technician:has(.technician-report-page) .content {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   body.app-body.role-technician:has(.technician-report-page) .app-shell {
@@ -883,8 +820,7 @@ body.app-body.role-technician:has(.technician-report-page) .content {
 
   body.app-body.role-technician:has(.technician-report-page) .app-sidebar,
   body.app-body.role-technician:has(.technician-report-page) .shell-topbar,
-  body.app-body.role-technician:has(.technician-report-page) .technician-report-period-form,
-  body.app-body.role-technician:has(.technician-report-page) .technician-report-week-controls,
+  body.app-body.role-technician:has(.technician-report-page) .technician-report-filter,
   body.app-body.role-technician:has(.technician-report-page) .technician-report-print-button,
   body.app-body.role-technician:has(.technician-report-page) .no-print {
     display: none !important;
@@ -903,6 +839,97 @@ body.app-body.role-technician:has(.technician-report-page) .content {
     min-height: 0;
     margin: 0;
     padding: 0;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .technician-report-page > .report-print-document-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px 22px;
+    margin: 0 0 12px;
+    padding: 0 0 10px;
+    color: #0f172a;
+    border-bottom: 1px solid #cbd5e1;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .technician-report-hero {
+    display: none !important;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .report-print-brand {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .report-print-logo {
+    display: block;
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .report-print-logo-placeholder {
+    display: grid;
+    width: 64px;
+    height: 64px;
+    place-items: center;
+    color: #64748b;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .report-print-company-copy,
+  body.app-body.role-technician:has(.technician-report-page) .report-print-meta {
+    min-width: 0;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .report-print-company-name,
+  body.app-body.role-technician:has(.technician-report-page) .report-print-company-address,
+  body.app-body.role-technician:has(.technician-report-page) .report-print-company-tax,
+  body.app-body.role-technician:has(.technician-report-page) .report-print-meta h2,
+  body.app-body.role-technician:has(.technician-report-page) .report-print-meta p {
+    margin: 0;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .report-print-company-name {
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .report-print-company-address,
+  body.app-body.role-technician:has(.technician-report-page) .report-print-company-tax {
+    max-width: 72ch;
+    margin-top: 3px;
+    color: #475569;
+    font-size: 10px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .report-print-meta {
+    align-self: center;
+    text-align: right;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .report-print-meta h2 {
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  body.app-body.role-technician:has(.technician-report-page) .report-print-meta p {
+    margin-top: 3px;
+    color: #475569;
+    font-size: 10px;
+    line-height: 1.35;
   }
 
   .technician-report-hero,
@@ -929,7 +956,6 @@ body.app-body.role-technician:has(.technician-report-page) .content {
   }
 
   .technician-report-summary-grid,
-  .technician-report-chart-grid,
   .technician-report-hero,
   .technician-report-panel {
     break-inside: avoid;
@@ -939,5 +965,17 @@ body.app-body.role-technician:has(.technician-report-page) .content {
   .technician-report-table-card {
     break-inside: auto;
     page-break-inside: auto;
+  }
+
+  .technician-report-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed;
+  }
+
+  .technician-report-table th,
+  .technician-report-table td {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
   }
 }

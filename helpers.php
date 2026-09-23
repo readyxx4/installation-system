@@ -38,6 +38,47 @@ function app_asset_url(string $path = ""): string
   return app_public_url($path);
 }
 
+function system_company_data(mysqli $conn): array
+{
+  $company = [
+    'system_name' => '-',
+    'system_logo' => '',
+    'system_logo_url' => '',
+    'company_address' => '-',
+    'tax_id' => '-',
+  ];
+
+  try {
+    $result = $conn->query('
+      SELECT system_name, system_logo, company_address, tax_id
+      FROM `system`
+      LIMIT 1
+    ');
+  } catch (Throwable $e) {
+    return $company;
+  }
+
+  $row = $result ? $result->fetch_assoc() : null;
+  if (!$row) {
+    return $company;
+  }
+
+  foreach (['system_name', 'company_address', 'tax_id'] as $field) {
+    $value = trim((string) ($row[$field] ?? ''));
+    $company[$field] = $value !== '' ? $value : '-';
+  }
+
+  $company['system_logo'] = trim((string) ($row['system_logo'] ?? ''));
+  if ($company['system_logo'] !== '') {
+    $company['system_logo_url'] = preg_match('#^(?:https?:)?//#i', $company['system_logo'])
+      || str_starts_with($company['system_logo'], '/')
+      ? $company['system_logo']
+      : app_public_url($company['system_logo']);
+  }
+
+  return $company;
+}
+
 function asset_version(string $path): string
 {
   $file = __DIR__ . '/' . ltrim($path, '/');

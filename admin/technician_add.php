@@ -157,12 +157,13 @@ layout_header('เพิ่มข้อมูลช่าง', 'technicians', '�
     <div class="staff-create-head staff-create-head-clean">
       <div>
         <h2>ข้อมูลช่างใหม่</h2>
+        <p>กรอกข้อมูลสำหรับสร้างบัญชีช่างติดตั้ง</p>
       </div>
     </div>
 
     <div class="staff-form-grid">
       <div class="staff-field readonly-field">
-        <label for="tech_id">รหัสช่าง *</label>
+        <label for="tech_id">รหัสช่าง <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('id') ?>
           <input
@@ -178,7 +179,7 @@ layout_header('เพิ่มข้อมูลช่าง', 'technicians', '�
       </div>
 
       <div class="staff-field">
-        <label for="tech_status">สถานะช่าง *</label>
+        <label for="tech_status">สถานะช่าง <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap select-wrap">
           <?= icon_svg('role') ?>
           <select id="tech_status" name="tech_status" required>
@@ -189,7 +190,7 @@ layout_header('เพิ่มข้อมูลช่าง', 'technicians', '�
       </div>
 
       <div class="staff-field staff-field-full">
-        <label for="tech_name">ชื่อ-นามสกุล *</label>
+        <label for="tech_name">ชื่อ-นามสกุล <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('user') ?>
           <input
@@ -204,7 +205,7 @@ layout_header('เพิ่มข้อมูลช่าง', 'technicians', '�
       </div>
 
       <div class="staff-field">
-        <label for="tech_phone">เบอร์โทรศัพท์ *</label>
+        <label for="tech_phone">เบอร์โทรศัพท์ <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('phone') ?>
           <input
@@ -221,7 +222,7 @@ layout_header('เพิ่มข้อมูลช่าง', 'technicians', '�
       </div>
 
       <div class="staff-field">
-        <label for="tech_email">อีเมล *</label>
+        <label for="tech_email">อีเมล <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('mail') ?>
           <input

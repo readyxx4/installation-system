@@ -6,6 +6,26 @@
   const controllers = Object.create(null);
   const sequences = Object.create(null);
 
+  const updatePrintDate = () => {
+    page.querySelectorAll('[data-sale-report-print-date]').forEach((node) => {
+      const timezone = node.dataset.timezone || undefined;
+      try {
+        const printedDate = new Intl.DateTimeFormat('en-GB', {
+          timeZone: timezone,
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }).format(new Date());
+        node.textContent = `วันที่พิมพ์: ${printedDate}`;
+      } catch (error) {
+        node.textContent = `วันที่พิมพ์: ${new Date().toLocaleDateString('en-GB')}`;
+      }
+    });
+  };
+
+  updatePrintDate();
+  window.addEventListener('beforeprint', updatePrintDate);
+
   const setUrl = (params) => {
     const url = new URL(window.location.href);
     Object.entries(params).forEach(([key, value]) => {
@@ -17,9 +37,7 @@
     window.history.replaceState({}, '', url);
   };
 
-  const panelFor = (section) => section === 'table'
-    ? page.querySelector('.sale-report-table-panel')
-    : page.querySelector('[data-sale-report-chart="' + section + '"]');
+  const panelFor = () => page.querySelector('.sale-report-table-panel');
 
   const busy = (panel, value) => {
     if (!panel) return;
@@ -63,72 +81,49 @@
     }
   };
 
-  const renderChart = (section, payload) => {
-    const card = panelFor(section);
-    const summary = card.querySelector('[data-sale-chart-summary]');
-    const summaryValue = summary?.querySelector('strong');
-    const summaryLabel = summary?.querySelector('span');
-    const chartWrap = card.querySelector('[data-sale-chart-wrap]');
-    const empty = card.querySelector('[data-sale-chart-empty]');
-    if (summaryValue) summaryValue.textContent = Number(payload.total || 0).toLocaleString('en-US') + ' งาน';
-    if (summaryLabel) summaryLabel.textContent = payload.period_label || '';
-    if (chartWrap && payload.chart_html) {
-      const parsed = new DOMParser().parseFromString(payload.chart_html, 'text/html').body.firstElementChild;
-      if (parsed) chartWrap.replaceChildren(parsed);
-    }
-    if (empty) empty.hidden = Number(payload.total || 0) !== 0;
-  };
-
-  page.querySelectorAll('[data-sale-period-form]').forEach((form) => {
-    const field = form.dataset.saleReportField;
-    const input = form.querySelector('[data-sale-period-input]');
-    const current = form.querySelector('[data-sale-period-current]');
-    const tabs = Array.from(form.querySelectorAll('[data-sale-period-tab]'));
-    if (!field || !input || !current || tabs.length === 0) return;
-    let active = current.value || 'day';
-    const values = { day: input.dataset.day || '', week: input.dataset.week || '', month: input.dataset.month || '' };
-    const sync = () => {
-      input.type = active === 'week' ? 'week' : active === 'month' ? 'month' : 'date';
-      input.value = values[active] || '';
-      current.value = active;
-      tabs.forEach((tab) => {
-        const selected = tab.dataset.salePeriodTab === active;
-        tab.classList.toggle('is-active', selected);
-        tab.setAttribute('aria-pressed', selected ? 'true' : 'false');
-      });
-    };
-    const load = () => {
-      if (input.value) values[active] = input.value;
-      sync();
-      request(field, { [field + '_period']: active, [field + '_value']: values[active] || '' })
-        .then((payload) => {
-          renderChart(field, payload);
-          setUrl({ [field + '_period']: payload.period, [field + '_value']: payload.value });
-        })
-        .catch((error) => { if (error.name !== 'AbortError') errorMessage(panelFor(field)); });
-    };
-    tabs.forEach((tab) => tab.addEventListener('click', () => {
-      const next = tab.dataset.salePeriodTab || 'day';
-      if (next !== active) { active = next; load(); }
-    }));
-    input.addEventListener('change', load);
-    form.addEventListener('submit', (event) => { event.preventDefault(); load(); });
-    sync();
-  });
-
   const tableForm = page.querySelector('[data-sale-report-table-form]');
   const tablePanel = panelFor('table');
   if (tableForm && tablePanel) {
+    const periodSelect = tableForm.querySelector('[data-sale-created-period]');
+    const dateRange = tableForm.querySelector('[data-sale-date-range]');
+    const dateFrom = tableForm.querySelector('[data-sale-created-date-from]');
+    const dateTo = tableForm.querySelector('[data-sale-created-date-to]');
+    const syncDateRange = () => {
+      const isCustom = periodSelect?.value === 'custom';
+      if (dateRange) dateRange.hidden = !isCustom;
+      [dateFrom, dateTo].forEach((input) => {
+        if (input) input.disabled = !isCustom;
+      });
+    };
+
+    periodSelect?.addEventListener('change', syncDateRange);
+    syncDateRange();
+
+    const renderSummary = (metrics = {}) => {
+      const summary = page.querySelector('[data-sale-report-summary]');
+      if (!summary) return;
+      summary.querySelectorAll('[data-sale-report-metric]').forEach((node) => {
+        const key = node.dataset.saleReportMetric;
+        const value = Number(metrics[key] || 0);
+        node.textContent = key === 'install_total'
+          ? value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : value.toLocaleString('en-US');
+      });
+    };
+
     const renderTable = (payload) => {
       const body = tablePanel.querySelector('[data-sale-report-table-body]');
       if (!body) return;
+      renderSummary(payload.metrics || {});
+      const resultCount = page.querySelector('[data-sale-report-result-count]');
+      if (resultCount) resultCount.textContent = `พบ ${Number(payload.count || 0).toLocaleString('en-US')} รายการ`;
       body.replaceChildren();
       if (!payload.rows?.length) {
         const row = document.createElement('tr');
         const cell = document.createElement('td');
         cell.colSpan = 7;
         cell.className = 'empty-state';
-        cell.textContent = 'ยังไม่มีใบงานติดตั้ง';
+        cell.textContent = 'ไม่พบข้อมูลที่ตรงกับตัวกรอง';
         row.appendChild(cell); body.appendChild(row); return;
       }
       payload.rows.forEach((item) => {
@@ -153,17 +148,30 @@
       event.preventDefault();
       const data = new FormData(tableForm);
       const params = Object.fromEntries(data.entries());
+      params.created_period = periodSelect?.value || 'all';
+      params.created_date_from = params.created_period === 'custom' ? (dateFrom?.value || '') : '';
+      params.created_date_to = params.created_period === 'custom' ? (dateTo?.value || '') : '';
       request('table', params).then((payload) => {
         renderTable(payload);
-        setUrl({ q: params.q || '', status: params.status || '' });
+        setUrl({
+          q: params.q || '',
+          status: params.status || '',
+          created_period: params.created_period,
+          created_date_from: params.created_date_from,
+          created_date_to: params.created_date_to
+        });
         const clear = tableForm.querySelector('[data-sale-clear-filter]');
-        if (clear) clear.hidden = !(params.q || params.status);
+        if (clear) clear.hidden = !(params.q || params.status || params.created_period !== 'all' || params.created_date_from || params.created_date_to);
       }).catch((error) => { if (error.name !== 'AbortError') errorMessage(tablePanel); });
     });
     tableForm.querySelector('[data-sale-clear-filter]')?.addEventListener('click', (event) => {
       event.preventDefault();
       tableForm.querySelector('[name="q"]').value = '';
       tableForm.querySelector('[name="status"]').value = '';
+      if (periodSelect) periodSelect.value = 'all';
+      if (dateFrom) dateFrom.value = '';
+      if (dateTo) dateTo.value = '';
+      syncDateRange();
       tableForm.dispatchEvent(new Event('submit', { cancelable: true }));
     });
   }

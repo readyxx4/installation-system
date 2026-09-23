@@ -93,23 +93,31 @@ function technician_my_jobs_ui_status(array $row): array
         return ['key' => 'done', 'label' => 'งานเสร็จสิ้นแล้ว', 'class' => 'success'];
     }
 
+    if ($assign_status === '3') {
+        return ['key' => 'accepted', 'label' => 'ช่างปฏิเสธงาน', 'class' => 'pink'];
+    }
+
+    if ($assign_status === '4') {
+        return ['key' => 'accepted', 'label' => 'ยกเลิกแล้ว', 'class' => 'red'];
+    }
+
     if ($setup_status === '3' && (string) ($row['has_install_result'] ?? '0') === '1') {
-        return ['key' => 'awaiting_review', 'label' => 'รอหัวหน้าช่างยืนยัน', 'class' => 'waiting'];
+        return ['key' => 'awaiting_review', 'label' => 'รอหัวหน้าช่างยืนยัน', 'class' => 'orange'];
     }
 
     if ($setup_status === '3') {
-        return ['key' => 'installing', 'label' => 'กำลังติดตั้ง', 'class' => 'info'];
+        return ['key' => 'installing', 'label' => 'กำลังติดตั้ง', 'class' => 'indigo'];
     }
 
     if ($assign_status === '2' && $receive_status === '1' && $setup_status === '2') {
-        return ['key' => 'ready', 'label' => 'พร้อมติดตั้ง', 'class' => 'green'];
+        return ['key' => 'ready', 'label' => 'พร้อมติดตั้ง', 'class' => 'blue'];
     }
 
     if ($assign_status === '2' && $receive_status !== '1') {
-        return ['key' => 'awaiting_receive', 'label' => 'รอรับสินค้า', 'class' => 'blue'];
+        return ['key' => 'awaiting_receive', 'label' => 'รอรับสินค้า', 'class' => 'cyan'];
     }
 
-    return ['key' => 'accepted', 'label' => assign_status_name($assign_status), 'class' => 'blue'];
+    return ['key' => 'accepted', 'label' => assign_status_name($assign_status), 'class' => 'cyan'];
 }
 
 $stmt_jobs = $conn->prepare("

@@ -164,12 +164,13 @@ layout_header('แก้ไขข้อมูลช่าง', 'technicians', '�
     <div class="staff-create-head staff-create-head-clean">
       <div>
         <h2>แก้ไขข้อมูลช่าง</h2>
+        <p>ปรับปรุงข้อมูลและสถานะช่างติดตั้ง</p>
       </div>
     </div>
 
     <div class="staff-form-grid">
       <div class="staff-field readonly-field">
-        <label for="tech_id_show">รหัสช่าง *</label>
+        <label for="tech_id_show">รหัสช่าง <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('id') ?>
           <input type="text" id="tech_id_show" value="<?= h($technician['tech_id']) ?>" readonly>
@@ -177,7 +178,7 @@ layout_header('แก้ไขข้อมูลช่าง', 'technicians', '�
       </div>
 
       <div class="staff-field">
-        <label for="tech_status">สถานะช่าง *</label>
+        <label for="tech_status">สถานะช่าง <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap select-wrap">
           <?= icon_svg('role') ?>
           <select id="tech_status" name="tech_status" required>
@@ -192,7 +193,7 @@ layout_header('แก้ไขข้อมูลช่าง', 'technicians', '�
       </div>
 
       <div class="staff-field staff-field-full">
-        <label for="tech_name">ชื่อ-นามสกุล *</label>
+        <label for="tech_name">ชื่อ-นามสกุล <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('user') ?>
           <input type="text" id="tech_name" name="tech_name" maxlength="100" value="<?= h($technician['tech_name']) ?>"
@@ -201,7 +202,7 @@ layout_header('แก้ไขข้อมูลช่าง', 'technicians', '�
       </div>
 
       <div class="staff-field">
-        <label for="tech_phone">เบอร์โทรศัพท์ *</label>
+        <label for="tech_phone">เบอร์โทรศัพท์ <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('phone') ?>
           <input type="text" id="tech_phone" name="tech_phone" maxlength="10" inputmode="numeric"
@@ -211,7 +212,7 @@ layout_header('แก้ไขข้อมูลช่าง', 'technicians', '�
       </div>
 
       <div class="staff-field">
-        <label for="tech_email">อีเมล *</label>
+        <label for="tech_email">อีเมล <span class="required-mark" aria-hidden="true">*</span></label>
         <div class="staff-input-wrap">
           <?= icon_svg('mail') ?>
           <input type="email" id="tech_email" name="tech_email" maxlength="100"

@@ -1,24 +1,41 @@
 /* my_jobs.php only */
 body.app-body.role-technician .technician-my-jobs-page .badge.blue {
   background: #eff6ff !important;
-  color: #2563eb !important;
+  color: #3b82f6 !important;
 }
 
 body.app-body.role-technician .technician-my-jobs-page .badge.green,
 body.app-body.role-technician .technician-my-jobs-page .badge.success {
   background: #ecfdf5 !important;
-  color: #059669 !important;
+  color: #10b981 !important;
 }
 
-body.app-body.role-technician .technician-my-jobs-page .badge.info {
+body.app-body.role-technician .technician-my-jobs-page .badge.cyan {
+  background: #ecfeff !important;
+  color: #0891b2 !important;
+}
+
+body.app-body.role-technician .technician-my-jobs-page .badge.indigo {
   background: #eef2ff !important;
-  color: #4f46e5 !important;
+  color: #6366f1 !important;
 }
 
-body.app-body.role-technician .technician-my-jobs-page .badge.waiting {
-  border: 1px solid #fde7c7 !important;
-  background: #fffbeb !important;
-  color: #a16207 !important;
+body.app-body.role-technician .technician-my-jobs-page .badge.orange {
+  border: 1px solid #fed7aa !important;
+  background: #fff7ed !important;
+  color: #f59e0b !important;
+}
+
+body.app-body.role-technician .technician-my-jobs-page .badge.pink {
+  border: 1px solid #fecdd3 !important;
+  background: #fff1f2 !important;
+  color: #f43f5e !important;
+}
+
+body.app-body.role-technician .technician-my-jobs-page .badge.red {
+  border: 1px solid #fecaca !important;
+  background: #fef2f2 !important;
+  color: #ef4444 !important;
 }
 
 /* Compact assignment table for my_jobs.php only. */

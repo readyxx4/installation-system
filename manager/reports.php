@@ -21,6 +21,20 @@ function manager_report_valid_date(string $value): string
     return $date->format('Y-m-d') === $value ? $value : '';
 }
 
+function manager_report_timestamp($value, DateTimeZone $timezone): ?DateTimeImmutable
+{
+    $value = trim((string) $value);
+    if ($value === '') {
+        return null;
+    }
+
+    try {
+        return new DateTimeImmutable($value, $timezone);
+    } catch (Throwable $e) {
+        return null;
+    }
+}
+
 function manager_report_format_date($value): string
 {
     if (empty($value)) {
@@ -191,7 +205,7 @@ $report_sql = "
         a.assign_install_end_time,
         a.assign_status,
         a.tech_id AS technician_id,
-        COALESCE(NULLIF(TRIM(t.tech_fullname), ''), NULLIF(TRIM(t.tech_name), ''), '-') AS technician_name,
+        COALESCE(NULLIF(TRIM(t.tech_name), ''), '-') AS technician_name,
         CASE WHEN EXISTS (
             SELECT 1
             FROM product_receive pr
@@ -227,19 +241,99 @@ while ($row = $report_result->fetch_assoc()) {
     $report_rows[] = $row;
 }
 
-$status_counts = array_fill_keys(array_keys($status_meta), 0);
-foreach ($report_rows as $report_row) {
-    $status_counts[$report_row['status_key']]++;
+$table_search = trim((string) ($_GET['q'] ?? ''));
+$table_status = trim((string) ($_GET['status'] ?? ''));
+$in_progress_keys = ['waiting', 'accepted', 'pickup', 'received', 'working'];
+$manager_status_groups = [
+    '' => array_keys($status_meta),
+    'unassigned' => ['unassigned'],
+    'in_progress' => $in_progress_keys,
+    'review' => ['review'],
+    'done' => ['done'],
+    'cancelled_rejected' => ['cancelled', 'rejected'],
+    'overdue' => ['overdue'],
+];
+$manager_status_labels = [
+    '' => 'ทุกสถานะ',
+    'unassigned' => 'ยังไม่ได้มอบหมาย',
+    'in_progress' => 'กำลังดำเนินการ',
+    'review' => 'รอหัวหน้าช่างยืนยัน',
+    'done' => 'เสร็จสิ้น',
+    'cancelled_rejected' => 'ยกเลิก/ปฏิเสธ',
+    'overdue' => 'เกินกำหนด',
+];
+if (!array_key_exists($table_status, $manager_status_groups)) {
+    $table_status = '';
+}
+$technician_filter = trim((string) ($_GET['technician_id'] ?? ''));
+$table_period = in_array((string) ($_GET['table_period'] ?? ''), ['all', 'today', 'month', 'year', 'custom'], true)
+    ? (string) $_GET['table_period']
+    : 'all';
+$table_date_from = manager_report_valid_date((string) ($_GET['table_date_from'] ?? ''));
+$table_date_to = manager_report_valid_date((string) ($_GET['table_date_to'] ?? ''));
+$table_period_start = null;
+$table_period_end = null;
+switch ($table_period) {
+    case 'today':
+        $table_period_start = $report_now->setTime(0, 0, 0);
+        $table_period_end = $table_period_start->modify('+1 day');
+        break;
+    case 'month':
+        $table_period_start = $report_now->modify('first day of this month')->setTime(0, 0, 0);
+        $table_period_end = $table_period_start->modify('+1 month');
+        break;
+    case 'year':
+        $table_period_start = $report_now->setDate((int) $report_now->format('Y'), 1, 1)->setTime(0, 0, 0);
+        $table_period_end = $table_period_start->modify('+1 year');
+        break;
+    case 'custom':
+        if ($table_date_from !== '') {
+            $table_period_start = DateTimeImmutable::createFromFormat('!Y-m-d', $table_date_from, $report_timezone);
+        }
+        if ($table_date_to !== '') {
+            $custom_end = DateTimeImmutable::createFromFormat('!Y-m-d', $table_date_to, $report_timezone);
+            $table_period_end = $custom_end instanceof DateTimeImmutable ? $custom_end->modify('+1 day') : null;
+        }
+        break;
 }
 
-$in_progress_keys = ['waiting', 'accepted', 'pickup', 'received', 'working'];
+$manager_report_matches_period = static function ($value, ?DateTimeImmutable $period_start, ?DateTimeImmutable $period_end) use ($report_timezone): bool {
+    if (!$period_start && !$period_end) {
+        return true;
+    }
+
+    $date = manager_report_timestamp($value, $report_timezone);
+    if (!$date) {
+        return false;
+    }
+
+    return (!$period_start || $date >= $period_start) && (!$period_end || $date < $period_end);
+};
+
+$table_rows = array_values(array_filter($report_rows, static function (array $row) use ($table_search, $table_status, $technician_filter, $manager_status_groups, $table_period_start, $table_period_end, $manager_report_matches_period): bool {
+    $search_matches = manager_report_contains((string) ($row['setup_id'] ?? ''), $table_search)
+        || manager_report_contains((string) ($row['customer_name'] ?? ''), $table_search)
+        || manager_report_contains((string) ($row['technician_id'] ?? ''), $table_search)
+        || manager_report_contains((string) ($row['technician_name'] ?? ''), $table_search);
+    $status_matches = in_array((string) ($row['status_key'] ?? ''), $manager_status_groups[$table_status] ?? [], true);
+    $technician_matches = $technician_filter === '' || (string) ($row['technician_id'] ?? '') === $technician_filter;
+    $time_matches = $manager_report_matches_period($row['created_at'] ?? null, $table_period_start, $table_period_end);
+
+    return $search_matches && $status_matches && $technician_matches && $time_matches;
+}));
+
+$status_counts = array_fill_keys(array_keys($status_meta), 0);
+foreach ($table_rows as $table_row) {
+    $status_counts[$table_row['status_key']]++;
+}
+
 $in_progress_count = 0;
 foreach ($in_progress_keys as $in_progress_key) {
     $in_progress_count += $status_counts[$in_progress_key] ?? 0;
 }
 
 $summary_cards = [
-    ['label' => 'งานทั้งหมด', 'value' => count($report_rows), 'tone' => 'blue', 'icon' => 'fa-layer-group'],
+    ['label' => 'งานทั้งหมด', 'value' => count($table_rows), 'tone' => 'blue', 'icon' => 'fa-layer-group'],
     ['label' => 'รอมอบหมาย', 'value' => $status_counts['unassigned'], 'tone' => 'amber', 'icon' => 'fa-inbox'],
     ['label' => 'กำลังดำเนินการ', 'value' => $in_progress_count, 'tone' => 'violet', 'icon' => 'fa-bars-progress'],
     ['label' => 'รอยืนยันผล', 'value' => $status_counts['review'], 'tone' => 'orange', 'icon' => 'fa-user-check'],
@@ -247,174 +341,83 @@ $summary_cards = [
     ['label' => 'เกินกำหนด', 'value' => $status_counts['overdue'], 'tone' => 'red', 'icon' => 'fa-clock'],
 ];
 
-$table_search = trim((string) ($_GET['q'] ?? ''));
-$table_status = trim((string) ($_GET['status'] ?? ''));
-if ($table_status !== '' && !array_key_exists($table_status, $status_meta)) {
-    $table_status = '';
-}
-
-$table_rows = array_values(array_filter($report_rows, static function (array $row) use ($table_search, $table_status): bool {
-    $search_matches = manager_report_contains((string) ($row['setup_id'] ?? ''), $table_search)
-        || manager_report_contains((string) ($row['customer_name'] ?? ''), $table_search);
-
-    return $search_matches && ($table_status === '' || $row['status_key'] === $table_status);
-}));
-
-$completed_day_counts = [];
-$completed_week_counts = [];
-$completed_month_counts = [];
-$completed_rows_result = $conn->query(
-    "SELECT s.setup_id, s.completed_at
-     FROM setup s
-     WHERE s.setup_status = 4
-       AND s.completed_at IS NOT NULL
-     ORDER BY s.completed_at ASC, s.setup_id ASC"
-);
-
-while ($completed_row = $completed_rows_result->fetch_assoc()) {
-    $completed_at = DateTimeImmutable::createFromFormat(
-        'Y-m-d H:i:s',
-        (string) $completed_row['completed_at'],
-        $report_timezone
+$manager_id = trim((string) ($_SESSION['user_id'] ?? ''));
+$manager_technician_options = [];
+if ($manager_id !== '') {
+    $manager_technician_stmt = $conn->prepare(
+        "SELECT DISTINCT
+                t.tech_id,
+                COALESCE(NULLIF(TRIM(t.tech_name), ''), t.tech_id) AS technician_name,
+                t.tech_status
+         FROM assignment a
+         INNER JOIN technicians t ON t.tech_id = a.tech_id
+         WHERE a.assign_by = ?
+           AND a.tech_id IS NOT NULL
+           AND TRIM(a.tech_id) <> ''
+         ORDER BY technician_name ASC, t.tech_id ASC"
     );
-    if (!$completed_at) {
-        continue;
+    $manager_technician_stmt->bind_param('s', $manager_id);
+    $manager_technician_stmt->execute();
+    $manager_technician_result = $manager_technician_stmt->get_result();
+    while ($technician_row = $manager_technician_result->fetch_assoc()) {
+        $technician_id = trim((string) ($technician_row['tech_id'] ?? ''));
+        if ($technician_id === '') {
+            continue;
+        }
+
+        $manager_technician_options[$technician_id] = [
+            'technician_id' => $technician_id,
+            'technician_name' => trim((string) ($technician_row['technician_name'] ?? '')) ?: $technician_id,
+            'tech_status' => (int) ($technician_row['tech_status'] ?? 1),
+        ];
     }
-
-    $completed_date_key = $completed_at->format('Y-m-d');
-    $completed_day_counts[$completed_date_key] ??= [0, 0, 0];
-    $completed_hour = (int) $completed_at->format('G');
-    $completed_day_slot = $completed_hour < 12 ? 0 : ($completed_hour < 17 ? 1 : 2);
-    $completed_day_counts[$completed_date_key][$completed_day_slot]++;
-
-    $week_start = $completed_at->modify('monday this week')->setTime(0, 0, 0);
-    $week_key = $week_start->format('Y-m-d');
-    $completed_week_counts[$week_key] ??= array_fill(0, 7, 0);
-    $week_offset = (int) $week_start->diff($completed_at->setTime(0, 0, 0))->format('%r%a');
-    if ($week_offset >= 0 && $week_offset < 7) {
-        $completed_week_counts[$week_key][$week_offset]++;
-    }
-
-    $year_key = $completed_at->format('Y');
-    $completed_month_counts[$year_key] ??= array_fill(0, 12, 0);
-    $completed_month_counts[$year_key][(int) $completed_at->format('n') - 1]++;
+    $manager_technician_stmt->close();
 }
 
-$requested_chart_view = (string) ($_GET['period'] ?? 'day');
-$chart_view = in_array($requested_chart_view, ['day', 'week', 'month'], true)
-    ? $requested_chart_view
-    : 'day';
-$chart_day = manager_report_valid_date((string) ($_GET['chart_day'] ?? '')) ?: $report_now->format('Y-m-d');
-$chart_week = preg_match('/^\d{4}-W\d{2}$/', (string) ($_GET['chart_week'] ?? ''))
-    ? (string) $_GET['chart_week']
-    : $report_now->format('o-\WW');
-$chart_month = preg_match('/^\d{4}-\d{2}$/', (string) ($_GET['chart_month'] ?? ''))
-    ? (string) $_GET['chart_month']
-    : $report_now->format('Y-m');
-
-$completed_data_json = json_encode([
-    'initialPeriod' => $chart_view,
-    'initialDay' => $chart_day,
-    'initialWeek' => $chart_week,
-    'initialMonth' => $chart_month,
-    'day' => ['dates' => $completed_day_counts],
-    'week' => ['weeks' => $completed_week_counts],
-    'month' => ['years' => $completed_month_counts],
-], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
-
-$requested_tech_filter_period = (string) ($_GET['tech_filter_period'] ?? 'month');
-$tech_filter_period = in_array($requested_tech_filter_period, ['week', 'month', 'all'], true)
-    ? $requested_tech_filter_period
-    : 'month';
-
-$requested_tech_filter_value = trim((string) ($_GET['tech_filter_value'] ?? ''));
-$tech_filter_week = preg_match('/^\d{4}-W\d{2}$/', $requested_tech_filter_value)
-    ? $requested_tech_filter_value
-    : (preg_match('/^\d{4}-W\d{2}$/', (string) ($_GET['tech_filter_week'] ?? ''))
-        ? (string) $_GET['tech_filter_week']
-        : $report_now->format('o-\\WW'));
-$tech_filter_month = preg_match('/^\d{4}-\d{2}$/', $requested_tech_filter_value)
-    ? $requested_tech_filter_value
-    : (preg_match('/^\d{4}-\d{2}$/', (string) ($_GET['tech_filter_month'] ?? ''))
-        ? (string) $_GET['tech_filter_month']
-        : $report_now->format('Y-m'));
-
-$tech_filter_start = null;
-$tech_filter_end = null;
-if ($tech_filter_period === 'week' && preg_match('/^(\d{4})-W(\d{2})$/', $tech_filter_week, $week_match)) {
-    $tech_filter_start = $report_now
-        ->setISODate((int) $week_match[1], (int) $week_match[2], 1)
-        ->setTime(0, 0, 0);
-    $tech_filter_end = $tech_filter_start->modify('+7 days');
-} elseif ($tech_filter_period === 'month') {
-    $tech_filter_start = DateTimeImmutable::createFromFormat('!Y-m-d', $tech_filter_month . '-01', $report_timezone);
-    if ($tech_filter_start) {
-        $tech_filter_end = $tech_filter_start->modify('+1 month');
-    }
+if ($technician_filter !== '' && !isset($manager_technician_options[$technician_filter])) {
+    $technician_filter = '';
 }
-
-$tech_filter_matches = static function ($value) use ($tech_filter_start, $tech_filter_end, $report_timezone): bool {
-    if (!$tech_filter_start || !$tech_filter_end) {
-        return true;
-    }
-
-    $value = trim((string) $value);
-    if ($value === '') {
-        return false;
-    }
-
-    $date = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $value, $report_timezone);
-    return $date instanceof DateTimeImmutable && $date >= $tech_filter_start && $date < $tech_filter_end;
-};
 
 $technician_report_rows = [];
-$technician_result = $conn->query(
-    "SELECT tech_id,
-            COALESCE(NULLIF(TRIM(tech_fullname), ''), NULLIF(TRIM(tech_name), ''), tech_id) AS technician_name
-     FROM technicians
-     ORDER BY technician_name ASC, tech_id ASC"
-);
-while ($technician_row = $technician_result->fetch_assoc()) {
-    $technician_id = trim((string) ($technician_row['tech_id'] ?? ''));
-    if ($technician_id === '') {
-        continue;
-    }
-
-    $technician_report_rows[$technician_id] = [
-        'technician_id' => $technician_id,
-        'technician_name' => trim((string) ($technician_row['technician_name'] ?? '')) ?: $technician_id,
-        'assigned' => 0,
-        'completed' => 0,
-    ];
-}
-
-foreach ($report_rows as $report_row) {
+foreach ($table_rows as $report_row) {
     $technician_id = trim((string) ($report_row['technician_id'] ?? ''));
-    if ($technician_id === '') {
+    if ($technician_id === '' || !isset($manager_technician_options[$technician_id])) {
         continue;
     }
 
     if (!isset($technician_report_rows[$technician_id])) {
+        $technician_option = $manager_technician_options[$technician_id];
         $technician_report_rows[$technician_id] = [
             'technician_id' => $technician_id,
-            'technician_name' => trim((string) ($report_row['technician_name'] ?? '')) ?: $technician_id,
+            'technician_name' => $technician_option['technician_name'],
+            'tech_status' => $technician_option['tech_status'],
+            'readiness_label' => $technician_option['tech_status'] === 0 ? 'พร้อมรับงาน' : 'ไม่พร้อมรับงาน',
+            'readiness_tone' => $technician_option['tech_status'] === 0 ? 'green' : 'red',
+            'readiness_icon' => $technician_option['tech_status'] === 0 ? 'fa-circle-check' : 'fa-circle-xmark',
             'assigned' => 0,
             'completed' => 0,
+            'in_progress' => 0,
+            'review' => 0,
+            'overdue' => 0,
         ];
     }
 
-    $setup_status = (int) ($report_row['setup_status'] ?? 0);
-    $assign_status = (int) ($report_row['assign_status'] ?? 0);
-    $is_current_assignment = in_array($assign_status, [1, 2], true)
-        && !in_array($setup_status, [4, 5], true);
+    /* $table_rows is the single filtered, latest-assignment-per-setup dataset. */
+    $technician_report_rows[$technician_id]['assigned']++;
 
-    if ($is_current_assignment && $tech_filter_matches($report_row['assign_date'] ?? null)) {
-        $technician_report_rows[$technician_id]['assigned']++;
+    $setup_status = (int) ($report_row['setup_status'] ?? 0);
+    $is_completed = $setup_status === 4 && trim((string) ($report_row['completed_at'] ?? '')) !== '';
+    if ($is_completed) {
+        $technician_report_rows[$technician_id]['completed']++;
     }
 
-    $is_completed = $setup_status === 4 && trim((string) ($report_row['completed_at'] ?? '')) !== '';
-    if ($is_completed && $tech_filter_matches($report_row['completed_at'] ?? null)) {
-        $technician_report_rows[$technician_id]['completed']++;
+    $status_key = (string) ($report_row['status_key'] ?? '');
+    if (in_array($status_key, $in_progress_keys, true)) {
+        $technician_report_rows[$technician_id]['in_progress']++;
+    } elseif ($status_key === 'review') {
+        $technician_report_rows[$technician_id]['review']++;
+    } elseif ($status_key === 'overdue') {
+        $technician_report_rows[$technician_id]['overdue']++;
     }
 }
 
@@ -434,54 +437,10 @@ foreach ($technician_report_rows as $technician_report_row) {
     $tech_assignment_max = max($tech_assignment_max, (int) $technician_report_row['assigned']);
     $tech_completed_max = max($tech_completed_max, (int) $technician_report_row['completed']);
 }
-
-$requested_trend_week = (string) ($_GET['tech_trend_week'] ?? '');
-$tech_trend_week = preg_match('/^\d{4}-W\d{2}$/', $requested_trend_week)
-    ? $requested_trend_week
-    : $report_now->format('o-\\WW');
-$trend_week_match = [];
-if (preg_match('/^(\d{4})-W(\d{2})$/', $tech_trend_week, $trend_week_match)) {
-    $trend_week_start = $report_now
-        ->setISODate((int) $trend_week_match[1], (int) $trend_week_match[2], 1)
-        ->setTime(0, 0, 0);
-} else {
-    $trend_week_start = $report_now->modify('monday this week')->setTime(0, 0, 0);
-    $tech_trend_week = $trend_week_start->format('o-\\WW');
-}
-
-$trend_week_key = $trend_week_start->format('Y-m-d');
-$weekly_trend_counts = $completed_week_counts[$trend_week_key] ?? array_fill(0, 7, 0);
-$weekly_trend_counts = array_pad(array_slice(array_map('intval', $weekly_trend_counts), 0, 7), 7, 0);
-$weekly_trend_max = max(1, max($weekly_trend_counts));
-$weekly_trend_labels = ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'];
-$weekly_trend_points = [];
-$weekly_trend_x_positions = [];
-$weekly_trend_svg_width = 760;
-$weekly_trend_svg_height = 238;
-$weekly_trend_plot_left = 44;
-$weekly_trend_plot_right = 18;
-$weekly_trend_plot_top = 24;
-$weekly_trend_plot_bottom = 46;
-$weekly_trend_plot_width = $weekly_trend_svg_width - $weekly_trend_plot_left - $weekly_trend_plot_right;
-$weekly_trend_plot_height = $weekly_trend_svg_height - $weekly_trend_plot_top - $weekly_trend_plot_bottom;
-foreach ($weekly_trend_counts as $trend_index => $trend_count) {
-    $trend_x = $weekly_trend_plot_left + ($weekly_trend_plot_width * ($trend_index / 6));
-    $trend_y = $weekly_trend_plot_top + $weekly_trend_plot_height - (($trend_count / $weekly_trend_max) * $weekly_trend_plot_height);
-    $weekly_trend_points[] = number_format($trend_x, 2, '.', '') . ',' . number_format($trend_y, 2, '.', '');
-    $weekly_trend_x_positions[] = $trend_x;
-}
-
-$trend_previous_week = $trend_week_start->modify('-7 days')->format('o-\\WW');
-$trend_next_week = $trend_week_start->modify('+7 days')->format('o-\\WW');
-$trend_previous_query = $_GET;
-$trend_previous_query['tech_trend_week'] = $trend_previous_week;
-$trend_next_query = $_GET;
-$trend_next_query['tech_trend_week'] = $trend_next_week;
-$tech_trend_previous_url = app_system_url('manager/reports.php') . '?' . http_build_query($trend_previous_query);
-$tech_trend_next_url = app_system_url('manager/reports.php') . '?' . http_build_query($trend_next_query);
+$technician_chart_max = max(1, $tech_assignment_max, $tech_completed_max);
 
 $ajax_section = trim((string) ($_GET['section'] ?? ''));
-if ((string) ($_GET['ajax'] ?? '') === '1' && in_array($ajax_section, ['table', 'technician', 'trend'], true)) {
+if ((string) ($_GET['ajax'] ?? '') === '1' && in_array($ajax_section, ['table', 'technician'], true)) {
     header('Content-Type: application/json; charset=utf-8');
     if ($ajax_section === 'table') {
         $rows = array_map(static function (array $row): array {
@@ -497,7 +456,20 @@ if ((string) ($_GET['ajax'] ?? '') === '1' && in_array($ajax_section, ['table', 
                 'status_icon' => (string) ($meta['icon'] ?? 'fa-circle-question'),
             ];
         }, $table_rows);
-        echo json_encode(['success' => true, 'section' => 'table', 'rows' => $rows, 'total' => count($rows)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        echo json_encode([
+            'success' => true,
+            'section' => 'table',
+            'rows' => $rows,
+            'total' => count($rows),
+            'metrics' => [
+                'total' => count($table_rows),
+                'unassigned' => (int) ($status_counts['unassigned'] ?? 0),
+                'in_progress' => (int) $in_progress_count,
+                'review' => (int) ($status_counts['review'] ?? 0),
+                'done' => (int) ($status_counts['done'] ?? 0),
+                'overdue' => (int) ($status_counts['overdue'] ?? 0),
+            ],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
     if ($ajax_section === 'technician') {
@@ -505,16 +477,24 @@ if ((string) ($_GET['ajax'] ?? '') === '1' && in_array($ajax_section, ['table', 
             return [
                 'technician_id' => (string) ($row['technician_id'] ?? ''),
                 'technician_name' => (string) ($row['technician_name'] ?? '-'),
+                'readiness_label' => (string) ($row['readiness_label'] ?? '-'),
+                'readiness_tone' => (string) ($row['readiness_tone'] ?? 'slate'),
+                'readiness_icon' => (string) ($row['readiness_icon'] ?? 'fa-circle-question'),
                 'assigned' => (int) ($row['assigned'] ?? 0),
                 'completed' => (int) ($row['completed'] ?? 0),
+                'in_progress' => (int) ($row['in_progress'] ?? 0),
+                'review' => (int) ($row['review'] ?? 0),
+                'overdue' => (int) ($row['overdue'] ?? 0),
             ];
         }, $technician_report_rows);
         echo json_encode([
             'success' => true,
             'section' => 'technician',
-            'period' => $tech_filter_period,
-            'week' => $tech_filter_week,
-            'month' => $tech_filter_month,
+            'technician_id' => $technician_filter,
+            'status' => $table_status,
+            'table_period' => $table_period,
+            'table_date_from' => $table_date_from,
+            'table_date_to' => $table_date_to,
             'rows' => $rows,
             'assigned_total' => $tech_assignment_total,
             'completed_total' => $tech_completed_total,
@@ -523,19 +503,10 @@ if ((string) ($_GET['ajax'] ?? '') === '1' && in_array($ajax_section, ['table', 
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
-    echo json_encode([
-        'success' => true,
-        'section' => 'trend',
-        'week' => $tech_trend_week,
-        'start' => $trend_week_start->format('d/m/Y'),
-        'end' => $trend_week_start->modify('+6 days')->format('d/m/Y'),
-        'previous_week' => $trend_previous_week,
-        'next_week' => $trend_next_week,
-        'labels' => array_values($weekly_trend_labels),
-        'values' => array_values(array_map('intval', $weekly_trend_counts)),
-    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    exit;
 }
+
+$manager_report_company = system_company_data($conn);
+$manager_report_print_date = (new DateTimeImmutable('now'))->format('d/m/Y');
 
 layout_header('รายงาน', 'manager_reports', 'สรุปข้อมูลและสถานะงานติดตั้งทั้งหมด');
 ?>
@@ -543,6 +514,25 @@ layout_header('รายงาน', 'manager_reports', 'สรุปข้อม
 <link rel="stylesheet" href="<?= h(app_asset_url('manager/assets/css/reports.css')) ?>?v=<?= h(asset_version('manager/assets/css/reports.css')) ?>">
 
 <div class="manager-report-page">
+    <header class="report-print-document-header" aria-label="หัวเอกสารรายงาน">
+        <div class="report-print-brand">
+            <?php if ($manager_report_company['system_logo_url'] !== ''): ?>
+                <img class="report-print-logo" src="<?= h($manager_report_company['system_logo_url']) ?>" alt="โลโก้บริษัท">
+            <?php else: ?>
+                <span class="report-print-logo-placeholder" aria-label="ไม่มีโลโก้บริษัท">-</span>
+            <?php endif; ?>
+            <div class="report-print-company-copy">
+                <p class="report-print-company-name"><?= h($manager_report_company['system_name']) ?></p>
+                <p class="report-print-company-address"><?= h($manager_report_company['company_address']) ?></p>
+                <p class="report-print-company-tax">เลขประจำตัวผู้เสียภาษี: <?= h($manager_report_company['tax_id']) ?></p>
+            </div>
+        </div>
+        <div class="report-print-meta">
+            <h2>รายงานงานติดตั้ง</h2>
+            <p data-manager-report-print-date data-timezone="<?= h(date_default_timezone_get()) ?>">วันที่พิมพ์: <?= h($manager_report_print_date) ?></p>
+        </div>
+    </header>
+
     <header class="report-header">
         <div class="report-header-copy">
             <h1>รายงานงานติดตั้ง</h1>
@@ -555,6 +545,60 @@ layout_header('รายงาน', 'manager_reports', 'สรุปข้อม
             </button>
         </div>
     </header>
+
+    <section class="manager-report-filter" aria-label="ตัวกรองรายงานงานติดตั้ง">
+        <form class="manager-report-filter-form" method="get" action="<?= h(app_system_url('manager/reports.php')) ?>" data-manager-report-filter-form>
+            <label class="manager-report-search-field">
+                <span class="sr-only">ค้นหาใบงาน ลูกค้า หรือช่าง</span>
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input type="search" name="q" value="<?= h($table_search) ?>" placeholder="ค้นหาใบงาน ลูกค้า หรือช่าง">
+            </label>
+            <label class="manager-report-field manager-report-technician-field">
+                <span class="sr-only">กรองช่าง</span>
+                <select name="technician_id">
+                    <option value="">ช่างทั้งหมด</option>
+                    <?php foreach ($manager_technician_options as $technician_option): ?>
+                        <option value="<?= h($technician_option['technician_id']) ?>" <?= $technician_filter === $technician_option['technician_id'] ? 'selected' : '' ?>><?= h($technician_option['technician_name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
+            <label class="manager-report-field">
+                <span class="sr-only">กรองสถานะ</span>
+                <select name="status">
+                    <?php foreach ($manager_status_labels as $status_key => $status_label): ?>
+                        <option value="<?= h($status_key) ?>" <?= $table_status === $status_key ? 'selected' : '' ?>><?= h($status_label) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
+            <label class="manager-report-field manager-report-period-field">
+                <span class="sr-only">ช่วงเวลาสร้างใบงาน</span>
+                <select name="table_period" data-manager-table-period>
+                    <option value="all" <?= $table_period === 'all' ? 'selected' : '' ?>>ช่วงเวลาทั้งหมด</option>
+                    <option value="today" <?= $table_period === 'today' ? 'selected' : '' ?>>วันนี้</option>
+                    <option value="month" <?= $table_period === 'month' ? 'selected' : '' ?>>เดือนนี้</option>
+                    <option value="year" <?= $table_period === 'year' ? 'selected' : '' ?>>ปีนี้</option>
+                    <option value="custom" <?= $table_period === 'custom' ? 'selected' : '' ?>>กำหนดช่วงวันที่</option>
+                </select>
+            </label>
+            <div class="manager-report-date-range" data-manager-table-date-range<?= $table_period === 'custom' ? '' : ' hidden' ?>>
+                <label class="manager-report-date-field">
+                    <span>วันที่เริ่มต้น</span>
+                    <input type="date" name="table_date_from" value="<?= h($table_date_from) ?>" data-manager-table-date-from>
+                </label>
+                <label class="manager-report-date-field">
+                    <span>วันที่สิ้นสุด</span>
+                    <input type="date" name="table_date_to" value="<?= h($table_date_to) ?>" data-manager-table-date-to>
+                </label>
+            </div>
+            <div class="manager-report-filter-actions">
+                <button type="submit" class="manager-report-submit">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    ค้นหา
+                </button>
+                <a class="manager-report-reset" href="<?= h(app_system_url('manager/reports.php')) ?>" data-manager-report-filter-reset>ล้างตัวกรอง</a>
+            </div>
+        </form>
+    </section>
 
     <section class="report-metric-grid manager-report-metric-grid" aria-label="สรุปงานติดตั้ง">
         <?php foreach ($summary_cards as $summary_card): ?>
@@ -570,191 +614,100 @@ layout_header('รายงาน', 'manager_reports', 'สรุปข้อม
         <?php endforeach; ?>
     </section>
 
-    <section class="manager-report-filter report-panel" aria-labelledby="manager-report-filter-title">
-        <div class="report-panel-head manager-report-filter-head">
+    <div class="manager-technician-report-grid">
+    <section class="report-panel manager-technician-chart-card manager-technician-clustered-card" aria-labelledby="manager-technician-chart-title" data-manager-technician-chart>
+        <div class="report-panel-head manager-technician-chart-head">
             <div>
-                <h2 id="manager-report-filter-title">ค้นหาใบงาน</h2>
-                <p>กรองรายการในตารางจากข้อมูลใบงานทั้งหมดของระบบ</p>
+                <h2 id="manager-technician-chart-title">กราฟเปรียบเทียบจำนวนงานที่ได้รับมอบหมาย</h2>
+
             </div>
-            <span class="report-panel-total" data-manager-table-total><?= h(number_format(count($table_rows))) ?> รายการ</span>
+            <div class="manager-technician-chart-legend" aria-label="คำอธิบายกราฟ">
+                <span><i class="manager-technician-legend-dot is-assigned" aria-hidden="true"></i>ได้รับมอบหมาย</span>
+                <span><i class="manager-technician-legend-dot is-completed" aria-hidden="true"></i>เสร็จสิ้น</span>
+            </div>
         </div>
-        <form class="manager-report-filter-form" method="get" action="<?= h(app_system_url('manager/reports.php')) ?>" data-manager-report-filter-form>
-            <label class="manager-report-field">
-                <span>รหัสใบงาน / ลูกค้า</span>
-                <input type="search" name="q" value="<?= h($table_search) ?>" placeholder="ค้นหารหัสใบงานหรือลูกค้า">
-            </label>
-            <label class="manager-report-field">
-                <span>สถานะ</span>
-                <select name="status">
-                    <option value="">ทุกสถานะ</option>
-                    <?php foreach ($status_meta as $status_key => $status_item): ?>
-                        <option value="<?= h($status_key) ?>"<?= $table_status === $status_key ? ' selected' : '' ?>><?= h($status_item['label']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
-            <div class="manager-report-filter-actions">
-                <button type="submit" class="manager-report-submit">
-                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                    ค้นหา
-                </button>
-                <a class="manager-report-reset" href="<?= h(app_system_url('manager/reports.php')) ?>">ล้าง</a>
+        <div class="manager-technician-clustered-chart" data-manager-technician-chart-body role="img" aria-label="กราฟเปรียบเทียบงานที่ได้รับมอบหมายและงานที่เสร็จสิ้นของช่างแต่ละคน">
+            <div class="manager-technician-chart-axis" aria-hidden="true">
+                <span><?= h(number_format($technician_chart_max)) ?></span>
+                <span><?= h(number_format((int) round($technician_chart_max / 2))) ?></span>
+                <span>0</span>
             </div>
-        </form>
+            <div class="manager-technician-chart-plot">
+                <div class="manager-technician-chart-grid-lines" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="manager-technician-cluster-groups">
+                    <?php foreach ($technician_report_rows as $technician_report_row): ?>
+                        <?php
+                        $assigned_total = (int) $technician_report_row['assigned'];
+                        $completed_total = (int) $technician_report_row['completed'];
+                        $technician_name = (string) $technician_report_row['technician_name'];
+                        ?>
+                        <div class="manager-technician-cluster-group" role="group" aria-label="<?= h($technician_name) ?>">
+                            <div class="manager-technician-cluster-bars">
+                                <div class="manager-technician-cluster-bar is-assigned" style="--bar-height: <?= h(($assigned_total / $technician_chart_max) * 100) ?>%;" role="img" aria-label="<?= h($technician_name . ': ได้รับมอบหมาย ' . number_format($assigned_total) . ' งาน') ?>">
+                                    <strong><?= h(number_format($assigned_total)) ?></strong>
+                                </div>
+                                <div class="manager-technician-cluster-bar is-completed" style="--bar-height: <?= h(($completed_total / $technician_chart_max) * 100) ?>%;" role="img" aria-label="<?= h($technician_name . ': เสร็จสิ้น ' . number_format($completed_total) . ' งาน') ?>">
+                                    <strong><?= h(number_format($completed_total)) ?></strong>
+                                </div>
+                            </div>
+                            <span class="manager-technician-cluster-label"><?= h($technician_name) ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <div class="report-empty-state manager-technician-empty-state" data-manager-technician-empty<?= $technician_report_rows === [] ? '' : ' hidden' ?>><i class="fa-regular fa-folder-open" aria-hidden="true"></i><span>ไม่พบข้อมูลตามตัวกรองที่เลือก</span></div>
     </section>
 
-    <section class="manager-report-visual-grid" aria-label="ภาพรวม workflow และงานที่เสร็จแล้ว">
-        <article class="report-panel completed-install-card" data-manager-completed-card>
-            <div class="report-panel-head completed-install-header">
-                <div>
-                    <h2>งานติดตั้งเสร็จแล้ว</h2>
-                    <p>สรุปจำนวนงานที่ติดตั้งเสร็จตามช่วงเวลา</p>
-                </div>
-                <div class="completed-install-controls">
-                    <div class="completed-period-tabs" role="group" aria-label="ช่วงเวลางานติดตั้งเสร็จแล้ว">
-                        <?php foreach (['day' => 'วัน', 'week' => 'สัปดาห์', 'month' => 'เดือน'] as $period_key => $period_label): ?>
-                            <button type="button" class="completed-period-tab<?= $chart_view === $period_key ? ' is-active' : '' ?>" data-manager-period="<?= h($period_key) ?>" aria-pressed="<?= $chart_view === $period_key ? 'true' : 'false' ?>">
-                                <?= h($period_label) ?>
-                            </button>
+    <section class="report-panel report-table-panel report-data-panel manager-technician-summary-panel" aria-labelledby="manager-technician-summary-title" data-manager-technician-summary-panel>
+        <div class="report-panel-head">
+            <div>
+                <h2 id="manager-technician-summary-title">สถานะงานปัจจุบันของช่าง</h2>
+
+            </div>
+        </div>
+        <div class="report-table-wrap">
+            <table class="report-table manager-technician-summary-table">
+                <thead>
+                    <tr>
+                        <th>รหัสช่าง</th>
+                        <th>ชื่อช่าง</th>
+                        <th>กำลังดำเนินการ</th>
+                        <th>รอหัวหน้าช่างยืนยัน</th>
+                        <th>เกินกำหนด</th>
+                    </tr>
+                </thead>
+                <tbody data-manager-technician-summary-body>
+                    <?php if ($technician_report_rows === []): ?>
+                        <tr>
+                            <td colspan="5"><div class="report-empty-state"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i><span>ไม่พบข้อมูลช่างตามตัวกรองที่เลือก</span></div></td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($technician_report_rows as $technician_report_row): ?>
+                            <tr>
+                                <td>
+                                    <strong><?= h($technician_report_row['technician_id']) ?></strong>
+                                </td>
+                                <td><span class="manager-technician-summary-name"><?= h($technician_report_row['technician_name']) ?></span></td>
+                                <td><?= h(number_format((int) $technician_report_row['in_progress'])) ?></td>
+                                <td><?= h(number_format((int) $technician_report_row['review'])) ?></td>
+                                <td><?= h(number_format((int) $technician_report_row['overdue'])) ?></td>
+                            </tr>
                         <?php endforeach; ?>
-                    </div>
-                    <label class="manager-period-picker">
-                        <input
-                            type="<?= $chart_view === 'week' ? 'week' : ($chart_view === 'month' ? 'month' : 'date') ?>"
-                            class="completed-range-input"
-                            data-manager-period-input
-                            value="<?= h($chart_view === 'week' ? $chart_week : ($chart_view === 'month' ? $chart_month : $chart_day)) ?>"
-                            aria-label="<?= h($chart_view === 'week' ? 'เลือกสัปดาห์' : ($chart_view === 'month' ? 'เลือกเดือน' : 'เลือกวันที่')) ?>"
-                        >
-                    </label>
-                </div>
-            </div>
-
-            <div class="completed-summary-row">
-                <div class="completed-install-summary" data-manager-completed-summary aria-live="polite"></div>
-            </div>
-            <div class="completed-install-chart" data-manager-completed-chart data-period="<?= h($chart_view) ?>" aria-live="polite"></div>
-        </article>
-
-    </section>
-
-    <section class="report-panel manager-technician-filter-panel" aria-labelledby="manager-technician-report-title">
-        <div class="report-panel-head manager-technician-filter-head">
-            <div>
-                <h2 id="manager-technician-report-title">รายงานงานของช่าง</h2>
-                <p>ดูจำนวนงานตามการมอบหมายล่าสุดและงานที่ปิดสำเร็จ</p>
-            </div>
-            <form class="manager-technician-period-form" method="get" action="<?= h(app_system_url('manager/reports.php')) ?>" data-manager-technician-period-form>
-                <input type="hidden" name="tech_filter_period" value="<?= h($tech_filter_period) ?>" data-manager-technician-period>
-                <?php foreach (['q', 'status', 'period', 'chart_day', 'chart_week', 'chart_month', 'tech_filter_week', 'tech_filter_month', 'tech_trend_week'] as $preserve_key): ?>
-                    <?php if (isset($_GET[$preserve_key]) && !is_array($_GET[$preserve_key])): ?>
-                        <input type="hidden" name="<?= h($preserve_key) ?>" value="<?= h((string) $_GET[$preserve_key]) ?>">
                     <?php endif; ?>
-                <?php endforeach; ?>
-                <div class="manager-technician-period-tabs" role="group" aria-label="ช่วงเวลารายงานงานของช่าง">
-                    <?php foreach (['week' => 'สัปดาห์', 'month' => 'เดือน', 'all' => 'ทั้งหมด'] as $period_key => $period_label): ?>
-                        <button type="button" class="manager-technician-period-tab<?= $tech_filter_period === $period_key ? ' is-active' : '' ?>" data-manager-technician-period-option="<?= h($period_key) ?>" aria-pressed="<?= $tech_filter_period === $period_key ? 'true' : 'false' ?>"><?= h($period_label) ?></button>
-                    <?php endforeach; ?>
-                </div>
-                <label class="manager-technician-period-picker" data-manager-technician-period-picker>
-                    <input
-                        type="<?= $tech_filter_period === 'week' ? 'week' : 'month' ?>"
-                        name="tech_filter_value"
-                        value="<?= h($tech_filter_period === 'week' ? $tech_filter_week : $tech_filter_month) ?>"
-                        data-manager-technician-period-input
-                        data-week-value="<?= h($tech_filter_week) ?>"
-                        data-month-value="<?= h($tech_filter_month) ?>"
-                        aria-label="<?= h($tech_filter_period === 'week' ? 'เลือกสัปดาห์' : 'เลือกเดือน') ?>"
-                        <?= $tech_filter_period === 'all' ? ' disabled' : '' ?>
-                    >
-                </label>
-            </form>
+                </tbody>
+            </table>
         </div>
     </section>
-
-    <section class="manager-technician-chart-grid" aria-label="รายงานงานของช่างตามช่วงเวลา">
-        <article class="report-panel manager-technician-chart-card" aria-labelledby="manager-assigned-tech-title" data-manager-technician-card="assigned">
-            <div class="report-panel-head manager-technician-chart-head">
-                <div>
-                    <h2 id="manager-assigned-tech-title">งานที่มอบหมายให้ช่าง</h2>
-                    <p>จำนวนใบงานที่ช่างแต่ละคนได้รับมอบหมาย</p>
-                </div>
-                <span class="report-panel-total" data-manager-technician-total="assigned"><?= h(number_format($tech_assignment_total)) ?> งาน</span>
-            </div>
-            <?php if ($tech_assignment_total === 0): ?>
-                <div class="report-empty-state manager-technician-empty-state"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><span>ไม่พบข้อมูลในช่วงเวลาที่เลือก</span></div>
-            <?php else: ?>
-                <div class="manager-technician-bars" role="list">
-                    <?php foreach ($technician_report_rows as $technician_report_row): ?>
-                        <?php $assigned_total = (int) $technician_report_row['assigned']; ?>
-                        <div class="manager-technician-bar-row<?= $assigned_total === 0 ? ' is-zero' : '' ?>" role="listitem" title="<?= h($technician_report_row['technician_name'] . ': ' . number_format($assigned_total) . ' งาน') ?>">
-                            <div class="manager-technician-bar-label"><span><?= h($technician_report_row['technician_name']) ?></span><strong><?= h(number_format($assigned_total)) ?> งาน</strong></div>
-                            <div class="manager-technician-bar-track"><span style="width: <?= h($tech_assignment_max > 0 ? (($assigned_total / $tech_assignment_max) * 100) : 0) ?>%;"></span></div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </article>
-
-        <article class="report-panel manager-technician-chart-card" aria-labelledby="manager-completed-tech-title" data-manager-technician-card="completed">
-            <div class="report-panel-head manager-technician-chart-head">
-                <div>
-                    <h2 id="manager-completed-tech-title">งานที่ช่างทำเสร็จแล้ว</h2>
-                    <p>จำนวนงานที่ปิดงานสำเร็จของช่างแต่ละคน</p>
-                </div>
-                <span class="report-panel-total" data-manager-technician-total="completed"><?= h(number_format($tech_completed_total)) ?> งาน</span>
-            </div>
-            <?php if ($tech_completed_total === 0): ?>
-                <div class="report-empty-state manager-technician-empty-state"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><span>ไม่พบข้อมูลในช่วงเวลาที่เลือก</span></div>
-            <?php else: ?>
-                <div class="manager-technician-bars" role="list">
-                    <?php foreach ($technician_report_rows as $technician_report_row): ?>
-                        <?php $completed_total = (int) $technician_report_row['completed']; ?>
-                        <div class="manager-technician-bar-row<?= $completed_total === 0 ? ' is-zero' : '' ?>" role="listitem" title="<?= h($technician_report_row['technician_name'] . ': ' . number_format($completed_total) . ' งาน') ?>">
-                            <div class="manager-technician-bar-label"><span><?= h($technician_report_row['technician_name']) ?></span><strong><?= h(number_format($completed_total)) ?> งาน</strong></div>
-                            <div class="manager-technician-bar-track"><span style="width: <?= h($tech_completed_max > 0 ? (($completed_total / $tech_completed_max) * 100) : 0) ?>%;"></span></div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </article>
-    </section>
-
-    <section class="report-panel manager-weekly-trend-panel" aria-labelledby="manager-weekly-trend-title" data-manager-weekly-trend>
-        <div class="report-panel-head manager-weekly-trend-head">
-            <div>
-                <h2 id="manager-weekly-trend-title">แนวโน้มงานเสร็จในสัปดาห์</h2>
-                <p>จำนวนงานที่ติดตั้งเสร็จในแต่ละวัน</p>
-            </div>
-            <div class="manager-weekly-trend-controls" aria-label="เลือกสัปดาห์">
-                <a class="manager-weekly-trend-arrow" href="<?= h($tech_trend_previous_url) ?>" data-manager-weekly-trend-arrow="previous" data-week="<?= h($trend_previous_week) ?>" aria-label="สัปดาห์ก่อน">&lsaquo;</a>
-                <span><?= h($trend_week_start->format('d/m/Y')) ?> - <?= h($trend_week_start->modify('+6 days')->format('d/m/Y')) ?></span>
-                <a class="manager-weekly-trend-arrow" href="<?= h($tech_trend_next_url) ?>" data-manager-weekly-trend-arrow="next" data-week="<?= h($trend_next_week) ?>" aria-label="สัปดาห์ถัดไป">&rsaquo;</a>
-            </div>
-        </div>
-        <div class="manager-weekly-trend-chart-wrap">
-            <svg class="manager-weekly-trend-chart" viewBox="0 0 <?= h($weekly_trend_svg_width) ?> <?= h($weekly_trend_svg_height) ?>" role="img" aria-label="จำนวนงานที่ติดตั้งเสร็จในแต่ละวันของสัปดาห์">
-                <?php foreach ([0, .5, 1] as $grid_ratio): ?>
-                    <?php $grid_y = $weekly_trend_plot_top + $weekly_trend_plot_height - ($weekly_trend_plot_height * $grid_ratio); ?>
-                    <line class="manager-weekly-trend-grid-line" x1="<?= h($weekly_trend_plot_left) ?>" x2="<?= h($weekly_trend_svg_width - $weekly_trend_plot_right) ?>" y1="<?= h($grid_y) ?>" y2="<?= h($grid_y) ?>"></line>
-                    <text class="manager-weekly-trend-y-label" x="<?= h($weekly_trend_plot_left - 10) ?>" y="<?= h($grid_y + 4) ?>" text-anchor="end"><?= h(number_format((int) round($weekly_trend_max * $grid_ratio))) ?></text>
-                <?php endforeach; ?>
-                <polyline class="manager-weekly-trend-line" points="<?= h(implode(' ', $weekly_trend_points)) ?>"></polyline>
-                <?php foreach ($weekly_trend_counts as $trend_index => $trend_count): ?>
-                    <?php $trend_y = $weekly_trend_plot_top + $weekly_trend_plot_height - (($trend_count / $weekly_trend_max) * $weekly_trend_plot_height); ?>
-                    <circle class="manager-weekly-trend-point" cx="<?= h($weekly_trend_x_positions[$trend_index]) ?>" cy="<?= h($trend_y) ?>" r="4" tabindex="0">
-                        <title><?= h($weekly_trend_labels[$trend_index]) ?>: <?= h(number_format($trend_count)) ?> งาน</title>
-                    </circle>
-                    <text class="manager-weekly-trend-x-label" x="<?= h($weekly_trend_x_positions[$trend_index]) ?>" y="<?= h($weekly_trend_svg_height - 16) ?>" text-anchor="middle"><?= h($weekly_trend_labels[$trend_index]) ?></text>
-                <?php endforeach; ?>
-            </svg>
-        </div>
-    </section>
+    </div>
 
     <section class="report-panel report-table-panel report-data-panel manager-report-table-panel" aria-labelledby="manager-latest-title" data-manager-report-table-panel>
         <div class="report-panel-head">
             <div>
                 <h2 id="manager-latest-title">ใบงานติดตั้งล่าสุด</h2>
-                <p>ใช้ assignment ล่าสุดของแต่ละ setup และแสดง 1 ใบงานต่อ 1 แถว</p>
+                
             </div>
         </div>
         <div class="report-table-wrap">
@@ -776,14 +729,14 @@ layout_header('รายงาน', 'manager_reports', 'สรุปข้อม
                         </tr>
                     <?php else: ?>
                         <?php foreach ($table_rows as $table_row): ?>
-                            <?php $table_status = $table_row['status_meta']; ?>
+                            <?php $row_status_meta = $table_row['status_meta']; ?>
                             <tr>
                                 <td><strong><?= h($table_row['setup_id']) ?></strong></td>
                                 <td><?= h($table_row['customer_name'] ?: '-') ?></td>
                                 <td><?= h($table_row['technician_display']) ?></td>
                                 <td><?= h($table_row['install_date_display']) ?></td>
                                 <td><?= h($table_row['install_time_display']) ?></td>
-                                <td><span class="report-status-label"><i class="fa-solid <?= h($table_status['icon']) ?> tone-<?= h($table_status['tone']) ?>" aria-hidden="true"></i><?= h($table_status['label']) ?></span></td>
+                                <td><span class="report-status-label"><i class="fa-solid <?= h($row_status_meta['icon']) ?> tone-<?= h($row_status_meta['tone']) ?>" aria-hidden="true"></i><?= h($row_status_meta['label']) ?></span></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -793,10 +746,101 @@ layout_header('รายงาน', 'manager_reports', 'สรุปข้อม
     </section>
 </div>
 
-<script>
-window.managerCompletedReport = <?= $completed_data_json ?: '{}' ?>;
-</script>
 <script src="<?= h(app_asset_url('manager/assets/js/reports.js')) ?>?v=<?= h(asset_version('manager/assets/js/reports.js')) ?>"></script>
 <script src="<?= h(app_asset_url('manager/assets/js/technician_reports.js')) ?>?v=<?= h(asset_version('manager/assets/js/technician_reports.js')) ?>"></script>
+<script>
+(function () {
+    'use strict';
+
+    const page = document.querySelector('.manager-report-page');
+    const form = page?.querySelector('[data-manager-report-filter-form]');
+    const periodSelect = form?.querySelector('[data-manager-table-period]');
+    const dateRange = form?.querySelector('[data-manager-table-date-range]');
+    const dateFrom = form?.querySelector('[data-manager-table-date-from]');
+    const dateTo = form?.querySelector('[data-manager-table-date-to]');
+    if (!page || !form || !periodSelect || !dateRange || !dateFrom || !dateTo || page.dataset.tableFilterDropdownReady === 'true') {
+        return;
+    }
+
+    page.dataset.tableFilterDropdownReady = 'true';
+
+    const syncDateRange = () => {
+        const isCustom = periodSelect.value === 'custom';
+        dateRange.hidden = !isCustom;
+        [dateFrom, dateTo].forEach((input) => {
+            input.disabled = false;
+            if (!isCustom) {
+                input.value = '';
+            }
+        });
+    };
+
+    const submitFilter = () => {
+        if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit();
+        } else {
+            form.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+    };
+
+    periodSelect.addEventListener('change', syncDateRange);
+    syncDateRange();
+
+    form.querySelector('[data-manager-report-filter-reset]')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        form.querySelector('[name="q"]').value = '';
+        form.querySelector('[name="status"]').value = '';
+        form.querySelector('[name="technician_id"]').value = '';
+        periodSelect.value = 'all';
+        dateFrom.value = '';
+        dateTo.value = '';
+        syncDateRange();
+        submitFilter();
+    }, true);
+
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async function () {
+        const response = await originalFetch.apply(window, arguments);
+        try {
+            const request = arguments[0];
+            const requestUrl = new URL(typeof request === 'string' ? request : request.url, window.location.href);
+            if (requestUrl.searchParams.get('section') !== 'table') {
+                return response;
+            }
+
+            const payload = await response.clone().json();
+            if (!payload.success || !payload.metrics) {
+                return response;
+            }
+
+            const values = ['total', 'unassigned', 'in_progress', 'review', 'done', 'overdue'];
+            const cards = page.querySelectorAll('.manager-report-metric-grid .report-metric-card strong');
+            values.forEach((key, index) => {
+                if (cards[index]) {
+                    cards[index].textContent = Number(payload.metrics[key] || 0).toLocaleString('en-US');
+                }
+            });
+
+            const url = new URL(window.location.href);
+            ['q', 'technician_id', 'status', 'table_period', 'table_date_from', 'table_date_to'].forEach((key) => {
+                const value = requestUrl.searchParams.get(key) || '';
+                if (value) {
+                    url.searchParams.set(key, value);
+                } else {
+                    url.searchParams.delete(key);
+                }
+            });
+            url.searchParams.delete('table_period_value');
+            url.searchParams.delete('ajax');
+            url.searchParams.delete('section');
+            window.history.replaceState({}, '', url);
+        } catch (error) {
+            // The existing report handler owns request errors and rendering.
+        }
+        return response;
+    };
+}());
+</script>
 
 <?php layout_footer(); ?>

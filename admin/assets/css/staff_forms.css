@@ -610,3 +610,745 @@ body.app-body.role-3 .admin-user-split-layout {
 body.app-body.role-3 .admin-user-split-layout.has-detail {
   grid-template-columns: minmax(0, 1fr) 320px;
 }
+
+/* =========================================================
+   Admin user add page
+   Scoped refresh for the current Admin neutral design system.
+   ========================================================= */
+
+body.app-body.role-3:has(.admin-user-add-page) .content {
+  background: #f6f8fb !important;
+}
+
+body.app-body.role-3 .admin-user-add-page {
+  width: 100%;
+  max-width: 1180px;
+  min-height: calc(100vh - 64px);
+  margin: 0 auto;
+  padding: 8px 12px 28px;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-page-back-row {
+  margin: 0 0 14px !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-back-link {
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 0 13px !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #475569 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+  transition: transform .18s ease, border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-back-link:hover {
+  border-color: #93c5fd !important;
+  background: #f8fbff !important;
+  color: #1d4ed8 !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, .08) !important;
+  transform: translateY(-1px);
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-back-link .action-icon {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2.1;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-create-card {
+  padding: 0 !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .04) !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-create-head {
+  align-items: flex-start;
+  padding: 20px 24px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-radius: 16px 16px 0 0 !important;
+  background: #ffffff !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-create-head h2 {
+  margin: 0;
+  color: #0f172a !important;
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  line-height: 1.25;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-create-head-clean p {
+  display: block !important;
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-form-grid {
+  gap: 18px !important;
+  padding: 24px !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-field label {
+  margin-bottom: 7px !important;
+  color: #334155 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.35;
+}
+
+body.app-body.role-3 .admin-user-add-page .required-mark {
+  margin-left: 2px;
+  color: #dc2626;
+  font-weight: 700;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap input,
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap select {
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 13px 0 42px !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap > .form-icon {
+  top: 50% !important;
+  left: 14px !important;
+  width: 17px !important;
+  height: 17px !important;
+  color: #94a3b8 !important;
+  stroke: currentColor !important;
+  transform: translateY(-50%) !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap.select-wrap::after {
+  top: 50% !important;
+  right: 15px !important;
+  border-right-color: #94a3b8 !important;
+  border-bottom-color: #94a3b8 !important;
+  transform: translateY(-60%) rotate(45deg) !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap input:focus,
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap select:focus {
+  border-color: var(--role-primary) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--role-primary) 14%, transparent) !important;
+  outline: none !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap input[readonly] {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  cursor: default !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-address-section {
+  padding: 20px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  background: #f8fafc !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-address-title {
+  gap: 9px !important;
+  margin-bottom: 16px !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-address-title .form-icon {
+  width: 18px !important;
+  height: 18px !important;
+  color: #64748b !important;
+  stroke: currentColor !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-address-title label {
+  color: #0f172a !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-address-grid {
+  gap: 16px !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap.address-select-wrap {
+  height: 44px !important;
+  min-height: 44px !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap.address-select-wrap select {
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0 38px 0 42px !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap.address-select-wrap .form-icon {
+  top: 50% !important;
+  left: 14px !important;
+  width: 17px !important;
+  height: 17px !important;
+  transform: translateY(-50%) !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap.address-select-wrap::after {
+  top: 50% !important;
+  right: 15px !important;
+  border-right-color: #94a3b8 !important;
+  border-bottom-color: #94a3b8 !important;
+  transform: translateY(-60%) rotate(45deg) !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-input-wrap.address-select-wrap:focus-within {
+  border-color: var(--role-primary) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--role-primary) 14%, transparent) !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-form-actions {
+  gap: 10px !important;
+  padding: 18px 24px 24px !important;
+  border-top: 1px solid #e5e7eb !important;
+  border-radius: 0 0 16px 16px !important;
+  background: #ffffff !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-cancel-btn,
+body.app-body.role-3 .admin-user-add-page .staff-save-btn {
+  min-height: 40px !important;
+  height: 40px !important;
+  padding: 0 16px !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  transition: transform .18s ease, border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-cancel-btn {
+  border: 1px solid #dbe3ec !important;
+  background: #ffffff !important;
+  color: #475569 !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-cancel-btn:hover {
+  border-color: #93c5fd !important;
+  background: #f8fbff !important;
+  color: #1d4ed8 !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, .08) !important;
+  transform: translateY(-1px);
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-save-btn {
+  min-width: 170px !important;
+  border: 1px solid var(--role-primary) !important;
+  background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--role-primary) 20%, transparent) !important;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-save-btn:hover {
+  background: linear-gradient(135deg, var(--role-primary-hover), var(--role-primary)) !important;
+  box-shadow: 0 10px 20px color-mix(in srgb, var(--role-primary-hover) 20%, transparent) !important;
+  transform: translateY(-1px);
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-back-link:active,
+body.app-body.role-3 .admin-user-add-page .staff-cancel-btn:active,
+body.app-body.role-3 .admin-user-add-page .staff-save-btn:active {
+  transform: translateY(0);
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-save-btn .action-icon {
+  width: 16px;
+  height: 16px;
+}
+
+body.app-body.role-3 .admin-user-add-page .staff-back-link,
+body.app-body.role-3 .admin-user-add-page .staff-cancel-btn,
+body.app-body.role-3 .admin-user-add-page .staff-save-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  line-height: 1 !important;
+}
+
+/* style.css has a broad .action-icon rule that also styles SVGs like buttons/badges. */
+body.app-body.role-3 .admin-user-add-page .action-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 16px !important;
+  flex-grow: 0 !important;
+  width: 16px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  line-height: 1 !important;
+  stroke: currentColor !important;
+  fill: none !important;
+}
+
+@media (max-width: 760px) {
+  body.app-body.role-3 .admin-user-add-page {
+    min-height: 0;
+    padding: 0 0 24px;
+  }
+
+  body.app-body.role-3 .admin-user-add-page .staff-create-head {
+    padding: 18px !important;
+  }
+
+  body.app-body.role-3 .admin-user-add-page .staff-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    padding: 18px !important;
+  }
+
+  body.app-body.role-3 .admin-user-add-page .staff-address-section {
+    padding: 16px !important;
+  }
+
+  body.app-body.role-3 .admin-user-add-page .staff-address-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-3 .admin-user-add-page .staff-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 16px 18px 18px !important;
+  }
+
+  body.app-body.role-3 .admin-user-add-page .staff-cancel-btn,
+  body.app-body.role-3 .admin-user-add-page .staff-save-btn {
+    width: 100%;
+  }
+}
+
+/* Shared Add/Edit form treatment for the remaining Admin form pages. */
+body.app-body.role-3:has(.staff-form-page) .content {
+  background: #f6f8fb !important;
+}
+
+body.app-body.role-3 .staff-form-page {
+  width: 100%;
+  max-width: 1180px;
+  min-height: calc(100vh - 64px);
+  margin: 0 auto;
+  padding: 8px 12px 28px;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+body.app-body.role-3 .staff-form-page .staff-page-back-row {
+  margin: 0 0 14px !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-back-link {
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 0 13px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #475569 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+  transition: transform .18s ease, border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+body.app-body.role-3 .staff-form-page .staff-back-link:hover {
+  border-color: #93c5fd !important;
+  background: #f8fbff !important;
+  color: #1d4ed8 !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, .08) !important;
+  transform: translateY(-1px);
+}
+
+body.app-body.role-3 .staff-form-page .staff-create-card {
+  padding: 0 !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .04) !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-create-head {
+  align-items: flex-start;
+  padding: 20px 24px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-radius: 16px 16px 0 0 !important;
+  background: #ffffff !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-create-head h2 {
+  margin: 0;
+  color: #0f172a !important;
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  line-height: 1.25;
+}
+
+body.app-body.role-3 .staff-form-page .staff-create-head-clean p {
+  display: block !important;
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+body.app-body.role-3 .staff-form-page .staff-form-grid {
+  gap: 18px !important;
+  padding: 24px !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-field label {
+  margin-bottom: 7px !important;
+  color: #334155 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.35;
+}
+
+body.app-body.role-3 .staff-form-page .required-mark {
+  margin-left: 2px;
+  color: #dc2626;
+  font-weight: 700;
+}
+
+body.app-body.role-3 .staff-form-page .staff-input-wrap input,
+body.app-body.role-3 .staff-form-page .staff-input-wrap select {
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 13px 0 42px !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-input-wrap input::placeholder,
+body.app-body.role-3 .staff-form-page .staff-textarea-wrap textarea::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+body.app-body.role-3 .staff-form-page .staff-input-wrap > .form-icon {
+  top: 50% !important;
+  left: 14px !important;
+  width: 17px !important;
+  height: 17px !important;
+  color: #94a3b8 !important;
+  stroke: currentColor !important;
+  transform: translateY(-50%) !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-input-wrap.select-wrap::after,
+body.app-body.role-3 .staff-form-page .staff-input-wrap.address-select-wrap::after {
+  top: 50% !important;
+  right: 15px !important;
+  border-right-color: #94a3b8 !important;
+  border-bottom-color: #94a3b8 !important;
+  transform: translateY(-60%) rotate(45deg) !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-input-wrap input:focus,
+body.app-body.role-3 .staff-form-page .staff-input-wrap select:focus,
+body.app-body.role-3 .staff-form-page .staff-textarea-wrap textarea:focus {
+  border-color: var(--role-primary) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--role-primary) 14%, transparent) !important;
+  outline: none !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-input-wrap input[readonly] {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  cursor: default !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-textarea-wrap textarea {
+  min-height: 96px !important;
+  height: auto !important;
+  padding: 11px 13px 11px 42px !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 10px !important;
+  color: #1e293b !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1.55 !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-textarea-wrap > .form-icon {
+  top: 14px !important;
+  left: 14px !important;
+  width: 17px !important;
+  height: 17px !important;
+  color: #94a3b8 !important;
+  stroke: currentColor !important;
+  transform: none !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-address-section {
+  padding: 20px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  background: #f8fafc !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-address-title {
+  gap: 9px !important;
+  margin-bottom: 16px !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-address-title .form-icon {
+  width: 18px !important;
+  height: 18px !important;
+  color: #64748b !important;
+  stroke: currentColor !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-address-title label {
+  color: #0f172a !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-address-grid {
+  gap: 16px !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-input-wrap.address-select-wrap {
+  height: 44px !important;
+  min-height: 44px !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-input-wrap.address-select-wrap select {
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0 38px 0 42px !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-input-wrap.address-select-wrap .form-icon {
+  top: 50% !important;
+  left: 14px !important;
+  width: 17px !important;
+  height: 17px !important;
+  transform: translateY(-50%) !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-input-wrap.address-select-wrap:focus-within {
+  border-color: var(--role-primary) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--role-primary) 14%, transparent) !important;
+}
+
+body.app-body.role-3 .staff-form-page .password-inline-row {
+  align-items: center;
+  gap: 10px;
+}
+
+body.app-body.role-3 .staff-form-page .password-change-trigger {
+  min-height: 44px !important;
+  height: 44px !important;
+  padding: 0 14px !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #475569 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+  transition: transform .18s ease, border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+body.app-body.role-3 .staff-form-page .password-change-trigger:hover {
+  border-color: #93c5fd !important;
+  background: #f8fbff !important;
+  color: #1d4ed8 !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, .08) !important;
+  transform: translateY(-1px);
+}
+
+body.app-body.role-3 .staff-form-page .staff-form-actions {
+  gap: 10px !important;
+  padding: 18px 24px 24px !important;
+  border-top: 1px solid #e5e7eb !important;
+  border-radius: 0 0 16px 16px !important;
+  background: #ffffff !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-cancel-btn,
+body.app-body.role-3 .staff-form-page .staff-save-btn {
+  min-height: 40px !important;
+  height: 40px !important;
+  padding: 0 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  transition: transform .18s ease, border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+body.app-body.role-3 .staff-form-page .staff-cancel-btn {
+  border: 1px solid #dbe3ec !important;
+  background: #ffffff !important;
+  color: #475569 !important;
+  box-shadow: none !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-cancel-btn:hover {
+  border-color: #93c5fd !important;
+  background: #f8fbff !important;
+  color: #1d4ed8 !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, .08) !important;
+  transform: translateY(-1px);
+}
+
+body.app-body.role-3 .staff-form-page .staff-save-btn {
+  min-width: 170px !important;
+  border: 1px solid var(--role-primary) !important;
+  background: linear-gradient(135deg, var(--role-primary), var(--role-primary-hover)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--role-primary) 20%, transparent) !important;
+}
+
+body.app-body.role-3 .staff-form-page .staff-save-btn:hover {
+  background: linear-gradient(135deg, var(--role-primary-hover), var(--role-primary)) !important;
+  box-shadow: 0 10px 20px color-mix(in srgb, var(--role-primary-hover) 20%, transparent) !important;
+  transform: translateY(-1px);
+}
+
+body.app-body.role-3 .staff-form-page .staff-back-link:active,
+body.app-body.role-3 .staff-form-page .staff-cancel-btn:active,
+body.app-body.role-3 .staff-form-page .staff-save-btn:active,
+body.app-body.role-3 .staff-form-page .password-change-trigger:active {
+  transform: translateY(0);
+}
+
+body.app-body.role-3 .staff-form-page .action-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 16px !important;
+  flex-grow: 0 !important;
+  width: 16px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  line-height: 1 !important;
+  stroke: currentColor !important;
+  fill: none !important;
+}
+
+@media (max-width: 760px) {
+  body.app-body.role-3 .staff-form-page {
+    min-height: 0;
+    padding: 0 0 24px;
+  }
+
+  body.app-body.role-3 .staff-form-page .staff-create-head {
+    padding: 18px !important;
+  }
+
+  body.app-body.role-3 .staff-form-page .staff-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    padding: 18px !important;
+  }
+
+  body.app-body.role-3 .staff-form-page .staff-address-section {
+    padding: 16px !important;
+  }
+
+  body.app-body.role-3 .staff-form-page .staff-address-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.app-body.role-3 .staff-form-page .password-inline-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body.app-body.role-3 .staff-form-page .password-change-trigger {
+    width: 100%;
+  }
+
+  body.app-body.role-3 .staff-form-page .staff-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 16px 18px 18px !important;
+  }
+
+  body.app-body.role-3 .staff-form-page .staff-cancel-btn,
+  body.app-body.role-3 .staff-form-page .staff-save-btn {
+    width: 100%;
+  }
+}
