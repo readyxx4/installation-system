@@ -2859,6 +2859,29 @@ body.app-body.role-3:has(.admin-report-page) .content {
     font-weight: 700;
 }
 
+@media (min-width: 1181px) {
+    .admin-report-page .report-filter-bar[data-filter-section="overview-latest"] {
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
+
+    .admin-report-page .report-filter-bar[data-filter-section="overview-latest"] .report-filter-search {
+        flex: 1 1 190px;
+        min-width: 160px;
+    }
+
+    .admin-report-page .report-filter-bar[data-filter-section="overview-latest"] .report-filter-select {
+        flex: 0 1 150px;
+        min-width: 112px;
+    }
+
+    .admin-report-page .report-filter-bar[data-filter-section="overview-latest"] .report-filter-submit,
+    .admin-report-page .report-filter-bar[data-filter-section="overview-latest"] .report-filter-reset {
+        flex: 0 0 auto;
+        flex-shrink: 0;
+    }
+}
+
 .admin-report-page .is-filter-loading .report-table-wrap {
     opacity: .58;
     transition: opacity .18s ease;

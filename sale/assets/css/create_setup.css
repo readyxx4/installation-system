@@ -1145,7 +1145,26 @@ body.app-body.role-2
 
   gap: 14px;
 
-  align-items: stretch;
+  align-items: start;
+}
+
+body.app-body.role-2
+.sales-dashboard-page.sale-create-page
+.setup-work-page.setup-create-page
+.setup-summary-sidebar,
+body.app-body.role-2
+.sales-dashboard-page.sale-create-page
+.setup-work-page.setup-create-page
+.sticky-summary {
+  align-self: start;
+}
+
+body.app-body.role-2
+.sales-dashboard-page.sale-create-page
+.setup-work-page.setup-create-page
+.sticky-summary {
+  position: static;
+  top: auto;
 }
 
 body.app-body.role-2

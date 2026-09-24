@@ -262,39 +262,6 @@
       box-shadow: 0 20px 36px rgba(13, 71, 161, .28);
     }
 
-    .login-links-final {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-top: 13px;
-      color: var(--login-muted);
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    .login-register-link-final {
-      display: flex;
-      align-items: center;
-      min-width: 0;
-    }
-
-    .login-links-final a {
-      color: var(--login-primary-dark);
-      font-weight: 600;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .login-links-final a:hover {
-      color: var(--login-primary);
-      text-decoration: underline;
-    }
-
-    .forgot-password-link-final[aria-disabled="true"] {
-      cursor: default;
-    }
-
     @media (max-width: 980px) {
       body.login-page-final {
         overflow: auto;
@@ -335,15 +302,6 @@
         font-size: 22px;
       }
 
-      .login-links-final {
-        align-items: stretch;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .forgot-password-link-final {
-        align-self: flex-start;
-      }
     }
   </style>
 </head>
@@ -421,11 +379,6 @@
           <button type="submit" class="login-submit-final">เข้าสู่ระบบ</button>
         </form>
 
-        <div class="login-links-final">
-          <a class="forgot-password-link-final" href="forgot_password.html">
-            ลืมรหัสผ่าน
-          </a>
-        </div>
       </div>
     </section>
   </main>

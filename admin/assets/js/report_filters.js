@@ -132,17 +132,6 @@
     });
   };
 
-  const showAllOverviewPersonnelTablesForPrint = () => {
-    const tableGrid = root.querySelector('[data-overview-personnel-tables]');
-    if (!tableGrid) return;
-
-    tableGrid.dataset.personnelType = 'all';
-    tableGrid.classList.remove('report-personnel-table-grid--single');
-    tableGrid.querySelectorAll('[data-personnel-table-type]').forEach((table) => {
-      table.hidden = false;
-    });
-  };
-
   const panelForForm = (form) => {
     const section = form.dataset.filterSection;
     if (section === 'installation-latest') {
@@ -490,7 +479,8 @@
   normalizeFilterCopy();
   window.addEventListener('beforeprint', () => {
     updatePrintDate();
-    showAllOverviewPersonnelTablesForPrint();
+    const overviewFilter = root.querySelector('[data-filter-section="overview-latest"]');
+    if (overviewFilter) applyOverviewPersonnelFilter(overviewFilter);
   });
   window.addEventListener('afterprint', () => {
     const overviewFilter = root.querySelector('[data-filter-section="overview-latest"]');
