@@ -148,9 +148,17 @@ $report_categories = [
     'revenue' => 'ค่าติดตั้ง',
 ];
 
-// Admin Reports now provides one consolidated Overview report. Legacy report
-// URLs intentionally fall back to this view without removing their report code.
-$report = 'overview';
+// Keep the report navigation intentionally limited to the current views.
+// Other legacy report keys continue to fall back to the Overview.
+$report_navigation_categories = [
+    'overview' => 'ภาพรวม',
+    'product' => 'สินค้า',
+    'revenue' => 'ค่าติดตั้ง',
+];
+$report = strtolower(trim((string) ($_GET['report'] ?? 'overview')));
+if (!array_key_exists($report, $report_navigation_categories)) {
+    $report = 'overview';
+}
 
 $start_date = admin_report_valid_date((string) ($_GET['start_date'] ?? ''));
 $end_date = admin_report_valid_date((string) ($_GET['end_date'] ?? ''));
@@ -158,17 +166,95 @@ if ($start_date !== '' && $end_date !== '' && $start_date > $end_date) {
     [$start_date, $end_date] = [$end_date, $start_date];
 }
 
+$overview_date_from_raw = trim((string) ($_GET['date_from'] ?? ''));
+$overview_date_to_raw = trim((string) ($_GET['date_to'] ?? ''));
+$overview_date_from = admin_report_valid_date($overview_date_from_raw);
+$overview_date_to = admin_report_valid_date($overview_date_to_raw);
+$overview_date_filter_error = '';
+if ($report === 'overview') {
+    if (($overview_date_from_raw !== '' && $overview_date_from === '')
+        || ($overview_date_to_raw !== '' && $overview_date_to === '')) {
+        $overview_date_filter_error = 'รูปแบบวันที่ไม่ถูกต้อง';
+    } elseif ($overview_date_from !== '' && $overview_date_to !== '' && $overview_date_from > $overview_date_to) {
+        $overview_date_filter_error = 'วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด';
+    }
+}
+
+$product_date_from_raw = trim((string) ($_GET['date_from'] ?? ''));
+$product_date_to_raw = trim((string) ($_GET['date_to'] ?? ''));
+$product_date_from = admin_report_valid_date($product_date_from_raw);
+$product_date_to = admin_report_valid_date($product_date_to_raw);
+$product_date_filter_error = '';
+if ($report === 'product') {
+    if (($product_date_from_raw !== '' && $product_date_from === '')
+        || ($product_date_to_raw !== '' && $product_date_to === '')) {
+        $product_date_filter_error = 'รูปแบบวันที่ไม่ถูกต้อง';
+    } elseif ($product_date_from !== '' && $product_date_to !== '' && $product_date_from > $product_date_to) {
+        $product_date_filter_error = 'วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด';
+    }
+}
+
+$product_date_conditions = [];
+$product_date_params = [];
+$product_date_types = '';
+if ($product_date_filter_error === '') {
+    if ($product_date_from !== '') {
+        $product_date_conditions[] = 's.created_at >= ?';
+        $product_date_params[] = $product_date_from . ' 00:00:00';
+        $product_date_types .= 's';
+    }
+    if ($product_date_to !== '') {
+        $product_date_conditions[] = 's.created_at < DATE_ADD(?, INTERVAL 1 DAY)';
+        $product_date_params[] = $product_date_to;
+        $product_date_types .= 's';
+    }
+}
+$product_date_where = $product_date_conditions === [] ? '1=1' : implode(' AND ', $product_date_conditions);
+
+$product_print_period = '';
+if ($report === 'product' && $product_date_filter_error === '') {
+    $product_print_date = static fn (string $value): string => date('d/m/Y', strtotime($value));
+    if ($product_date_from !== '' && $product_date_to !== '') {
+        $product_print_period = 'ช่วงข้อมูล: ' . $product_print_date($product_date_from) . ' - ' . $product_print_date($product_date_to);
+    } elseif ($product_date_from !== '') {
+        $product_print_period = 'ช่วงข้อมูล: ตั้งแต่ ' . $product_print_date($product_date_from);
+    } elseif ($product_date_to !== '') {
+        $product_print_period = 'ช่วงข้อมูล: ถึง ' . $product_print_date($product_date_to);
+    }
+}
+
+$product_type_options = [];
+$product_type_filter = '';
+if ($report === 'product') {
+    $product_type_options = admin_report_rows(
+        $conn,
+        'SELECT protype_id, protype_name FROM product_type ORDER BY protype_name ASC, protype_id ASC'
+    );
+    $product_type_input = trim((string) ($_GET['product_type'] ?? ''));
+    $product_type_ids = array_column($product_type_options, 'protype_id');
+    if (in_array($product_type_input, $product_type_ids, true)) {
+        $product_type_filter = $product_type_input;
+    }
+}
+
+$active_start_date = $report === 'overview' && $overview_date_filter_error === ''
+    ? $overview_date_from
+    : $start_date;
+$active_end_date = $report === 'overview' && $overview_date_filter_error === ''
+    ? $overview_date_to
+    : $end_date;
+
 $setup_date_conditions = [];
 $setup_date_params = [];
 $setup_date_types = '';
-if ($start_date !== '') {
+if ($active_start_date !== '') {
     $setup_date_conditions[] = 's.created_at >= ?';
-    $setup_date_params[] = $start_date . ' 00:00:00';
+    $setup_date_params[] = $active_start_date . ' 00:00:00';
     $setup_date_types .= 's';
 }
-if ($end_date !== '') {
+if ($active_end_date !== '') {
     $setup_date_conditions[] = 's.created_at < DATE_ADD(?, INTERVAL 1 DAY)';
-    $setup_date_params[] = $end_date;
+    $setup_date_params[] = $active_end_date;
     $setup_date_types .= 's';
 }
 $setup_date_where = $setup_date_conditions === [] ? '1=1' : implode(' AND ', $setup_date_conditions);
@@ -197,14 +283,14 @@ $overview_limit_description = $overview_limit === 'all'
 $assignment_date_conditions = [];
 $assignment_date_params = [];
 $assignment_date_types = '';
-if ($start_date !== '') {
+if ($active_start_date !== '') {
     $assignment_date_conditions[] = 'a.assign_date >= ?';
-    $assignment_date_params[] = $start_date . ' 00:00:00';
+    $assignment_date_params[] = $active_start_date . ' 00:00:00';
     $assignment_date_types .= 's';
 }
-if ($end_date !== '') {
+if ($active_end_date !== '') {
     $assignment_date_conditions[] = 'a.assign_date < DATE_ADD(?, INTERVAL 1 DAY)';
-    $assignment_date_params[] = $end_date;
+    $assignment_date_params[] = $active_end_date;
     $assignment_date_types .= 's';
 }
 $assignment_date_where = $assignment_date_conditions === [] ? '1=1' : implode(' AND ', $assignment_date_conditions);
@@ -484,6 +570,70 @@ $overview_completed_setup_count = count(array_filter(
     $overview_filtered_rows,
     static fn (array $row): bool => (string) ($row['report_status'] ?? '') === 'done'
 ));
+$product_assigned_products = [];
+$product_revenue_products = [];
+$product_assigned_leader = null;
+$product_revenue_leader = null;
+$product_revenue_top_five = [];
+if ($report === 'product' && $product_date_filter_error === '') {
+    $product_type_where = '1=1';
+    $product_filter_params = $product_date_params;
+    $product_filter_types = $product_date_types;
+    if ($product_type_filter !== '') {
+        $product_type_where = 'p.protype_id = ?';
+        $product_filter_params[] = $product_type_filter;
+        $product_filter_types .= 's';
+    }
+
+    $product_assigned_products = admin_report_rows(
+        $conn,
+        "SELECT
+                d.pro_id AS product_id,
+                COALESCE(NULLIF(TRIM(p.pro_name), ''), NULLIF(TRIM(d.pro_id), ''), '-') AS product_name,
+                COUNT(DISTINCT s.setup_id) AS assigned_total
+         FROM setup s
+         INNER JOIN assignment a
+           ON a.setup_id = s.setup_id
+          AND a.assign_id = (
+              SELECT a2.assign_id
+              FROM assignment a2
+              WHERE a2.setup_id = s.setup_id
+              ORDER BY a2.assign_date DESC, a2.assign_id DESC
+              LIMIT 1
+          )
+         INNER JOIN install_detail d ON d.setup_id = s.setup_id
+         LEFT JOIN product p ON p.pro_id = d.pro_id
+         WHERE {$product_date_where}
+           AND {$product_type_where}
+         GROUP BY d.pro_id, p.pro_name
+         ORDER BY assigned_total DESC, product_name ASC, product_id ASC",
+        $product_filter_types,
+        $product_filter_params
+    );
+
+    $product_revenue_products = admin_report_rows(
+        $conn,
+        "SELECT
+                COALESCE(NULLIF(TRIM(p.pro_name), ''), NULLIF(TRIM(d.pro_id), ''), '-') AS product_name,
+                COALESCE(SUM(COALESCE(d.install_qty, 1)), 0) AS install_quantity,
+                COALESCE(SUM(COALESCE(d.install_total, 0)), 0) AS revenue_total
+         FROM install_detail d
+         INNER JOIN setup s ON s.setup_id = d.setup_id
+         LEFT JOIN product p ON p.pro_id = d.pro_id
+         WHERE s.setup_status = 4
+           AND s.completed_at IS NOT NULL
+           AND {$product_date_where}
+           AND {$product_type_where}
+         GROUP BY d.pro_id, p.pro_name
+         ORDER BY revenue_total DESC, install_quantity DESC, product_name ASC",
+        $product_filter_types,
+        $product_filter_params
+    );
+
+    $product_assigned_leader = $product_assigned_products[0] ?? null;
+    $product_revenue_leader = $product_revenue_products[0] ?? null;
+    $product_revenue_top_five = array_slice($product_revenue_products, 0, 5);
+}
 $installation_status_rows = admin_report_rows(
     $conn,
     "SELECT latest.report_status, COUNT(*) AS total
@@ -530,6 +680,18 @@ $overview_metrics = [
     ['key' => 'products', 'label' => 'สินค้าทั้งหมด', 'value' => number_format($overview_dataset_metrics['products']), 'tone' => 'violet', 'icon' => 'fa-box'],
     ['key' => 'completed', 'label' => 'งานเสร็จสิ้นทั้งหมด', 'value' => number_format($overview_dataset_metrics['completed']), 'tone' => 'green', 'icon' => 'fa-circle-check'],
 ];
+
+$overview_print_period = '';
+if ($report === 'overview' && $overview_date_filter_error === '') {
+    $overview_print_date = static fn (string $value): string => date('d/m/Y', strtotime($value));
+    if ($overview_date_from !== '' && $overview_date_to !== '') {
+        $overview_print_period = 'ช่วงข้อมูล: ' . $overview_print_date($overview_date_from) . ' - ' . $overview_print_date($overview_date_to);
+    } elseif ($overview_date_from !== '') {
+        $overview_print_period = 'ช่วงข้อมูล: ตั้งแต่ ' . $overview_print_date($overview_date_from);
+    } elseif ($overview_date_to !== '') {
+        $overview_print_period = 'ช่วงข้อมูล: ถึง ' . $overview_print_date($overview_date_to);
+    }
+}
 
 $period_label = 'ทุกช่วงเวลา';
 if ($start_date !== '' && $end_date !== '') {
@@ -846,16 +1008,47 @@ if ($report === 'installations') {
 }
 
 if ($report === 'revenue') {
-    $fee_year_input = trim((string) ($_GET['fee_year'] ?? ''));
-    $fee_year = preg_match('/^\d{4}$/', $fee_year_input) ? (int) $fee_year_input : (int) date('Y');
-    $fee_year = max(2000, min(2100, $fee_year));
-    $fee_year_start = sprintf('%04d-01-01 00:00:00', $fee_year);
-    $fee_next_year_start = sprintf('%04d-01-01 00:00:00', $fee_year + 1);
-    $fee_year_options = range(max(2000, (int) date('Y') - 4), (int) date('Y'));
-    if (!in_array($fee_year, $fee_year_options, true)) {
-        $fee_year_options[] = $fee_year;
-        sort($fee_year_options);
+    $revenue_date_from_raw = trim((string) ($_GET['date_from'] ?? ''));
+    $revenue_date_to_raw = trim((string) ($_GET['date_to'] ?? ''));
+    $revenue_date_from = admin_report_valid_date($revenue_date_from_raw);
+    $revenue_date_to = admin_report_valid_date($revenue_date_to_raw);
+    $revenue_date_filter_error = '';
+    if (($revenue_date_from_raw !== '' && $revenue_date_from === '')
+        || ($revenue_date_to_raw !== '' && $revenue_date_to === '')) {
+        $revenue_date_filter_error = 'รูปแบบวันที่ไม่ถูกต้อง';
+    } elseif ($revenue_date_from !== '' && $revenue_date_to !== '' && $revenue_date_from > $revenue_date_to) {
+        $revenue_date_filter_error = 'วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด';
     }
+
+    $revenue_date_conditions = ['1=1'];
+    $revenue_date_params = [];
+    $revenue_date_types = '';
+    if ($revenue_date_filter_error === '') {
+        if ($revenue_date_from !== '') {
+            $revenue_date_conditions[] = 's.created_at >= ?';
+            $revenue_date_params[] = $revenue_date_from . ' 00:00:00';
+            $revenue_date_types .= 's';
+        }
+        if ($revenue_date_to !== '') {
+            $revenue_date_conditions[] = 's.created_at < DATE_ADD(?, INTERVAL 1 DAY)';
+            $revenue_date_params[] = $revenue_date_to . ' 00:00:00';
+            $revenue_date_types .= 's';
+        }
+    }
+    $revenue_date_where = implode(' AND ', $revenue_date_conditions);
+
+    $revenue_print_period = '';
+    if ($revenue_date_filter_error === '') {
+        $revenue_print_date = static fn (string $value): string => date('d/m/Y', strtotime($value));
+        if ($revenue_date_from !== '' && $revenue_date_to !== '') {
+            $revenue_print_period = 'ช่วงข้อมูล: ' . $revenue_print_date($revenue_date_from) . ' - ' . $revenue_print_date($revenue_date_to);
+        } elseif ($revenue_date_from !== '') {
+            $revenue_print_period = 'ช่วงข้อมูล: ตั้งแต่ ' . $revenue_print_date($revenue_date_from);
+        } elseif ($revenue_date_to !== '') {
+            $revenue_print_period = 'ช่วงข้อมูล: ถึง ' . $revenue_print_date($revenue_date_to);
+        }
+    }
+    $revenue_period_label = $revenue_print_period !== '' ? $revenue_print_period : 'ทุกช่วงเวลา';
 
     /* Always reduce install_detail to one row per setup before summing fees. */
     $fee_detail_summary_sql = '(SELECT setup_id, SUM(COALESCE(install_total, 0)) AS install_total
@@ -879,11 +1072,13 @@ if ($report === 'revenue') {
         ELSE 'unassigned'
     END";
     $fee_source_sql = "SELECT s.setup_id, s.setup_status, s.completed_at,
+                              COALESCE(NULLIF(TRIM(c.customer_name), ''), '-') AS customer_name,
                               COALESCE(detail_summary.install_total, 0) AS install_total,
                               {$fee_report_status_case_sql} AS report_status
                        FROM setup s
                        INNER JOIN {$fee_detail_summary_sql} detail_summary
                                ON detail_summary.setup_id = s.setup_id
+                       LEFT JOIN customers c ON c.customer_id = s.customer_id
                        LEFT JOIN assignment a
                          ON a.setup_id = s.setup_id
                         AND a.assign_id = (
@@ -893,13 +1088,15 @@ if ($report === 'revenue') {
                             ORDER BY a2.assign_date DESC, a2.assign_id DESC
                             LIMIT 1
                         )
-                       WHERE {$setup_date_where}";
+                       WHERE {$revenue_date_where}";
     $fee_monthly_source_sql = "SELECT s.setup_id, s.setup_status, s.completed_at,
+                                      COALESCE(NULLIF(TRIM(c.customer_name), ''), '-') AS customer_name,
                                       COALESCE(detail_summary.install_total, 0) AS install_total,
                                       {$fee_report_status_case_sql} AS report_status
                                FROM setup s
                                INNER JOIN {$fee_detail_summary_sql} detail_summary
                                        ON detail_summary.setup_id = s.setup_id
+                               LEFT JOIN customers c ON c.customer_id = s.customer_id
                                LEFT JOIN assignment a
                                  ON a.setup_id = s.setup_id
                                 AND a.assign_id = (
@@ -909,20 +1106,27 @@ if ($report === 'revenue') {
                                     ORDER BY a2.assign_date DESC, a2.assign_id DESC
                                     LIMIT 1
                                 )
-                               WHERE 1=1";
+                               WHERE {$revenue_date_where}";
     $fee_status_filter_conditions = ['1=1'];
     $fee_status_filter_params = [];
     $fee_status_filter_types = '';
+    if ($report_filter_search !== '') {
+        $fee_search_like = '%' . $report_filter_search . '%';
+        $fee_status_filter_conditions[] = '(fee.setup_id LIKE ? OR fee.customer_name LIKE ?)';
+        $fee_status_filter_params[] = $fee_search_like;
+        $fee_status_filter_params[] = $fee_search_like;
+        $fee_status_filter_types .= 'ss';
+    }
     if ($report_filter_status === 'in_progress') {
         $fee_status_filter_conditions[] = "fee.report_status IN ('assigned', 'accepted', 'received', 'working', 'review')";
     } elseif ($report_filter_status !== '') {
         $fee_status_filter_conditions[] = 'fee.report_status = ?';
         $fee_status_filter_params[] = $report_filter_status;
-        $fee_status_filter_types = 's';
+        $fee_status_filter_types .= 's';
     }
     $fee_status_filter_where = implode(' AND ', $fee_status_filter_conditions);
-    $fee_filtered_rows_params = array_merge($setup_date_params, $fee_status_filter_params);
-    $fee_filtered_rows_types = $setup_date_types . $fee_status_filter_types;
+    $fee_filtered_rows_params = array_merge($revenue_date_params, $fee_status_filter_params);
+    $fee_filtered_rows_types = $revenue_date_types . $fee_status_filter_types;
     $fee_setup_rows = admin_report_rows(
         $conn,
         "SELECT fee.*
@@ -986,32 +1190,57 @@ if ($report === 'revenue') {
     }
 
     $fee_month_labels = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-    $fee_monthly = [];
-    for ($month = 1; $month <= 12; $month++) {
-        $fee_monthly[$month] = ['jobs' => 0, 'fee' => 0.0];
-    }
+    $fee_monthly_by_key = [];
     foreach (admin_report_rows(
         $conn,
-        "SELECT MONTH(fee.completed_at) AS month_index,
+        "SELECT YEAR(fee.completed_at) AS year_index,
+                MONTH(fee.completed_at) AS month_index,
                 COUNT(*) AS job_total,
                 COALESCE(SUM(fee.install_total), 0) AS fee_total
          FROM ({$fee_monthly_source_sql}) fee
          WHERE fee.setup_status = 4
            AND fee.completed_at IS NOT NULL
-           AND fee.completed_at >= ? AND fee.completed_at < ?
            AND {$fee_status_filter_where}
-         GROUP BY MONTH(fee.completed_at)",
-        'ss' . $fee_status_filter_types,
-        array_merge([$fee_year_start, $fee_next_year_start], $fee_status_filter_params)
+         GROUP BY YEAR(fee.completed_at), MONTH(fee.completed_at)
+         ORDER BY YEAR(fee.completed_at), MONTH(fee.completed_at)",
+        $fee_filtered_rows_types,
+        $fee_filtered_rows_params
     ) as $fee_month_row) {
         $fee_month_index = (int) ($fee_month_row['month_index'] ?? 0);
-        if ($fee_month_index >= 1 && $fee_month_index <= 12) {
-            $fee_monthly[$fee_month_index] = [
+        $fee_year_index = (int) ($fee_month_row['year_index'] ?? 0);
+        if ($fee_month_index >= 1 && $fee_month_index <= 12 && $fee_year_index > 0) {
+            $fee_monthly_by_key[sprintf('%04d-%02d', $fee_year_index, $fee_month_index)] = [
                 'jobs' => (int) ($fee_month_row['job_total'] ?? 0),
                 'fee' => (float) ($fee_month_row['fee_total'] ?? 0),
             ];
         }
     }
+
+    $fee_month_range_start = $revenue_date_from !== ''
+        ? new DateTimeImmutable(substr($revenue_date_from, 0, 7) . '-01')
+        : new DateTimeImmutable(date('Y-01-01'));
+    $fee_month_range_end = $revenue_date_to !== ''
+        ? new DateTimeImmutable(substr($revenue_date_to, 0, 7) . '-01')
+        : new DateTimeImmutable(($revenue_date_from !== '' ? substr($revenue_date_from, 0, 4) : date('Y')) . '-12-01');
+    if ($revenue_date_from === '' && $revenue_date_to !== '') {
+        $fee_month_range_start = new DateTimeImmutable(substr($revenue_date_to, 0, 4) . '-01-01');
+    }
+
+    $fee_monthly = [];
+    for ($fee_month_cursor = $fee_month_range_start; $fee_month_cursor <= $fee_month_range_end; $fee_month_cursor = $fee_month_cursor->modify('+1 month')) {
+        $fee_month_year = (int) $fee_month_cursor->format('Y');
+        $fee_month_index = (int) $fee_month_cursor->format('n');
+        $fee_month_key = $fee_month_cursor->format('Y-m');
+        $fee_month_actual = $fee_monthly_by_key[$fee_month_key] ?? ['jobs' => 0, 'fee' => 0.0];
+        $fee_monthly[] = [
+            'label' => $fee_month_labels[$fee_month_index - 1] . ' ' . $fee_month_year,
+            'jobs' => (int) $fee_month_actual['jobs'],
+            'fee' => (float) $fee_month_actual['fee'],
+        ];
+    }
+    $fee_monthly_description = $revenue_print_period !== ''
+        ? 'งานเสร็จสิ้นของใบงานใน' . $revenue_print_period
+        : 'งานเสร็จสิ้นในปี ' . date('Y');
 
     $report_metrics = [
         ['label' => 'ค่าติดตั้งรวมทั้งหมด', 'value' => number_format($fee_total, 2) . ' ฿', 'detail' => 'รวมใบงานที่มีรายการค่าติดตั้ง', 'tone' => 'violet', 'icon' => 'fa-baht-sign'],
@@ -1024,6 +1253,36 @@ if ($report === 'revenue') {
 
 $ajax_section = trim((string) ($_GET['section'] ?? ''));
 if ((string) ($_GET['ajax'] ?? '') === '1') {
+    if ($report === 'overview' && $ajax_section === 'overview-latest' && $overview_date_filter_error !== '') {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => false,
+            'section' => $ajax_section,
+            'message' => $overview_date_filter_error,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($report === 'revenue' && $ajax_section === 'revenue' && $revenue_date_filter_error !== '') {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => false,
+            'section' => $ajax_section,
+            'message' => $revenue_date_filter_error,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($report === 'product' && $ajax_section === 'product' && $product_date_filter_error !== '') {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => false,
+            'section' => $ajax_section,
+            'message' => $product_date_filter_error,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
     if (($report === 'overview' && $ajax_section === 'overview-latest') || ($report === 'installations' && $ajax_section === 'installation-latest')) {
         $ajax_latest_rows = array_map(static function (array $row) use ($report_workflow_status_meta): array {
             $status = $report_workflow_status_meta[(string) ($row['report_status'] ?? '')] ?? ['label' => 'ไม่ระบุสถานะ', 'tone' => 'blue', 'icon' => 'fa-circle-question'];
@@ -1045,6 +1304,7 @@ if ((string) ($_GET['ajax'] ?? '') === '1') {
         $ajax_installation_metric_labels = [];
         $ajax_overview_personnel_metric = [];
         $ajax_overview_dataset_metrics = [];
+        $ajax_overview_personnel_tables = [];
         $ajax_overview_limit_description = '';
         if ($report === 'installations') {
             $ajax_installation_metrics = [
@@ -1059,6 +1319,7 @@ if ((string) ($_GET['ajax'] ?? '') === '1') {
         } elseif ($report === 'overview') {
             $ajax_overview_personnel_metric = $overview_personnel_metric;
             $ajax_overview_dataset_metrics = $overview_dataset_metrics;
+            $ajax_overview_personnel_tables = $overview_personnel_tables;
             $ajax_overview_limit_description = $overview_limit_description;
         }
         header('Content-Type: application/json; charset=utf-8');
@@ -1071,6 +1332,7 @@ if ((string) ($_GET['ajax'] ?? '') === '1') {
             'metric_labels' => $ajax_installation_metric_labels,
             'overview_personnel_metric' => $ajax_overview_personnel_metric,
             'overview_dataset_metrics' => $ajax_overview_dataset_metrics,
+            'overview_personnel_tables' => $ajax_overview_personnel_tables,
             'overview_limit_description' => $ajax_overview_limit_description,
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
@@ -1117,11 +1379,24 @@ if ((string) ($_GET['ajax'] ?? '') === '1') {
                 'cancelled' => $fee_cancelled_total,
                 'average' => $fee_average,
             ],
-            'year' => $fee_year,
-            'labels' => array_values($fee_month_labels),
             'monthly' => array_values($fee_monthly),
+            'monthly_description' => $fee_monthly_description,
             'status_rows' => $ajax_fee_status_rows,
             'count' => $fee_setup_count,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    if ($report === 'product' && $ajax_section === 'product') {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => true,
+            'section' => $ajax_section,
+            'assigned_products' => $product_assigned_products,
+            'revenue_products' => $product_revenue_products,
+            'assigned_leader' => $product_assigned_leader,
+            'revenue_leader' => $product_revenue_leader,
+            'top_revenue_products' => $product_revenue_top_five,
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
@@ -1129,11 +1404,15 @@ if ((string) ($_GET['ajax'] ?? '') === '1') {
 
 $report_print_titles = [
     'overview' => 'รายงานภาพรวมระบบ',
+    'product' => 'รายงานสินค้า',
     'installations' => 'รายงานงานติดตั้ง',
     'users' => 'รายงานพนักงาน',
     'revenue' => 'รายงานค่าติดตั้ง',
 ];
 $report_print_title = $report_print_titles[$report] ?? $report_print_titles['overview'];
+$report_print_period = $report === 'revenue'
+    ? ($revenue_print_period ?? '')
+    : ($report === 'product' ? $product_print_period : $overview_print_period);
 $report_system = system_company_data($conn);
 $report_system_logo_url = $report_system['system_logo_url'];
 $report_system_name = $report_system['system_name'];
@@ -1147,6 +1426,10 @@ $report_page_headers = [
         'title' => $report_print_titles['overview'],
         'subtitle' => 'สรุปข้อมูลผู้ใช้งาน ใบงานติดตั้ง สถานะงาน และค่าติดตั้งของระบบ',
     ],
+    'product' => [
+        'title' => $report_print_titles['product'],
+        'subtitle' => 'สรุปสินค้าที่ถูกมอบหมายและสร้างรายได้ตามช่วงข้อมูล',
+    ],
     'installations' => [
         'title' => $report_print_titles['installations'],
         'subtitle' => 'เรียงจากวันที่สร้างใบงานใหม่สุด และใช้ assignment ล่าสุดต่อใบงาน',
@@ -1157,7 +1440,7 @@ $report_page_headers = [
     ],
     'revenue' => [
         'title' => $report_print_titles['revenue'],
-        'subtitle' => 'สรุปจำนวนงานและยอดค่าติดตั้งตามสถานะใน' . $period_label,
+        'subtitle' => 'สรุปจำนวนงานและยอดค่าติดตั้งตามสถานะใน' . ($revenue_period_label ?? $period_label),
     ],
 ];
 $page_title = $report_page_headers[$report]['title'] ?? $report_page_headers['overview']['title'];

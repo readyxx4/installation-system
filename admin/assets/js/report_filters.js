@@ -99,11 +99,13 @@
   const setUrlState = (section, params) => {
     const url = new URL(window.location.href);
     const keys = section === 'overview-latest'
-      ? ['search', 'status', 'personnel_type', 'limit']
+      ? ['search', 'status', 'personnel_type', 'limit', 'date_from', 'date_to']
       : section === 'personnel'
       ? ['personnel_search', 'personnel_type']
       : section === 'revenue'
-        ? ['status', 'fee_year']
+        ? ['search', 'status', 'date_from', 'date_to']
+        : section === 'product'
+          ? ['product_type', 'date_from', 'date_to']
         : ['search', 'status'];
 
     keys.forEach((key) => {
@@ -111,12 +113,44 @@
       if (value === '') url.searchParams.delete(key);
       else url.searchParams.set(key, value);
     });
+    if (section === 'revenue') url.searchParams.delete('fee_year');
     url.searchParams.delete('ajax');
     url.searchParams.delete('section');
     window.history.replaceState({}, '', url);
   };
 
   const readForm = (form) => Object.fromEntries(new FormData(form).entries());
+
+  const updateReportPrintPeriod = (form) => {
+    if (!['overview-latest', 'revenue', 'product'].includes(form?.dataset.filterSection)) return;
+
+    const from = form.querySelector('input[name="date_from"]')?.value || '';
+    const to = form.querySelector('input[name="date_to"]')?.value || '';
+    const node = root.querySelector('[data-report-print-period]');
+    if (!node) return;
+
+    const formatDate = (value) => {
+      const parts = value.split('-');
+      return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : value;
+    };
+    const label = from && to
+      ? `ช่วงข้อมูล: ${formatDate(from)} - ${formatDate(to)}`
+      : from
+        ? `ช่วงข้อมูล: ตั้งแต่ ${formatDate(from)}`
+        : to
+          ? `ช่วงข้อมูล: ถึง ${formatDate(to)}`
+          : '';
+    node.hidden = label === '';
+    node.textContent = label;
+  };
+
+  const validateDateRange = (form, params) => {
+    if (!['overview-latest', 'revenue', 'product'].includes(form.dataset.filterSection)) return '';
+    if (params.date_from && params.date_to && params.date_from > params.date_to) {
+      return 'วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด';
+    }
+    return '';
+  };
 
   const applyOverviewPersonnelFilter = (form) => {
     if (form.dataset.filterSection !== 'overview-latest') return;
@@ -146,6 +180,9 @@
     if (section === 'revenue') {
       return root.querySelector('[data-filter-target="revenue-status"]');
     }
+    if (section === 'product') {
+      return root.querySelector('[data-filter-target="product-assigned-products"]');
+    }
     return form.closest('.report-table-panel');
   };
 
@@ -166,6 +203,10 @@
       const monthlyPanel = root.querySelector('[data-filter-target="revenue-monthly"]');
       if (summary) panels.push(summary);
       if (monthlyPanel) panels.push(monthlyPanel);
+    }
+    if (form.dataset.filterSection === 'product') {
+      const revenueProductsPanel = root.querySelector('[data-filter-target="product-revenue-products"]');
+      if (revenueProductsPanel) panels.push(revenueProductsPanel);
     }
     return panels;
   };
@@ -195,7 +236,11 @@
       });
       if (!response.ok) throw new Error('request-failed');
       const payload = await response.json();
-      if (!payload.success || payload.section !== section) throw new Error('invalid-response');
+      if (!payload.success || payload.section !== section) {
+        const error = new Error('invalid-response');
+        error.userMessage = typeof payload.message === 'string' ? payload.message : '';
+        throw error;
+      }
       return payload;
     } finally {
       if (controllers[section] === controller) {
@@ -390,24 +435,69 @@
 
     const monthlyPanel = root.querySelector('[data-filter-target="revenue-monthly"]');
     const monthlyBody = monthlyPanel?.querySelector('tbody');
-    const labels = Array.isArray(payload.labels) ? payload.labels : [];
     const monthly = Array.isArray(payload.monthly) ? payload.monthly : [];
     if (monthlyBody) {
-      monthlyBody.innerHTML = labels.map((label, index) => {
-        const item = monthly[index] || { jobs: 0, fee: 0 };
+      monthlyBody.innerHTML = monthly.length ? monthly.map((item) => {
         const jobs = Number(item.jobs || 0);
         const fee = Number(item.fee || 0);
         return '<tr>' +
-          '<td>' + escapeHtml(label) + '</td>' +
+          '<td>' + escapeHtml(item.label || '-') + '</td>' +
           '<td class="report-number-cell">' + number(jobs) + ' งาน</td>' +
           '<td class="report-money-cell">' + number(fee, 2) + ' ฿</td>' +
-          '<td class="report-money-cell">' + number(jobs ? fee / jobs : 0, 2) + ' ฿</td>' +
-        '</tr>';
-      }).join('');
+          '</tr>';
+      }).join('') : renderEmpty(3, 'ไม่พบข้อมูลที่ตรงกับตัวกรอง');
     }
     monthlyPanel?.querySelector('.report-panel-head p')?.replaceChildren(
-      document.createTextNode('งานเสร็จสิ้นในปี ' + String(payload.year || ''))
+      document.createTextNode(String(payload.monthly_description || 'งานเสร็จสิ้นทุกช่วงเวลา'))
     );
+
+  };
+
+  const renderProductTables = (payload) => {
+    const assignedLeader = payload.assigned_leader || {};
+    const revenueLeader = payload.revenue_leader || {};
+    const assignedName = root.querySelector('[data-product-assigned-name]');
+    const assignedValue = root.querySelector('[data-product-assigned-value]');
+    const revenueName = root.querySelector('[data-product-revenue-name]');
+    const revenueValue = root.querySelector('[data-product-revenue-value]');
+    if (assignedName) assignedName.textContent = assignedLeader.product_name || '-';
+    if (assignedValue) assignedValue.textContent = number(assignedLeader.assigned_total) + ' งาน';
+    if (revenueName) revenueName.textContent = revenueLeader.product_name || '-';
+    if (revenueValue) revenueValue.textContent = number(revenueLeader.revenue_total, 2) + ' บาท';
+
+    const ranking = root.querySelector('[data-product-revenue-ranking]');
+    const topRevenueProducts = Array.isArray(payload.top_revenue_products) ? payload.top_revenue_products : [];
+    if (ranking) {
+      const maxRevenue = Math.max(0, ...topRevenueProducts.map((product) => Number(product.revenue_total || 0)));
+      ranking.innerHTML = topRevenueProducts.length ? topRevenueProducts.map((product) => {
+        const share = maxRevenue > 0 ? (Number(product.revenue_total || 0) / maxRevenue) * 100 : 0;
+        return '<li><span class="product-revenue-track"><span style="--product-revenue-share: ' + share.toFixed(2) + '%"></span></span>' +
+          '<strong>' + escapeHtml(product.product_name || '-') + '</strong>' +
+          '<b>' + number(product.revenue_total, 2) + ' บาท</b></li>';
+      }).join('') : '<li class="report-empty-state"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><span>ไม่พบข้อมูลที่ตรงกับตัวกรอง</span></li>';
+    }
+
+    const assignedBody = root.querySelector('[data-filter-target="product-assigned-products"] tbody');
+    const assignedProducts = Array.isArray(payload.assigned_products) ? payload.assigned_products : [];
+    if (assignedBody) {
+      assignedBody.innerHTML = assignedProducts.length ? assignedProducts.map((product, index) =>
+        '<tr><td class="report-number-cell">' + number(index + 1) + '</td>' +
+        '<td><strong>' + escapeHtml(product.product_id || '-') + '</strong></td>' +
+        '<td>' + escapeHtml(product.product_name || '-') + '</td>' +
+        '<td class="report-number-cell">' + number(product.assigned_total) + ' งาน</td></tr>'
+      ).join('') : renderEmpty(4, 'ไม่พบข้อมูลที่ตรงกับตัวกรอง');
+    }
+
+    const revenueBody = root.querySelector('[data-filter-target="product-revenue-products"] tbody');
+    const revenueProducts = Array.isArray(payload.revenue_products) ? payload.revenue_products : [];
+    if (revenueBody) {
+      revenueBody.innerHTML = revenueProducts.length ? revenueProducts.map((product, index) =>
+        '<tr><td class="report-number-cell">' + number(index + 1) + '</td>' +
+        '<td><strong>' + escapeHtml(product.product_name || '-') + '</strong></td>' +
+        '<td class="report-number-cell">' + number(product.install_quantity) + ' รายการ</td>' +
+        '<td class="report-money-cell">' + number(product.revenue_total, 2) + ' ฿</td></tr>'
+      ).join('') : renderEmpty(4, 'ไม่พบข้อมูลที่ตรงกับตัวกรอง');
+    }
   };
 
   const renderTechnicians = (form, payload) => {
@@ -459,6 +549,11 @@
   const apply = async (form) => {
     const section = form.dataset.filterSection;
     const params = readForm(form);
+    const dateRangeError = validateDateRange(form, params);
+    if (dateRangeError) {
+      showMessage(form, dateRangeError);
+      return;
+    }
     applyOverviewPersonnelFilter(form);
     try {
       const payload = await request(form, params);
@@ -466,13 +561,28 @@
         renderLatest(form, payload);
         renderOverviewPersonnelMetric(payload);
         renderOverviewDatasetMetrics(form, payload);
+        renderPersonnel(form, {
+          type: form.querySelector('select[name="personnel_type"]')?.value || 'all',
+          tables: payload.overview_personnel_tables || []
+        });
+        applyOverviewPersonnelFilter(form);
+        updateReportPrintPeriod(form);
       }
       else if (section === 'installation-latest') renderInstallation(form, payload);
       else if (section === 'personnel') renderPersonnel(form, payload);
-      else if (section === 'revenue') renderRevenueUnified(form, payload);
+      else if (section === 'revenue') {
+        renderRevenueUnified(form, payload);
+        updateReportPrintPeriod(form);
+      }
+      else if (section === 'product') {
+        renderProductTables(payload);
+        updateReportPrintPeriod(form);
+      }
       setUrlState(section, params);
     } catch (error) {
-      if (error.name !== 'AbortError') showMessage(form, 'ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
+      if (error.name !== 'AbortError') {
+        showMessage(form, error.userMessage || 'ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
+      }
     }
   };
 
@@ -480,7 +590,14 @@
   window.addEventListener('beforeprint', () => {
     updatePrintDate();
     const overviewFilter = root.querySelector('[data-filter-section="overview-latest"]');
-    if (overviewFilter) applyOverviewPersonnelFilter(overviewFilter);
+    if (overviewFilter) {
+      applyOverviewPersonnelFilter(overviewFilter);
+      updateReportPrintPeriod(overviewFilter);
+    }
+    const revenueFilter = root.querySelector('[data-filter-section="revenue"]');
+    if (revenueFilter) updateReportPrintPeriod(revenueFilter);
+    const productFilter = root.querySelector('[data-filter-section="product"]');
+    if (productFilter) updateReportPrintPeriod(productFilter);
   });
   window.addEventListener('afterprint', () => {
     const overviewFilter = root.querySelector('[data-filter-section="overview-latest"]');
@@ -489,6 +606,7 @@
 
   root.querySelectorAll('[data-report-filter-form]:not([data-filter-disabled])').forEach((form) => {
     applyOverviewPersonnelFilter(form);
+    updateReportPrintPeriod(form);
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();

@@ -251,6 +251,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'start
     $startJobMessage = 'ไม่สามารถเริ่มงานได้ กรุณาตรวจสอบว่างานพร้อมติดตั้งแล้วและลองอีกครั้ง';
     $startJobSucceeded = false;
     $startJobToken = $_POST['csrf_token'] ?? null;
+    $startJobNow = new DateTimeImmutable('now', new DateTimeZone('Asia/Bangkok'));
+    $startJobDate = $startJobNow->format('Y-m-d');
+    $startJobTime = $startJobNow->format('H:i:s');
 
     if (is_string($startJobToken) && hash_equals($_SESSION['technician_start_job_csrf'], $startJobToken)) {
         try {
@@ -273,11 +276,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'start
                       SELECT 1 FROM product_receive pr
                       WHERE pr.assign_id = a.assign_id AND pr.receive_status = 1
                   )
+                  AND NULLIF(TRIM(a.assign_install_date), '') IS NOT NULL
+                  AND (
+                      a.assign_install_date < ?
+                      OR (a.assign_install_date = ? AND ? >= '09:00:00')
+                  )
             ");
-            $startJobStmt->bind_param('ss', $assignId, $currentTechId);
+            $startJobStmt->bind_param('sssss', $assignId, $currentTechId, $startJobDate, $startJobDate, $startJobTime);
             if ($startJobStmt->execute() && $startJobStmt->affected_rows === 1) {
                 $startJobSucceeded = true;
                 $startJobMessage = 'เริ่มงานแล้ว สถานะเปลี่ยนเป็นกำลังติดตั้ง';
+            } else {
+                $startJobMessage = 'เริ่มงานได้ตั้งแต่เวลา 09:00 น. ของวันนัดติดตั้ง หรือเงื่อนไขเริ่มงานยังไม่ครบ';
             }
         } catch (Throwable $e) {
             error_log('Technician start job failed: ' . $e->getMessage());
@@ -675,6 +685,27 @@ if ($installDate !== '--' && $installTime !== '--') {
     $installDateTime = $installDate . ' ' . $installTime;
 } elseif ($installDate !== '--') {
     $installDateTime = $installDate;
+}
+
+$canStartJobBySchedule = true;
+$startJobScheduleMessage = '';
+$installDateRaw = trim((string) ($job['assign_install_date'] ?? ''));
+$installTimeRaw = trim((string) ($job['assign_install_time'] ?? ''));
+if ($installDateRaw !== '') {
+    try {
+        $scheduledInstallAt = new DateTimeImmutable($installDateRaw . ' 09:00:00', new DateTimeZone('Asia/Bangkok'));
+        $canStartJobBySchedule = $scheduledInstallAt <= new DateTimeImmutable('now', new DateTimeZone('Asia/Bangkok'));
+        if (!$canStartJobBySchedule) {
+            $startJobScheduleMessage = 'สามารถเริ่มงานได้วันที่ ' . $scheduledInstallAt->format('d/m/Y')
+                . ' เวลา 09:00 น.';
+        }
+    } catch (Throwable $e) {
+        $canStartJobBySchedule = false;
+        $startJobScheduleMessage = 'ไม่สามารถตรวจสอบวันและเวลานัดติดตั้งได้';
+    }
+} else {
+    $canStartJobBySchedule = false;
+    $startJobScheduleMessage = 'ยังไม่มีวันและเวลานัดติดตั้งสำหรับเริ่มงาน';
 }
 
 $productReceive = null;
@@ -1882,10 +1913,13 @@ endif;
                                 <form class="action-panel__decision-form" method="POST" action="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode($assignId))) ?>">
                                     <input type="hidden" name="action" value="start_job">
                                     <input type="hidden" name="csrf_token" value="<?= h($_SESSION['technician_start_job_csrf']) ?>">
-                                    <button class="action-panel__submit" type="submit" data-technician-confirm="ยืนยันเริ่มติดตั้งงานนี้หรือไม่?">
+                                    <button class="action-panel__submit<?= !$canStartJobBySchedule ? ' is-schedule-locked' : '' ?>" type="submit"<?= !$canStartJobBySchedule ? ' disabled aria-describedby="start-job-schedule-message" title="' . h($startJobScheduleMessage) . '"' : '' ?><?= $canStartJobBySchedule ? ' data-technician-confirm="ยืนยันเริ่มติดตั้งงานนี้หรือไม่?"' : '' ?>>
                                         <i class="fa-solid fa-wrench" aria-hidden="true"></i>
                                         <span>เริ่มงาน</span>
                                     </button>
+                                    <?php if (!$canStartJobBySchedule): ?>
+                                        <p class="action-panel__schedule-hint" id="start-job-schedule-message"><?= h($startJobScheduleMessage) ?></p>
+                                    <?php endif; ?>
                                 </form>
                             <?php elseif ($isInstalling && $canConfirmReceive && !$isInstallDone && !$hasInstallResult): ?>
                                 <?php if ($hasInstallationDraft): ?>

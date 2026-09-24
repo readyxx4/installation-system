@@ -337,7 +337,7 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                     <th>เบอร์โทร</th>
                     <th>อีเมล</th>
                     <th>สิทธิ์</th>
-                    <th style="width:180px;">จัดการ</th>
+                    <th style="width:200px;">จัดการ</th>
                 </tr>
             </thead>
 
@@ -361,6 +361,11 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                         && (int) $row['user_role'] === 3
                         && active_admin_count_excluding($conn, $row['user_id']) < 1;
                     $can_delete_user = !$is_current_user && !$has_historical_relation && !$is_last_active_admin;
+                    $delete_disabled_reason = $is_current_user
+                        ? 'ไม่สามารถลบบัญชีที่กำลังใช้งานอยู่'
+                        : ($has_historical_relation
+                            ? 'ไม่สามารถลบได้ เนื่องจากมีประวัติการทำงาน'
+                            : 'ไม่สามารถลบผู้ดูแลระบบที่ใช้งานอยู่คนสุดท้าย');
                     ?>
                     <tr class="user-detail-row<?= $is_active ? '' : ' is-suspended' ?>"
                         tabindex="0"
@@ -424,8 +429,10 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                                     </a>
                                 <?php endif; ?>
 
-                                <?php if ($can_delete_user): ?>
-                                <a class="btn btn-delete btn-delete-icon"
+                            <?php endif; ?>
+
+                            <?php if ($can_delete_user): ?>
+                                <a class="btn btn-delete"
                                    href="<?= h(app_system_url('admin/users.php?action=delete&id=' . urlencode($row['user_id']))) ?>"
                                    title="ลบบัญชี"
                                    aria-label="ลบบัญชี"
@@ -437,8 +444,23 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                                         <path d="M10 11v6"></path>
                                         <path d="M14 11v6"></path>
                                     </svg>
+                                    <span>ลบ</span>
                                 </a>
-                                <?php endif; ?>
+                            <?php else: ?>
+                                <button type="button"
+                                        class="btn btn-delete btn-delete-disabled"
+                                        disabled
+                                        title="<?= h($delete_disabled_reason) ?>"
+                                        aria-label="<?= h($delete_disabled_reason) ?>">
+                                    <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M8 6V4h8v2"></path>
+                                        <path d="M19 6l-1 14H6L5 6"></path>
+                                        <path d="M10 11v6"></path>
+                                        <path d="M14 11v6"></path>
+                                    </svg>
+                                    <span>ลบ</span>
+                                </button>
                             <?php endif; ?>
                             </div>
                         </td>

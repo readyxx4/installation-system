@@ -1368,6 +1368,23 @@ body.app-body.role-technician .technician-detail-page .action-panel__submit--fin
     background: #047857;
 }
 
+body.app-body.role-technician .technician-detail-page .action-panel__submit.is-schedule-locked,
+body.app-body.role-technician .technician-detail-page .action-panel__submit:disabled {
+    border-color: #cbd5e1;
+    background: #e2e8f0;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__schedule-hint {
+    margin: -2px 0 0;
+    color: #92400e;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
+}
+
 body.app-body.role-technician .technician-detail-page .receive-confirm-submit:disabled {
     border-color: #cbd5e1;
     background: #e2e8f0;

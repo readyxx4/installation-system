@@ -260,6 +260,7 @@ foreach ($items as $item) {
 $slip_company = system_company_data($conn);
 $slip_company_name = $slip_company['system_name'];
 $slip_company_address = $slip_company['company_address'];
+$slip_company_registration_no = $slip_company['company_registration_no'];
 $slip_company_tax_id = $slip_company['tax_id'];
 $slip_company_logo_url = $slip_company['system_logo_url'];
 
@@ -321,6 +322,8 @@ layout_header('ใบติดตั้ง', 'setups');
                     </div>
 
                     <p><?= h($slip_company_address) ?></p>
+
+                    <p>เลขทะเบียนนิติบุคคล: <?= h($slip_company_registration_no) ?></p>
 
                     <p>เลขประจำตัวผู้เสียภาษี: <?= h($slip_company_tax_id) ?></p>
                 </div>
@@ -427,7 +430,7 @@ layout_header('ใบติดตั้ง', 'setups');
                 <?php if ($has_active_assignment): ?>
                     <p></p>
                     <strong>ช่างผู้ติดตั้ง</strong>
-                    <small><?= h($slip_technician_name) ?> · ผู้ดำเนินงานติดตั้ง</small>
+                    <small><?= h($slip_technician_name) ?></small>
                     <span>วันที่ ____ / ____ / ______</span>
                 <?php endif; ?>
             </div>
@@ -435,14 +438,14 @@ layout_header('ใบติดตั้ง', 'setups');
             <div class="install-slip-signature">
                 <p></p>
                 <strong>ลูกค้า / ผู้รับงาน</strong>
-                <small><?= h($slip_customer_name) ?> · ผู้ตรวจรับงานติดตั้ง</small>
+                <small><?= h($slip_customer_name) ?></small>
                 <span>วันที่ ____ / ____ / ______</span>
             </div>
 
             <div class="install-slip-signature">
                 <p></p>
-                <strong><?= h($slip_creator_name) ?></strong>
-                <small>พนักงานขาย · ผู้จัดทำใบงาน</small>
+                <strong>พนักงานขาย</strong>
+                <small><?= h($slip_creator_name) ?></small>
                 <span>วันที่ ____ / ____ / ______</span>
             </div>
         </footer>

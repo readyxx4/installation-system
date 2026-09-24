@@ -23,6 +23,7 @@
         <div class="report-print-meta">
             <h2><?= h($report_print_title) ?></h2>
             <p data-report-print-date data-timezone="<?= h(date_default_timezone_get()) ?>">วันที่พิมพ์: <?= h($report_print_date) ?></p>
+            <p class="report-print-period" data-report-print-period<?= $report_print_period === '' ? ' hidden' : '' ?>><?= h($report_print_period) ?></p>
         </div>
     </header>
                 </td>
@@ -44,6 +45,19 @@
             </button>
         </div>
     </header>
+
+    <nav class="report-category-nav" aria-label="หมวดรายงาน">
+        <?php foreach ($report_navigation_categories as $key => $label): ?>
+            <?php $is_report_tab_active = $report === $key; ?>
+            <a
+                class="report-category-link<?= $is_report_tab_active ? ' is-active' : '' ?>"
+                href="<?= h(admin_report_url($key, $start_date, $end_date)) ?>"
+                <?= $is_report_tab_active ? 'aria-current="page"' : '' ?>
+            >
+                <?= h($label) ?>
+            </a>
+        <?php endforeach; ?>
+    </nav>
 
     <?php if ($report === 'overview'): ?>
         <section class="report-metric-grid report-overview-metric-grid" aria-label="ตัวชี้วัดภาพรวมระบบ">
@@ -85,18 +99,21 @@
                     <option value="technician"<?= $personnel_filter_type === 'technician' ? ' selected' : '' ?>>ช่างติดตั้ง</option>
                 </select>
             </label>
-            <label class="report-filter-select">
-                <span class="sr-only">จำนวนรายการ</span>
-                <select name="limit" data-filter-default-value="all">
-                    <option value="10"<?= $overview_limit === '10' ? ' selected' : '' ?>>10 รายการ</option>
-                    <option value="20"<?= $overview_limit === '20' ? ' selected' : '' ?>>20 รายการ</option>
-                    <option value="50"<?= $overview_limit === '50' ? ' selected' : '' ?>>50 รายการ</option>
-                    <option value="all"<?= $overview_limit === 'all' ? ' selected' : '' ?>>ทั้งหมด</option>
-                </select>
+            <label class="report-filter-date">
+                <span>จากวันที่</span>
+                <input type="date" name="date_from" value="<?= h($overview_date_from) ?>" aria-label="จากวันที่">
+            </label>
+            <label class="report-filter-date">
+                <span>ถึงวันที่</span>
+                <input type="date" name="date_to" value="<?= h($overview_date_to) ?>" aria-label="ถึงวันที่">
             </label>
             <button type="submit" class="report-filter-submit"><i class="fa-solid fa-filter" aria-hidden="true"></i><span>à¸à¸£à¸­à¸‡</span></button>
             <button type="button" class="report-filter-reset" data-filter-reset>à¸¥à¹‰à¸²à¸‡à¸•à¸±à¸§à¸à¸£à¸­à¸‡</button>
         </form>
+
+        <?php if ($overview_date_filter_error !== ''): ?>
+            <p class="report-filter-message" role="alert"><?= h($overview_date_filter_error) ?></p>
+        <?php endif; ?>
 
         <?php $personnel_tables = $overview_personnel_tables; ?>
         <section class="report-table-panel-grid report-personnel-table-grid<?= count($personnel_tables) === 1 ? ' report-personnel-table-grid--single' : '' ?>" data-personnel-tables data-overview-personnel-tables data-personnel-type="all" aria-label="สรุปข้อมูลพนักงาน">
@@ -266,6 +283,137 @@
             </div>
         </section>
 
+    <?php elseif ($report === 'product'): ?>
+        <section class="report-metric-grid report-product-summary-grid" data-product-summary aria-label="สินค้าเด่น">
+            <article class="report-metric-card">
+                <div class="report-metric-icon tone-blue"><i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i></div>
+                <div class="report-metric-copy">
+                    <span>สินค้าที่ถูกมอบหมายมากที่สุด</span>
+                    <strong data-product-assigned-name><?= h($product_assigned_leader['product_name'] ?? '-') ?></strong>
+                    <small data-product-assigned-value><?= h(number_format((int) ($product_assigned_leader['assigned_total'] ?? 0))) ?> งาน</small>
+                </div>
+            </article>
+            <article class="report-metric-card">
+                <div class="report-metric-icon tone-green"><i class="fa-solid fa-baht-sign" aria-hidden="true"></i></div>
+                <div class="report-metric-copy">
+                    <span>สินค้าที่ทำรายได้มากที่สุด</span>
+                    <strong data-product-revenue-name><?= h($product_revenue_leader['product_name'] ?? '-') ?></strong>
+                    <small data-product-revenue-value><?= h(number_format((float) ($product_revenue_leader['revenue_total'] ?? 0), 2)) ?> บาท</small>
+                </div>
+            </article>
+        </section>
+
+        <form class="report-filter-bar" data-report-filter-form data-filter-section="product">
+            <label class="report-filter-select">
+                <span class="sr-only">ประเภทสินค้า</span>
+                <select name="product_type" data-filter-default-value="">
+                    <option value="">ประเภทสินค้าทั้งหมด</option>
+                    <?php foreach ($product_type_options as $product_type_option): ?>
+                        <option value="<?= h($product_type_option['protype_id']) ?>"<?= $product_type_filter === $product_type_option['protype_id'] ? ' selected' : '' ?>><?= h($product_type_option['protype_name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
+            <label class="report-filter-date">
+                <span>จากวันที่</span>
+                <input type="date" name="date_from" value="<?= h($product_date_from) ?>">
+            </label>
+            <label class="report-filter-date">
+                <span>ถึงวันที่</span>
+                <input type="date" name="date_to" value="<?= h($product_date_to) ?>">
+            </label>
+            <button type="submit" class="report-filter-submit"><i class="fa-solid fa-filter" aria-hidden="true"></i><span>กรอง</span></button>
+            <button type="button" class="report-filter-reset" data-filter-reset>ล้างตัวกรอง</button>
+            <?php if ($product_date_filter_error !== ''): ?>
+                <p class="report-filter-error" role="alert"><?= h($product_date_filter_error) ?></p>
+            <?php endif; ?>
+        </form>
+
+        <section class="report-panel report-product-top-five" data-filter-target="product-top-revenue" aria-labelledby="product-top-revenue-title">
+            <div class="report-panel-head">
+                <div>
+                    <h2 id="product-top-revenue-title">Top 5 สินค้าที่ทำรายได้มากที่สุด</h2>
+                    <p>เฉพาะงานติดตั้งที่เสร็จสิ้นแล้ว</p>
+                </div>
+            </div>
+            <ol class="product-revenue-ranking" data-product-revenue-ranking>
+                <?php if ($product_revenue_top_five === []): ?>
+                    <li class="report-empty-state"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><span>ไม่พบข้อมูลที่ตรงกับตัวกรอง</span></li>
+                <?php else: ?>
+                    <?php $product_top_revenue = max(array_map(static fn (array $row): float => (float) $row['revenue_total'], $product_revenue_top_five)); ?>
+                    <?php foreach ($product_revenue_top_five as $top_product): ?>
+                        <?php $product_revenue_share = $product_top_revenue > 0 ? ((float) $top_product['revenue_total'] / $product_top_revenue) * 100 : 0; ?>
+                        <li>
+                            <span class="product-revenue-track"><span style="--product-revenue-share: <?= h(number_format($product_revenue_share, 2, '.', '')) ?>%"></span></span>
+                            <strong><?= h($top_product['product_name']) ?></strong>
+                            <b><?= h(number_format((float) $top_product['revenue_total'], 2)) ?> บาท</b>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ol>
+        </section>
+
+        <div class="product-report-panels">
+        <section class="report-panel report-table-panel" data-filter-target="product-assigned-products" aria-labelledby="product-assigned-products-title">
+            <div class="report-panel-head">
+                <div>
+                    <h2 id="product-assigned-products-title">สินค้าที่ถูกมอบหมายมากที่สุด</h2>
+                    <p>นับจากใบงานที่มีการมอบหมายช่างล่าสุด</p>
+                </div>
+            </div>
+            <div class="report-table-wrap">
+                <table class="report-table product-assigned-products-table">
+                    <thead>
+                        <tr><th scope="col">อันดับ</th><th scope="col">รหัสสินค้า</th><th scope="col">ชื่อสินค้า</th><th scope="col">จำนวนงานที่ถูกมอบหมาย</th></tr>
+                    </thead>
+                    <tbody>
+                        <?php if ($product_assigned_products === []): ?>
+                            <tr><td colspan="4"><div class="report-empty-state"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><span>ไม่พบข้อมูลที่ตรงกับตัวกรอง</span></div></td></tr>
+                        <?php else: ?>
+                            <?php foreach ($product_assigned_products as $product_rank => $product_assigned_product): ?>
+                                <tr>
+                                    <td class="report-number-cell"><?= h(number_format($product_rank + 1)) ?></td>
+                                    <td><strong><?= h($product_assigned_product['product_id']) ?></strong></td>
+                                    <td><?= h($product_assigned_product['product_name']) ?></td>
+                                    <td class="report-number-cell"><?= h(number_format((int) $product_assigned_product['assigned_total'])) ?> งาน</td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="report-panel report-table-panel" data-filter-target="product-revenue-products" aria-labelledby="product-revenue-products-title">
+            <div class="report-panel-head">
+                <div>
+                    <h2 id="product-revenue-products-title">สินค้าที่ทำรายได้มากที่สุด</h2>
+                    <p>เฉพาะงานติดตั้งที่เสร็จสิ้นแล้ว</p>
+                </div>
+            </div>
+            <div class="report-table-wrap">
+                <table class="report-table product-revenue-products-table">
+                    <thead>
+                        <tr><th scope="col">อันดับ</th><th scope="col">ชื่อสินค้า</th><th scope="col">จำนวนติดตั้ง</th><th scope="col">รายได้รวม</th></tr>
+                    </thead>
+                    <tbody>
+                        <?php if ($product_revenue_products === []): ?>
+                            <tr><td colspan="4"><div class="report-empty-state"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><span>ไม่พบข้อมูลที่ตรงกับตัวกรอง</span></div></td></tr>
+                        <?php else: ?>
+                            <?php foreach ($product_revenue_products as $product_rank => $product_revenue_product): ?>
+                                <tr>
+                                    <td class="report-number-cell"><?= h(number_format($product_rank + 1)) ?></td>
+                                    <td><strong><?= h($product_revenue_product['product_name']) ?></strong></td>
+                                    <td class="report-number-cell"><?= h(number_format((int) $product_revenue_product['install_quantity'])) ?> รายการ</td>
+                                    <td class="report-money-cell"><?= h(number_format((float) $product_revenue_product['revenue_total'], 2)) ?> ฿</td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        </div>
+
     <?php elseif ($report === 'revenue'): ?>
         <section class="report-metric-grid report-revenue-summary-grid" aria-label="ตัวชี้วัดค่าติดตั้ง">
             <?php $revenue_metric_keys = ['total', 'done', 'in_progress', 'cancelled', 'average']; ?>
@@ -284,6 +432,11 @@
         </section>
 
         <form class="report-filter-bar" data-report-filter-form data-filter-section="revenue">
+            <label class="report-filter-search">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <span class="sr-only">ค้นหาใบงานจากรหัสหรือชื่อลูกค้า</span>
+                <input type="search" name="search" value="<?= h($report_filter_search) ?>" placeholder="ค้นหาใบงานจากรหัสหรือชื่อลูกค้า" autocomplete="off">
+            </label>
             <label class="report-filter-select">
                 <span class="sr-only">กรองตามสถานะ</span>
                 <select name="status">
@@ -293,16 +446,19 @@
                     <?php endforeach; ?>
                 </select>
             </label>
-            <label class="report-filter-select">
-                <span>ปี</span>
-                <select name="fee_year" data-filter-default-value="<?= h((string) date('Y')) ?>">
-                    <?php foreach (array_reverse($fee_year_options) as $year_option): ?>
-                        <option value="<?= h((string) $year_option) ?>"<?= $fee_year === $year_option ? ' selected' : '' ?>><?= h((string) $year_option) ?></option>
-                    <?php endforeach; ?>
-                </select>
+            <label class="report-filter-date">
+                <span>จากวันที่</span>
+                <input type="date" name="date_from" value="<?= h($revenue_date_from) ?>">
+            </label>
+            <label class="report-filter-date">
+                <span>ถึงวันที่</span>
+                <input type="date" name="date_to" value="<?= h($revenue_date_to) ?>">
             </label>
             <button type="submit" class="report-filter-submit"><i class="fa-solid fa-filter" aria-hidden="true"></i><span>กรอง</span></button>
             <button type="button" class="report-filter-reset" data-filter-reset>ล้างตัวกรอง</button>
+            <?php if ($revenue_date_filter_error !== ''): ?>
+                <p class="report-filter-message" role="alert"><?= h($revenue_date_filter_error) ?></p>
+            <?php endif; ?>
         </form>
 
         <section class="report-table-panel-grid" aria-label="รายละเอียดค่าติดตั้ง">
@@ -310,7 +466,7 @@
                 <div class="report-panel-head">
                     <div>
                         <h2 id="revenue-status-title">ค่าติดตั้งตามสถานะงาน</h2>
-                        <p>สรุปจำนวนงานและยอดค่าติดตั้งตามสถานะใน<?= h($period_label) ?></p>
+                        <p>สรุปจำนวนงานและยอดค่าติดตั้งตามสถานะใน<?= h($revenue_period_label) ?></p>
                     </div>
                     <span class="report-table-period report-result-count"><i class="fa-solid fa-baht-sign" aria-hidden="true"></i><span data-revenue-result-count><?= h(number_format($fee_setup_count)) ?> รายการ</span></span>
                 </div>
@@ -336,7 +492,7 @@
                 <div class="report-panel-head">
                     <div>
                         <h2 id="revenue-monthly-title">สรุปค่าติดตั้งรายเดือน</h2>
-                        <p>งานเสร็จสิ้นในปี <?= h((string) $fee_year) ?></p>
+                        <p><?= h($fee_monthly_description) ?></p>
                     </div>
                 </div>
                 <div class="report-table-wrap">
@@ -345,17 +501,19 @@
                             <tr><th scope="col">เดือน</th><th scope="col">จำนวนงานเสร็จสิ้น</th><th scope="col">ค่าติดตั้งรวม</th></tr>
                         </thead>
                         <tbody>
-                            <?php for ($month = 1; $month <= 12; $month++): ?>
-                                <?php
-                                $month_jobs = $fee_monthly[$month]['jobs'];
-                                $month_fee = $fee_monthly[$month]['fee'];
-                                ?>
+                            <?php if ($fee_monthly === []): ?>
                                 <tr>
-                                    <td><?= h($fee_month_labels[$month - 1]) ?></td>
-                                    <td class="report-number-cell"><?= h(number_format($month_jobs)) ?> งาน</td>
-                                    <td class="report-money-cell"><?= h(number_format($month_fee, 2)) ?> ฿</td>
+                                    <td colspan="3"><div class="report-empty-state"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><span>ไม่พบข้อมูลที่ตรงกับตัวกรอง</span></div></td>
                                 </tr>
-                            <?php endfor; ?>
+                            <?php else: ?>
+                                <?php foreach ($fee_monthly as $fee_month_row): ?>
+                                    <tr>
+                                        <td><?= h($fee_month_row['label']) ?></td>
+                                        <td class="report-number-cell"><?= h(number_format($fee_month_row['jobs'])) ?> งาน</td>
+                                        <td class="report-money-cell"><?= h(number_format($fee_month_row['fee'], 2)) ?> ฿</td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>

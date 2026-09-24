@@ -2716,7 +2716,8 @@ body.app-body.role-3:has(.admin-report-page) .content {
 }
 
 .admin-report-page .report-filter-search,
-.admin-report-page .report-filter-select {
+.admin-report-page .report-filter-select,
+.admin-report-page .report-filter-date {
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -2741,7 +2742,8 @@ body.app-body.role-3:has(.admin-report-page) .content {
 }
 
 .admin-report-page .report-filter-search input,
-.admin-report-page .report-filter-select select {
+.admin-report-page .report-filter-select select,
+.admin-report-page .report-filter-date input {
     width: 100%;
     min-width: 0;
     height: 38px;
@@ -2781,8 +2783,28 @@ body.app-body.role-3:has(.admin-report-page) .content {
     cursor: pointer;
 }
 
+.admin-report-page .report-filter-date {
+    flex: 0 1 174px;
+    gap: 8px;
+    padding: 0 11px;
+}
+
+.admin-report-page .report-filter-date > span {
+    flex: 0 0 auto;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.admin-report-page .report-filter-date input {
+    padding: 0;
+    cursor: pointer;
+}
+
 .admin-report-page .report-filter-search:focus-within,
-.admin-report-page .report-filter-select:focus-within {
+.admin-report-page .report-filter-select:focus-within,
+.admin-report-page .report-filter-date:focus-within {
     border-color: #93c5fd;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
 }
@@ -2871,12 +2893,43 @@ body.app-body.role-3:has(.admin-report-page) .content {
     }
 
     .admin-report-page .report-filter-bar[data-filter-section="overview-latest"] .report-filter-select {
-        flex: 0 1 150px;
-        min-width: 112px;
+        flex: 0 1 142px;
+        min-width: 118px;
+    }
+
+    .admin-report-page .report-filter-bar[data-filter-section="overview-latest"] .report-filter-date {
+        flex: 0 1 164px;
+        min-width: 156px;
     }
 
     .admin-report-page .report-filter-bar[data-filter-section="overview-latest"] .report-filter-submit,
     .admin-report-page .report-filter-bar[data-filter-section="overview-latest"] .report-filter-reset {
+        flex: 0 0 auto;
+        flex-shrink: 0;
+    }
+
+    .admin-report-page .report-filter-bar[data-filter-section="revenue"] {
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
+
+    .admin-report-page .report-filter-bar[data-filter-section="revenue"] .report-filter-search {
+        flex: 1 1 220px;
+        min-width: 170px;
+    }
+
+    .admin-report-page .report-filter-bar[data-filter-section="revenue"] .report-filter-select {
+        flex: 0 1 190px;
+        min-width: 150px;
+    }
+
+    .admin-report-page .report-filter-bar[data-filter-section="revenue"] .report-filter-date {
+        flex: 0 1 164px;
+        min-width: 150px;
+    }
+
+    .admin-report-page .report-filter-bar[data-filter-section="revenue"] .report-filter-submit,
+    .admin-report-page .report-filter-bar[data-filter-section="revenue"] .report-filter-reset {
         flex: 0 0 auto;
         flex-shrink: 0;
     }
@@ -2901,6 +2954,7 @@ body.app-body.role-3:has(.admin-report-page) .content {
 @media (max-width: 700px) {
     .admin-report-page .report-filter-search,
     .admin-report-page .report-filter-select,
+    .admin-report-page .report-filter-date,
     .admin-report-page .report-filter-submit,
     .admin-report-page .report-filter-reset {
         flex: 1 1 100%;
@@ -3251,6 +3305,96 @@ body.app-body.role-3:has(.admin-report-page) .installation-summary-dot.tone-crim
 .admin-report-page .revenue-monthly-panel .revenue-monthly-table td:nth-child(2),
 .admin-report-page .revenue-monthly-panel .revenue-monthly-table td:nth-child(3) {
     white-space: nowrap;
+}
+
+/* Keep the top-product headers and their values aligned to the same column edge. */
+.admin-report-page .product-revenue-products-table th,
+.admin-report-page .product-revenue-products-table td,
+.admin-report-page .product-revenue-products-table .report-number-cell,
+.admin-report-page .product-revenue-products-table .report-money-cell {
+    text-align: left;
+}
+
+.admin-report-page .product-assigned-products-table th,
+.admin-report-page .product-assigned-products-table td,
+.admin-report-page .product-assigned-products-table .report-number-cell {
+    text-align: left;
+}
+
+.admin-report-page .product-report-panels {
+    display: grid;
+    gap: 18px;
+}
+
+.admin-report-page .report-product-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-report-page .report-product-summary-grid .report-metric-copy strong {
+    font-size: clamp(17px, 1.45vw, 22px);
+}
+
+.admin-report-page .report-product-top-five {
+    margin-bottom: 18px;
+}
+
+.admin-report-page .product-revenue-ranking {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.admin-report-page .product-revenue-ranking li {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) minmax(190px, 1.7fr) auto;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.admin-report-page .product-revenue-ranking strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-report-page .product-revenue-ranking b {
+    color: #166534;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.admin-report-page .product-revenue-track {
+    display: block;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #dcfce7;
+}
+
+.admin-report-page .product-revenue-track > span {
+    display: block;
+    width: var(--product-revenue-share);
+    height: 100%;
+    border-radius: inherit;
+    background: #22c55e;
+}
+
+@media (max-width: 700px) {
+    .admin-report-page .report-product-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-report-page .product-revenue-ranking li {
+        grid-template-columns: 84px minmax(0, 1fr);
+        gap: 8px 12px;
+    }
+
+    .admin-report-page .product-revenue-ranking b {
+        grid-column: 2;
+    }
 }
 
 @media (max-width: 700px) {
