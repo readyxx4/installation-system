@@ -883,17 +883,50 @@ body.app-body.role-2:has(.sale-report-page) .content {
     display: none !important;
   }
 
-  body.app-body.role-2:has(.sale-report-page) .sale-report-page > .report-print-document-header {
+  .sale-report-page .sale-print-document {
+    display: table !important;
+    width: 100% !important;
+    height: auto !important;
+    border-spacing: 0;
+    border-collapse: collapse;
+    visibility: visible !important;
+    overflow: visible !important;
+  }
+
+  .sale-report-page .sale-print-document .report-print-document-header {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 14px 22px;
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
     margin: 0 0 12px;
     padding: 0 0 10px;
     color: #0f172a;
     border-bottom: 1px solid #cbd5e1;
+    visibility: visible !important;
+    overflow: visible !important;
+    transform: none !important;
     break-inside: avoid;
     page-break-inside: avoid;
+  }
+
+  .sale-print-document > thead {
+    display: table-header-group !important;
+    height: auto !important;
+    visibility: visible !important;
+    overflow: visible !important;
+  }
+
+  .sale-print-document > tbody {
+    display: table-row-group;
+  }
+
+  .sale-print-document > thead > tr > td,
+  .sale-print-document > tbody > tr > td {
+    padding: 0;
+    vertical-align: top;
   }
 
   body.app-body.role-2:has(.sale-report-page) .report-print-brand {
@@ -928,7 +961,7 @@ body.app-body.role-2:has(.sale-report-page) .content {
 
   body.app-body.role-2:has(.sale-report-page) .report-print-company-name,
   body.app-body.role-2:has(.sale-report-page) .report-print-company-address,
-  body.app-body.role-2:has(.sale-report-page) .report-print-company-tax,
+  body.app-body.role-2:has(.sale-report-page) .report-print-company-identifiers,
   body.app-body.role-2:has(.sale-report-page) .report-print-meta h2,
   body.app-body.role-2:has(.sale-report-page) .report-print-meta p {
     margin: 0;
@@ -942,13 +975,20 @@ body.app-body.role-2:has(.sale-report-page) .content {
   }
 
   body.app-body.role-2:has(.sale-report-page) .report-print-company-address,
-  body.app-body.role-2:has(.sale-report-page) .report-print-company-tax {
+  body.app-body.role-2:has(.sale-report-page) .report-print-company-identifiers {
     max-width: 72ch;
     margin-top: 3px;
     color: #475569;
     font-size: 10px;
     line-height: 1.45;
     overflow-wrap: anywhere;
+  }
+
+  body.app-body.role-2:has(.sale-report-page) .report-print-company-identifiers {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    white-space: nowrap;
   }
 
   body.app-body.role-2:has(.sale-report-page) .report-print-meta {

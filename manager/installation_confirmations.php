@@ -7,6 +7,11 @@ require_login('1');
 date_default_timezone_set('Asia/Bangkok');
 
 $keyword = trim((string) ($_GET['q'] ?? ''));
+$currentManagerId = trim((string) ($_SESSION['user_id'] ?? ''));
+
+if ($currentManagerId === '') {
+    redirect_to(app_system_url('manager/index.php?status=error'));
+}
 
 function manager_confirmation_date(?string $value): string
 {
@@ -68,6 +73,7 @@ $sql = <<<'SQL'
     LEFT JOIN technicians t
         ON TRIM(t.tech_id) = TRIM(a.tech_id)
     WHERE s.setup_status = 3
+      AND a.assign_by = ?
       AND (a.assign_status IS NULL OR a.assign_status NOT IN (4, 5))
       AND EXISTS (
           SELECT 1
@@ -97,11 +103,12 @@ if (!$stmt) {
     $rows = [];
 } elseif ($keyword !== '') {
     $like = '%' . $keyword . '%';
-    $stmt->bind_param('sssss', $like, $like, $like, $like, $like);
+    $stmt->bind_param('ssssss', $currentManagerId, $like, $like, $like, $like, $like);
     $stmt->execute();
     $result = $stmt->get_result();
     $rows = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 } else {
+    $stmt->bind_param('s', $currentManagerId);
     $stmt->execute();
     $result = $stmt->get_result();
     $rows = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];

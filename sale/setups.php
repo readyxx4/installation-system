@@ -320,7 +320,7 @@ function render_sale_setup_rows(array $rows, string $empty_message): void
 
                     echo h(
                         $createdTimestamp
-                        ? date('d/m/Y H:i', $createdTimestamp)
+                        ? date('d/m/Y', $createdTimestamp)
                         : $createdAt
                     );
                 } else {
@@ -425,7 +425,7 @@ layout_header('รายการงานติดตั้ง', 'setups', 'ใ
             <thead>
                 <tr>
                     <th>รหัสใบงาน</th>
-                    <th>วันที่-เวลา</th>
+                    <th>วันที่</th>
                     <th>ลูกค้า</th>
                     <th>จำนวนสินค้า</th>
                     <th>ค่าติดตั้ง</th>

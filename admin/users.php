@@ -354,7 +354,6 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                     $address = (string) $row['user_address'];
                     $role_name = user_role_name($row['user_role']);
                     $role_badge = user_role_badge($row['user_role']);
-                    $created_display = format_user_created_date($row['user_created_at'] ?? null);
                     $is_active = (int) ($row['user_status'] ?? 0) === 1;
                     $is_current_user = $row['user_id'] === ($_SESSION['user_id'] ?? '');
                     $has_historical_relation = user_has_historical_relation($conn, $row['user_id']);
@@ -372,7 +371,6 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                         data-user-role="<?= h($role_name) ?>"
                         data-user-role-badge="<?= h($role_badge) ?>"
                         data-user-address="<?= h($address !== '' ? $address : '-') ?>"
-                        data-user-created="<?= h($created_display) ?>"
                         data-user-edit-url="<?= h($edit_url) ?>">
                         <td><?= h($row['user_id']) ?></td>
                         <td>
@@ -484,11 +482,6 @@ layout_header('จัดการข้อมูลพนักงาน', 'user
                         <span class="admin-user-detail-icon"><i class="fa-solid fa-envelope" aria-hidden="true"></i></span>
                         <span>อีเมล</span>
                         <strong data-detail-email>-</strong>
-                    </div>
-                    <div class="admin-user-detail-item">
-                        <span class="admin-user-detail-icon"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span>
-                        <span>สร้างบัญชีเมื่อ</span>
-                        <strong data-detail-created>-</strong>
                     </div>
                     <div class="admin-user-detail-item admin-user-detail-address">
                         <span class="admin-user-detail-icon"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></span>

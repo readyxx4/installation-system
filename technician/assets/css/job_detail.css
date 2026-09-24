@@ -333,6 +333,24 @@ body.app-body.role-technician .technician-detail-page .callout.is-ready {
     color: #065f46;
 }
 
+body.app-body.role-technician .technician-detail-page .callout.is-installing {
+    border: 1px solid #c7d2fe;
+    background: #eef2ff;
+    color: #6366f1;
+}
+
+body.app-body.role-technician .technician-detail-page .callout.is-awaiting-review {
+    border: 1px solid rgba(124, 58, 237, .35);
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
+body.app-body.role-technician .technician-detail-page .callout.is-cancelled {
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
 body.app-body.role-technician .technician-detail-page .callout-icon {
     display: inline-flex;
     align-items: center;
@@ -847,15 +865,20 @@ body.app-body.role-technician .technician-detail-page .installation-result-more:
 }
 
 body.app-body.role-technician .technician-detail-page .installation-result-modal {
-    width: min(1040px, calc(100% - 32px));
-    max-width: 1040px;
-    max-height: min(88dvh, 900px);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: min(1100px, calc(100vw - 40px));
+    max-height: calc(100vh - 40px);
+    margin: 0;
     padding: 0;
     border: 1px solid #dbe3ee;
     border-radius: 16px;
     background: #fff;
     color: #0f172a;
     box-shadow: 0 20px 60px rgba(15, 23, 42, .2);
+    overflow: hidden;
+    transform: translate(-50%, -50%);
 }
 
 body.app-body.role-technician .technician-detail-page .installation-result-modal::backdrop {
@@ -902,25 +925,86 @@ body.app-body.role-technician .technician-detail-page .installation-result-modal
     color: #1d4ed8;
 }
 
-body.app-body.role-technician .technician-detail-page .installation-result-modal-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-body.app-body.role-technician .technician-detail-page .installation-result-modal-grid a {
-    display: block;
-    aspect-ratio: 4 / 3;
-    overflow: hidden;
-    border: 1px solid #dbe3ee;
-    border-radius: 12px;
+body.app-body.role-technician .technician-detail-page .installation-result-modal-stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    height: min(520px, calc(100dvh - 220px));
+    padding: 20px 76px;
     background: #f8fafc;
-    cursor: zoom-in;
 }
 
-body.app-body.role-technician .technician-detail-page .installation-result-modal-grid img {
+body.app-body.role-technician .technician-detail-page .installation-result-modal-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-nav {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .92);
+    color: #1e293b;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-nav:hover,
+body.app-body.role-technician .technician-detail-page .installation-result-modal-nav:focus-visible {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-nav.is-prev {
+    left: 20px;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-nav.is-next {
+    right: 20px;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-grid {
+    display: flex;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid #e5ecf6;
+    background: #fff;
+    overflow-x: auto;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-thumb {
+    width: 72px;
+    height: 54px;
+    flex: 0 0 auto;
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: #f1f5f9;
+    cursor: pointer;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-thumb.is-active {
+    border-color: #2563eb;
+}
+
+body.app-body.role-technician .technician-detail-page .installation-result-modal-thumb img {
     display: block;
     width: 100%;
     height: 100%;
@@ -948,10 +1032,22 @@ body.app-body.role-technician .technician-detail-page .installation-result-modal
         max-height: 90dvh;
     }
 
+    body.app-body.role-technician .technician-detail-page .installation-result-modal-stage {
+        height: min(460px, calc(100dvh - 210px));
+        padding-right: 58px;
+        padding-left: 58px;
+    }
+
+    body.app-body.role-technician .technician-detail-page .installation-result-modal-nav.is-prev {
+        left: 12px;
+    }
+
+    body.app-body.role-technician .technician-detail-page .installation-result-modal-nav.is-next {
+        right: 12px;
+    }
+
     body.app-body.role-technician .technician-detail-page .installation-result-modal-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-        padding: 14px;
+        padding: 12px 14px;
     }
 }
 
@@ -960,8 +1056,15 @@ body.app-body.role-technician .technician-detail-page .installation-result-modal
         grid-template-columns: minmax(0, 1fr);
     }
 
-    body.app-body.role-technician .technician-detail-page .installation-result-modal-grid {
-        grid-template-columns: minmax(0, 1fr);
+    body.app-body.role-technician .technician-detail-page .installation-result-modal-stage {
+        height: min(360px, calc(100dvh - 200px));
+        padding-right: 48px;
+        padding-left: 48px;
+    }
+
+    body.app-body.role-technician .technician-detail-page .installation-result-modal-nav {
+        width: 34px;
+        height: 34px;
     }
 }
 
@@ -1126,6 +1229,24 @@ body.app-body.role-technician .technician-detail-page .action-panel__state.is-re
     color: #047857;
 }
 
+body.app-body.role-technician .technician-detail-page .action-panel__state.is-cancelled {
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__state.is-installing {
+    border: 1px solid #c7d2fe;
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__state.is-awaiting-review {
+    border: 1px solid rgba(124, 58, 237, .35);
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
 body.app-body.role-technician .technician-detail-page .action-panel__state strong {
     display: block;
     color: inherit;
@@ -1236,11 +1357,401 @@ body.app-body.role-technician .technician-detail-page .receive-confirm-submit {
     color: #fff;
 }
 
+body.app-body.role-technician .technician-detail-page .action-panel__submit--finalize {
+    border-color: #059669;
+    background: #059669;
+}
+
+body.app-body.role-technician .technician-detail-page .action-panel__submit--finalize:hover,
+body.app-body.role-technician .technician-detail-page .action-panel__submit--finalize:focus-visible {
+    border-color: #047857;
+    background: #047857;
+}
+
 body.app-body.role-technician .technician-detail-page .receive-confirm-submit:disabled {
     border-color: #cbd5e1;
     background: #e2e8f0;
     color: #94a3b8;
     cursor: not-allowed;
+}
+
+body.app-body.role-technician .job-detail-receive-modal {
+    width: min(500px, calc(100vw - 32px));
+    margin: auto;
+    padding: 0;
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+    background: #fff;
+    color: #0f172a;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, .18);
+}
+
+body.app-body.role-technician .job-detail-receive-modal::backdrop {
+    background: rgba(15, 23, 42, .42);
+}
+
+body.app-body.role-technician .job-detail-receive-modal__header,
+body.app-body.role-technician .job-detail-receive-modal__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+}
+
+body.app-body.role-technician .job-detail-receive-modal__header {
+    border-bottom: 1px solid #e5edf6;
+}
+
+body.app-body.role-technician .job-detail-receive-modal h2,
+body.app-body.role-technician .job-detail-receive-modal h3 {
+    margin: 0;
+}
+
+body.app-body.role-technician .job-detail-receive-modal h2 {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+body.app-body.role-technician .job-detail-receive-modal h3 {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+body.app-body.role-technician .job-detail-receive-modal__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid #dbe3ee;
+    border-radius: 50%;
+    background: #fff;
+    color: #64748b;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, .08);
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 1;
+}
+
+body.app-body.role-technician .job-detail-receive-modal__close:hover,
+body.app-body.role-technician .job-detail-receive-modal__close:focus-visible {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+body.app-body.role-technician .job-detail-receive-modal__content {
+    padding: 18px 20px;
+}
+
+body.app-body.role-technician .job-detail-receive-modal__products {
+    display: grid;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+body.app-body.role-technician .job-detail-receive-modal__products li {
+    padding: 10px 12px;
+    border: 1px solid #e5edf6;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+body.app-body.role-technician .job-detail-receive-modal__message {
+    margin: 12px 0 0;
+    color: #b91c1c;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+body.app-body.role-technician .job-detail-receive-modal__actions {
+    justify-content: flex-end;
+    border-top: 1px solid #e5edf6;
+}
+
+body.app-body.role-technician .job-detail-receive-modal__actions .btn {
+    min-height: 38px;
+}
+
+body.app-body.role-technician .install-complete-modal {
+    width: min(420px, calc(100vw - 32px));
+    margin: auto;
+    padding: 0;
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+    background: #fff;
+    color: #0f172a;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, .18);
+}
+
+body.app-body.role-technician .install-complete-modal::backdrop {
+    background: rgba(15, 23, 42, .42);
+}
+
+body.app-body.role-technician .install-complete-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5edf6;
+}
+
+body.app-body.role-technician .install-complete-modal__header h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+body.app-body.role-technician .install-complete-modal__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 1;
+}
+
+body.app-body.role-technician .install-complete-modal__close:hover,
+body.app-body.role-technician .install-complete-modal__close:focus-visible {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+body.app-body.role-technician .install-complete-modal__form {
+    display: grid;
+    gap: 14px;
+    padding: 20px;
+}
+
+body.app-body.role-technician .install-complete-modal__cancel,
+body.app-body.role-technician .install-complete-modal__save,
+body.app-body.role-technician .install-complete-modal__add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 48px;
+    border-radius: 12px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+body.app-body.role-technician .install-complete-modal__add {
+    border: 1px solid #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, .1);
+}
+
+body.app-body.role-technician .install-complete-modal__add:hover,
+body.app-body.role-technician .install-complete-modal__add:focus-visible {
+    border-color: #93c5fd;
+    background: #dbeafe;
+    box-shadow: 0 7px 14px rgba(37, 99, 235, .16);
+    transform: translateY(-1px);
+}
+
+body.app-body.role-technician .install-complete-modal__limit {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+}
+
+body.app-body.role-technician .install-complete-modal__cancel {
+    border: 1px solid #dbe3ee;
+    background: #fff;
+    color: #475569;
+    box-shadow: 0 3px 8px rgba(15, 23, 42, .06);
+}
+
+body.app-body.role-technician .install-complete-modal__cancel:hover,
+body.app-body.role-technician .install-complete-modal__cancel:focus-visible {
+    background: #f8fafc;
+    color: #334155;
+    box-shadow: 0 6px 12px rgba(15, 23, 42, .1);
+    transform: translateY(-1px);
+}
+
+body.app-body.role-technician .install-complete-modal__save {
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, .16);
+}
+
+body.app-body.role-technician .install-complete-modal__save:hover,
+body.app-body.role-technician .install-complete-modal__save:focus-visible {
+    border-color: #1d4ed8;
+    background: #1d4ed8;
+    box-shadow: 0 7px 14px rgba(37, 99, 235, .22);
+    transform: translateY(-1px);
+}
+
+body.app-body.role-technician .install-complete-modal__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+body.app-body.role-technician .install-complete-modal__preview {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+body.app-body.role-technician .install-complete-modal__preview figure {
+    position: relative;
+    aspect-ratio: 1;
+    margin: 0;
+}
+
+body.app-body.role-technician .install-complete-modal__preview-open {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #dbe3ee;
+    border-radius: 10px;
+    background: #f8fafc;
+    cursor: zoom-in;
+}
+
+body.app-body.role-technician .install-complete-modal__preview-open img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+body.app-body.role-technician .install-complete-modal__preview-remove {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .8);
+    border-radius: 50%;
+    background: rgba(15, 23, 42, .72);
+    color: #fff;
+    cursor: pointer;
+}
+
+body.app-body.role-technician .install-complete-preview-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    margin: 0;
+    padding: 20px;
+    border: 0;
+    background: transparent;
+    overflow: auto;
+}
+
+body.app-body.role-technician .install-complete-preview-overlay[open] {
+    display: flex;
+}
+
+body.app-body.role-technician .install-complete-preview-overlay::backdrop {
+    background: rgba(15, 23, 42, .56);
+}
+
+body.app-body.role-technician .install-complete-preview-dialog {
+    position: relative;
+    inset: auto;
+    box-sizing: border-box;
+    width: min(1100px, calc(100vw - 40px));
+    max-width: 100%;
+    max-height: calc(100dvh - 40px);
+    margin: 0;
+    border: 1px solid #dbe3ee;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, .22);
+    overflow: hidden;
+}
+
+body.app-body.role-technician .install-complete-preview-dialog__viewer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    padding: 20px;
+}
+
+body.app-body.role-technician .install-complete-preview-dialog img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: calc(100dvh - 220px);
+    margin: 0 auto;
+    object-fit: contain;
+}
+
+body.app-body.role-technician .install-complete-preview-dialog__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid #dbe3ee;
+    border-radius: 50%;
+    background: #fff;
+    color: #334155;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, .1);
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+}
+
+body.app-body.role-technician .install-complete-modal__message {
+    margin: 0;
+    color: #b91c1c;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+body.app-body.role-technician .install-complete-modal__cancel:disabled,
+body.app-body.role-technician .install-complete-modal__save:disabled,
+body.app-body.role-technician .install-complete-modal__add:disabled {
+    cursor: wait;
+    opacity: .65;
 }
 
 body.app-body.role-technician .technician-detail-page .callout .btn-outline,
@@ -1483,6 +1994,21 @@ body.app-body.role-technician .technician-detail-page .receive-note-field textar
     body.app-body.role-technician .technician-detail-page .action-panel__link,
     body.app-body.role-technician .technician-detail-page .action-panel__submit {
         width: 100%;
+    }
+}
+
+@media (max-width: 560px) {
+    body.app-body.role-technician .job-detail-receive-modal__header,
+    body.app-body.role-technician .job-detail-receive-modal__content,
+    body.app-body.role-technician .job-detail-receive-modal__actions {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    body.app-body.role-technician .install-complete-modal__header,
+    body.app-body.role-technician .install-complete-modal__form {
+        padding-right: 16px;
+        padding-left: 16px;
     }
 }
 

@@ -355,6 +355,114 @@ body.app-body.role-1 .manager-assignment-detail-page .sale-detail-confirm-btn:fo
     outline-offset: 2px;
 }
 
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal {
+    width: min(440px, calc(100vw - 32px));
+    margin: auto;
+    padding: 0;
+    border: 1px solid #dbe3ee;
+    border-radius: 16px;
+    background: #fff;
+    color: #0f172a;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, .22);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal::backdrop {
+    background: rgba(15, 23, 42, .42);
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__header,
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 18px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__header {
+    border-bottom: 1px solid #e5ecf6;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__header h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid #dbe3ee;
+    border-radius: 10px;
+    background: #fff;
+    color: #475569;
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__close:hover,
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__close:focus-visible {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__body {
+    padding: 18px;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__body p {
+    margin: 0;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__body small {
+    display: block;
+    margin-top: 6px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__actions {
+    justify-content: flex-end;
+    border-top: 1px solid #e5ecf6;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__cancel {
+    min-height: 42px;
+    padding: 8px 14px;
+    border: 1px solid #dbe3ee;
+    border-radius: 10px;
+    background: #fff;
+    color: #475569;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__cancel:hover,
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__cancel:focus-visible {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__actions .sale-detail-confirm-btn:disabled {
+    cursor: wait;
+    opacity: .7;
+}
+
+body.app-body.role-1 .manager-assignment-detail-page .manager-installation-confirm-modal__actions .sale-detail-confirm-btn {
+    width: auto;
+}
+
 /* Manager detail follows the two-column detail pattern used by Technician. */
 body.app-body.role-1:has(.manager-assignment-detail-page) {
     background: #f1f5f9;

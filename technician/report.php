@@ -377,24 +377,38 @@ layout_header('รายงานของฉัน', 'technician_report', 'ส�
 >
 
 <main class="technician-report-page">
-  <header class="report-print-document-header" aria-label="หัวเอกสารรายงาน">
-    <div class="report-print-brand">
-      <?php if ($technician_report_company['system_logo_url'] !== ''): ?>
-        <img class="report-print-logo" src="<?= h($technician_report_company['system_logo_url']) ?>" alt="โลโก้บริษัท">
-      <?php else: ?>
-        <span class="report-print-logo-placeholder" aria-label="ไม่มีโลโก้บริษัท">-</span>
-      <?php endif; ?>
-      <div class="report-print-company-copy">
-        <p class="report-print-company-name"><?= h($technician_report_company['system_name']) ?></p>
-        <p class="report-print-company-address"><?= h($technician_report_company['company_address']) ?></p>
-        <p class="report-print-company-tax">เลขประจำตัวผู้เสียภาษี: <?= h($technician_report_company['tax_id']) ?></p>
-      </div>
-    </div>
-    <div class="report-print-meta">
-      <h2>รายงานของฉัน</h2>
-      <p data-technician-report-print-date data-timezone="<?= h(date_default_timezone_get()) ?>">วันที่พิมพ์: <?= h($technician_report_print_date) ?></p>
-    </div>
-  </header>
+  <table class="technician-print-document" role="presentation">
+    <thead>
+      <tr>
+        <td>
+          <header class="report-print-document-header" aria-label="หัวเอกสารรายงาน">
+            <div class="report-print-brand">
+              <?php if ($technician_report_company['system_logo_url'] !== ''): ?>
+                <img class="report-print-logo" src="<?= h($technician_report_company['system_logo_url']) ?>" alt="โลโก้บริษัท">
+              <?php else: ?>
+                <span class="report-print-logo-placeholder" aria-label="ไม่มีโลโก้บริษัท">-</span>
+              <?php endif; ?>
+              <div class="report-print-company-copy">
+                <p class="report-print-company-name"><?= h($technician_report_company['system_name']) ?></p>
+                <p class="report-print-company-address"><?= h($technician_report_company['company_address']) ?></p>
+                <p class="report-print-company-identifiers">
+                  <span>เลขทะเบียนนิติบุคคล: <?= h($technician_report_company['company_registration_no']) ?></span>
+                  <span aria-hidden="true">|</span>
+                  <span>เลขประจำตัวผู้เสียภาษี: <?= h($technician_report_company['tax_id']) ?></span>
+                </p>
+              </div>
+            </div>
+            <div class="report-print-meta">
+              <h2>รายงานของฉัน</h2>
+              <p data-technician-report-print-date data-timezone="<?= h(date_default_timezone_get()) ?>">วันที่พิมพ์: <?= h($technician_report_print_date) ?></p>
+            </div>
+          </header>
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
 
   <header class="technician-report-hero">
     <div class="technician-report-hero-copy">
@@ -515,6 +529,10 @@ layout_header('รายงานของฉัน', 'technician_report', 'ส�
       </table>
     </div>
   </section>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </main>
 
 <script

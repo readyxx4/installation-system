@@ -45,12 +45,13 @@ function system_company_data(mysqli $conn): array
     'system_logo' => '',
     'system_logo_url' => '',
     'company_address' => '-',
+    'company_registration_no' => '-',
     'tax_id' => '-',
   ];
 
   try {
     $result = $conn->query('
-      SELECT system_name, system_logo, company_address, tax_id
+      SELECT system_name, system_logo, company_address, company_registration_no, tax_id
       FROM `system`
       LIMIT 1
     ');
@@ -63,7 +64,7 @@ function system_company_data(mysqli $conn): array
     return $company;
   }
 
-  foreach (['system_name', 'company_address', 'tax_id'] as $field) {
+  foreach (['system_name', 'company_address', 'company_registration_no', 'tax_id'] as $field) {
     $value = trim((string) ($row[$field] ?? ''));
     $company[$field] = $value !== '' ? $value : '-';
   }
@@ -862,32 +863,6 @@ function layout_header(string $title, string $active = 'dashboard', ?string $sub
           ?>
 
         <?php endif; ?>
-
-
-        <!-- ====================================== -->
-        <!-- Profile -->
-        <!-- ====================================== -->
-
-        <div class="sidebar-profile sidebar-user-card">
-
-          <div class="sidebar-profile-avatar">
-            <?= h($initial) ?>
-          </div>
-
-          <div class="sidebar-profile-info">
-
-            <strong>
-              <?= h($userName) ?>
-            </strong>
-
-            <span>
-              <?= h(role_name($role)) ?>
-            </span>
-
-          </div>
-
-        </div>
-
 
         <!-- ====================================== -->
         <!-- Account -->

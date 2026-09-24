@@ -63,6 +63,11 @@ function prepare_assignment_assign_by(mysqli $conn): void
 
 prepare_assignment_assign_by($conn);
 
+$current_manager_id = trim((string) ($_SESSION['user_id'] ?? ''));
+if ($current_manager_id === '') {
+    redirect_to(app_system_url('manager/index.php?status=error'));
+}
+
 function make_cancel_assign_id(mysqli $conn): string
 {
     $prefix = 'ASG-';
@@ -355,7 +360,7 @@ $group_sql = "\n    GROUP BY\n        s.setup_id,\n        s.customer_id,\n     
 if ($search !== '') {
     $like = '%' . $search . '%';
 
-    $stmt = $conn->prepare($base_sql . "\n        WHERE s.setup_id LIKE ?\n           OR c.customer_name LIKE ?\n           OR c.customer_phone LIKE ?\n           OR c.customer_email LIKE ?\n           OR p.pro_name LIKE ?\n           OR t.tech_name LIKE ?\n           OR t.tech_fullname LIKE ?\n           OR t.tech_phone LIKE ?\n           OR m.user_name LIKE ?\n    " . $group_sql . "\n        ORDER BY
+    $stmt = $conn->prepare($base_sql . "\n        WHERE a.assign_by = ?\n          AND (s.setup_id LIKE ?\n           OR c.customer_name LIKE ?\n           OR c.customer_phone LIKE ?\n           OR c.customer_email LIKE ?\n           OR p.pro_name LIKE ?\n           OR t.tech_name LIKE ?\n           OR t.tech_fullname LIKE ?\n           OR t.tech_phone LIKE ?\n           OR m.user_name LIKE ?)\n    " . $group_sql . "\n        ORDER BY
             CASE
                 WHEN a.assign_id IS NULL OR (s.setup_status = 0 AND (a.assign_status IS NULL OR a.assign_status <> 4)) THEN 0
                 WHEN a.assign_status = 4 THEN 1
@@ -366,7 +371,8 @@ if ($search !== '') {
             s.setup_id DESC\n    ");
 
     $stmt->bind_param(
-        'sssssssss',
+        'ssssssssss',
+        $current_manager_id,
         $like,
         $like,
         $like,
@@ -380,7 +386,7 @@ if ($search !== '') {
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
-    $result = $conn->query($base_sql . $group_sql . "\n        ORDER BY
+    $stmt = $conn->prepare($base_sql . "\n        WHERE a.assign_by = ?\n    " . $group_sql . "\n        ORDER BY
             CASE
                 WHEN a.assign_id IS NULL OR (s.setup_status = 0 AND (a.assign_status IS NULL OR a.assign_status <> 4)) THEN 0
                 WHEN a.assign_status = 4 THEN 1
@@ -389,6 +395,9 @@ if ($search !== '') {
             END ASC,
             s.created_at DESC,
             s.setup_id DESC\n    ");
+    $stmt->bind_param('s', $current_manager_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 }
 
 $setups = [];

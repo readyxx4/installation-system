@@ -1,4 +1,8 @@
 <main class="admin-report-page">
+    <table class="admin-print-document" role="presentation" width="100%" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <td>
     <header class="report-print-document-header" aria-label="หัวเอกสารรายงาน">
         <div class="report-print-brand">
             <?php if ($report_system_logo_url !== ''): ?>
@@ -9,7 +13,11 @@
             <div class="report-print-company-copy">
                 <p class="report-print-company-name"><?= h($report_system_name) ?></p>
                 <p class="report-print-company-address"><?= h($report_company_address) ?></p>
-                <p class="report-print-company-tax">เลขประจำตัวผู้เสียภาษี: <?= h($report_company_tax_id) ?></p>
+                <p class="report-print-company-identifiers">
+                    <span>เลขทะเบียนนิติบุคคล: <?= h($report_company_registration_no) ?></span>
+                    <span aria-hidden="true">|</span>
+                    <span>เลขประจำตัวผู้เสียภาษี: <?= h($report_company_tax_id) ?></span>
+                </p>
             </div>
         </div>
         <div class="report-print-meta">
@@ -17,6 +25,12 @@
             <p data-report-print-date data-timezone="<?= h(date_default_timezone_get()) ?>">วันที่พิมพ์: <?= h($report_print_date) ?></p>
         </div>
     </header>
+                </td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
 
     <header class="report-header">
         <div class="report-header-copy">
@@ -31,19 +45,6 @@
         </div>
     </header>
 
-    <nav class="report-category-nav" aria-label="หมวดรายงาน">
-        <?php foreach ($report_navigation_categories as $key => $label): ?>
-            <?php $is_report_tab_active = ($report === 'users' && $key === 'personnel') || $report === $key; ?>
-            <a
-                class="report-category-link<?= $is_report_tab_active ? ' is-active' : '' ?>"
-                href="<?= h(admin_report_url($key, $start_date, $end_date)) ?>"
-                <?= $is_report_tab_active ? 'aria-current="page"' : '' ?>
-            >
-                <?= h($label) ?>
-            </a>
-        <?php endforeach; ?>
-    </nav>
-
     <?php if ($report === 'overview'): ?>
         <section class="report-metric-grid report-overview-metric-grid" aria-label="ตัวชี้วัดภาพรวมระบบ">
             <?php foreach ($overview_metrics as $metric): ?>
@@ -52,8 +53,8 @@
                         <i class="fa-solid <?= h($metric['icon']) ?>" aria-hidden="true"></i>
                     </div>
                     <div class="report-metric-copy">
-                        <span><?= h($metric['label']) ?></span>
-                        <strong><?= h($metric['value']) ?></strong>
+                        <span<?= ($metric['key'] ?? '') === 'personnel' ? ' data-overview-personnel-metric-label' : '' ?>><?= h($metric['label']) ?></span>
+                        <strong<?= ($metric['key'] ?? '') !== '' ? ' data-overview-metric="' . h($metric['key']) . '"' : '' ?><?= ($metric['key'] ?? '') === 'personnel' ? ' data-overview-personnel-metric' : '' ?>><?= h($metric['value']) ?></strong>
                     </div>
                 </article>
             <?php endforeach; ?>
@@ -75,15 +76,76 @@
                     <option value="cancelled"<?= $report_filter_status === 'cancelled' ? ' selected' : '' ?>>à¸¢à¸à¹€à¸¥à¸´à¸à¹à¸¥à¹‰à¸§</option>
                 </select>
             </label>
+            <label class="report-filter-select">
+                <span class="sr-only">กรองตามประเภทพนักงาน</span>
+                <select name="personnel_type" data-filter-default-value="all">
+                    <option value="all"<?= $personnel_filter_type === 'all' ? ' selected' : '' ?>>ทั้งหมด</option>
+                    <option value="sale"<?= $personnel_filter_type === 'sale' ? ' selected' : '' ?>>พนักงานขาย</option>
+                    <option value="manager"<?= $personnel_filter_type === 'manager' ? ' selected' : '' ?>>หัวหน้าช่าง</option>
+                    <option value="technician"<?= $personnel_filter_type === 'technician' ? ' selected' : '' ?>>ช่างติดตั้ง</option>
+                </select>
+            </label>
+            <label class="report-filter-select">
+                <span class="sr-only">จำนวนรายการ</span>
+                <select name="limit" data-filter-default-value="all">
+                    <option value="10"<?= $overview_limit === '10' ? ' selected' : '' ?>>10 รายการ</option>
+                    <option value="20"<?= $overview_limit === '20' ? ' selected' : '' ?>>20 รายการ</option>
+                    <option value="50"<?= $overview_limit === '50' ? ' selected' : '' ?>>50 รายการ</option>
+                    <option value="all"<?= $overview_limit === 'all' ? ' selected' : '' ?>>ทั้งหมด</option>
+                </select>
+            </label>
             <button type="submit" class="report-filter-submit"><i class="fa-solid fa-filter" aria-hidden="true"></i><span>à¸à¸£à¸­à¸‡</span></button>
             <button type="button" class="report-filter-reset" data-filter-reset>à¸¥à¹‰à¸²à¸‡à¸•à¸±à¸§à¸à¸£à¸­à¸‡</button>
         </form>
+
+        <?php $personnel_tables = $overview_personnel_tables; ?>
+        <section class="report-table-panel-grid report-personnel-table-grid<?= count($personnel_tables) === 1 ? ' report-personnel-table-grid--single' : '' ?>" data-personnel-tables data-overview-personnel-tables data-personnel-type="all" aria-label="สรุปข้อมูลพนักงาน">
+            <?php foreach ($personnel_tables as $personnel_table): ?>
+                <article class="report-panel report-table-panel" data-personnel-table-type="<?= h($personnel_table['type']) ?>" aria-labelledby="personnel-table-<?= h($personnel_table['type']) ?>-title">
+                    <div class="report-panel-head">
+                        <div>
+                            <h2 id="personnel-table-<?= h($personnel_table['type']) ?>-title"><?= h($personnel_table['title']) ?></h2>
+                            <p><?= h($personnel_table['description']) ?></p>
+                        </div>
+                    </div>
+                    <div class="report-table-wrap">
+                        <table class="report-table personnel-table">
+                            <thead>
+                                <tr>
+                                    <?php foreach ($personnel_table['columns'] as $column): ?>
+                                        <th scope="col"><?= h($column) ?></th>
+                                    <?php endforeach; ?>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if ($personnel_table['rows'] === []): ?>
+                                    <tr><td colspan="<?= h((string) count($personnel_table['columns'])) ?>"><div class="report-empty-state"><i class="<?= h($personnel_table['empty_icon']) ?>" aria-hidden="true"></i><span><?= h($personnel_table['empty_message']) ?></span></div></td></tr>
+                                <?php else: ?>
+                                    <?php foreach ($personnel_table['rows'] as $row): ?>
+                                        <tr>
+                                            <td><strong><?= h($row['id']) ?></strong></td>
+                                            <td><span class="report-status-label"><i class="fa-solid <?= h($personnel_table['row_icon']) ?> tone-<?= h($personnel_table['row_tone']) ?>" aria-hidden="true"></i><?= h($row['name']) ?></span></td>
+                                            <?php if ($personnel_table['type'] === 'technician'): ?>
+                                                <td><span class="report-readiness-badge<?= !empty($row['ready']) ? ' is-ready' : ' is-busy' ?>"><?= !empty($row['ready']) ? 'พร้อมรับงาน' : 'ไม่พร้อมรับงาน' ?></span></td>
+                                            <?php endif; ?>
+                                            <?php foreach ($row['stats'] as $stat): ?>
+                                                <td class="report-number-cell"><?= h(number_format((int) $stat)) ?> งาน</td>
+                                            <?php endforeach; ?>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            <?php endforeach; ?>
+        </section>
 
         <section class="report-panel report-table-panel report-latest-panel" data-filter-target="overview-latest" aria-labelledby="overview-latest-title">
             <div class="report-panel-head">
                 <div>
                     <h2 id="overview-latest-title">ใบงานติดตั้งล่าสุด</h2>
-                    <p>10 ใบงานที่สร้างล่าสุด พร้อมสถานะปัจจุบัน</p>
+                    <p><?= h($overview_limit_description) ?></p>
                 </div>
                 <span class="report-table-period report-result-count" data-result-count="overview-latest"><i class="fa-regular fa-clock" aria-hidden="true"></i><span data-result-value><?= h(number_format(count($latest_installation_rows))) ?> รายการ</span></span>
             </div>
@@ -208,6 +270,7 @@
         <section class="report-metric-grid report-revenue-summary-grid" aria-label="ตัวชี้วัดค่าติดตั้ง">
             <?php $revenue_metric_keys = ['total', 'done', 'in_progress', 'cancelled', 'average']; ?>
             <?php foreach ($report_metrics as $metric_index => $metric): ?>
+                <?php if (($revenue_metric_keys[$metric_index] ?? '') === 'average') continue; ?>
                 <article class="report-metric-card">
                     <div class="report-metric-icon tone-<?= h($metric['tone']) ?>">
                         <i class="fa-solid <?= h($metric['icon']) ?>" aria-hidden="true"></i>
@@ -279,20 +342,18 @@
                 <div class="report-table-wrap">
                     <table class="report-table revenue-monthly-table">
                         <thead>
-                            <tr><th scope="col">เดือน</th><th scope="col">จำนวนงานเสร็จสิ้น</th><th scope="col">ค่าติดตั้งรวม</th><th scope="col">ค่าเฉลี่ยต่อใบงาน</th></tr>
+                            <tr><th scope="col">เดือน</th><th scope="col">จำนวนงานเสร็จสิ้น</th><th scope="col">ค่าติดตั้งรวม</th></tr>
                         </thead>
                         <tbody>
                             <?php for ($month = 1; $month <= 12; $month++): ?>
                                 <?php
                                 $month_jobs = $fee_monthly[$month]['jobs'];
                                 $month_fee = $fee_monthly[$month]['fee'];
-                                $month_average = $month_jobs > 0 ? $month_fee / $month_jobs : 0;
                                 ?>
                                 <tr>
                                     <td><?= h($fee_month_labels[$month - 1]) ?></td>
                                     <td class="report-number-cell"><?= h(number_format($month_jobs)) ?> งาน</td>
                                     <td class="report-money-cell"><?= h(number_format($month_fee, 2)) ?> ฿</td>
-                                    <td class="report-money-cell"><?= h(number_format($month_average, 2)) ?> ฿</td>
                                 </tr>
                             <?php endfor; ?>
                         </tbody>
@@ -302,7 +363,7 @@
         </section>
 
     <?php elseif ($report === 'users'): ?>
-        <section class="report-metric-grid report-personnel-summary-grid" data-personnel-summary data-personnel-type="<?= h($personnel_view['type']) ?>" aria-label="ตัวชี้วัดบุคลากร">
+        <section class="report-metric-grid report-personnel-summary-grid" data-personnel-summary data-personnel-type="<?= h($personnel_view['type']) ?>" aria-label="ตัวชี้วัดพนักงาน">
             <?php foreach ($personnel_view['summary_cards'] as $metric): ?>
                 <article class="report-metric-card">
                     <div class="report-metric-icon tone-<?= h($metric['tone']) ?>">
@@ -319,63 +380,16 @@
         <form class="report-filter-bar" data-report-filter-form data-filter-section="personnel">
             <label class="report-filter-search">
                 <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                <span class="sr-only">ค้นหารหัสหรือชื่อบุคลากร</span>
+                <span class="sr-only">ค้นหารหัสหรือชื่อพนักงาน</span>
                 <input type="search" name="personnel_search" value="<?= h($personnel_filter_search) ?>" placeholder="ค้นหารหัสหรือชื่อ" autocomplete="off">
             </label>
-            <label class="report-filter-select">
-                <span class="sr-only">กรองตามประเภท</span>
-                <select name="personnel_type">
-                    <option value=""<?= $personnel_filter_type === 'all' ? ' selected' : '' ?>>ทั้งหมด</option>
-                    <option value="sale"<?= $personnel_filter_type === 'sale' ? ' selected' : '' ?>>พนักงานขาย</option>
-                    <option value="manager"<?= $personnel_filter_type === 'manager' ? ' selected' : '' ?>>หัวหน้าช่าง</option>
-                    <option value="technician"<?= $personnel_filter_type === 'technician' ? ' selected' : '' ?>>ช่างติดตั้ง</option>
-                </select>
-            </label>
-            <button type="submit" class="report-filter-submit"><i class="fa-solid fa-filter" aria-hidden="true"></i><span>กรอง</span></button>
             <button type="button" class="report-filter-reset" data-filter-reset>ล้างตัวกรอง</button>
         </form>
 
-        <?php $personnel_tables = $personnel_view['tables']; ?>
-        <section class="report-table-panel-grid report-personnel-table-grid<?= count($personnel_tables) === 1 ? ' report-personnel-table-grid--single' : '' ?>" data-personnel-tables data-personnel-type="<?= h($personnel_view['type']) ?>" aria-label="สรุปข้อมูลบุคลากร">
-            <?php foreach ($personnel_tables as $personnel_table): ?>
-                <article class="report-panel report-table-panel" data-personnel-table-type="<?= h($personnel_table['type']) ?>" aria-labelledby="personnel-table-<?= h($personnel_table['type']) ?>-title">
-                    <div class="report-panel-head">
-                        <div>
-                            <h2 id="personnel-table-<?= h($personnel_table['type']) ?>-title"><?= h($personnel_table['title']) ?></h2>
-                            <p><?= h($personnel_table['description']) ?></p>
-                        </div>
-                    </div>
-                    <div class="report-table-wrap">
-                        <table class="report-table personnel-table">
-                            <thead>
-                                <tr>
-                                    <?php foreach ($personnel_table['columns'] as $column): ?>
-                                        <th scope="col"><?= h($column) ?></th>
-                                    <?php endforeach; ?>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if ($personnel_table['rows'] === []): ?>
-                                    <tr><td colspan="<?= h((string) count($personnel_table['columns'])) ?>"><div class="report-empty-state"><i class="<?= h($personnel_table['empty_icon']) ?>" aria-hidden="true"></i><span><?= h($personnel_table['empty_message']) ?></span></div></td></tr>
-                                <?php else: ?>
-                                    <?php foreach ($personnel_table['rows'] as $row): ?>
-                                        <tr>
-                                            <td><strong><?= h($row['id']) ?></strong></td>
-                                            <td><span class="report-status-label"><i class="fa-solid <?= h($personnel_table['row_icon']) ?> tone-<?= h($personnel_table['row_tone']) ?>" aria-hidden="true"></i><?= h($row['name']) ?></span></td>
-                                            <?php if ($personnel_table['type'] === 'technician'): ?>
-                                                <td><span class="report-readiness-badge<?= !empty($row['ready']) ? ' is-ready' : ' is-busy' ?>"><?= !empty($row['ready']) ? 'พร้อมรับงาน' : 'ไม่พร้อมรับงาน' ?></span></td>
-                                            <?php endif; ?>
-                                            <?php foreach ($row['stats'] as $stat): ?>
-                                                <td class="report-number-cell"><?= h(number_format((int) $stat)) ?> งาน</td>
-                                            <?php endforeach; ?>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </article>
-            <?php endforeach; ?>
-        </section>
     <?php endif; ?>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </main>

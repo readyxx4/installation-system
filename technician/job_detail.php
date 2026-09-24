@@ -15,6 +15,16 @@ if ($assignId === '') {
     redirect_to(app_system_url('technician/accept_job.php'));
 }
 
+// The former receive-confirm view is retired. Keep only the clean job-detail route.
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && (string) ($_GET['receive'] ?? '') === 'confirm') {
+    redirect_to(app_system_url('technician/job_detail.php?id=' . urlencode($assignId)));
+}
+
+// The former full-page installation-result form is retired in favor of the modal flow.
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && (string) ($_GET['install'] ?? '') === 'complete') {
+    redirect_to(app_system_url('technician/job_detail.php?id=' . urlencode($assignId)));
+}
+
 function technician_job_detail_date(?string $value, bool $withTime = false): string
 {
     $value = trim((string) $value);
@@ -85,6 +95,8 @@ function technician_detail_icon_svg(string $name, int $size = 16, string $class 
         'truck' => '<path d="M10 17h4V5H2v12h3"></path><path d="M14 17h1m4 0h3v-6l-3-4h-5v10h2"></path><circle cx="7.5" cy="17.5" r="2.5"></circle><circle cx="17.5" cy="17.5" r="2.5"></circle>',
         'file' => '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8M8 17h5"></path>',
         'calendar' => '<rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path>',
+        'wrench' => '<path d="M14.7 6.3a4.5 4.5 0 01-5.9 5.9L3 18l3 3 5.8-5.8a4.5 4.5 0 005.9-5.9l-3.1 3.1-2.3-2.3 2.4-3.8z"></path>',
+        'xmark' => '<path d="M18 6L6 18M6 6l12 12"></path>',
         'alert' => '<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path><path d="M12 9v4M12 17h.01"></path>',
         'hash' => '<path d="M4 9h16"></path><path d="M4 15h16"></path><path d="M10 3L8 21"></path><path d="M16 3l-2 18"></path>',
     ];
@@ -103,6 +115,13 @@ function technician_detail_ui_status(array $job, ?array $productReceive): array
     $assignStatus = (string) ($job['assign_status'] ?? '');
     $setupStatus = (string) ($job['setup_status'] ?? '');
     $receiveStatus = (string) ($productReceive['receive_status'] ?? '');
+
+    if (in_array($assignStatus, ['3', '4'], true)) {
+        return [
+            'label' => technician_assignment_status_text($assignStatus),
+            'class' => technician_assignment_status_class($assignStatus),
+        ];
+    }
 
     if ($assignStatus === '5' || $setupStatus === '4') {
         return ['label' => 'งานเสร็จสิ้นแล้ว', 'class' => 'success'];
@@ -407,7 +426,7 @@ if (!$job) {
     redirect_to(app_system_url('technician/accept_job.php?status=notfound'));
 }
 
-if (!in_array((string) ($job['assign_status'] ?? ''), ['1', '2', '5'], true)) {
+if (!in_array((string) ($job['assign_status'] ?? ''), ['1', '2', '3', '4', '5'], true)) {
     redirect_to(app_system_url('technician/accept_job.php?status=notfound'));
 }
 
@@ -443,44 +462,50 @@ if ($setupId !== '') {
 }
 
 $itemCount = count($items);
+$totalProductQuantity = $totalQty;
+$maxInstallationImages = max(10, $totalProductQuantity);
 
 $installError = '';
-$installNote = is_string($_POST['install_note'] ?? null) ? trim($_POST['install_note']) : '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'complete_install') {
+$installationDraftSessionKey = 'technician_installation_drafts';
+$installationDraft = $_SESSION[$installationDraftSessionKey][$assignId] ?? [];
+$installationDraftPaths = is_array($installationDraft['photos'] ?? null)
+    ? array_values(array_filter($installationDraft['photos'], static fn ($path): bool => is_string($path) && str_starts_with($path, 'uploads/product_receive/')))
+    : [];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'confirm_installation_photos') {
     $installProofFiles = [];
     $installTransaction = false;
     $installSaved = false;
     try {
         $token = $_POST['csrf_token'] ?? null;
         if (!is_string($token) || !hash_equals($_SESSION['technician_start_job_csrf'], $token)) {
-            throw new RuntimeException('คำขอหมดอายุ กรุณาเลือกภาพและบันทึกอีกครั้ง');
+            throw new RuntimeException('คำขอหมดอายุ กรุณาเลือกภาพและยืนยันอีกครั้ง');
         }
-        if (strlen($installNote) > 15000) {
-            throw new RuntimeException('หมายเหตุยาวเกินไป กรุณาลดความยาวแล้วลองอีกครั้ง');
-        }
-        $categories = ['installation' => 'รูปงานติดตั้ง', 'wide_angle' => 'รูปมุมกว้าง', 'additional' => 'รูปเพิ่มเติม'];
-        $installUploads = ['installation' => [], 'wide_angle' => [], 'additional' => []];
         if (!$items) {
-            throw new RuntimeException('ไม่พบรายการสินค้าในใบงาน ไม่สามารถบันทึกผลได้');
+            throw new RuntimeException('ไม่พบรายการสินค้าในใบงาน ไม่สามารถยืนยันรูปได้');
         }
         $installationFiles = technician_receive_uploaded_files('installation_proofs');
-        $maxInstallationFiles = min(10, count($items));
-        if (!$installationFiles) {
-            throw new RuntimeException('กรุณาเพิ่มรูปงานติดตั้งอย่างน้อย 1 รูป');
-        }
-        if (count($installationFiles) > $maxInstallationFiles) {
-            throw new RuntimeException('อัปโหลดรูปงานติดตั้งได้สูงสุด ' . $maxInstallationFiles . ' รูป');
-        }
         $expectedCount = filter_var($_POST['installation_proofs_count'] ?? null, FILTER_VALIDATE_INT);
         if ($expectedCount === false || $expectedCount !== count($installationFiles)) {
             throw new RuntimeException('รูปงานติดตั้งส่งมาไม่ครบ กรุณาเลือกภาพอีกครั้ง');
+        }
+
+        $requestedExistingPaths = $_POST['installation_existing_proofs'] ?? [];
+        $requestedExistingPaths = is_array($requestedExistingPaths) ? $requestedExistingPaths : [];
+        $keptDraftPaths = array_values(array_intersect($installationDraftPaths, array_filter($requestedExistingPaths, 'is_string')));
+
+        if (count($keptDraftPaths) + count($installationFiles) < 1) {
+            throw new RuntimeException('กรุณาเพิ่มรูปงานติดตั้งอย่างน้อย 1 รูป');
+        }
+        if (count($keptDraftPaths) + count($installationFiles) > $maxInstallationImages) {
+            throw new RuntimeException('อัปโหลดรูปงานติดตั้งได้สูงสุด ' . $maxInstallationImages . ' รูป');
         }
         foreach ($installationFiles as $installationFile) {
             if (($installationFile['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK || ($installationFile['size'] ?? 0) > 5 * 1024 * 1024) {
                 throw new RuntimeException('รูปงานติดตั้งอัปโหลดไม่สำเร็จหรือมีขนาดเกิน 5 MB');
             }
         }
-        $installUploads['installation'] = $installationFiles;
+
         $conn->begin_transaction();
         $installTransaction = true;
         $lockInstall = $conn->prepare("
@@ -494,40 +519,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'compl
         $lockInstall->execute();
         $installJob = $lockInstall->get_result()->fetch_assoc();
         if (!$installJob) {
-            throw new RuntimeException('บันทึกได้เฉพาะงานของคุณที่กำลังติดตั้งเท่านั้น');
+            throw new RuntimeException('ยืนยันรูปได้เฉพาะงานของคุณที่กำลังติดตั้งเท่านั้น');
         }
-        $installSetupId = (string) $installJob['setup_id'];
-        $existingInstall = $conn->prepare('SELECT result_id FROM installation_result WHERE setup_id = ? LIMIT 1 FOR UPDATE');
-        $existingInstall->bind_param('s', $installSetupId);
-        $existingInstall->execute();
-        if ($existingInstall->get_result()->num_rows > 0) {
-            throw new RuntimeException('งานนี้บันทึกผลการติดตั้งแล้ว ไม่สามารถบันทึกซ้ำได้');
-        }
-        $photos = [];
-        foreach ($installUploads as $category => $uploadedFiles) {
-            try {
-                $proofs = technician_prepare_receive_proofs($uploadedFiles, $installProofFiles, null);
-            } catch (Throwable $uploadError) {
-                throw new RuntimeException('อัปโหลด' . $categories[$category] . 'ไม่สำเร็จ กรุณาตรวจสอบไฟล์ JPG, PNG หรือ WebP และลองอีกครั้ง', 0, $uploadError);
-            }
-            $photos[$category] = array_column($proofs, 'path');
-        }
-        $resultImage = json_encode([
-            'version' => 1,
-            'photos' => $photos,
-            'note' => $installNote,
-            'submitted_at' => (new DateTimeImmutable('now', new DateTimeZone('Asia/Bangkok')))->format(DateTimeInterface::ATOM),
-            'submitted_by' => $currentTechId,
-            'assignment_id' => $assignId,
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
-        $resultId = 'IR' . bin2hex(random_bytes(4));
-        $insertInstall = $conn->prepare('INSERT INTO installation_result (result_id, setup_id, result_image) VALUES (?, ?, ?)');
-        $insertInstall->bind_param('sss', $resultId, $installSetupId, $resultImage);
-        if (!$insertInstall->execute()) {
-            throw new RuntimeException('ไม่สามารถบันทึกผลได้ กรุณาลองอีกครั้ง');
-        }
+
+        $proofs = technician_prepare_receive_proofs($installationFiles, $installProofFiles, null);
+        $confirmedDraftPaths = array_merge($keptDraftPaths, array_column($proofs, 'path'));
         $conn->commit();
         $installTransaction = false;
+        $_SESSION[$installationDraftSessionKey][$assignId] = [
+            'setup_id' => (string) $installJob['setup_id'],
+            'photos' => $confirmedDraftPaths,
+            'confirmed_at' => (new DateTimeImmutable('now', new DateTimeZone('Asia/Bangkok')))->format(DateTimeInterface::ATOM),
+        ];
+        foreach (array_diff($installationDraftPaths, $keptDraftPaths) as $removedDraftPath) {
+            $removedDraftFile = __DIR__ . '/../' . $removedDraftPath;
+            if (is_file($removedDraftFile)) {
+                @unlink($removedDraftFile);
+            }
+        }
         $installSaved = true;
     } catch (Throwable $e) {
         if ($installTransaction) {
@@ -540,8 +549,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'compl
         }
         $installError = $e instanceof RuntimeException && !($e instanceof mysqli_sql_exception)
             ? $e->getMessage()
-            : 'บันทึกไม่สำเร็จ กรุณาเลือกภาพและลองอีกครั้ง';
-        error_log('Installation result failed: ' . $e->getMessage());
+            : 'ยืนยันรูปไม่สำเร็จ กรุณาเลือกภาพและลองอีกครั้ง';
+        error_log('Installation photo confirmation failed: ' . $e->getMessage());
+    }
+    if ($installSaved) {
+        redirect_to(app_system_url('technician/job_detail.php?id=' . urlencode($assignId)));
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'finalize_installation_result') {
+    $installTransaction = false;
+    $installSaved = false;
+    try {
+        $token = $_POST['csrf_token'] ?? null;
+        if (!is_string($token) || !hash_equals($_SESSION['technician_start_job_csrf'], $token)) {
+            throw new RuntimeException('คำขอหมดอายุ กรุณาลองบันทึกผลการติดตั้งอีกครั้ง');
+        }
+        if (!$installationDraftPaths) {
+            throw new RuntimeException('กรุณายืนยันรูปงานติดตั้งอย่างน้อย 1 รูปก่อนบันทึกผล');
+        }
+
+        $conn->begin_transaction();
+        $installTransaction = true;
+        $lockInstall = $conn->prepare("
+            SELECT s.setup_id
+            FROM setup s INNER JOIN assignment a ON a.setup_id = s.setup_id
+            WHERE a.assign_id = ? AND a.tech_id = ?
+              AND a.assign_status = 2 AND s.setup_status = 3
+            FOR UPDATE
+        ");
+        $lockInstall->bind_param('ss', $assignId, $currentTechId);
+        $lockInstall->execute();
+        $installJob = $lockInstall->get_result()->fetch_assoc();
+        if (!$installJob) {
+            throw new RuntimeException('บันทึกผลได้เฉพาะงานของคุณที่กำลังติดตั้งเท่านั้น');
+        }
+
+        $installSetupId = (string) $installJob['setup_id'];
+        $existingInstall = $conn->prepare('SELECT result_id FROM installation_result WHERE setup_id = ? LIMIT 1 FOR UPDATE');
+        $existingInstall->bind_param('s', $installSetupId);
+        $existingInstall->execute();
+        if ($existingInstall->get_result()->num_rows > 0) {
+            throw new RuntimeException('งานนี้บันทึกผลการติดตั้งแล้ว ไม่สามารถบันทึกซ้ำได้');
+        }
+
+        $resultImage = json_encode([
+            'version' => 1,
+            'photos' => ['installation' => $installationDraftPaths],
+            'submitted_at' => (new DateTimeImmutable('now', new DateTimeZone('Asia/Bangkok')))->format(DateTimeInterface::ATOM),
+            'submitted_by' => $currentTechId,
+            'assignment_id' => $assignId,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        $resultId = 'IR' . bin2hex(random_bytes(4));
+        $insertInstall = $conn->prepare('INSERT INTO installation_result (result_id, setup_id, result_image) VALUES (?, ?, ?)');
+        $insertInstall->bind_param('sss', $resultId, $installSetupId, $resultImage);
+        if (!$insertInstall->execute()) {
+            throw new RuntimeException('ไม่สามารถบันทึกผลได้ กรุณาลองอีกครั้ง');
+        }
+        $conn->commit();
+        $installTransaction = false;
+        unset($_SESSION[$installationDraftSessionKey][$assignId]);
+        $installSaved = true;
+    } catch (Throwable $e) {
+        if ($installTransaction) {
+            $conn->rollback();
+        }
+        $installError = $e instanceof RuntimeException && !($e instanceof mysqli_sql_exception)
+            ? $e->getMessage()
+            : 'บันทึกผลการติดตั้งไม่สำเร็จ กรุณาลองอีกครั้ง';
+        error_log('Installation result finalization failed: ' . $e->getMessage());
     }
     if ($installSaved) {
         redirect_to(app_system_url('technician/job_detail.php?id=' . urlencode($assignId)));
@@ -553,6 +629,11 @@ $installResultStmt->bind_param('s', $job['setup_id']);
 $installResultStmt->execute();
 $installResultRow = $installResultStmt->get_result()->fetch_assoc() ?: null;
 $hasInstallResult = $installResultRow !== null;
+$hasInstallationDraft = !$hasInstallResult && count($installationDraftPaths) > 0;
+$installationDraftPreviewData = array_map(
+    static fn (string $path): array => ['path' => $path, 'url' => app_public_url($path)],
+    $installationDraftPaths
+);
 $installResultPhotos = [];
 $installResultNote = '';
 if ($installResultRow) {
@@ -570,6 +651,11 @@ if ($installResultRow) {
     }
     if (is_array($installResultData) && isset($installResultData['note']) && is_string($installResultData['note'])) {
         $installResultNote = $installResultData['note'];
+    }
+}
+if ($hasInstallationDraft) {
+    foreach ($installationDraftPaths as $installationDraftPath) {
+        $installResultPhotos[] = app_public_url($installationDraftPath);
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['install'] ?? '') === 'complete' && empty($_POST)) {
@@ -664,17 +750,22 @@ if ($jobWarningLevel === 'overdue') {
 
 $detailUiStatus = technician_detail_ui_status($job, $productReceive);
 $hasReceivedProducts = (string) ($productReceive['receive_status'] ?? '') === '1';
-$isInstallDone = (string) ($job['setup_status'] ?? '') === '4' || (string) ($job['assign_status'] ?? '') === '5';
+$isCancelledJob = (string) ($job['assign_status'] ?? '') === '4';
+$isCancelledOrRejected = in_array((string) ($job['assign_status'] ?? ''), ['3', '4'], true);
+$isInstallDone = !$isCancelledOrRejected
+    && ((string) ($job['setup_status'] ?? '') === '4' || (string) ($job['assign_status'] ?? '') === '5');
 $isInstalling = (string) ($job['setup_status'] ?? '') === '3';
-$isAwaitingInstallReview = $isInstalling && $hasInstallResult;
+$isHistoryJob = $isCancelledOrRejected || (string) ($job['assign_status'] ?? '') === '5'
+    || (string) ($job['setup_status'] ?? '') === '4';
+$isAwaitingInstallReview = !$isHistoryJob && $isInstalling && $hasInstallResult;
 if ($isAwaitingInstallReview) {
     $installStatusText = 'รอหัวหน้าช่างยืนยัน';
     $detailUiStatus = ['label' => 'รอหัวหน้าช่างยืนยัน', 'class' => 'waiting'];
 }
-$isInstallCompleteMode = ($_GET['install'] ?? '') === 'complete' && $isInstalling && $canConfirmReceive && !$hasInstallResult;
+$isInstallCompleteMode = false; // The legacy full-page installation-result form is intentionally unreachable.
 $hasAcceptedJob = in_array((string) ($job['assign_status'] ?? ''), ['2', '5'], true);
 $isPreAcceptJob = (string) ($job['assign_status'] ?? '') === '1';
-$isReceiveConfirmMode = (string) ($_GET['receive'] ?? '') === 'confirm' && !$hasReceivedProducts && $canConfirmReceive;
+$isReceiveConfirmMode = false; // The legacy checkbox view is intentionally unreachable.
 $showUrgentHeaderBadge = $isPreAcceptJob && in_array($jobWarningLevel, ['near', 'urgent', 'today', 'overdue'], true);
 $detailBackUrl = $isPreAcceptJob
     ? app_system_url('technician/accept_job.php')
@@ -685,7 +776,7 @@ $detailTitle = $isPreAcceptJob
     : 'สรุปใบงาน · ' . (string) ($job['setup_id'] ?? '--');
 $detailSubtitle = $isPreAcceptJob
     ? 'ตรวจสอบข้อมูลก่อนตัดสินใจรับงาน'
-    : ($isReceiveConfirmMode ? 'ตรวจสอบสินค้าและอัปโหลดหลักฐานการรับสินค้า' : 'ตรวจสอบและดำเนินการขั้นตอนถัดไป');
+    : 'ตรวจสอบและดำเนินการขั้นตอนถัดไป';
 
 $timelineSteps = [
     [
@@ -715,7 +806,13 @@ $nextStepText = $hasReceivedProducts
     ? 'คุณได้ยืนยันรับสินค้าแล้ว โปรดเตรียมอุปกรณ์และไปยังจุดติดตั้งตามกำหนด'
     : 'กรุณาไปรับสินค้าที่คลัง และตรวจนับสินค้าให้ครบก่อนยืนยันการรับสินค้า';
 
-if ($isInstalling) {
+if ($isCancelledJob) {
+    $nextStepTitle = 'งานนี้ถูกยกเลิกแล้ว';
+    $nextStepText = 'ใบงานติดตั้งนี้ถูกยกเลิกและไม่สามารถดำเนินงานต่อได้';
+} elseif ($isInstallDone) {
+    $nextStepTitle = 'งานเสร็จสิ้นแล้ว';
+    $nextStepText = 'งานติดตั้งนี้ได้รับการยืนยันและปิดงานเรียบร้อยแล้ว';
+} elseif ($isInstalling) {
     if ($isAwaitingInstallReview) {
         $nextStepTitle = 'รอหัวหน้าช่างยืนยัน';
         $nextStepText = 'ช่างบันทึกผลการติดตั้งแล้ว และกำลังรอหัวหน้าช่างยืนยันงาน';
@@ -798,12 +895,6 @@ layout_header('รายละเอียดงานติดตั้ง', $i
         </section>
     </form>
     <input type="file" accept="image/*" capture="environment" data-camera class="install-camera-input">
-    <input type="file" accept="image/jpeg,image/png,image/webp" multiple data-album hidden>
-    <dialog class="install-source" aria-labelledby="install-source-heading">
-        <h3 id="install-source-heading">เพิ่มรูปงานติดตั้ง</h3>
-        <button class="install-add" type="button" data-source-album><i class="fa-solid fa-images" aria-hidden="true"></i> เลือกจากอัลบั้ม</button>
-        <button class="install-add" type="button" data-source-close><i class="fa-solid fa-xmark" aria-hidden="true"></i> ยกเลิก</button>
-    </dialog>
     <dialog class="install-camera-preview" aria-labelledby="install-camera-preview-heading">
         <h3 id="install-camera-preview-heading">ตรวจสอบภาพถ่าย</h3>
         <img data-camera-preview-image alt="ตัวอย่างภาพถ่ายงานติดตั้ง">
@@ -870,11 +961,6 @@ body.app-body.role-technician .technician-detail-page.install-complete-page .ins
 .install-complete-page button:focus-visible, .install-complete-page a:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
 .install-complete-page dialog { box-sizing: border-box; padding: 24px; border: 1px solid #dbe3ee; border-radius: 12px; background: #fff; color: #334155; }
 .install-complete-page dialog::backdrop { background: rgb(15 23 42 / 45%); }
-.install-complete-page .install-source { width: min(380px,calc(100% - 24px)); }
-.install-complete-page .install-source h3 { margin: 0 0 16px; font-size: 18px; }
-.install-complete-page .install-source .install-add { display: flex; width: 100%; margin-top: 8px; }
-.install-complete-page .install-source h3 { text-align: center; }
-.install-complete-page .install-source .install-add { width: min(100%, 320px); margin: 10px auto 0; }
 .install-complete-page .install-gallery { width: min(1000px,calc(100% - 32px)); max-height: 90dvh; }
 .install-complete-page .install-gallery-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
 .install-complete-page .install-gallery-header h2 { margin: 0; font-size: 20px; }
@@ -885,7 +971,6 @@ body.app-body.role-technician .technician-detail-page.install-complete-page .ins
  .install-complete-page .install-more { grid-column: 1 / -1; aspect-ratio: auto; min-height: 48px; flex-direction: row; }
  .install-complete-page .install-remove { width: 36px; height: 36px; }
  .install-complete-page .install-product-header { flex-wrap: wrap; }
- .install-complete-page .install-source { width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 16px 16px 0 0; padding-bottom: max(24px,env(safe-area-inset-bottom)); }
  .install-complete-page .install-gallery { width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; border: 0; border-radius: 0; padding: 16px; }
  .install-complete-page .install-gallery-header { position: sticky; top: -16px; padding-block: 16px; background: #fff; z-index: 1; }
 }
@@ -1155,18 +1240,6 @@ body.app-body.role-technician .technician-detail-page.install-complete-page .ins
     height: 1px;
     opacity: 0;
 }
-.install-complete-page .install-source {
-    position: fixed;
-    inset: 50% auto auto 50%;
-    z-index: 1000;
-    margin: 0;
-    transform: translate(-50%, -50%);
-}
-.install-complete-page .install-source::backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgb(15 23 42 / 45%);
-}
 @media (max-width: 760px) {
     .install-complete-page #installCompleteForm .install-products { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 }
@@ -1232,14 +1305,14 @@ body.app-body.role-technician .technician-detail-page.install-complete-page #ins
 <script>
 (() => {
  const page=document.querySelector('.install-complete-page'), form=page.querySelector('form');
- const source=page.querySelector('.install-source'), gallery=page.querySelector('.install-gallery');
- const camera=page.querySelector('[data-camera]'), album=page.querySelector('[data-album]');
+ const gallery=page.querySelector('.install-gallery');
+ const camera=page.querySelector('[data-camera]');
  const cameraPreview=page.querySelector('.install-camera-preview'), cameraImage=page.querySelector('[data-camera-preview-image]');
  const formError=page.querySelector('[data-form-error]'), galleryError=page.querySelector('[data-gallery-error]');
  const preview=page.querySelector('[data-gallery-preview]'), addPhoto=page.querySelector('[data-gallery-add-photo]');
  const filesInput=page.querySelector('[data-gallery-files]'), countInput=page.querySelector('[data-gallery-count-input]');
  const galleryGrid=page.querySelector('[data-gallery-grid]'), viewer=page.querySelector('.install-image-viewer');
- const maxFiles=Math.min(10, <?= (int) $itemCount ?>);
+ const maxFiles=<?= (int) $maxInstallationImages ?>;
  let files=[], pendingCamera=null, previousScroll=0;
  const icon=name=>{const i=document.createElement('i');i.className='fa-solid '+name;i.setAttribute('aria-hidden','true');return i;};
  const setError=message=>{formError.textContent=message;galleryError.textContent=message;};
@@ -1267,18 +1340,15 @@ body.app-body.role-technician .technician-detail-page.install-complete-page #ins
   if(files.length+selected.length>maxFiles){setError('อัปโหลดรูปได้สูงสุด '+maxFiles+' รูป');return;}
   selected.forEach(file=>files.push({file,url:URL.createObjectURL(file)}));setError('');sync();
  };
- const choose=()=>{if(files.length>=maxFiles){setError('อัปโหลดรูปได้สูงสุด '+maxFiles+' รูป');return;}source.showModal();};
+ const choose=()=>{if(files.length>=maxFiles){setError('อัปโหลดรูปได้สูงสุด '+maxFiles+' รูป');return;}filesInput.click();};
  addPhoto.addEventListener('click',choose);
- page.querySelector('[data-source-camera]')?.addEventListener('click',()=>{source.close();requestAnimationFrame(()=>camera.click());});
- page.querySelector('[data-source-album]').addEventListener('click',()=>{source.close();album.click();});
- page.querySelector('[data-source-close]').addEventListener('click',()=>source.close());
  page.querySelector('[data-gallery-add]').addEventListener('click',choose);
  page.querySelector('[data-gallery-close]').addEventListener('click',closeGallery);
  page.querySelector('[data-image-close]').addEventListener('click',()=>viewer.close());
  page.querySelector('[data-camera-retake]').addEventListener('click',()=>{cameraPreview.close();pendingCamera=null;camera.value='';});
  page.querySelector('[data-camera-confirm]').addEventListener('click',()=>{if(pendingCamera){addSelected([pendingCamera]);}cameraPreview.close();pendingCamera=null;camera.value='';});
  camera.addEventListener('change',()=>{const selected=Array.from(camera.files||[]);if(!selected.length)return;const file=selected[0];if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){addSelected(selected);camera.value='';return;}pendingCamera=file;cameraImage.src=URL.createObjectURL(file);cameraPreview.showModal();});
- album.addEventListener('change',()=>{addSelected(Array.from(album.files||[]));album.value='';});
+ filesInput.addEventListener('change',()=>{addSelected(Array.from(filesInput.files||[]));filesInput.value='';});
  form.addEventListener('submit',event=>{if(!files.length){event.preventDefault();setError('กรุณาเพิ่มรูปงานติดตั้งอย่างน้อย 1 รูป');addPhoto.focus();}});
  sync();
  window.addEventListener('pagehide',event=>{if(!event.persisted)files.forEach(entry=>URL.revokeObjectURL(entry.url));});
@@ -1545,9 +1615,9 @@ endif;
         </div>
     </section>
 
-    <section class="callout <?= ($hasReceivedProducts || $hasInstallResult) ? 'is-ready' : 'is-warning' ?>">
+    <section class="callout <?= $isCancelledJob ? 'is-cancelled' : ($isAwaitingInstallReview ? 'is-awaiting-review' : ($isInstalling ? 'is-installing' : (($isInstallDone || $hasReceivedProducts || $hasInstallResult) ? 'is-ready' : 'is-warning'))) ?>">
         <div class="callout-icon">
-            <?= technician_detail_icon_svg(($hasReceivedProducts || $hasInstallResult) ? 'check' : 'truck', 18) ?>
+            <?= technician_detail_icon_svg($isCancelledJob ? 'xmark' : ($isInstalling ? 'wrench' : (($isInstallDone || $hasReceivedProducts || $hasInstallResult) ? 'check' : 'truck')), 18) ?>
         </div>
         <div class="callout-content">
             <h2><?= h($nextStepTitle) ?></h2>
@@ -1622,7 +1692,7 @@ endif;
                 </footer>
             </section>
 
-            <?php if ($hasInstallResult): ?>
+            <?php if ($hasInstallResult || $hasInstallationDraft): ?>
                 <section class="card installation-result-card" id="installation-result" aria-labelledby="installation-result-title">
                     <header class="card-header installation-result-header">
                         <div class="installation-result-heading">
@@ -1635,11 +1705,18 @@ endif;
                     </header>
                     <div class="card-body installation-result-body">
                         <div class="proof-gallery-block installation-result-content">
-                            <span class="installation-result-label">รูปงานติดตั้ง</span>
+                            <span class="installation-result-label"><?= $hasInstallationDraft ? 'รูปงานติดตั้งที่ยืนยันแล้ว' : 'รูปงานติดตั้ง' ?></span>
                             <?php if ($installResultPhotos): ?>
                                 <div class="proof-gallery installation-result-gallery">
                                     <?php foreach (array_slice($installResultPhotos, 0, 3) as $photoIndex => $photoUrl): ?>
-                                        <a class="installation-result-image-link" href="<?= h($photoUrl) ?>" target="_blank" rel="noopener">
+                                        <a
+                                            class="installation-result-image-link"
+                                            href="<?= h($photoUrl) ?>"
+                                            data-installation-result-image
+                                            data-gallery-index="<?= h((string) $photoIndex) ?>"
+                                            data-image-src="<?= h($photoUrl) ?>"
+                                            data-image-alt="รูปงานติดตั้งที่ <?= h((string) ($photoIndex + 1)) ?>"
+                                        >
                                             <img class="installation-result-image" src="<?= h($photoUrl) ?>" alt="รูปงานติดตั้งที่ <?= h((string) ($photoIndex + 1)) ?>">
                                         </a>
                                     <?php endforeach; ?>
@@ -1664,17 +1741,30 @@ endif;
                         </div>
                     </div>
                 </section>
-                <?php if (count($installResultPhotos) > 3): ?>
+                <?php if ($installResultPhotos): ?>
                     <dialog class="installation-result-modal" data-installation-result-modal aria-labelledby="installation-result-modal-title">
                         <div class="installation-result-modal-header">
                             <h2 id="installation-result-modal-title">รูปงานติดตั้งทั้งหมด</h2>
                             <button class="installation-result-modal-close" type="button" data-installation-result-close aria-label="ปิดรูปภาพ">×</button>
                         </div>
-                        <div class="installation-result-modal-grid">
+                        <div class="installation-result-modal-stage" data-installation-result-stage>
+                            <button class="installation-result-modal-nav is-prev" type="button" data-installation-result-prev aria-label="ดูรูปก่อนหน้า">‹</button>
+                            <img class="installation-result-modal-image" data-installation-result-modal-image alt="">
+                            <button class="installation-result-modal-nav is-next" type="button" data-installation-result-next aria-label="ดูรูปถัดไป">›</button>
+                        </div>
+                        <div class="installation-result-modal-grid" data-installation-result-grid>
                             <?php foreach ($installResultPhotos as $photoIndex => $photoUrl): ?>
-                                <a href="<?= h($photoUrl) ?>" target="_blank" rel="noopener">
-                                    <img src="<?= h($photoUrl) ?>" alt="รูปงานติดตั้งที่ <?= h((string) ($photoIndex + 1)) ?>">
-                                </a>
+                                <button
+                                    class="installation-result-modal-thumb"
+                                    type="button"
+                                    data-installation-result-thumb
+                                    data-gallery-index="<?= h((string) $photoIndex) ?>"
+                                    data-image-src="<?= h($photoUrl) ?>"
+                                    data-image-alt="รูปงานติดตั้งที่ <?= h((string) ($photoIndex + 1)) ?>"
+                                    aria-label="เปิดรูปงานติดตั้งที่ <?= h((string) ($photoIndex + 1)) ?>"
+                                >
+                                    <img src="<?= h($photoUrl) ?>" alt="" loading="lazy">
+                                </button>
                             <?php endforeach; ?>
                         </div>
                     </dialog>
@@ -1759,12 +1849,21 @@ endif;
                             </div>
                         </div>
 
-                        <div class="action-panel__state <?= ($hasReceivedProducts || $hasInstallResult) ? 'is-ready' : 'is-warning' ?>">
-                            <?= technician_detail_icon_svg(($hasReceivedProducts || $hasInstallResult) ? 'check' : 'truck', 18) ?>
+                        <div class="action-panel__state <?= $isCancelledJob ? 'is-cancelled' : ($isInstallDone ? 'is-ready' : ($isAwaitingInstallReview ? 'is-awaiting-review' : ($isInstalling && !$hasInstallResult ? 'is-installing' : (($hasReceivedProducts || $hasInstallResult) ? 'is-ready' : 'is-warning')))) ?>">
+                            <?= technician_detail_icon_svg($isCancelledJob ? 'xmark' : ($isInstallDone ? 'check' : ($isInstalling && !$hasInstallResult ? 'wrench' : (($hasReceivedProducts || $hasInstallResult) ? 'check' : 'truck'))), 18) ?>
                             <div>
-                                <?php if ($hasInstallResult): ?>
+                                <?php if ($isCancelledJob): ?>
+                                    <strong>ยกเลิกแล้ว</strong>
+                                    <span>งานนี้ถูกยกเลิกแล้ว ไม่มีขั้นตอนดำเนินงานต่อ</span>
+                                <?php elseif ($isInstallDone): ?>
+                                    <strong>งานเสร็จสิ้นแล้ว</strong>
+                                    <span>หัวหน้าช่างยืนยันผลการติดตั้งเรียบร้อยแล้ว</span>
+                                <?php elseif ($hasInstallResult): ?>
                                     <strong>รอหัวหน้าช่างยืนยัน</strong>
                                     <span>ช่างบันทึกผลการติดตั้งแล้ว และกำลังรอหัวหน้าช่างยืนยันงาน</span>
+                                <?php elseif ($isInstalling): ?>
+                                    <strong>กำลังติดตั้ง</strong>
+                                    <span>กำลังดำเนินการติดตั้ง กรุณาตรวจสอบงานให้เรียบร้อยก่อนยืนยันเสร็จสิ้น</span>
                                 <?php else: ?>
                                     <strong><?= $hasReceivedProducts ? 'รับสินค้าแล้ว' : 'ยังไม่ได้รับสินค้าจากคลัง' ?></strong>
                                     <span><?= $hasReceivedProducts ? 'สามารถดูใบติดตั้งและดำเนินงานตามขั้นตอนถัดไป' : 'กรุณายืนยันรับสินค้าก่อนวันติดตั้ง' ?></span>
@@ -1772,44 +1871,68 @@ endif;
                             </div>
                         </div>
 
-                        <?php if ($startJobFlash): ?>
+                        <?php if ($startJobFlash && !$startJobFlash['success']): ?>
                             <div class="action-panel__state <?= $startJobFlash['success'] ? 'is-ready' : 'is-warning' ?>" role="status">
                                 <span><?= h($startJobFlash['message']) ?></span>
                             </div>
                         <?php endif; ?>
 
-                        <?php if ($hasReceivedProducts && $canConfirmReceive && (string) ($job['setup_status'] ?? '') === '2'): ?>
-                            <form class="action-panel__decision-form" method="POST" action="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode($assignId))) ?>">
-                                <input type="hidden" name="action" value="start_job">
-                                <input type="hidden" name="csrf_token" value="<?= h($_SESSION['technician_start_job_csrf']) ?>">
-                                <button class="action-panel__submit" type="submit" data-technician-confirm="ยืนยันเริ่มติดตั้งงานนี้หรือไม่?">
-                                    <i class="fa-solid fa-wrench" aria-hidden="true"></i>
-                                    <span>เริ่มงาน</span>
+                        <?php if (!$isHistoryJob): ?>
+                            <?php if ($hasReceivedProducts && $canConfirmReceive && (string) ($job['setup_status'] ?? '') === '2'): ?>
+                                <form class="action-panel__decision-form" method="POST" action="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode($assignId))) ?>">
+                                    <input type="hidden" name="action" value="start_job">
+                                    <input type="hidden" name="csrf_token" value="<?= h($_SESSION['technician_start_job_csrf']) ?>">
+                                    <button class="action-panel__submit" type="submit" data-technician-confirm="ยืนยันเริ่มติดตั้งงานนี้หรือไม่?">
+                                        <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+                                        <span>เริ่มงาน</span>
+                                    </button>
+                                </form>
+                            <?php elseif ($isInstalling && $canConfirmReceive && !$isInstallDone && !$hasInstallResult): ?>
+                                <?php if ($hasInstallationDraft): ?>
+                                    <form class="action-panel__decision-form" method="POST" action="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode($assignId))) ?>">
+                                        <input type="hidden" name="action" value="finalize_installation_result">
+                                        <input type="hidden" name="csrf_token" value="<?= h($_SESSION['technician_start_job_csrf']) ?>">
+                                        <button class="action-panel__submit action-panel__submit--finalize" type="submit">
+                                            <i class="fa-solid fa-check" aria-hidden="true"></i>
+                                            <span>บันทึกผลการติดตั้ง</span>
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
+                                <button class="action-panel__submit" type="button" data-install-complete-open>
+                                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                                    <span><?= $hasInstallationDraft ? 'เพิ่ม/แก้ไขรูป' : 'ติดตั้งเสร็จ' ?></span>
                                 </button>
-                            </form>
-                        <?php elseif ($isInstalling && $canConfirmReceive && !$isInstallDone && !$hasInstallResult): ?>
-                            <a class="action-panel__submit" href="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode($assignId) . '&install=complete')) ?>">
-                                <i class="fa-solid fa-check" aria-hidden="true"></i>
-                                <span>ติดตั้งเสร็จ</span>
-                            </a>
-                        <?php elseif ($hasInstallResult): ?>
+                            <?php endif; ?>
+
+                            <?php if (!$hasReceivedProducts && $canConfirmReceive): ?>
+                                <button
+                                    class="action-panel__submit"
+                                    type="button"
+                                    data-job-detail-receive-open
+                                    data-receive-assign-id="<?= h((string) ($job['assign_id'] ?? '')) ?>"
+                                    data-receive-action="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode((string) ($job['assign_id'] ?? '')))) ?>"
+                                    data-receive-return-url="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode((string) ($job['assign_id'] ?? '')))) ?>"
+                                >
+                                    <?= technician_detail_icon_svg('package', 16) ?>
+                                    <span>ยืนยันรับสินค้า</span>
+                                </button>
+                            <?php endif; ?>
+
+                        <?php endif; ?>
+
+                        <?php if (($hasInstallResult || $hasInstallationDraft) && (!$isHistoryJob || $isInstallDone)): ?>
                             <a class="action-panel__submit" href="#installation-result">
                                 <i class="fa-solid fa-images" aria-hidden="true"></i>
-                                <span>ดูผลการติดตั้ง</span>
+                                <span><?= $hasInstallationDraft ? 'ดูรูปที่ยืนยันแล้ว' : 'ดูผลการติดตั้ง' ?></span>
                             </a>
                         <?php endif; ?>
 
-                        <?php if (!$hasReceivedProducts && $canConfirmReceive): ?>
-                            <a class="action-panel__submit" href="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode((string) ($job['assign_id'] ?? '')) . '&receive=confirm')) ?>">
-                                <?= technician_detail_icon_svg('package', 16) ?>
-                                <span>ยืนยันรับสินค้า</span>
+                        <?php if (!$isHistoryJob || $isInstallDone): ?>
+                            <a class="action-panel__link" href="<?= h(app_system_url('technician/setup_slip.php?id=' . urlencode($setupId))) ?>">
+                                <?= technician_detail_icon_svg('file', 16) ?>
+                                <span>ใบติดตั้ง</span>
                             </a>
                         <?php endif; ?>
-
-                        <a class="action-panel__link" href="<?= h(app_system_url('technician/setup_slip.php?id=' . urlencode($setupId))) ?>">
-                            <?= technician_detail_icon_svg('file', 16) ?>
-                            <span>ใบติดตั้ง</span>
-                        </a>
 
                     </div>
                 <?php endif; ?>
@@ -1817,6 +1940,86 @@ endif;
         </aside>
     </div>
 </section>
+
+<?php if (!$hasReceivedProducts && $canConfirmReceive): ?>
+    <dialog class="job-detail-receive-modal" data-job-detail-receive-modal aria-labelledby="jobDetailReceiveTitle">
+        <div class="job-detail-receive-modal__header">
+            <h2 id="jobDetailReceiveTitle">ยืนยันรับสินค้า</h2>
+            <button class="job-detail-receive-modal__close" type="button" data-job-detail-receive-cancel aria-label="ปิดหน้าต่าง">&times;</button>
+        </div>
+
+        <section class="job-detail-receive-modal__content" aria-labelledby="jobDetailReceiveProductsTitle">
+            <h3 id="jobDetailReceiveProductsTitle">รายการสินค้า</h3>
+            <ol class="job-detail-receive-modal__products">
+                <?php foreach ($items as $item): ?>
+                    <li><?= h((string) ($item['pro_name'] ?? '-')) ?> — จำนวน <?= h((string) ($item['install_qty'] ?? 0)) ?> ชิ้น</li>
+                <?php endforeach; ?>
+            </ol>
+            <p class="job-detail-receive-modal__message" data-job-detail-receive-message hidden role="status"></p>
+        </section>
+
+        <div class="job-detail-receive-modal__actions">
+            <button class="btn btn-outline" type="button" data-job-detail-receive-cancel>ยกเลิก</button>
+            <button class="btn btn-primary" type="button" data-job-detail-receive-submit>
+                <?= technician_detail_icon_svg('package', 16) ?>
+                <span>ยืนยัน</span>
+            </button>
+        </div>
+    </dialog>
+<?php endif; ?>
+
+<?php if ($isInstalling && $canConfirmReceive && !$isInstallDone && !$hasInstallResult): ?>
+    <dialog class="install-complete-modal" data-install-complete-modal aria-labelledby="installCompleteModalTitle">
+        <div class="install-complete-modal__header">
+            <h2 id="installCompleteModalTitle">เพิ่มรูปงานติดตั้ง</h2>
+            <button class="install-complete-modal__close" type="button" data-install-complete-cancel aria-label="ปิดหน้าต่าง">&times;</button>
+        </div>
+
+        <form
+            class="install-complete-modal__form"
+            data-install-complete-form
+            method="POST"
+            enctype="multipart/form-data"
+            action="<?= h(app_system_url('technician/job_detail.php?id=' . urlencode($assignId))) ?>"
+            data-max-files="<?= h((string) $maxInstallationImages) ?>"
+            data-confirmed-photos="<?= h((string) json_encode($installationDraftPreviewData, JSON_UNESCAPED_SLASHES)) ?>"
+        >
+            <input type="hidden" name="action" value="confirm_installation_photos">
+            <input type="hidden" name="csrf_token" value="<?= h($_SESSION['technician_start_job_csrf']) ?>">
+            <input type="hidden" name="installation_proofs_count" value="0" data-install-complete-count>
+            <input type="file" name="installation_proofs[]" accept="image/jpeg,image/png,image/webp" multiple hidden data-install-complete-files>
+            <div data-install-complete-existing></div>
+
+            <button class="install-complete-modal__add" type="button" data-install-complete-add>
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                <span>เพิ่มรูป</span>
+            </button>
+            <p class="install-complete-modal__limit">อัปโหลดรูปได้สูงสุด <?= h((string) $maxInstallationImages) ?> รูป</p>
+
+            <div class="install-complete-modal__preview" data-install-complete-preview hidden aria-live="polite"></div>
+            <p class="install-complete-modal__message" data-install-complete-message hidden role="status"></p>
+
+            <div class="install-complete-modal__actions">
+                <button class="install-complete-modal__cancel" type="button" data-install-complete-cancel>
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    <span>ยกเลิก</span>
+                </button>
+                <button class="install-complete-modal__save" type="submit" data-install-complete-save>
+                    <i class="fa-solid fa-check" aria-hidden="true"></i>
+                    <span>ยืนยันรูป</span>
+                </button>
+            </div>
+        </form>
+    </dialog>
+    <dialog class="install-complete-preview-overlay" data-install-complete-preview-dialog aria-label="ดูรูปงานติดตั้งขนาดใหญ่">
+        <div class="install-complete-preview-dialog" role="document">
+            <button class="install-complete-preview-dialog__close" type="button" data-install-complete-preview-close aria-label="ปิดรูปภาพ">&times;</button>
+            <div class="install-complete-preview-dialog__viewer">
+                <img data-install-complete-preview-image alt="">
+            </div>
+        </div>
+    </dialog>
+<?php endif; ?>
 
 <script>
 (() => {
@@ -1853,6 +2056,11 @@ endif;
     inputs.forEach((input) => input.addEventListener('change', renderPreview));
 })();
 </script>
+
+<script
+    src="<?= h(app_asset_url('technician/assets/js/job_detail.js')) ?>?v=<?= h(asset_version('technician/assets/js/job_detail.js')) ?>"
+    defer
+></script>
 
 <?php
 layout_footer();

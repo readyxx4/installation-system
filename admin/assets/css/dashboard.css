@@ -1297,3 +1297,321 @@ body.app-body.role-3 .admin-dashboard-summary-page .admin-quick-arrow {
         border-bottom: 0;
     }
 }
+
+/* Admin dashboard directory view — scoped to this page only. */
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-greeting {
+    margin: 0 0 24px;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-greeting h1 {
+    margin: 0;
+    color: #020617;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-greeting p {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+    margin: 0 0 24px;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-stat {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+    min-height: 78px;
+    padding: 14px 18px;
+    border: 1px solid #e5ecf6;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .035);
+    color: #020617;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-stat:hover {
+    border-color: #dbeafe;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, .06);
+    transform: translateY(-1px);
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-stat__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-radius: 12px;
+    font-size: 20px;
+    line-height: 1;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-stat > div {
+    min-width: 0;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-stat > div > span {
+    display: block;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-stat strong {
+    display: block;
+    margin-top: 4px;
+    color: #020617;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.05;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-stat--blue .admin-dashboard-stat__icon {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-stat--green .admin-dashboard-stat__icon {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-stat--orange .admin-dashboard-stat__icon {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-stat--slate .admin-dashboard-stat__icon {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-card {
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #e5ecf6;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 26px;
+    border-bottom: 1px solid #e5ecf6;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-card__header h2 {
+    margin: 0;
+    color: #020617;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-card__header p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-card__header > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-card__header > a:hover {
+    color: #2563eb;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-card__header > a:focus-visible,
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__edit:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .18);
+    outline-offset: 3px;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-card__list {
+    display: grid;
+    padding: 18px 26px;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+    min-height: 80px;
+    padding: 12px 0;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item + .admin-dashboard-directory-item {
+    border-top: 1px solid #edf2f7;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__avatar--technician {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__avatar--employee {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__copy {
+    min-width: 0;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__copy strong,
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__copy span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__copy strong {
+    color: #020617;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__copy span {
+    margin-top: 3px;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.35;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__status,
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 6px 12px;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__status.is-ready {
+    border-color: #bbf7d0;
+    background: #ecfdf5;
+    color: #047857;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__status.is-unavailable {
+    border-color: #fdba74;
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__edit:hover {
+    border-color: #93c5fd;
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-card__empty {
+    min-height: 78px;
+    margin: 0;
+    padding: 12px 0;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+}
+
+@media (max-width: 1180px) {
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 980px) {
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-card__header,
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-card__list {
+        padding-right: 18px;
+        padding-left: 18px;
+    }
+
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item {
+        grid-template-columns: 44px minmax(0, 1fr);
+    }
+
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__avatar {
+        width: 44px;
+        height: 44px;
+    }
+
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__status,
+    body.app-body.role-3 .admin-dashboard-summary-page .admin-dashboard-directory-item__edit {
+        grid-column: 2;
+        justify-self: start;
+    }
+}

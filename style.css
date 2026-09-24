@@ -11087,6 +11087,7 @@ body.app-body.role-3 .sidebar-profile {
 }
 
 body.app-body.role-3 .sidebar-account {
+  margin-top: auto !important;
   border-top: 1px solid #e5e7eb !important;
 }
 
@@ -11910,6 +11911,17 @@ body.app-body.role-1 .sidebar-profile-info span {
 }
 
 body.app-body.role-1 .sidebar-account {
+  margin-top: auto !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+body.app-body.role-2 .sidebar-account {
+  margin-top: auto !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+body.app-body.role-technician .sidebar-account {
+  margin-top: auto !important;
   border-top: 1px solid #e5e7eb !important;
 }
 

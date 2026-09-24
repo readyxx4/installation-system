@@ -177,6 +177,11 @@ function manager_report_contains(string $value, string $query): bool
 $status_meta = manager_report_status_meta();
 $report_timezone = new DateTimeZone('Asia/Bangkok');
 $report_now = new DateTimeImmutable('now', $report_timezone);
+$current_manager_id = trim((string) ($_SESSION['user_id'] ?? ''));
+
+if ($current_manager_id === '') {
+    redirect_to(app_system_url('manager/index.php?status=error'));
+}
 
 $latest_assignment_join = '
     LEFT JOIN assignment a
@@ -221,10 +226,14 @@ $report_sql = "
     LEFT JOIN customers c ON c.customer_id = s.customer_id
     {$latest_assignment_join}
     LEFT JOIN technicians t ON t.tech_id = a.tech_id
+    WHERE a.assign_by = ?
     ORDER BY s.created_at DESC, s.setup_id DESC
 ";
 
-$report_result = $conn->query($report_sql);
+$report_stmt = $conn->prepare($report_sql);
+$report_stmt->bind_param('s', $current_manager_id);
+$report_stmt->execute();
+$report_result = $report_stmt->get_result();
 $report_rows = [];
 while ($row = $report_result->fetch_assoc()) {
     $row['status_key'] = manager_report_status_key($row);
@@ -341,22 +350,30 @@ $summary_cards = [
     ['label' => 'เกินกำหนด', 'value' => $status_counts['overdue'], 'tone' => 'red', 'icon' => 'fa-clock'],
 ];
 
-$manager_id = trim((string) ($_SESSION['user_id'] ?? ''));
 $manager_technician_options = [];
-if ($manager_id !== '') {
+if ($current_manager_id !== '') {
     $manager_technician_stmt = $conn->prepare(
         "SELECT DISTINCT
                 t.tech_id,
                 COALESCE(NULLIF(TRIM(t.tech_name), ''), t.tech_id) AS technician_name,
                 t.tech_status
-         FROM assignment a
+         FROM setup s
+         INNER JOIN assignment a
+           ON a.setup_id = s.setup_id
+          AND a.assign_id = (
+              SELECT latest_a.assign_id
+              FROM assignment latest_a
+              WHERE latest_a.setup_id = s.setup_id
+              ORDER BY latest_a.assign_date DESC, latest_a.assign_id DESC
+              LIMIT 1
+          )
          INNER JOIN technicians t ON t.tech_id = a.tech_id
          WHERE a.assign_by = ?
            AND a.tech_id IS NOT NULL
            AND TRIM(a.tech_id) <> ''
          ORDER BY technician_name ASC, t.tech_id ASC"
     );
-    $manager_technician_stmt->bind_param('s', $manager_id);
+    $manager_technician_stmt->bind_param('s', $current_manager_id);
     $manager_technician_stmt->execute();
     $manager_technician_result = $manager_technician_stmt->get_result();
     while ($technician_row = $manager_technician_result->fetch_assoc()) {
@@ -514,6 +531,10 @@ layout_header('รายงาน', 'manager_reports', 'สรุปข้อม
 <link rel="stylesheet" href="<?= h(app_asset_url('manager/assets/css/reports.css')) ?>?v=<?= h(asset_version('manager/assets/css/reports.css')) ?>">
 
 <div class="manager-report-page">
+    <table class="manager-print-document" role="presentation" width="100%" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <td>
     <header class="report-print-document-header" aria-label="หัวเอกสารรายงาน">
         <div class="report-print-brand">
             <?php if ($manager_report_company['system_logo_url'] !== ''): ?>
@@ -524,7 +545,11 @@ layout_header('รายงาน', 'manager_reports', 'สรุปข้อม
             <div class="report-print-company-copy">
                 <p class="report-print-company-name"><?= h($manager_report_company['system_name']) ?></p>
                 <p class="report-print-company-address"><?= h($manager_report_company['company_address']) ?></p>
-                <p class="report-print-company-tax">เลขประจำตัวผู้เสียภาษี: <?= h($manager_report_company['tax_id']) ?></p>
+                <p class="report-print-company-identifiers">
+                    <span>เลขทะเบียนนิติบุคคล: <?= h($manager_report_company['company_registration_no']) ?></span>
+                    <span aria-hidden="true">|</span>
+                    <span>เลขประจำตัวผู้เสียภาษี: <?= h($manager_report_company['tax_id']) ?></span>
+                </p>
             </div>
         </div>
         <div class="report-print-meta">
@@ -532,6 +557,12 @@ layout_header('รายงาน', 'manager_reports', 'สรุปข้อม
             <p data-manager-report-print-date data-timezone="<?= h(date_default_timezone_get()) ?>">วันที่พิมพ์: <?= h($manager_report_print_date) ?></p>
         </div>
     </header>
+                </td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
 
     <header class="report-header">
         <div class="report-header-copy">
@@ -744,6 +775,10 @@ layout_header('รายงาน', 'manager_reports', 'สรุปข้อม
             </table>
         </div>
     </section>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 
 <script src="<?= h(app_asset_url('manager/assets/js/reports.js')) ?>?v=<?= h(asset_version('manager/assets/js/reports.js')) ?>"></script>

@@ -65,6 +65,11 @@ if ($setupId === '') {
     redirect_to(app_system_url('manager/assignment_history.php'));
 }
 
+$currentManagerId = trim((string) ($_SESSION['user_id'] ?? ''));
+if ($currentManagerId === '') {
+    redirect_to(app_system_url('manager/assignment_history.php'));
+}
+
 function manager_detail_date(?string $value, bool $withTime = false): string
 {
     $value = trim((string) $value);
@@ -172,10 +177,11 @@ $setupStmt = $conn->prepare("
     LEFT JOIN `user` assigner
         ON a.assign_by = assigner.user_id
     WHERE s.setup_id = ?
+      AND a.assign_by = ?
     LIMIT 1
 ");
 
-$setupStmt->bind_param('s', $setupId);
+$setupStmt->bind_param('ss', $setupId, $currentManagerId);
 $setupStmt->execute();
 $setup = $setupStmt->get_result()->fetch_assoc();
 
@@ -234,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'confi
         $lockedSetup = $lockSetupStmt->get_result()->fetch_assoc();
 
         $lockAssignmentStmt = $conn->prepare('
-            SELECT assign_id, assign_status
+            SELECT assign_id, assign_by, assign_status
             FROM assignment
             WHERE setup_id = ?
             ORDER BY assign_date DESC, assign_id DESC
@@ -257,6 +263,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'confi
             $hasLockedResult
             && $lockedSetup
             && $lockedAssignment
+            && (string) ($lockedAssignment['assign_by'] ?? '') === $currentManagerId
             && !in_array($lockedSetupStatus, [4, 5], true)
             && !in_array($lockedAssignmentStatus, [4, 5], true)
         ) {
@@ -421,9 +428,10 @@ $historyStmt = $conn->prepare("
     LEFT JOIN technicians t
         ON TRIM(a.tech_id) = TRIM(t.tech_id)
     WHERE a.setup_id = ?
+      AND a.assign_by = ?
     ORDER BY a.assign_date DESC, a.assign_id DESC
 ");
-$historyStmt->bind_param('s', $setupId);
+$historyStmt->bind_param('ss', $setupId, $currentManagerId);
 $historyStmt->execute();
 $historyResult = $historyStmt->get_result();
 
@@ -633,12 +641,27 @@ layout_header('รายละเอียดงานมอบหมาย', 'a
 
         <div class="manager-detail-action-stack">
             <?php if ($canConfirmInstallation): ?>
-                <form method="post" action="<?= h(app_system_url('manager/assignment_detail.php?id=' . urlencode($setupId))) ?>">
+                <form method="post" action="<?= h(app_system_url('manager/assignment_detail.php?id=' . urlencode($setupId))) ?>" data-installation-confirm-form>
                     <input type="hidden" name="setup_id" value="<?= h($setupId) ?>">
                     <input type="hidden" name="action" value="confirm_installation_result">
-                    <button class="sale-detail-slip-btn sale-detail-confirm-btn" type="submit">
+                    <button class="sale-detail-slip-btn sale-detail-confirm-btn" type="button" data-installation-confirm-open>
                         ยืนยันงานติดตั้ง
                     </button>
+
+                    <dialog class="manager-installation-confirm-modal" data-installation-confirm-modal aria-labelledby="installationConfirmTitle">
+                        <div class="manager-installation-confirm-modal__header">
+                            <h2 id="installationConfirmTitle">ยืนยันงานติดตั้ง</h2>
+                            <button class="manager-installation-confirm-modal__close" type="button" data-installation-confirm-close aria-label="ปิดหน้าต่าง">&times;</button>
+                        </div>
+                        <div class="manager-installation-confirm-modal__body">
+                            <p>คุณต้องการยืนยันให้งานติดตั้งนี้เสร็จสิ้นหรือไม่?</p>
+                            <small>เมื่อยืนยันแล้ว งานจะถูกบันทึกเป็นงานเสร็จสิ้น</small>
+                        </div>
+                        <div class="manager-installation-confirm-modal__actions">
+                            <button class="manager-installation-confirm-modal__cancel" type="button" data-installation-confirm-close>ยกเลิก</button>
+                            <button class="sale-detail-slip-btn sale-detail-confirm-btn" type="submit" data-installation-confirm-submit>ยืนยันงานติดตั้ง</button>
+                        </div>
+                    </dialog>
                 </form>
             <?php endif; ?>
 
@@ -794,6 +817,53 @@ layout_header('รายละเอียดงานมอบหมาย', 'a
             event.preventDefault();
             modal.close();
         }
+    });
+})();
+</script>
+
+<script>
+(() => {
+    const form = document.querySelector('[data-installation-confirm-form]');
+    const openButton = document.querySelector('[data-installation-confirm-open]');
+    const modal = document.querySelector('[data-installation-confirm-modal]');
+    const confirmButton = document.querySelector('[data-installation-confirm-submit]');
+
+    if (!form || !openButton || !modal || !confirmButton) {
+        return;
+    }
+
+    const closeModal = () => {
+        if (modal.open) {
+            modal.close();
+        }
+    };
+
+    openButton.addEventListener('click', () => {
+        if (!modal.open) {
+            modal.showModal();
+        }
+        modal.querySelector('[data-installation-confirm-close]')?.focus();
+    });
+
+    modal.querySelectorAll('[data-installation-confirm-close]').forEach((button) => {
+        button.addEventListener('click', closeModal);
+    });
+
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    form.addEventListener('submit', (event) => {
+        if (form.dataset.submitting === 'true') {
+            event.preventDefault();
+            return;
+        }
+
+        form.dataset.submitting = 'true';
+        confirmButton.disabled = true;
+        confirmButton.setAttribute('aria-disabled', 'true');
     });
 })();
 </script>

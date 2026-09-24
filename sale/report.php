@@ -315,6 +315,7 @@ $sale_report_system = system_company_data($conn);
 $sale_report_system_logo_url = $sale_report_system['system_logo_url'];
 $sale_report_system_name = $sale_report_system['system_name'];
 $sale_report_company_address = $sale_report_system['company_address'];
+$sale_report_company_registration_no = $sale_report_system['company_registration_no'];
 $sale_report_company_tax_id = $sale_report_system['tax_id'];
 $sale_report_print_date = (new DateTimeImmutable('now'))->format('d/m/Y');
 
@@ -336,6 +337,10 @@ layout_header('รายงานงานติดตั้ง', 'report', 'ส
 </style>
 
 <div class="sale-report-page">
+  <table class="sale-print-document" role="presentation" width="100%" cellspacing="0" cellpadding="0">
+    <thead>
+      <tr>
+        <td>
   <header class="report-print-document-header" aria-label="หัวเอกสารรายงาน">
     <div class="report-print-brand">
       <?php if ($sale_report_system_logo_url !== ''): ?>
@@ -346,7 +351,11 @@ layout_header('รายงานงานติดตั้ง', 'report', 'ส
       <div class="report-print-company-copy">
         <p class="report-print-company-name"><?= h($sale_report_system_name) ?></p>
         <p class="report-print-company-address"><?= h($sale_report_company_address) ?></p>
-        <p class="report-print-company-tax">เลขประจำตัวผู้เสียภาษี: <?= h($sale_report_company_tax_id) ?></p>
+        <p class="report-print-company-identifiers">
+          <span>เลขทะเบียนนิติบุคคล: <?= h($sale_report_company_registration_no) ?></span>
+          <span aria-hidden="true">|</span>
+          <span>เลขประจำตัวผู้เสียภาษี: <?= h($sale_report_company_tax_id) ?></span>
+        </p>
       </div>
     </div>
     <div class="report-print-meta">
@@ -354,6 +363,12 @@ layout_header('รายงานงานติดตั้ง', 'report', 'ส
       <p data-sale-report-print-date data-timezone="<?= h(date_default_timezone_get()) ?>">วันที่พิมพ์: <?= h($sale_report_print_date) ?></p>
     </div>
   </header>
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
 
   <header class="sale-report-hero">
     <div class="sale-report-hero-copy">
@@ -488,6 +503,10 @@ layout_header('รายงานงานติดตั้ง', 'report', 'ส
       </table>
     </div>
   </section>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <script

@@ -188,7 +188,7 @@ layout_header('ประวัติใบงาน', 'setup_history', 'ตร�
             <thead>
                 <tr>
                     <th>รหัสใบงาน</th>
-                    <th>วันที่-เวลา</th>
+                    <th>วันที่</th>
                     <th>ลูกค้า</th>
                     <th>จำนวนสินค้า</th>
                     <th>ค่าติดตั้ง</th>
@@ -221,7 +221,7 @@ layout_header('ประวัติใบงาน', 'setup_history', 'ตร�
                         if ($created_at !== '') {
                             $created_timestamp = strtotime($created_at);
                             $created_text = $created_timestamp
-                                ? date('d/m/Y H:i', $created_timestamp)
+                                ? date('d/m/Y', $created_timestamp)
                                 : $created_at;
                         }
                     ?>

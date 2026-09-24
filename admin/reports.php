@@ -141,31 +141,16 @@ function admin_report_url(string $report, string $startDate = '', string $endDat
 $report_categories = [
     'overview' => 'ภาพรวมระบบ',
     'users' => 'ผู้ใช้งาน',
-    'personnel' => 'บุคลากร',
+    'personnel' => 'พนักงาน',
     'installations' => 'ใบงานติดตั้ง',
     'sales' => 'พนักงานขาย',
     'technicians' => 'ช่างติดตั้ง',
     'revenue' => 'ค่าติดตั้ง',
 ];
 
-// Keep the existing report keys valid for bookmarked URLs while presenting
-// the four high-level sections in the report navigation.
-$report_navigation_categories = [
-    'overview' => 'ภาพรวม',
-    'installations' => 'งานติดตั้ง',
-    'personnel' => 'บุคลากร',
-    'revenue' => 'ค่าติดตั้ง',
-];
-
-$report = strtolower(trim((string) ($_GET['report'] ?? 'overview')));
-if (!array_key_exists($report, $report_categories)) {
-    $report = 'overview';
-}
-
-// Keep legacy bookmarks working while using the consolidated Personnel report.
-if ($report === 'personnel' || $report === 'sales' || $report === 'technicians') {
-    $report = 'users';
-}
+// Admin Reports now provides one consolidated Overview report. Legacy report
+// URLs intentionally fall back to this view without removing their report code.
+$report = 'overview';
 
 $start_date = admin_report_valid_date((string) ($_GET['start_date'] ?? ''));
 $end_date = admin_report_valid_date((string) ($_GET['end_date'] ?? ''));
@@ -200,6 +185,14 @@ if ($personnel_filter_type === '') {
 if (!in_array($personnel_filter_type, ['all', 'sale', 'manager', 'technician'], true)) {
     $personnel_filter_type = 'all';
 }
+$overview_limit_input = strtolower(trim((string) ($_GET['limit'] ?? 'all')));
+$overview_limit = in_array($overview_limit_input, ['10', '20', '50', 'all'], true)
+    ? $overview_limit_input
+    : 'all';
+$overview_limit_sql = $overview_limit === 'all' ? '' : ' LIMIT ' . (int) $overview_limit;
+$overview_limit_description = $overview_limit === 'all'
+    ? 'ใบงานทั้งหมดที่ผ่านตัวกรอง พร้อมสถานะปัจจุบัน'
+    : $overview_limit . ' ใบงานที่สร้างล่าสุด พร้อมสถานะปัจจุบัน';
 
 $assignment_date_conditions = [];
 $assignment_date_params = [];
@@ -429,6 +422,7 @@ $latest_installation_rows_params = array_merge($setup_date_params, $latest_filte
 $latest_installation_rows_types = $setup_date_types . $latest_filter_types;
 $latest_installation_source_sql = "SELECT
     s.setup_id,
+    s.customer_id,
     COALESCE(NULLIF(TRIM(c.customer_name), ''), '-') AS customer_name,
     COALESCE(NULLIF(TRIM(seller.user_name), ''), '-') AS seller_name,
     COALESCE(NULLIF(TRIM(t.tech_fullname), ''), NULLIF(TRIM(t.tech_name), ''), '-') AS technician_name,
@@ -450,18 +444,46 @@ $latest_installation_source_sql = "SELECT
  LEFT JOIN technicians t ON t.tech_id = a.tech_id
  WHERE {$setup_date_where}";
 $latest_installation_rows = [];
+$overview_filtered_rows = [];
 if ($report === 'overview' || $report === 'installations') {
+    $latest_rows_limit_sql = $report === 'overview' ? $overview_limit_sql : ' LIMIT 10';
     $latest_installation_rows = admin_report_rows(
         $conn,
         "SELECT latest.*
          FROM ({$latest_installation_source_sql}) latest
          WHERE {$latest_filter_where}
          ORDER BY latest.created_at DESC, latest.setup_id DESC
-         LIMIT 10",
+          {$latest_rows_limit_sql}",
         $latest_installation_rows_types,
         $latest_installation_rows_params
     );
+
+    if ($report === 'overview') {
+        $overview_filtered_rows = $latest_installation_rows;
+    }
 }
+$overview_setup_ids = array_values(array_unique(array_filter(array_map(
+    static fn (array $row): string => trim((string) ($row['setup_id'] ?? '')),
+    $overview_filtered_rows
+))));
+$overview_customer_ids = array_values(array_unique(array_filter(array_map(
+    static fn (array $row): string => trim((string) ($row['customer_id'] ?? '')),
+    $overview_filtered_rows
+))));
+$overview_product_count = 0;
+if ($overview_setup_ids !== []) {
+    $overview_product_count = admin_report_count(
+        $conn,
+        'SELECT COUNT(DISTINCT d.pro_id) AS total FROM install_detail d WHERE d.setup_id IN ('
+            . implode(', ', array_fill(0, count($overview_setup_ids), '?')) . ')',
+        str_repeat('s', count($overview_setup_ids)),
+        $overview_setup_ids
+    );
+}
+$overview_completed_setup_count = count(array_filter(
+    $overview_filtered_rows,
+    static fn (array $row): bool => (string) ($row['report_status'] ?? '') === 'done'
+));
 $installation_status_rows = admin_report_rows(
     $conn,
     "SELECT latest.report_status, COUNT(*) AS total
@@ -487,12 +509,26 @@ $ongoing_setup_count = $table_by_status['assigned']['total']
 $report_total = array_sum(array_column($table_by_status, 'total'));
 $report_completion_rate = $report_total > 0 ? round(($completed_setup_count / $report_total) * 100, 1) : 0;
 $report_average_install = $report_total > 0 ? $total_install_revenue / $report_total : 0;
+$overview_personnel_metrics_by_type = [
+    'all' => ['label' => 'พนักงานทั้งหมด', 'value' => $total_personnel],
+    'sale' => ['label' => 'พนักงานขาย', 'value' => $total_sales],
+    'manager' => ['label' => 'หัวหน้าช่าง', 'value' => $total_managers],
+    'technician' => ['label' => 'ช่างติดตั้ง', 'value' => $total_technicians],
+];
+$overview_personnel_metric = $overview_personnel_metrics_by_type[$personnel_filter_type]
+    ?? $overview_personnel_metrics_by_type['all'];
+$overview_dataset_metrics = [
+    'setups' => count($overview_filtered_rows),
+    'customers' => count($overview_customer_ids),
+    'products' => $overview_product_count,
+    'completed' => $overview_completed_setup_count,
+];
 $overview_metrics = [
-    ['label' => 'ใบงานติดตั้งทั้งหมด', 'value' => number_format($total_setups_all), 'tone' => 'blue', 'icon' => 'fa-clipboard-list'],
-    ['label' => 'บุคลากรทั้งหมด', 'value' => number_format($total_personnel), 'tone' => 'cyan', 'icon' => 'fa-users'],
-    ['label' => 'ลูกค้าทั้งหมด', 'value' => number_format($total_customers), 'tone' => 'amber', 'icon' => 'fa-address-card'],
-    ['label' => 'สินค้าทั้งหมด', 'value' => number_format($total_products), 'tone' => 'violet', 'icon' => 'fa-box'],
-    ['label' => 'งานเสร็จสิ้นทั้งหมด', 'value' => number_format($completed_setup_count), 'tone' => 'green', 'icon' => 'fa-circle-check'],
+    ['key' => 'setups', 'label' => 'ใบงานติดตั้งทั้งหมด', 'value' => number_format($overview_dataset_metrics['setups']), 'tone' => 'blue', 'icon' => 'fa-clipboard-list'],
+    ['key' => 'personnel', 'label' => $overview_personnel_metric['label'], 'value' => number_format($overview_personnel_metric['value']), 'tone' => 'cyan', 'icon' => 'fa-users'],
+    ['key' => 'customers', 'label' => 'ลูกค้าทั้งหมด', 'value' => number_format($overview_dataset_metrics['customers']), 'tone' => 'amber', 'icon' => 'fa-address-card'],
+    ['key' => 'products', 'label' => 'สินค้าทั้งหมด', 'value' => number_format($overview_dataset_metrics['products']), 'tone' => 'violet', 'icon' => 'fa-box'],
+    ['key' => 'completed', 'label' => 'งานเสร็จสิ้นทั้งหมด', 'value' => number_format($overview_dataset_metrics['completed']), 'tone' => 'green', 'icon' => 'fa-circle-check'],
 ];
 
 $period_label = 'ทุกช่วงเวลา';
@@ -515,18 +551,21 @@ $technician_table_rows = [];
 $personnel_tables_by_type = [];
 $personnel_summary_cards_by_type = [];
 $personnel_view = [
-    'type' => $personnel_filter_type,
+    'type' => $report === 'users' ? 'all' : $personnel_filter_type,
     'summary_cards' => [],
     'tables' => [],
 ];
+$overview_personnel_tables = [];
+$personnel_query_type = in_array($report, ['overview', 'users'], true) ? 'all' : $personnel_filter_type;
+$personnel_query_search = $report === 'overview' ? '' : $personnel_filter_search;
 $personnel_user_conditions = ['1=1'];
 $personnel_user_params = [];
 $personnel_user_types = '';
 $personnel_tech_conditions = ['1=1'];
 $personnel_tech_params = [];
 $personnel_tech_types = '';
-if ($personnel_filter_search !== '') {
-    $personnel_search_like = '%' . $personnel_filter_search . '%';
+if ($personnel_query_search !== '') {
+    $personnel_search_like = '%' . $personnel_query_search . '%';
     $personnel_user_conditions[] = '(u.user_id LIKE ? OR u.user_name LIKE ?)';
     $personnel_user_params = [$personnel_search_like, $personnel_search_like];
     $personnel_user_types = 'ss';
@@ -540,8 +579,8 @@ $personnel_sum_stat = static function (array $rows, int $index): int {
     return array_sum(array_map(static fn (array $row): int => (int) ($row['stats'][$index] ?? 0), $rows));
 };
 
-if ($report === 'users') {
-    if (in_array($personnel_filter_type, ['all', 'sale'], true)) {
+if ($report === 'overview' || $report === 'users') {
+    if (in_array($personnel_query_type, ['all', 'sale'], true)) {
         $sales_report_rows = admin_report_rows(
             $conn,
             "SELECT
@@ -600,13 +639,13 @@ if ($report === 'users') {
             'row_icon' => 'fa-user-tie',
             'row_tone' => 'cyan',
             'empty_icon' => 'fa-regular fa-user',
-            'empty_message' => $personnel_filter_search !== '' ? 'ไม่พบข้อมูลที่ตรงกับตัวกรอง' : 'ยังไม่มีข้อมูลพนักงานขาย',
+            'empty_message' => $personnel_query_search !== '' ? 'ไม่พบข้อมูลที่ตรงกับตัวกรอง' : 'ยังไม่มีข้อมูลพนักงานขาย',
             'columns' => ['รหัสพนักงาน', 'ชื่อ', 'ใบงานที่สร้าง', 'เสร็จสิ้น', 'ยกเลิก'],
             'rows' => $sales_table_rows,
         ];
     }
 
-    if (in_array($personnel_filter_type, ['all', 'manager'], true)) {
+    if (in_array($personnel_query_type, ['all', 'manager'], true)) {
         $manager_report_rows = admin_report_rows(
             $conn,
             "SELECT
@@ -657,13 +696,13 @@ if ($report === 'users') {
             'row_icon' => 'fa-user-tie',
             'row_tone' => 'amber',
             'empty_icon' => 'fa-regular fa-user',
-            'empty_message' => $personnel_filter_search !== '' ? 'ไม่พบข้อมูลที่ตรงกับตัวกรอง' : 'ยังไม่มีข้อมูลหัวหน้าช่าง',
+            'empty_message' => $personnel_query_search !== '' ? 'ไม่พบข้อมูลที่ตรงกับตัวกรอง' : 'ยังไม่มีข้อมูลหัวหน้าช่าง',
             'columns' => ['รหัสพนักงาน', 'ชื่อ', 'งานที่มอบหมาย', 'เสร็จสิ้น'],
             'rows' => $manager_table_rows,
         ];
     }
 
-    if (in_array($personnel_filter_type, ['all', 'technician'], true)) {
+    if (in_array($personnel_query_type, ['all', 'technician'], true)) {
         $technicians_report_rows = admin_report_rows(
             $conn,
             "SELECT
@@ -717,15 +756,21 @@ if ($report === 'users') {
             'row_icon' => 'fa-screwdriver-wrench',
             'row_tone' => 'green',
             'empty_icon' => 'fa-solid fa-screwdriver-wrench',
-            'empty_message' => $personnel_filter_search !== '' ? 'ไม่พบข้อมูลที่ตรงกับตัวกรอง' : 'ยังไม่มีข้อมูลช่างติดตั้ง',
-            'columns' => ['รหัสช่าง', 'ชื่อ', 'ความพร้อม', 'ได้รับมอบหมาย', 'เสร็จสิ้น'],
+            'empty_message' => $personnel_query_search !== '' ? 'ไม่พบข้อมูลที่ตรงกับตัวกรอง' : 'ยังไม่มีข้อมูลช่างติดตั้ง',
+            'columns' => ['รหัสช่าง', 'ชื่อ', 'สถานะช่าง', 'ได้รับมอบหมาย', 'เสร็จสิ้น'],
             'rows' => $technician_table_rows,
         ];
     }
 
-    if ($personnel_filter_type === 'all') {
+    if ($report === 'overview') {
+        $overview_personnel_tables = [
+            $personnel_tables_by_type['sale'],
+            $personnel_tables_by_type['manager'],
+            $personnel_tables_by_type['technician'],
+        ];
+    } else {
         $personnel_view['summary_cards'] = [
-            ['label' => 'บุคลากรทั้งหมด', 'value' => count($sales_table_rows) + count($manager_table_rows) + count($technician_table_rows), 'tone' => 'blue', 'icon' => 'fa-users'],
+            ['label' => 'พนักงานทั้งหมด', 'value' => count($sales_table_rows) + count($manager_table_rows) + count($technician_table_rows), 'tone' => 'blue', 'icon' => 'fa-users'],
             ['label' => 'พนักงานขาย', 'value' => count($sales_table_rows), 'tone' => 'cyan', 'icon' => 'fa-user-tag'],
             ['label' => 'หัวหน้าช่าง', 'value' => count($manager_table_rows), 'tone' => 'amber', 'icon' => 'fa-user-tie'],
             ['label' => 'ช่างติดตั้ง', 'value' => count($technician_table_rows), 'tone' => 'green', 'icon' => 'fa-screwdriver-wrench'],
@@ -735,9 +780,6 @@ if ($report === 'users') {
             $personnel_tables_by_type['manager'],
             $personnel_tables_by_type['technician'],
         ];
-    } else {
-        $personnel_view['summary_cards'] = $personnel_summary_cards_by_type[$personnel_filter_type];
-        $personnel_view['tables'] = [$personnel_tables_by_type[$personnel_filter_type]];
     }
 }
 
@@ -1001,6 +1043,9 @@ if ((string) ($_GET['ajax'] ?? '') === '1') {
         }, $latest_installation_rows);
         $ajax_installation_metrics = [];
         $ajax_installation_metric_labels = [];
+        $ajax_overview_personnel_metric = [];
+        $ajax_overview_dataset_metrics = [];
+        $ajax_overview_limit_description = '';
         if ($report === 'installations') {
             $ajax_installation_metrics = [
                 'total' => $installation_filtered_total,
@@ -1011,6 +1056,10 @@ if ((string) ($_GET['ajax'] ?? '') === '1') {
                 'cancelled' => $installation_workflow_counts['cancelled'],
             ];
             $ajax_installation_metric_labels = $installation_metric_labels;
+        } elseif ($report === 'overview') {
+            $ajax_overview_personnel_metric = $overview_personnel_metric;
+            $ajax_overview_dataset_metrics = $overview_dataset_metrics;
+            $ajax_overview_limit_description = $overview_limit_description;
         }
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
@@ -1020,6 +1069,9 @@ if ((string) ($_GET['ajax'] ?? '') === '1') {
             'rows' => $ajax_latest_rows,
             'metrics' => $ajax_installation_metrics,
             'metric_labels' => $ajax_installation_metric_labels,
+            'overview_personnel_metric' => $ajax_overview_personnel_metric,
+            'overview_dataset_metrics' => $ajax_overview_dataset_metrics,
+            'overview_limit_description' => $ajax_overview_limit_description,
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
@@ -1078,7 +1130,7 @@ if ((string) ($_GET['ajax'] ?? '') === '1') {
 $report_print_titles = [
     'overview' => 'รายงานภาพรวมระบบ',
     'installations' => 'รายงานงานติดตั้ง',
-    'users' => 'รายงานบุคลากร',
+    'users' => 'รายงานพนักงาน',
     'revenue' => 'รายงานค่าติดตั้ง',
 ];
 $report_print_title = $report_print_titles[$report] ?? $report_print_titles['overview'];
@@ -1086,11 +1138,30 @@ $report_system = system_company_data($conn);
 $report_system_logo_url = $report_system['system_logo_url'];
 $report_system_name = $report_system['system_name'];
 $report_company_address = $report_system['company_address'];
+$report_company_registration_no = $report_system['company_registration_no'];
 $report_company_tax_id = $report_system['tax_id'];
 $report_print_date = (new DateTimeImmutable('now'))->format('d/m/Y');
 
-$page_title = 'รายงานภาพรวมระบบ';
-$page_subtitle = 'สรุปข้อมูลผู้ใช้งาน ใบงานติดตั้ง สถานะงาน และค่าติดตั้งของระบบ';
+$report_page_headers = [
+    'overview' => [
+        'title' => $report_print_titles['overview'],
+        'subtitle' => 'สรุปข้อมูลผู้ใช้งาน ใบงานติดตั้ง สถานะงาน และค่าติดตั้งของระบบ',
+    ],
+    'installations' => [
+        'title' => $report_print_titles['installations'],
+        'subtitle' => 'เรียงจากวันที่สร้างใบงานใหม่สุด และใช้ assignment ล่าสุดต่อใบงาน',
+    ],
+    'users' => [
+        'title' => $report_print_titles['users'],
+        'subtitle' => 'สรุปข้อมูลพนักงานในระบบ',
+    ],
+    'revenue' => [
+        'title' => $report_print_titles['revenue'],
+        'subtitle' => 'สรุปจำนวนงานและยอดค่าติดตั้งตามสถานะใน' . $period_label,
+    ],
+];
+$page_title = $report_page_headers[$report]['title'] ?? $report_page_headers['overview']['title'];
+$page_subtitle = $report_page_headers[$report]['subtitle'] ?? $report_page_headers['overview']['subtitle'];
 
 layout_header('รายงาน', 'reports', 'ศูนย์รวมรายงานระบบสำหรับผู้ดูแล');
 ?>

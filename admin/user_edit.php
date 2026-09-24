@@ -225,7 +225,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       );
     }
 
-    $stmt->execute();
+    $update_succeeded = $stmt->execute();
+    if ($update_succeeded && $user_id === (string) ($_SESSION['user_id'] ?? '')) {
+      $_SESSION['user_name'] = $user_name;
+    }
     redirect_to(app_system_url('admin/users.php?status=updated'));
   } catch (Throwable $e) {
     redirect_to(app_system_url('admin/user_edit.php?id=' . urlencode($user_id) . '&status=error'));

@@ -22,7 +22,6 @@
   };
 
   updatePrintDate();
-  window.addEventListener('beforeprint', updatePrintDate);
 
   const controllers = Object.create(null);
   const number = (value, decimals = 0) => Number(value || 0).toLocaleString('en-US', {
@@ -99,7 +98,9 @@
 
   const setUrlState = (section, params) => {
     const url = new URL(window.location.href);
-    const keys = section === 'personnel'
+    const keys = section === 'overview-latest'
+      ? ['search', 'status', 'personnel_type', 'limit']
+      : section === 'personnel'
       ? ['personnel_search', 'personnel_type']
       : section === 'revenue'
         ? ['status', 'fee_year']
@@ -116,6 +117,31 @@
   };
 
   const readForm = (form) => Object.fromEntries(new FormData(form).entries());
+
+  const applyOverviewPersonnelFilter = (form) => {
+    if (form.dataset.filterSection !== 'overview-latest') return;
+
+    const type = form.querySelector('select[name="personnel_type"]')?.value || 'all';
+    const tableGrid = root.querySelector('[data-overview-personnel-tables]');
+    if (!tableGrid) return;
+
+    tableGrid.dataset.personnelType = type;
+    tableGrid.classList.toggle('report-personnel-table-grid--single', type !== 'all');
+    tableGrid.querySelectorAll('[data-personnel-table-type]').forEach((table) => {
+      table.hidden = type !== 'all' && table.dataset.personnelTableType !== type;
+    });
+  };
+
+  const showAllOverviewPersonnelTablesForPrint = () => {
+    const tableGrid = root.querySelector('[data-overview-personnel-tables]');
+    if (!tableGrid) return;
+
+    tableGrid.dataset.personnelType = 'all';
+    tableGrid.classList.remove('report-personnel-table-grid--single');
+    tableGrid.querySelectorAll('[data-personnel-table-type]').forEach((table) => {
+      table.hidden = false;
+    });
+  };
 
   const panelForForm = (form) => {
     const section = form.dataset.filterSection;
@@ -231,6 +257,31 @@
     }
     const result = panelForForm(form)?.querySelector('[data-result-value]');
     if (result) result.textContent = number(payload.count) + ' รายการ';
+  };
+
+  const renderOverviewPersonnelMetric = (payload) => {
+    const metric = payload.overview_personnel_metric || {};
+    if (!Object.prototype.hasOwnProperty.call(metric, 'label') || !Object.prototype.hasOwnProperty.call(metric, 'value')) return;
+
+    const label = root.querySelector('[data-overview-personnel-metric-label]');
+    const value = root.querySelector('[data-overview-personnel-metric]');
+    if (label) label.textContent = metric.label;
+    if (value) value.textContent = number(metric.value);
+  };
+
+  const renderOverviewDatasetMetrics = (form, payload) => {
+    const metrics = payload.overview_dataset_metrics || {};
+    root.querySelectorAll('[data-overview-metric]').forEach((node) => {
+      const key = node.dataset.overviewMetric;
+      if (key && Object.prototype.hasOwnProperty.call(metrics, key)) {
+        node.textContent = number(metrics[key]);
+      }
+    });
+
+    const description = panelForForm(form)?.querySelector('.report-panel-head p');
+    if (description && typeof payload.overview_limit_description === 'string') {
+      description.textContent = payload.overview_limit_description;
+    }
   };
 
   const renderInstallation = (form, payload) => {
@@ -419,9 +470,14 @@
   const apply = async (form) => {
     const section = form.dataset.filterSection;
     const params = readForm(form);
+    applyOverviewPersonnelFilter(form);
     try {
       const payload = await request(form, params);
-      if (section === 'overview-latest') renderLatest(form, payload);
+      if (section === 'overview-latest') {
+        renderLatest(form, payload);
+        renderOverviewPersonnelMetric(payload);
+        renderOverviewDatasetMetrics(form, payload);
+      }
       else if (section === 'installation-latest') renderInstallation(form, payload);
       else if (section === 'personnel') renderPersonnel(form, payload);
       else if (section === 'revenue') renderRevenueUnified(form, payload);
@@ -432,7 +488,18 @@
   };
 
   normalizeFilterCopy();
+  window.addEventListener('beforeprint', () => {
+    updatePrintDate();
+    showAllOverviewPersonnelTablesForPrint();
+  });
+  window.addEventListener('afterprint', () => {
+    const overviewFilter = root.querySelector('[data-filter-section="overview-latest"]');
+    if (overviewFilter) applyOverviewPersonnelFilter(overviewFilter);
+  });
+
   root.querySelectorAll('[data-report-filter-form]:not([data-filter-disabled])').forEach((form) => {
+    applyOverviewPersonnelFilter(form);
+
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       apply(form);

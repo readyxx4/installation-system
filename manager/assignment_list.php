@@ -36,6 +36,11 @@ function prepare_assignment_assign_by(mysqli $conn): void
 
 prepare_assignment_assign_by($conn);
 
+$current_manager_id = trim((string) ($_SESSION['user_id'] ?? ''));
+if ($current_manager_id === '') {
+    redirect_to(app_system_url('manager/index.php?status=error'));
+}
+
 function make_cancel_assign_id(mysqli $conn): string
 {
     $prefix = 'ASG-';
@@ -109,10 +114,14 @@ if ($action === 'cancel') {
             redirect_to(app_system_url('manager/assignment_list.php?status=all&cancel=notfound'));
         }
 
-        $assign_stmt = $conn->prepare("\n            SELECT assign_id, tech_id, assign_status\n            FROM assignment\n            WHERE setup_id = ?\n            ORDER BY assign_date DESC, assign_id DESC\n            LIMIT 1\n        ");
+        $assign_stmt = $conn->prepare("\n            SELECT assign_id, tech_id, assign_status, assign_by\n            FROM assignment\n            WHERE setup_id = ?\n            ORDER BY assign_date DESC, assign_id DESC\n            LIMIT 1\n        ");
         $assign_stmt->bind_param('s', $setup_id_cancel);
         $assign_stmt->execute();
         $assignment = $assign_stmt->get_result()->fetch_assoc();
+
+        if ($assignment && (string) ($assignment['assign_by'] ?? '') !== $current_manager_id) {
+            redirect_to(app_system_url('manager/assignment_list.php?status=all&cancel=notfound'));
+        }
 
         $cancel_check = [
             'setup_status' => $setup_cancel['setup_status'] ?? null,
@@ -132,7 +141,7 @@ if ($action === 'cancel') {
             $cancel_stmt->execute();
         } else {
             $cancel_assign_id = make_cancel_assign_id($conn);
-            $assign_by = $_SESSION['user_id'] ?? null;
+            $assign_by = $current_manager_id;
             $assign_date = date('Y-m-d H:i:s');
             $cancel_status = 4;
             $customer_id = $setup_cancel['customer_id'] ?? null;

@@ -151,6 +151,11 @@ function assignment_time_slots(): array
 
 prepare_assignment_table($conn);
 
+$current_manager_id = trim((string) ($_SESSION['user_id'] ?? ''));
+if ($current_manager_id === '') {
+    redirect_to(app_system_url('manager/assignment_list.php?status=error'));
+}
+
 $setup_id = trim($_GET['setup_id'] ?? $_POST['setup_id'] ?? '');
 
 if ($setup_id === '') {
@@ -222,10 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect_to(app_system_url('manager/assignment_list.php?status=notfound'));
         }
 
-        $assign_by = $_SESSION['user_id'] ?? '';
-        if ($assign_by === '') {
-            redirect_to(app_system_url('manager/assignments.php?setup_id=' . urlencode($setup_id) . '&status=error'));
-        }
+        $assign_by = $current_manager_id;
 
         $active_stmt = $conn->prepare("
             SELECT
@@ -235,6 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 TIME_FORMAT(a.assign_install_time, '%H:%i') AS assign_install_time,
                 TIME_FORMAT(a.assign_install_end_time, '%H:%i') AS assign_install_end_time,
                 a.assign_status,
+                a.assign_by,
                 COALESCE(t.tech_status, 0) AS current_tech_status
             FROM assignment a
             LEFT JOIN technicians t ON a.tech_id = t.tech_id
@@ -246,6 +249,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $active_stmt->bind_param('s', $setup_id);
         $active_stmt->execute();
         $active_assignment = $active_stmt->get_result()->fetch_assoc();
+
+        if ($active_assignment && (string) ($active_assignment['assign_by'] ?? '') !== $current_manager_id) {
+            redirect_to(app_system_url('manager/assignment_list.php?status=notfound'));
+        }
+
         $setup_status = (int) ($setup['setup_status'] ?? 0);
         $current_assign_status = (int) ($active_assignment['assign_status'] ?? 0);
 
@@ -486,6 +494,7 @@ $current_assignment_stmt = $conn->prepare("
         TIME_FORMAT(a.assign_install_time, '%H:%i') AS assign_install_time,
         TIME_FORMAT(a.assign_install_end_time, '%H:%i') AS assign_install_end_time,
         a.assign_status,
+        a.assign_by,
         t.tech_name,
         t.tech_fullname,
         t.tech_phone,
@@ -502,6 +511,10 @@ $current_assignment_stmt = $conn->prepare("
 $current_assignment_stmt->bind_param('s', $setup_id);
 $current_assignment_stmt->execute();
 $current_assignment = $current_assignment_stmt->get_result()->fetch_assoc();
+
+if ($current_assignment && (string) ($current_assignment['assign_by'] ?? '') !== $current_manager_id) {
+    redirect_to(app_system_url('manager/assignment_list.php?status=notfound'));
+}
 
 $technicians_data = [];
 $technicians_result = $conn->query("

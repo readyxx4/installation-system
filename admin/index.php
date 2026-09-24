@@ -371,6 +371,13 @@ $status_overview = [
 ];
 $status_count_values = array_map('intval', array_column($status_overview, 'count'));
 $status_max_count = max([1, ...$status_count_values]);
+$dashboard_admin_name = trim((string) ($_SESSION['user_name'] ?? ''));
+$dashboard_admin_name = $dashboard_admin_name !== '' ? $dashboard_admin_name : 'ผู้ดูแลระบบ';
+$dashboard_employee_role_labels = [
+    '1' => 'หัวหน้าช่าง',
+    '2' => 'พนักงานขาย',
+    '3' => 'ผู้ดูแลระบบ',
+];
 
 layout_header('หน้าหลัก', 'dashboard', 'ภาพรวมข้อมูลและสถานะการทำงานของระบบ');
 ?>
@@ -380,157 +387,99 @@ layout_header('หน้าหลัก', 'dashboard', 'ภาพรวมข้
     href="<?= h(app_asset_url('admin/assets/css/dashboard.css')) ?>?v=<?= h(asset_version('admin/assets/css/dashboard.css')) ?>"
 >
 
-<div class="admin-dashboard-v2 admin-dashboard-summary-page">
+<main class="admin-dashboard-summary-page" aria-label="ภาพรวมข้อมูลและการจัดการระบบ">
+    <header class="admin-dashboard-greeting">
+        <h1>สวัสดี, <?= h($dashboard_admin_name) ?> 👋</h1>
+        <p>ภาพรวมข้อมูลและการจัดการระบบวันนี้</p>
+    </header>
 
-    <div class="admin-dashboard-top">
-        <div>
-            <h1>สรุปภาพรวม</h1>
-        </div>
-
-        <div class="admin-dashboard-actions">
-            <div class="admin-date-pill admin-update-pill">
-                <i class="fa-regular fa-clock"></i>
-                อัปเดตล่าสุด <?= h($dashboard_updated_at) ?>
-            </div>
-        </div>
-    </div>
-
-    <div class="admin-summary-grid">
-        <div class="admin-summary-card blue">
-            <div>
-                <span>พนักงาน</span>
-                <strong><?= h((string) $total_system_users) ?></strong>
-                <small>บัญชีผู้ใช้งานระบบ</small>
-            </div>
-            <div class="summary-icon"><i class="fa-solid fa-user-tie"></i></div>
-        </div>
-
-        <div class="admin-summary-card green">
-            <div>
-                <span>ช่าง</span>
-                <strong><?= h((string) $total_technicians) ?></strong>
-                <small>พร้อมรับงาน <?= h((string) $total_technicians_ready) ?></small>
-            </div>
-            <div class="summary-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
-        </div>
-
-        <div class="admin-summary-card cyan">
-            <div>
-                <span>ลูกค้า</span>
-                <strong><?= h((string) $total_customers) ?></strong>
-                <small>ข้อมูลลูกค้าทั้งหมด</small>
-            </div>
-            <div class="summary-icon"><i class="fa-solid fa-users"></i></div>
-        </div>
-
-        <div class="admin-summary-card orange">
-            <div>
-                <span>สินค้า</span>
-                <strong><?= h((string) $total_products) ?></strong>
-                <small>ประเภทสินค้า <?= h((string) $total_product_types) ?></small>
-            </div>
-            <div class="summary-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
-        </div>
-
-        <div class="admin-summary-card purple">
-            <div>
-                <span>งานติดตั้ง</span>
-                <strong><?= h((string) $total_setups) ?></strong>
-                <small>เสร็จสิ้น <?= h((string) $status_counts['done']) ?></small>
-            </div>
-            <div class="summary-icon"><i class="fa-solid fa-clipboard-check"></i></div>
-        </div>
-    </div>
-
-    <div class="admin-dashboard-brief-grid">
-        <div class="admin-widget admin-brief-card">
-            <div class="admin-widget-head">
-                <div>
-                    <h2>สรุปสถานะงานติดตั้ง</h2>
-                    <p>จำนวนงานตามสถานะปัจจุบัน</p>
-                </div>
-            </div>
-
-            <div class="admin-status-metrics">
-                <?php foreach ($status_overview as $item): ?>
-                    <div class="admin-status-metric">
-                        <span>
-                            <i class="admin-status-dot <?= h($item['badge']) ?>" aria-hidden="true"></i>
-                            <?= h($item['label']) ?>
-                        </span>
-                        <strong><?= h((string) $item['count']) ?></strong>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-
-    </div>
-
-    <section class="admin-quick-section" aria-labelledby="admin-quick-title">
-        <div class="admin-section-heading">
-            <div>
-                <h2 id="admin-quick-title">ทางลัดการจัดการ</h2>
-                <p>เข้าถึงหมวดข้อมูลได้อย่างรวดเร็ว</p>
-            </div>
-        </div>
-
-        <div class="admin-quick-grid">
-            <a class="admin-quick-card" href="<?= h(app_system_url('admin/users.php')) ?>">
-                <span class="admin-quick-icon blue"><i class="fa-regular fa-user"></i></span>
-                <span class="admin-quick-copy">
-                    <strong>จัดการพนักงาน</strong>
-                    <small><?= h((string) $total_system_users) ?> บัญชีผู้ใช้งาน</small>
-                </span>
-                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
-            </a>
-
-            <a class="admin-quick-card" href="<?= h(app_system_url('admin/technicians.php')) ?>">
-                <span class="admin-quick-icon teal"><i class="fa-solid fa-screwdriver-wrench"></i></span>
-                <span class="admin-quick-copy">
-                    <strong>จัดการช่าง</strong>
-                    <small><?= h((string) $total_technicians) ?> คน</small>
-                </span>
-                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
-            </a>
-
-            <a class="admin-quick-card" href="<?= h(app_system_url('admin/customers.php')) ?>">
-                <span class="admin-quick-icon orange"><i class="fa-regular fa-address-card"></i></span>
-                <span class="admin-quick-copy">
-                    <strong>จัดการลูกค้า</strong>
-                    <small><?= h((string) $total_customers) ?> ราย</small>
-                </span>
-                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
-            </a>
-
-            <a class="admin-quick-card" href="<?= h(app_system_url('admin/product_types.php')) ?>">
-                <span class="admin-quick-icon indigo"><i class="fa-regular fa-rectangle-list"></i></span>
-                <span class="admin-quick-copy">
-                    <strong>ประเภทสินค้า</strong>
-                    <small><?= h((string) $total_product_types) ?> ประเภท</small>
-                </span>
-                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
-            </a>
-
-            <a class="admin-quick-card" href="<?= h(app_system_url('admin/products.php')) ?>">
-                <span class="admin-quick-icon slate"><i class="fa-solid fa-cube"></i></span>
-                <span class="admin-quick-copy">
-                    <strong>สินค้า</strong>
-                    <small><?= h((string) $total_products) ?> รายการ</small>
-                </span>
-                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
-            </a>
-
-            <a class="admin-quick-card" href="<?= h(app_system_url('admin/system.php')) ?>">
-                <span class="admin-quick-icon sky"><i class="fa-solid fa-circle-info"></i></span>
-                <span class="admin-quick-copy">
-                    <strong>ข้อมูลระบบ</strong>
-                    <small>ตั้งค่าข้อมูลพื้นฐาน</small>
-                </span>
-                <i class="fa-solid fa-chevron-right admin-quick-arrow" aria-hidden="true"></i>
-            </a>
-        </div>
+    <section class="admin-dashboard-summary-grid" aria-label="สรุปข้อมูลระบบ">
+        <article class="admin-dashboard-stat admin-dashboard-stat--blue">
+            <span class="admin-dashboard-stat__icon"><i class="fa-solid fa-user-tie" aria-hidden="true"></i></span>
+            <div><span>พนักงาน</span><strong><?= h((string) $total_system_users) ?></strong></div>
+        </article>
+        <article class="admin-dashboard-stat admin-dashboard-stat--green">
+            <span class="admin-dashboard-stat__icon"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i></span>
+            <div><span>ช่าง</span><strong><?= h((string) $total_technicians) ?></strong></div>
+        </article>
+        <article class="admin-dashboard-stat admin-dashboard-stat--orange">
+            <span class="admin-dashboard-stat__icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
+            <div><span>ลูกค้า</span><strong><?= h((string) $total_customers) ?></strong></div>
+        </article>
+        <article class="admin-dashboard-stat admin-dashboard-stat--slate">
+            <span class="admin-dashboard-stat__icon"><i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i></span>
+            <div><span>สินค้า</span><strong><?= h((string) $total_products) ?></strong></div>
+        </article>
+        <article class="admin-dashboard-stat admin-dashboard-stat--blue">
+            <span class="admin-dashboard-stat__icon"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i></span>
+            <div><span>งานติดตั้ง</span><strong><?= h((string) $total_setups) ?></strong></div>
+        </article>
     </section>
 
-</div>
+    <section class="admin-dashboard-directory-grid" aria-label="ข้อมูลบุคลากร">
+        <section class="admin-dashboard-directory-card" aria-labelledby="admin-technician-directory-title">
+            <header class="admin-dashboard-directory-card__header">
+                <div>
+                    <h2 id="admin-technician-directory-title">ข้อมูลช่างติดตั้ง</h2>
+                    <p>สถานะความพร้อมของช่างในระบบ</p>
+                </div>
+                <a href="<?= h(app_system_url('admin/technicians.php')) ?>">ดูทั้งหมด <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </header>
+            <div class="admin-dashboard-directory-card__list">
+                <?php if (!$technician_performance || $technician_performance->num_rows === 0): ?>
+                    <p class="admin-dashboard-directory-card__empty">ยังไม่มีข้อมูลช่างติดตั้ง</p>
+                <?php else: ?>
+                    <?php while ($technician = $technician_performance->fetch_assoc()): ?>
+                        <?php
+                        $technician_name = trim((string) ($technician['tech_name'] ?? ''));
+                        $technician_initial = function_exists('mb_substr') ? mb_substr($technician_name, 0, 1, 'UTF-8') : substr($technician_name, 0, 1);
+                        $is_technician_ready = (string) ($technician['tech_status'] ?? '') === '0';
+                        ?>
+                        <article class="admin-dashboard-directory-item">
+                            <span class="admin-dashboard-directory-item__avatar admin-dashboard-directory-item__avatar--technician"><?= h($technician_initial !== '' ? $technician_initial : '-') ?></span>
+                            <div class="admin-dashboard-directory-item__copy">
+                                <strong><?= h($technician_name !== '' ? $technician_name : '-') ?></strong>
+                                <span><?= h((string) ($technician['tech_id'] ?? '-')) ?></span>
+                            </div>
+                            <span class="admin-dashboard-directory-item__status<?= $is_technician_ready ? ' is-ready' : ' is-unavailable' ?>"><?= h(tech_status_name($technician['tech_status'] ?? null)) ?></span>
+                        </article>
+                    <?php endwhile; ?>
+                <?php endif; ?>
+            </div>
+        </section>
+
+        <section class="admin-dashboard-directory-card" aria-labelledby="admin-employee-directory-title">
+            <header class="admin-dashboard-directory-card__header">
+                <div>
+                    <h2 id="admin-employee-directory-title">ข้อมูลพนักงาน</h2>
+                    <p>จัดการบัญชีพนักงานในระบบ</p>
+                </div>
+                <a href="<?= h(app_system_url('admin/users.php')) ?>">ดูทั้งหมด <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </header>
+            <div class="admin-dashboard-directory-card__list">
+                <?php if (!$recent_users || $recent_users->num_rows === 0): ?>
+                    <p class="admin-dashboard-directory-card__empty">ยังไม่มีข้อมูลพนักงาน</p>
+                <?php else: ?>
+                    <?php while ($employee = $recent_users->fetch_assoc()): ?>
+                        <?php
+                        $employee_name = trim((string) ($employee['user_name'] ?? ''));
+                        $employee_initial = function_exists('mb_substr') ? mb_substr($employee_name, 0, 1, 'UTF-8') : substr($employee_name, 0, 1);
+                        $employee_role = $dashboard_employee_role_labels[(string) ($employee['user_role'] ?? '')] ?? 'ไม่ทราบสิทธิ์';
+                        $employee_edit_url = app_system_url('admin/user_edit.php?id=' . urlencode((string) ($employee['user_id'] ?? '')));
+                        ?>
+                        <article class="admin-dashboard-directory-item">
+                            <span class="admin-dashboard-directory-item__avatar admin-dashboard-directory-item__avatar--employee"><?= h($employee_initial !== '' ? $employee_initial : '-') ?></span>
+                            <div class="admin-dashboard-directory-item__copy">
+                                <strong><?= h($employee_name !== '' ? $employee_name : '-') ?></strong>
+                                <span><?= h($employee_role) ?></span>
+                            </div>
+                            <a class="admin-dashboard-directory-item__edit" href="<?= h($employee_edit_url) ?>">แก้ไข</a>
+                        </article>
+                    <?php endwhile; ?>
+                <?php endif; ?>
+            </div>
+        </section>
+    </section>
+</main>
 
 <?php layout_footer(); ?>

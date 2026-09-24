@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     code: document.querySelector('[data-detail-code]'),
     phone: document.querySelector('[data-detail-phone]'),
     email: document.querySelector('[data-detail-email]'),
-    created: document.querySelector('[data-detail-created]'),
     address: document.querySelector('[data-detail-address]'),
     edit: document.querySelector('[data-detail-edit]')
   };
@@ -40,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setText(fields.code, data.userId);
     setText(fields.phone, data.userPhone);
     setText(fields.email, data.userEmail);
-    setText(fields.created, data.userCreated);
     setText(fields.address, data.userAddress);
 
     if (fields.role) {

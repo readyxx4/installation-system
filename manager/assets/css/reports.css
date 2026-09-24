@@ -737,7 +737,7 @@ body.app-body.role-1:has(.manager-report-page) .report-panel:hover::before {
         padding: 0;
     }
 
-    body.app-body.role-1:has(.manager-report-page) .manager-report-page > .report-print-document-header {
+    body.app-body.role-1:has(.manager-report-page) .manager-print-document .report-print-document-header {
         display: grid !important;
         grid-template-columns: minmax(0, 1fr) auto;
         align-items: center;
@@ -748,6 +748,20 @@ body.app-body.role-1:has(.manager-report-page) .report-panel:hover::before {
         border-bottom: 1px solid #cbd5e1;
         break-inside: avoid;
         page-break-inside: avoid;
+    }
+
+    .manager-print-document > thead {
+        display: table-header-group;
+    }
+
+    .manager-print-document > tbody {
+        display: table-row-group;
+    }
+
+    .manager-print-document > thead > tr > td,
+    .manager-print-document > tbody > tr > td {
+        padding: 0;
+        vertical-align: top;
     }
 
     body.app-body.role-1:has(.manager-report-page) .manager-report-page > .report-header {
@@ -786,7 +800,7 @@ body.app-body.role-1:has(.manager-report-page) .report-panel:hover::before {
 
     body.app-body.role-1:has(.manager-report-page) .report-print-company-name,
     body.app-body.role-1:has(.manager-report-page) .report-print-company-address,
-    body.app-body.role-1:has(.manager-report-page) .report-print-company-tax,
+    body.app-body.role-1:has(.manager-report-page) .report-print-company-identifiers,
     body.app-body.role-1:has(.manager-report-page) .report-print-meta h2,
     body.app-body.role-1:has(.manager-report-page) .report-print-meta p {
         margin: 0;
@@ -800,13 +814,20 @@ body.app-body.role-1:has(.manager-report-page) .report-panel:hover::before {
     }
 
     body.app-body.role-1:has(.manager-report-page) .report-print-company-address,
-    body.app-body.role-1:has(.manager-report-page) .report-print-company-tax {
+    body.app-body.role-1:has(.manager-report-page) .report-print-company-identifiers {
         max-width: 72ch;
         margin-top: 3px;
         color: #475569;
         font-size: 10px;
         line-height: 1.45;
         overflow-wrap: anywhere;
+    }
+
+    body.app-body.role-1:has(.manager-report-page) .report-print-company-identifiers {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        white-space: nowrap;
     }
 
     body.app-body.role-1:has(.manager-report-page) .report-print-meta {
@@ -858,9 +879,101 @@ body.app-body.role-1:has(.manager-report-page) .report-panel:hover::before {
         page-break-inside: avoid;
     }
 
+    .manager-report-page .manager-technician-clustered-card,
+    .manager-report-page .manager-technician-cluster-bar {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .manager-report-page .manager-technician-cluster-bar {
+        box-sizing: border-box;
+        background: transparent !important;
+        border-style: solid;
+        border-width: 0 15px;
+    }
+
+    .manager-report-page .manager-technician-cluster-bar.is-assigned {
+        border-color: #2563eb;
+    }
+
+    .manager-report-page .manager-technician-cluster-bar.is-completed {
+        border-color: #16a34a;
+    }
+
     .manager-report-page .report-table-panel {
         break-inside: auto;
         page-break-inside: auto;
+    }
+
+    /* The shared report table card clips its edge-to-edge table wrapper on paper. */
+    .manager-report-page .manager-technician-summary-panel,
+    .manager-report-page .manager-report-table-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: visible !important;
+        border-radius: 0 !important;
+        box-sizing: border-box;
+    }
+
+    .manager-report-page .manager-technician-summary-panel .report-table-wrap,
+    .manager-report-page .manager-report-table-panel .report-table-wrap {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 10px 10px;
+        overflow: visible !important;
+        box-sizing: border-box;
+    }
+
+    .manager-report-page .manager-technician-summary-table,
+    .manager-report-page .manager-report-table {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box;
+    }
+
+    .manager-report-page .manager-technician-summary-table th,
+    .manager-report-page .manager-technician-summary-table td,
+    .manager-report-page .manager-report-table th,
+    .manager-report-page .manager-report-table td {
+        padding: 6px 8px;
+        box-sizing: border-box;
+    }
+
+    .manager-report-page .manager-report-table td:nth-child(2),
+    .manager-report-page .manager-report-table td:nth-child(3) {
+        max-width: none;
+        overflow: visible;
+        text-overflow: clip;
+    }
+
+    .manager-report-page .manager-report-metric-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .manager-report-page .manager-report-summary-card {
+        min-height: 74px;
+        padding: 9px;
+        gap: 7px;
+    }
+
+    .manager-report-page .manager-report-summary-card .report-metric-copy > span {
+        overflow: visible;
+        font-size: 9.5px;
+        line-height: 1.15;
+        text-overflow: clip;
+        white-space: normal;
+    }
+
+    .manager-report-page .manager-report-summary-card .report-metric-copy strong {
+        overflow: visible;
+        font-size: 19px;
+        line-height: 1.1;
+        text-overflow: clip;
     }
 
     .manager-report-table {
@@ -873,5 +986,14 @@ body.app-body.role-1:has(.manager-report-page) .report-panel:hover::before {
     .manager-report-table td {
         white-space: normal !important;
         overflow-wrap: anywhere;
+    }
+
+    .manager-report-page .report-table thead {
+        display: table-header-group;
+    }
+
+    .manager-report-page .report-table tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
 }
